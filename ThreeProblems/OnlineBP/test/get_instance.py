@@ -69,7 +69,7 @@ class GetData():
 
     def get_instances(self,capacity,size):
         opt_num_bins = {}
-        self.datasets = self.read_dataset_from_file('../weibull_instances/test_dataset_'+size+'.pkl')
+        self.datasets = self.read_dataset_from_file('../instances/test_dataset_'+size+'.pkl')
         for test_num in range(len(self.datasets)):
             test_key = f'test_{test_num}'
             self.datasets['Weibull '+size][test_key]['capacity'] = capacity

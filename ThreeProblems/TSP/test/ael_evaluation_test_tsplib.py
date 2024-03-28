@@ -17,7 +17,7 @@ class Evaluation():
 
         #self.coords,self.instances,self.opt_costs = readTSPLib.read_instance_all(self.instance_path)
         m = 50 # neighborhood size
-        instances_path = "../instance/TSPLib200"
+        instances_path = path+"/../instances/TSPLib200"
         coords = []
         instances = []
         neighbors = []

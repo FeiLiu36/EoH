@@ -12,7 +12,7 @@ class Evaluation():
         self.ite_max = 1000 # maximum number of local searchs in GLS for each instance
         self.perturbation_moves = 1 # movers of each edge in each perturbation
         path = os.path.dirname(os.path.abspath(__file__))
-        self.instance_path = path+'../instance/TSP50.pkl' #,instances=None,instances_name=None,instances_scale=None
+        self.instance_path = path+'/../instances/TSP50.pkl' #,instances=None,instances_name=None,instances_scale=None
         self.debug_mode=False
 
         self.coords,self.instances,self.opt_costs = readTSPRandom.read_instance_all(self.instance_path)
