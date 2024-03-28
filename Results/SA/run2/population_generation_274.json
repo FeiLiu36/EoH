@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    max_capacity = np.max(bins)\n\n    scores = (remaining_capacity**2 + max_capacity**2) / (max_capacity + 1)\n\n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the score for each bin based on the remaining capacity, the inverse of the sum of the remaining capacity and the item size, and a regularization term that penalizes bins with large remaining capacities, using a modified penalty factor that increases the penalties for bins with remaining capacities closer to the maximum capacity compared to the previous algorithm.\n\nHere is the modified implementation of the algorithm in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the remaining capacity\n    remaining_capacity = bins - item\n    \n    # Calculate the inverse of the sum of remaining capacity and item size\n    inv_sum_weight = 1 / (remaining_capacity + item)\n    \n    # Calculate the penalty factor for bins close to maximum capacity (with higher penalty)\n    penalty_factor = np.exp(-np.square(remaining_capacity) / np.square(np.max(bins)))\n    \n    # Calculate the regularization term to penalize bins with large remaining capacities\n    regularization_term = np.exp(-np.square(remaining_capacity) / np.square(np.mean(bins)))\n    \n    # Initialize an array to store the scores\n    scores = np.zeros_like(bins)\n    \n    # Calculate the scores for each bin\n    scores[bins >= item] = np.multiply(np.multiply(inv_sum_weight[bins >= item], penalty_factor[bins >= item]), regularization_term[bins >= item])\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

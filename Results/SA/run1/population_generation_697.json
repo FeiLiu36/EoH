@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "My new algorithm calculates the scores for the bins by taking the element-wise division of the remaining capacities of the bins by the item size, subtracting the maximum value across all bins from the obtained quotients, normalizing the scores by dividing them by the sum of quotients, and finally multiplies the scores by a factor based on the square root of the item size.\n\nUpdated implementation in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    \"\"\"Create a new algorithm that calculates the scores for the bins\n    by taking the element-wise division of the remaining capacities of the bins by the item size,\n    subtracts the maximum value across all bins from the obtained quotients,\n    normalizes the scores by dividing them by the sum of quotients,\n    and finally multiplies the scores by a factor based on the square root of the item size.\"\"\"\n    \n    # Calculate the element-wise division of the remaining capacities of the bins by the item size\n    quotients = np.divide(bins, item)\n\n    # Subtract the maximum value across all bins from the obtained quotients\n    subtracted_quotients = np.subtract(quotients, np.max(quotients))\n\n    # Normalize the scores by dividing them by the sum of quotients\n    normalized_scores = subtracted_quotients / np.sum(subtracted_quotients)\n\n    # Multiply the scores by a factor based on the square root of the item size\n    scores = normalized_scores * np.sqrt(item)\n\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the scores for the bins by subtracting the inverse of the item size from the inverse of the bin capacities, and then adds the maximum score multiplied by the item size to each score and returns it as the scores for the bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    inverse_item = 1.0 / item\n    inverse_bins = 1.0 / bins\n    \n    scores = inverse_bins - inverse_item\n    scores += np.max(scores) * item\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

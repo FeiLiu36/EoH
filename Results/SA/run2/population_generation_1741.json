@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "Algorithm Description: The new algorithm assigns scores to the bins based on the square root of the product of the bin capacity and the item size, divided by the difference between the bin capacity and the item size.\n\nPython Implementation:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the differences between the bin capacity and the item size\n    differences = bins - item\n    \n    # Calculate the product of the bin capacity and the item size\n    product = bins * item\n    \n    # Calculate the square root of the product\n    sqrt_product = np.sqrt(product)\n    \n    # Avoid division by zero\n    differences += (differences == 0)\n    \n    # Calculate the modified scores for the bins\n    scores = sqrt_product / differences\n    \n    return scores",
+          "objective": 0.04306,
+          "other_inf": null
+     }
+]

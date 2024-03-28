@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm description: The modified algorithm will calculate the score for each bin by taking the product of the remaining capacity of the bin and the square of the reciprocal of the difference between the remaining capacity and the size of the item, and then return the scores as a Numpy array.\n\nCode:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins * (1 / ((bins - item) ** 2))).astype(float)\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

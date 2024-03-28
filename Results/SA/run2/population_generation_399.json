@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm assigns a score to each bin based on the remaining capacity, the ratio of the item size to the remaining capacity, a scaling factor calculated based on the average remaining capacity, a penalty factor for bins that are at maximum capacity, and an additional factor that penalizes bins with remaining capacity higher than a certain threshold. The scores are then sorted in descending order.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    ratio_capacity = item / remaining_capacity\n\n    avg_remaining_capacity = np.mean(remaining_capacity)\n    scale_factor = 0.5  # Predetermined scale factor\n\n    weighting_factor = (avg_remaining_capacity * scale_factor) / remaining_capacity\n    penalty_factor = np.where(remaining_capacity == np.max(remaining_capacity), -1, 0)  # Penalty factor for bins at maximum capacity\n    \n    threshold = 0.8 * np.max(bins)  # Threshold for penalizing high remaining capacity\n    high_capacity_penalty = np.where(remaining_capacity > threshold, -0.5, 0)  # Penalty factor for high remaining capacity\n    \n    scores = ratio_capacity + weighting_factor + penalty_factor + high_capacity_penalty\n    \n    sorted_scores = np.sort(scores)[::-1]\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

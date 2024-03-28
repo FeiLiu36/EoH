@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm assigns scores to the bins based on the square root of the remaining capacity divided by the square root of the item size factor, and normalized by the square root of the maximum remaining capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacity = max_capacity - bins\n\n    scores = np.sqrt(remaining_capacity) / np.sqrt(item) / np.sqrt(max_capacity)\n\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

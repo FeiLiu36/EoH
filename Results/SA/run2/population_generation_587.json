@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm description: In the new algorithm, we modify the scoring function by assigning scores to the bins based on their remaining capacity relative to a threshold value. Bins with remaining capacity below the threshold will receive bonus scores, while bins with remaining capacity above the threshold will receive penalty scores. The final scores for the bins are calculated by combining the base scores, bonus scores, and penalty scores.\n\nNew algorithm implementation:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    num_bins = len(bins)\n    \n    # Calculate base scores\n    base_scores = 1 - bins / item\n    \n    # Define threshold as a percentage of the maximum capacity\n    threshold = 0.8\n    \n    # Calculate bonus for bins with remaining capacity below the threshold\n    bonus_scores = np.where(bins < threshold * np.max(bins), (1 - bins / (threshold * np.max(bins))) ** 2, 0)\n    \n    # Calculate penalty for bins with remaining capacity above the threshold\n    penalty_scores = np.where(bins > threshold * np.max(bins), (bins / (threshold * np.max(bins))) ** 2, 0)\n    \n    # Calculate final scores by combining base scores, bonus scores, and penalty scores\n    scores = base_scores + bonus_scores - penalty_scores\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

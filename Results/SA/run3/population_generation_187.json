@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm: \n1. Calculate the inverse of the difference between the remaining capacity and the item size, raised to the power of 4 and multiplied by a factor of 10.\n2. Calculate the absolute difference between the logarithms of the remaining capacity divided by the item size and a constant value (10).\n3. Square the absolute difference and multiply it by a factor of 100.\n4. Generate the scores for each bin by comparing the remaining capacity with the item size. If the remaining capacity is greater than or equal to the item size, assign a very high score (1e9), otherwise assign the sum of the inverse difference and the squared absolute difference.\n5. Return the scores for the bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    inverse_difference = 10 * (1 / np.abs(remaining_capacity - item))**4\n    logarithm_difference = np.abs(np.log(remaining_capacity / item) - 10)\n    squared_difference = 100 * np.square(logarithm_difference)\n    scores = np.where(remaining_capacity >= item, np.full_like(remaining_capacity, 1e9), inverse_difference + squared_difference)\n    return scores",
+          "objective": 0.01358,
+          "other_inf": null
+     }
+]

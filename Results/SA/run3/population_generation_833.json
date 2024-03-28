@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the score for each bin by taking the ratio between the remaining capacity and the item size, applying a logarithmic function to this ratio, multiplying it by a constant factor, and subtracting it from the ratio between the remaining capacity and the maximum capacity, while also considering the standard deviation of the remaining capacities for all bins as a penalty factor.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n\n    # Define constant factor\n    constant_factor = 0.7\n\n    # Calculate the score for each bin\n    ratio = remaining_capacity / item\n    log_ratio = np.log(ratio)\n    penalty_factor = np.std(remaining_capacity)\n    scores = ratio - (log_ratio * constant_factor * penalty_factor)\n\n    # Assign maximum scores for bins with remaining capacity >= item size\n    scores = np.where(remaining_capacity >= item, np.inf, scores)\n\n    return scores",
+          "objective": 0.01368,
+          "other_inf": null
+     }
+]

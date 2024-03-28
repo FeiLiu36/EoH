@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New Algorithm Description: The \"Weighted Score Function\" assigns scores to the bins using a weighted score function that takes into account the rest capacity of each bin and the average capacity of all bins, with a specific weight assigned to each term in the scoring equation.\n\nCode:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate statistics\n    max_capacity = np.max(bins)\n    average_capacity = np.mean(bins)\n\n    # Additional variables\n    weight_exp = 0.3\n    weight_lin = 0.2\n    weight_log = 0.1\n    weight_ratio = 0.1\n    weight_quad = 0.1\n    weight_power = 0.2\n\n    # Scoring terms\n    exponential_term = np.exp(-(bins - item) / average_capacity)\n\n    linear_term = (bins - item) / average_capacity\n\n    logarithmic_term = np.log(1 + (bins - item) / average_capacity)\n\n    ratio_term = np.power(bins / (bins - item), 2)\n\n    quadratic_term = np.zeros_like(bins)\n    quadratic_term[:7] = (bins[:7] ** 2) / 4\n\n    power_factor = np.power(\n        weight_power * np.power((bins - item) / average_capacity, 2),\n        np.arange(1, len(bins) + 1)\n    )\n\n    scores = (\n        weight_exp * exponential_term\n        + weight_lin * linear_term\n        + weight_log * logarithmic_term\n        + weight_ratio * ratio_term\n        + weight_quad * quadratic_term\n        + power_factor\n    ) / (\n        weight_exp\n        + weight_lin\n        + weight_log\n        + weight_ratio\n        + weight_quad\n        + weight_power * np.sum(np.power(np.abs(bins - item) / average_capacity, 2))\n    )\n\n    return scores",
+          "objective": 0.00704,
+          "other_inf": null
+     }
+]

@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "Algorithm description: The new algorithm assigns scores to the bins by taking the reciprocal of the sum of the bin capacities divided by the square root of the item size, multiplied by the natural logarithm of the item size, divided by the sum of the bin capacities, then multiplied by the logarithm of the maximum bin capacity, and adding the sum of the bin capacities divided by the absolute difference between the maximum bin capacity and the item size.\n\nCode:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.reciprocal(np.sum(bins) / np.sqrt(item)) * np.log(item) / np.sum(bins) * np.log(np.max(bins)) + np.sum(bins) / np.abs(np.max(bins) - item)\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

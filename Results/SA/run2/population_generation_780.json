@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "\nNew algorithm description: The new algorithm assigns scores to the bins based on the product of the ratio of the rest capacity of each bin to the maximum capacity and the square root of the item size divided by the rest capacity plus a small constant epsilon to avoid division by zero errors. The final scores are adjusted to ensure self-consistency by dividing them by the maximum value, and the output scores are sorted in descending order.\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the ratio of the rest capacity to the maximum capacity of each bin\n    ratio_capacity = bins / np.max(bins)\n\n    # Calculate the square root of the item size divided by the rest capacity plus epsilon\n    epsilon = 1e-8\n    sqrt_division = np.sqrt(item / (bins + epsilon))\n\n    # Calculate the scores based on the ratio of capacity and the square root of the item size\n    scores = ratio_capacity * sqrt_division\n\n    # Adjust the scores to ensure self-consistency by dividing them by the maximum value\n    scores = scores / np.max(scores)\n\n    # Sort the scores in descending order\n    scores = np.sort(scores)[::-1]\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

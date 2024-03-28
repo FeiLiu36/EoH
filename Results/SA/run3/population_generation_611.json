@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the score for each bin based on a modified formula by adding a third-degree polynomial term, a logarithmic term, and a square root term to the original algorithm.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n\n    # Calculate the reciprocal of the third-degree polynomial of the remaining capacity\n    third_degree = 1 / ((remaining_capacity ** 3) + 1)\n\n    # Calculate the logarithm of the remaining capacity squared\n    log_capacity = np.log(remaining_capacity ** 2)\n\n    # Calculate the square root of the remaining capacity\n    square_root = np.sqrt(remaining_capacity)\n\n    # Multiply the third degree, logarithmic, and square root terms\n    score_step4 = third_degree * log_capacity * square_root\n\n    # Add the product of the third degree and the square root term to the scores\n    scores_step5 = score_step4 + (third_degree * square_root)\n\n    # Assign maximum scores for bins with remaining capacity >= item size\n    scores_step6 = np.where(remaining_capacity >= item, np.inf, scores_step5)\n\n    # Multiply scores with mask to make scores of unused bins equal to 0\n    scores = scores_step6 * (1 - np.where(remaining_capacity == bins, 1, 0))\n\n    return scores",
+          "objective": 0.01358,
+          "other_inf": null
+     }
+]

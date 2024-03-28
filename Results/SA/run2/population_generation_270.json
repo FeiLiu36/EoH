@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "My new algorithm uses a combination of a logarithmic score and a linear score to assign items to bins. In each step, the scores are calculated by dividing the logarithm of the remaining capacity of the bin by the item size, multiplying it by a linear score which is the maximum capacity minus the remaining capacity, and then adding a small constant. The scores are returned in descending order.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    max_capacity = np.max(bins)\n\n    scores = ((np.log(remaining_capacity) / item) * (max_capacity - remaining_capacity)) + 0.001\n\n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm, named \"Modified Rank Score Algorithm,\" assigns scores to the bins based on a modified rank formula that takes into account the remaining capacities of the bins, the number of items already present in each bin, and a penalization factor for bins close to reaching their maximum capacity. The algorithm aims to prioritize bins with larger remaining capacities and minimize the number of used bins by assigning higher scores to bins that have both a larger remaining capacity and fewer items already present. The rank factor allows for more fine-tuning of the scores and emphasizes the impact of the penalization factor.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the remaining capacities of the bins\n    remaining_capacity = bins - item\n\n    # Convert remaining capacity to a rank-like score\n    rank_scores = np.max(remaining_capacity) - remaining_capacity + 1\n\n    # Calculate the score based on the rank scores, the number of items already present, and the penalization factor\n    scores = rank_scores * (1 - np.count_nonzero(bins) / bins.size) * np.exp(-(np.max(bins) - bins) / np.max(bins))\n\n    # Minimize the score of bins with remaining capacity equal to the maximum capacity\n    max_capacity = np.max(bins)\n    scores[bins == max_capacity] = -np.inf\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

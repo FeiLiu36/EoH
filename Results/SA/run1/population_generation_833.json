@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm:\n\nThe new algorithm scores the bins for assignment by taking the logarithm of the item size divided by the rest capacity of the bins, multiplied by the cube root of the inverse of the bin capacity, with an additional scaling factor that is equal to the cube root of the maximum bin capacity divided by the item size. The scores are then sorted in descending order.\n\nPython implementation:\n``` ",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    log_ratio = np.log(item / bins)\n    inverse_bin_capacity = 1 / np.cbrt(bins)\n    scaling_factor = np.cbrt(max_capacity) / np.cbrt(item)\n    \n    scores = log_ratio * inverse_bin_capacity * scaling_factor\n    sorted_scores = np.sort(scores)[::-1]\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

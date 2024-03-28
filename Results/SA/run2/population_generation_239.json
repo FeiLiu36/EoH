@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the product of the cumulative sum of the remaining capacity for each bin (after deducting the item size) and the square root of the normalized remaining capacity of each bin by dividing the maximum capacity of the bins by the remaining capacity, and assigns it to a variable called 'cumulative_product_square_root'. \n\nNext, it calculates the cumulative product of the 'cumulative_product_square_root' array and assigns it to a variable called 'cumulative_product'. \n\nThen, it calculates the scores for each bin by multiplying the 'cumulative_product' array by the 'cumulative_squared' array from the original algorithm. \n\nThe scores are then sorted in descending order and returned. \n\nFinally, a check is performed to ensure that no bin with a remaining capacity equal to the maximum capacity is used.\nCode:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    remaining_capacity = bins - item\n\n    cumulative_squared = np.cumsum(remaining_capacity)**2\n    cumulative_product_square_root = cumulative_squared * np.sqrt(max_capacity / remaining_capacity)\n    cumulative_product = np.cumprod(cumulative_product_square_root)\n\n    scores = cumulative_product * cumulative_squared\n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n\n    if remaining_capacity[int(sorted_indices[0])] == max_capacity:\n        scores[0] = 0\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm will assign scores to the bins based on a modified version of the original algorithm. It will calculate the difference between the rest capacity of a bin and the size of the current item, and then apply a series of mathematical operations to obtain the scores. The scores will be sorted in descending order and returned as the final output.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    scaling_factor = 0.7\n    \n    max_capacity = np.max(bins)\n    \n    difference = item - bins\n    abs_difference = np.abs(difference)\n    \n    penalty = scaling_factor * np.exp(-abs_difference) / (max_capacity * max_capacity + 1)\n    \n    reward = scaling_factor * np.exp(-abs_difference) / (max_capacity * max_capacity + 1)\n    \n    std_deviation = np.std(bins)\n    \n    balanced_term = scaling_factor * (1 / (difference / (bins * bins + 1))) - scaling_factor * (1 / (std_deviation * std_deviation + 1))\n    \n    log_term = scaling_factor * np.log(np.abs(bins)) / (np.log(max_capacity) + 1)\n    \n    promotion_term = scaling_factor * (std_deviation / max_capacity)\n    \n    scores = penalty + reward + balanced_term + log_term + promotion_term\n    \n    sorted_scores = np.sort(scores)[::-1]\n    \n    return scores",
+          "objective": 0.0163,
+          "other_inf": null
+     }
+]

@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm I propose involves calculating the scores for bin assignment by taking the reciprocal of the absolute difference between the item size and the rest capacity of each bin, and multiplying it by a scaling factor that is equal to the ratio between the maximum bin capacity and the item size. The scores are then sorted in descending order.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    difference = np.abs(item - bins)\n    scaling_factor = max_capacity / item\n    \n    scores = 1 / difference * scaling_factor\n    sorted_scores = np.sort(scores)[::-1]\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

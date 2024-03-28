@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm is based on a function that combines a quadratic function of the remaining capacity and a linear function of the modified exponential ratio. It then applies a logarithmic transformation to the scores and returns them in descending order.\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    max_remaining_capacity = np.max(bins)\n    modified_ratio = np.exp(remaining_capacity) / np.exp(max_remaining_capacity)\n    \n    # Constants for adjusting importance of each term in the scoring formula\n    quadratic_factor = 0.6\n    linear_factor = 0.4\n    \n    quadratic_term = quadratic_factor * np.square(remaining_capacity)\n    linear_term = linear_factor * modified_ratio\n    \n    scores = np.log(quadratic_term + linear_term)\n    \n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

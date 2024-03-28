@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "\nThe new algorithm calculates the score for each bin based on the ratio of the remaining capacity to the square root of the sum of the item size and the bin capacity, multiplied by the ratio of the maximum capacity to the total sum of the capacities of all the bins, with a constant added. The scores are then normalized to have values between 0 and 1 and sorted in descending order before being returned as the scores for the bins.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity_ratio = bins / np.sqrt(item + bins)\n    capacity_ratio_sum = np.max(bins) / np.sum(bins) + 1\n    \n    constant = 0.5\n    scores = remaining_capacity_ratio * capacity_ratio_sum + constant\n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n    scores /= np.max(scores)\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

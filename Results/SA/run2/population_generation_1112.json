@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the score for each bin based on a combination of the remaining capacity, a penalty factor that increases as the remaining capacity approaches the maximum capacity, and a regularization term to penalize bins with large remaining capacities. However, in this modified version, the penalty factor is calculated using a sigmoid function, and the regularization term is normalized by subtracting the minimum value and dividing by the range to ensure values are between 0 and 1.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the remaining capacity\n    remaining_capacity = bins - item\n    \n    # Calculate the penalty factor for bins close to maximum capacity (with higher penalty)\n    penalty_factor = 1 / (1 + np.exp(-(remaining_capacity - 0.9*np.max(bins))))\n    \n    # Calculate the regularization term to penalize bins with large remaining capacities and normalize it\n    regularization_term = (remaining_capacity - np.min(remaining_capacity)) / np.ptp(remaining_capacity)\n    \n    # Initialize an array to store the scores\n    scores = np.zeros_like(bins)\n\n    # Calculate the scores for each bin\n    scores[bins >= item] = (\n        penalty_factor[bins >= item] * regularization_term[bins >= item]\n    )\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

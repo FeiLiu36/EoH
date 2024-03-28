@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "My new algorithm calculates the scores for each bin based on the following steps:\n1. Calculate the mean of the rest capacities of the bins.\n2. Calculate the square differences between the rest capacities of bins and the mean.\n3. Multiply the square differences by a fixed factor.\n4. Subtract the item size from the multiplied values.\n5. Add the maximum capacity of the bins.\n6. Return the calculated scores for each bin.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    mean_capacity = np.mean(bins) # Step 1\n    diffs = np.square(bins - mean_capacity) # Step 2\n    scores = (diffs * 5) - item # Step 3 and 4\n    scores += np.max(bins) # Step 5\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

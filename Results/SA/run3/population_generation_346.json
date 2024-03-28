@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm uses a combination of the remaining capacity of the bins and the relative difference between the item size and the bin size. It calculates the score by dividing the remaining capacity by the absolute difference between the item size and the bin size, and further adjusting it based on the ratio of the item size to the bin size. The algorithm aims to promote the assignment of items to bins with smaller size differences by applying a modified penalty term.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n\n    # Calculate the difference between the item size and the bin size\n    diff = np.abs(item - bins)\n\n    # Calculate the ratio of the item size to the bin size\n    ratio = item / bins\n\n    # Calculate the penalty for bins with smaller size differences\n    penalty = np.exp(ratio)\n\n    # Calculate the adjusted score based on the difference, the ratio, and the penalty\n    adjusted_score = (remaining_capacity / diff) * penalty\n\n    # Calculate the final scores, adjusting them based on the inverse of the remaining capacity of the bin\n    scores = np.where(remaining_capacity >= item, 1e9, adjusted_score / remaining_capacity)\n\n    return scores",
+          "objective": 0.01358,
+          "other_inf": null
+     }
+]

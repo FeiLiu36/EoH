@@ -1,0 +1,62 @@
+[
+     {
+          "algorithm": "The new algorithm assigns a score to each bin based on the ratio of the item size to the product of the remaining capacity of the bin raised to the power determined by its index, with a balanced penalty applied to bins with smaller capacities and a bonus for bins with larger capacities, in order to minimize the number of used bins. The algorithm also takes into consideration the total remaining capacity of all bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    bin_weights = np.ones(num_bins)\n    penalties = (1 / bins) ** (np.arange(1, num_bins + 1))\n    scores = item / ((bins - item) * penalties) * bin_weights\n    return scores",
+          "objective": 0.00674,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns a score to each bin based on the ratio of the item size to the product of the remaining capacity of the bin raised to the power determined by its index, with a balanced penalty applied to bins with smaller capacities and a bonus for bins with larger capacities, in order to minimize the number of used bins. The algorithm also takes into consideration the total remaining capacity of all bins. The scoring function is modified by adding a scaling factor to the penalties calculated based on the ratio of the total remaining capacity to the maximum bin capacity, aiming to prioritize bins with larger remaining capacities. \n\nHere is the implementation of the new score function in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    bin_weights = 1 / num_bins\n    bonus_penalties = 1\n    penalties = (1 / bins) ** (np.arange(1, num_bins + 1))\n    total_remaining_capacity = np.sum(bins)\n    max_bin_capacity = np.max(bins)\n    scaling_factor = total_remaining_capacity / max_bin_capacity\n    scaled_penalties = penalties * scaling_factor\n    scores = item / ((bins - item) * scaled_penalties) * bin_weights * bonus_penalties\n    return scores",
+          "objective": 0.00704,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns a score to each bin based on the logarithm of the product of the item size and the remaining capacity of the bin, raised to the power determined by its index, with an additional penalty term that promotes performance and minimizes the number of used bins. The penalty term is calculated as the difference between the maximum capacity of the bins and the remaining capacity, scaled by a factor determined by the index of the bin, and divided by the logarithm of the item size. The formula is implemented within a loop to calculate scores for each bin, and the scores are returned as a Numpy array.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    bin_index = np.arange(1, num_bins + 1)\n    scores = np.log(item * bins) ** bin_index / (bins - item) - (bins.max() - bins) * bin_index / (np.log(item))\n    return scores",
+          "objective": 0.00956,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: All of the provided algorithms assign a score to each bin based on the ratio of the item size to the product of the remaining capacity of the bin raised to a power determined by its index, with additional penalty terms to promote performance and minimize the number of used bins.\n\nNew algorithm description: The new algorithm assigns a score to each bin based on the sum of the item size and the square root of the remaining capacity of the bin, raised to the power determined by its index, with additional penalty terms that promote performance and minimize the number of used bins, and finally multiplied by a constant factor of 100.\n\nPython implementation:\n\n``` ",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    bin_index = np.arange(1, num_bins + 1)\n    bin_weights = (1 - bins / np.sum(bins))\n    penalty_terms = (bins.max() - bins) * bin_index / num_bins - np.sqrt(item)\n    scores = (item + np.sqrt(bins) ** bin_index / (bins - item) + penalty_terms) * 100\n    return scores",
+          "objective": 0.01056,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: The provided algorithms assign a score to each bin based on the product of the item size and a function of the remaining capacity of the bin, raised to the power determined by its index, with additional penalty terms that promote performance and minimize the number of used bins.\n\nNew algorithm description: The new algorithm assigns a score to each bin based on the product of the item size and the square root of the remaining capacity of the bin, raised to the power determined by its index, with an additional penalty term that promotes performance and minimizes the number of used bins. The penalty term is calculated as the sum of the difference between the maximum capacity of the bins and the remaining capacity, scaled by a factor determined by the index of the bin, subtracted by the cube root of the item size.\n\nPython implementation of the new score function:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    bin_index = np.arange(1, num_bins + 1)\n    penalty_terms = - np.cbrt(item)\n    scores = (item * np.sqrt(bins) ** bin_index / (bins - item) + penalty_terms) * 50\n    return scores",
+          "objective": 0.01067,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns a score to each bin based on the product of the item size and the square root of the remaining capacity of the bin, raised to the power determined by its index, with an additional penalty term that promotes performance and minimizes the number of used bins. The penalty term is calculated as the difference between the maximum capacity of the bins and the remaining capacity, scaled by a factor determined by the index of the bin. The formula is implemented within a loop to calculate scores for each bin and the scores are returned as a Numpy array.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    bin_index = np.arange(1, num_bins + 1)\n    scores = item * np.sqrt(bins) ** bin_index / (bins - item) - (bins.max() - bins) * bin_index / num_bins\n    return scores",
+          "objective": 0.01117,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns a score to each bin based on the product of the square root of the item size and the remaining capacity of the bin, raised to the power determined by its index, with an additional penalty term that promotes performance and minimizes the number of used bins. The penalty term is calculated as the difference between the maximum capacity of the bins and the remaining capacity, divided by the square root of the item size, and scaled by a factor determined by the index of the bin. The formula is implemented within a loop to calculate scores for each bin, and the scores are returned as a Numpy array.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    bin_index = np.arange(1, num_bins + 1)\n    penalty_terms = (bins.max() - bins) * bin_index / np.sqrt(item)\n    scores = np.sqrt(item) * np.sqrt(bins) ** bin_index / (bins - item) + penalty_terms\n    return scores",
+          "objective": 0.01127,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns a score to each bin based on the product of the item size and the logarithm of the remaining capacity of the bin, raised to the power determined by its index, with additional penalty terms that promote performance and minimize the number of used bins, and then multiplied by a constant factor of 50. The penalty terms are calculated as the sum of the difference between the maximum capacity of the bins and the remaining capacity, scaled by a factor determined by the index of the bin, subtracted by the square root of the item size.\n\nPython implementation of the new score function:\n\n```\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    bin_index = np.arange(1, num_bins + 1)\n    bin_weights = (1 - bins / np.sum(bins))\n    penalty_terms = (bins.max() - bins) * bin_index / num_bins - np.sqrt(item)\n    scores = (item * np.log(bins) ** bin_index / (bins - item) + penalty_terms) * 50\n    return scores",
+          "objective": 0.01137,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns a score to each bin based on the product of the square root of the item size and the natural logarithm of the remaining capacity of the bin, raised to the power determined by its index, with an additional penalty term that promotes performance and minimizes the number of used bins. The penalty term is calculated as the reciprocal of the bin index divided by the square of the bin capacity, and the final scores are multiplied by a constant factor of 100.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    bin_index = np.arange(1, num_bins + 1)\n    scores = np.sqrt(item) * np.log(bins) ** bin_index / (bins - item) + (1 / (bin_index * np.power(bins, 2))) * 100\n    return scores",
+          "objective": 0.01147,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns a score to each bin based on the logarithm of the remaining capacity of the bin, raised to the power determined by its index, with additional penalty terms that promote performance and minimize the number of used bins, and finally multiplied by a constant factor of 10.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    bin_index = np.arange(1, num_bins + 1)\n    bin_weights = (1 - bins) * 10\n    scores = (np.log(bins + 1) ** bin_index / (bins - item) + (1 / np.power(bin_index + 1, 2)) * bin_weights) * 10\n    return scores",
+          "objective": 0.01157,
+          "other_inf": null
+     }
+]

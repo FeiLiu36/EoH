@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "My new algorithm aims to assign a score to each bin by considering the ratio between the item size and the difference between each bin's capacity and the item size, while also taking into account the difference between the rest capacity of the bin and the average capacity of all bins, and promoting more balanced bin utilization.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    average_capacity = np.mean(bins)\n    capacity_difference = bins - item\n    scores = item / capacity_difference\n    scores += (bins - average_capacity) / average_capacity\n    return scores",
+          "objective": 0.03954,
+          "other_inf": null
+     }
+]

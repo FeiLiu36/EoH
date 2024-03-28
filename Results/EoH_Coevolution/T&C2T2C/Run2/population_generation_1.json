@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "The new algorithm assigns scores to the bins by multiplying the item size with the inverse of the rest capacity, taking into account the difference between the item size and the rest capacity, and prioritizing bins with lower indices, and returns the scores for each bin for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    N = len(bins)\n    \n    # Calculate the inverse of rest capacities\n    inv_caps = 1 / bins\n    \n    # Calculate the score for each bin\n    scores = item * inv_caps * (item - bins) * np.arange(N, 0, -1)\n    \n    return scores",
+          "objective": 0.03964,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns a score to each bin based on the product of the item size and the inverse of the square of the rest capacity, minimizing the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (item * (1 / (bins ** 2)))\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: The new algorithm assigns scores to the bins by dividing the inverse of the rest capacity by the difference between the item size and the rest capacity, taking into account the proximity to the item size and the inverse bin number, and returns the scores for each bin for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins, dtype=np.float64)\n    max_capacity = np.max(bins)\n    used_bins = np.count_nonzero(bins != max_capacity)\n\n    if used_bins == len(bins):\n        return scores\n\n    for i in range(len(bins)):\n        if bins[i] != max_capacity:\n            score = (1 / (max_capacity - bins[i])) / (item - bins[i])\n            scores[i] = score + (1 / (i + 1))\n\n    return scores",
+          "objective": 0.04095,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The score function will calculate the scores for each bin based on the remaining capacity, with a penalty for bins with maximum capacity to minimize the number of used bins.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = (max_capacity - bins) + (bins == max_capacity) * item\n    return scores",
+          "objective": 0.04105,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The common backbone idea in the provided algorithms is to calculate the score for each bin based on its rest capacity and/or the ratio of item size to capacity, and then assign the item to the bin with the maximum score.}\n\n{New algorithm:}\n\n{1. Calculate the score for each bin based on the logarithm of the rest capacity and the bin number, using a weighted average.}\n\n{2. Return the scores for the bins for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.log(bins) + np.arange(len(bins))\n    return scores",
+          "objective": 0.04216,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm:}\n\n{1. Calculate the score for each bin based on the reciprocal of its rest capacity and the square of the item size, using a weighted average.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.reciprocal(bins) * item**2\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm will calculate the score for each bin based on the ratio of the item size to the remaining capacity, taking into account the inverse of the bin number, and then return the scores for each bin for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (item / bins) * (1 / np.arange(1, len(bins) + 1))\n    return scores",
+          "objective": 0.04256,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on their rest capacities and assigns the item to the bin with the maximum score, minimizing the number of used bins, but additionally considers the number of items already assigned to each bin to adjust the scores.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros(len(bins))\n    max_capacity = np.max(bins)\n    \n    for i, bin_capacity in enumerate(bins):\n        if bin_capacity == max_capacity:\n            scores[i] = -np.inf\n        else:\n            scores[i] = bin_capacity - item - np.sum(bins[:i])\n    \n    return scores",
+          "objective": 0.04276,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nDescription: \nThe algorithm calculates the scores for each bin based on their rest capacities and assigns the item to the bin with the maximum score, minimizing the number of used bins.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = bins / np.maximum((bins - item), 1)\n    scores[bins == bins.max()] = 0\n    return scores",
+          "objective": 0.04306,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: The score function will calculate the scores for each bin based on the remaining capacity divided by the item size, prioritizing bins with higher ratios and lower indices, and returning the scores for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins / item) * (1 / np.arange(1, len(bins) + 1))\n    return scores",
+          "objective": 0.04407,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm:}\n\n{1. Calculate the score for each bin based on the inverse of the bin's rest capacity, squared, and the bin number, using a weighted average.}\n\n{2. Return the scores for the bins for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (1 / bins) ** 2 * np.arange(len(bins))\n    scores[bins == max(bins)] = -np.inf\n    return scores",
+          "objective": 0.0498,
+          "other_inf": null
+     },
+     {
+          "algorithm": "N",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = item * np.log(bins) / (bins - item)\n    scores[bins == item] = -np.inf\n    return scores",
+          "objective": 0.05071,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on the ratio of the item size to the remaining capacity, taking into account a weighted average using the reciprocal of the bin number, and returns the scores for each bin for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros(len(bins))\n    for i in range(len(bins)):\n        if bins[i] != item:\n            ratio = item / (bins[i] - item)\n            scores[i] = ratio / (i+1)\n    return scores",
+          "objective": 0.05131,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: \n1. Calculate the available capacity for each bin by subtracting the item size from the rest capacities of feasible bins. \n2. Set the score for each bin to 0 if the available capacity is less than the item size, otherwise set the score to the available capacity. \n3. If the rest capacity of a bin equals the maximum capacity, set the score to -1 to indicate that it will not be used. \n4. Return the scores for the bins for assignment. \n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    available_capacity = bins - item\n    scores = np.where(available_capacity < item, 0, available_capacity)\n    scores = np.where(bins == np.max(bins), -1, scores)\n    return scores",
+          "objective": 0.05795,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\n  The new algorithm will calculate the score for each bin based on the rest capacity, using a weighted average of the rest capacity and the inverse of the bin number, then return the scores for each bin for assignment. \n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    weights = np.arange(1, num_bins + 1)\n    normalized_capacity = 1 - (bins / np.max(bins))\n    scores = normalized_capacity * weights\n    return scores",
+          "objective": 0.05815,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: Calculating the scores based on the rest capacity of the bins and considering factors such as item size, proximity to item size, and inverse bin number.}\n\n{New algorithm description: The new algorithm assigns scores to the bins based on the product of the item size and the inverse of the rest capacity, considering the proximity to the item size and the inverse bin number, and returns the scores for each bin for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    inverse_bin_number = 1 / np.arange(1, len(bins) + 1)\n    proximity_to_item_size = np.abs(bins - item)\n\n    scores = item * inverse_bin_number * proximity_to_item_size / bins\n    scores[bins == np.max(bins)] = 0  # Setting score to 0 for bins with maximum capacity\n\n    return scores",
+          "objective": 0.06057,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Calculate the ratio of item size to each bin's rest capacity, and calculate the score for each bin based on the ratio and the condition of the rest capacity. If the ratio is greater than a threshold, assign a very low score to the bin. If the rest capacity of the bin is equal to the maximum capacity, assign a very low score to the bin. Return the scores for the bins for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = max(bins)\n    threshold = 0.5\n    scores = np.zeros_like(bins, dtype=np.float64)\n    \n    for i in range(len(bins)):\n        ratio = item / bins[i]\n        if ratio > threshold or bins[i] == max_capacity:\n            scores[i] = -1e9  # Assign a very low score\n        else:\n            scores[i] = ratio\n    \n    return scores",
+          "objective": 0.06399,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nDefine a function named score that takes in inputs 'item' and 'bins' and returns the output 'scores' as a Numpy array, implementing a novel scoring algorithm to assign the item to the bins with the maximum score while minimizing the number of used bins.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    feasible_bins = np.where(bins >= item)[0]\n    \n    if len(feasible_bins) == 0:\n        return scores\n    \n    min_capacity = np.min(bins[feasible_bins])\n    \n    for i in feasible_bins:\n        if bins[i] == min_capacity:\n            scores[i] = -1\n        else:\n            scores[i] = (bins[i] - item) / bins[i]\n    \n    return scores",
+          "objective": 0.06962,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The score function will calculate the scores for each bin based on the rest capacity, prioritizing bins with higher rest capacity and lower index, and returning a Numpy array of scores for assignment. \n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = bins * (bins == np.max(bins)) - (2 * np.arange(len(bins)))\n    return scores",
+          "objective": 0.07073,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nDescribe the algorithm:\nThe score function takes an input item size and an array of rest capacities of feasible bins, and returns an array of scores for the bins, where the item will be assigned to the bin with the maximum score in each step, with the goal of minimizing the number of used bins.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    valid_bins = bins[bins != item]  # remove bins with rest capacity equal to item size\n\n    for i in range(valid_bins.shape[0]):\n        scores[i] = valid_bins[i] - item\n\n    return scores",
+          "objective": 0.08693,
+          "other_inf": null
+     }
+]

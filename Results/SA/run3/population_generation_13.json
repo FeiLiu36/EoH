@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm scores each bin based on the difference between the remaining capacity and the item size, divided by the maximum capacity multiplied by a penalty term based on the ratio between the remaining capacity and the maximum capacity. If the remaining capacity is greater than or equal to the item size, the score is set to the penalty term multiplied by a very large positive value. If the item size is greater than the remaining capacity, the score is set to the penalty term multiplied by a very large negative value. The scores are then returned as a Numpy array.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacity = max_capacity - bins\n    penalty = remaining_capacity / max_capacity\n    scores = np.where(remaining_capacity >= item, penalty * 1e100, np.where(item > remaining_capacity, penalty * -1e100, (remaining_capacity - item) / (max_capacity * penalty)))\n    return scores",
+          "objective": 0.04105,
+          "other_inf": null
+     }
+]

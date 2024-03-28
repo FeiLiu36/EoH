@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "Algorithm: The new algorithm calculates the scores for the bins by dividing the remaining capacities of the bins after assigning the item by the maximum capacity, then taking the negative of the logarithm of the result. Finally, it sets the scores of bins that are not used to a large negative value.\n\nThe new algorithm I propose is as follows:\n- Create an array `sizes` with the size of `bins` and initialize it with the size of `item`.\n- Find the indices of bins that have remaining capacity greater than or equal to `sizes`.\n- Calculate the scores for the eligible bins based on the division of remaining capacities by the maximum capacity.\n- Set the scores of ineligible bins to a large negative value.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Create an array 'sizes' with the size of 'bins' and initialize it with 'item'\n    sizes = np.full_like(bins, item)\n    \n    # Find the indices of bins that have remaining capacity greater than or equal to 'sizes'\n    indices = np.where(bins >= sizes)[0]\n    \n    # Calculate the scores for the eligible bins based on the division of remaining capacities by the maximum capacity\n    scores = -np.log(bins[indices] / np.max(bins))\n    \n    # Create an array 'output_scores' with the size of 'bins' and initialize it with a large negative value\n    output_scores = np.full_like(bins, -np.inf)\n    \n    # Set the scores of eligible bins to their corresponding values in 'scores'\n    output_scores[indices] = scores\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

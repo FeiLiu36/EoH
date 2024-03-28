@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm description: The new algorithm calculates the scores for bin assignment by taking the element-wise product of the logarithm of the item size and the inverse of the bin capacities, and then multiplying by the ratio of the maximum bin capacity to the sum of the bin capacities. The scores are sorted in descending order.\n\nNew algorithm implementation in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    bin_capacities = np.log(bins)\n    total_capacity = np.sum(bins)\n\n    # Calculate the inverse of the bin capacities\n    inverse_capacity = 1.0 / bin_capacities\n\n    # Calculate the scores as the element-wise product of the logarithm of the item size\n    # and the inverse of the bin capacities\n    scores = np.log(item) * inverse_capacity\n\n    # Calculate the ratio of the maximum bin capacity to the sum of the bin capacities\n    max_to_sum_ratio = max_capacity / total_capacity\n\n    # Multiply the scores by the max_to_sum_ratio\n    scores *= max_to_sum_ratio\n\n    # Sort the scores in descending order\n    sorted_scores = np.sort(scores)[::-1]\n\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm description: The new algorithm calculates the scores for the bins by taking the element-wise product of the remaining capacities of the bins with the item size, subtracting the maximum value across all bins from the obtained products, normalizing the scores by dividing them by the sum of products, and finally multiplies the scores by a factor based on the logarithm of the item size.\n\nUpdated implementation in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    \"\"\"Create a new algorithm that calculates the scores for the bins\n    by taking the element-wise product of the remaining capacities of the bins with the item size,\n    subtracts the maximum value across all bins from the obtained products,\n    normalizes the scores by dividing them by the sum of products,\n    and finally multiplies the scores by a factor based on the logarithm of the item size.\"\"\"\n    \n    # Calculate the element-wise product of the remaining capacities of the bins with the item size\n    products = np.multiply(bins, item)\n\n    # Subtract the maximum value across all bins from the obtained products\n    subtracted_products = np.subtract(products, np.max(products))\n\n    # Normalize the scores by dividing them by the sum of products\n    normalized_scores = subtracted_products / np.sum(subtracted_products)\n\n    # Multiply the scores by a factor based on the logarithm of the item size\n    scores = normalized_scores * np.log(item)\n\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

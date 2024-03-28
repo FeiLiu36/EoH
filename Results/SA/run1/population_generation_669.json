@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the scores for the bins based on the exponential of the ratio of the remaining capacity of each bin to the maximum capacity, raised to the power of the item size, multiplied by the logarithm of the item size, then subtracts the maximum value across all bins from the obtained scores, finally normalizes the scores by dividing them by the sum of all scores.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    \"\"\"Create a new algorithm that calculates the scores for the bins based on the exponential of the ratio of the remaining capacity of each bin to the maximum capacity, raised to the power of the item size, multiplied by the logarithm of the item size, then subtracts the maximum value across all bins from the obtained scores, finally normalizes the scores by dividing them by the sum of all scores.\"\"\"\n\n    # Calculate the ratios of the remaining capacity of each bin to the maximum capacity\n    ratios = bins / np.max(bins)\n\n    # Raise the ratios to the power of the item size\n    powered_ratios = np.power(ratios, item)\n\n    # Multiply the powered ratios by the logarithm of the item size\n    scores = np.exp(powered_ratios * np.log(item))\n\n    # Subtract the maximum value across all bins from the scores\n    scores -= np.max(scores)\n\n    # Normalize the scores by dividing them by the sum of all scores\n    scores /= np.sum(scores)\n\n    return scores",
+          "objective": 0.03994,
+          "other_inf": null
+     }
+]

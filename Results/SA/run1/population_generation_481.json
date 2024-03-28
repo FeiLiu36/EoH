@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "Algorithm description: The new algorithm is a modified version of the original algorithm and follows these steps:\n- Calculate the weights for each bin by taking the logarithm of the item size and dividing it by the rest capacity.\n- Sort the weights array in ascending order.\n- Calculate the scores as the cumulative sum of the sorted weights.\n- Normalize the scores by dividing them by the maximum score.\n\nHere's the implementation of the new algorithm in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the weights for each bin\n    weights = np.log(item) / bins\n\n    # Sort the weights array in ascending order\n    weights_sorted = np.sort(weights)\n\n    # Calculate the scores as the cumulative sum of the sorted weights\n    scores = np.cumsum(weights_sorted)\n\n    # Normalize the scores by dividing them by the maximum score\n    scores /= np.max(scores)\n\n    return scores",
+          "objective": 0.04236,
+          "other_inf": null
+     }
+]

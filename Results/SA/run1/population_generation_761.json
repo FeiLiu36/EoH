@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the scores for the bins by dividing the item size by the bin capacities, and then multiplies it by the square of the item size and returns it as the scores for the bins.\n\nHere's the implementation of the new algorithm in Python:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = item / bins\n    scores *= item**2\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

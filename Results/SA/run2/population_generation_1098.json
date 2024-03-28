@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm description: The new algorithm assigns a score to each bin based on the remaining capacity, the ratio of the remaining capacity to the item size, a penalty factor that increases as the remaining capacity approaches the maximum capacity, a regularization term to penalize bins with large remaining capacities, and an additional factor that increases as the remaining capacity decreases.\n\nNew code:\n\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the remaining capacity\n    remaining_capacity = bins - item\n    \n    # Calculate the ratio of remaining capacity to item size\n    ratio = remaining_capacity / item\n    \n    # Calculate the penalty factor for bins close to maximum capacity (with higher penalty)\n    penalty_factor = (bins == np.max(bins)) * np.exp(-np.square(ratio))\n    \n    # Calculate the regularization term to penalize bins with large remaining capacities\n    regularization_term = np.exp(-np.square(remaining_capacity) / (np.mean(bins) * np.sqrt(item)))\n    \n    # Calculate the additional factor that increases as remaining capacity decreases\n    additional_factor = np.exp(-remaining_capacity)\n    \n    # Initialize an array to store the scores\n    scores = np.zeros_like(bins)\n    \n    # Calculate the scores for each bin\n    scores[bins >= item] = np.multiply(ratio[bins >= item], np.multiply(penalty_factor[bins >= item], np.multiply(regularization_term[bins >= item], additional_factor[bins >= item])))\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

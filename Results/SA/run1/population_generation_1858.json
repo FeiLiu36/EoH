@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm description: The \"Modified Exponential Score Function\" assigns scores to the bins using a modified exponential score function that incorporates the exponential distribution to determine the relative fitness of each bin for item assignment.\n\nNew code:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate statistics\n    max_capacity = np.max(bins)\n    average_capacity = np.mean(bins)\n    std_dev = np.std(bins)\n    \n    # Additional variables\n    power = 2\n    weight = 0.8\n    \n    # Scoring terms\n    linear_term = 1 - np.abs(item - bins) / average_capacity\n    \n    exponential_term = np.exp(np.abs(item - bins) / average_capacity)\n    \n    ratio_term = np.power(bins / (item - bins), power)\n    \n    exponential_dist = np.random.exponential(scale=std_dev, size=len(bins))\n    exponential_term_2 = np.exp(-((bins - item) / exponential_dist))\n    \n    quadratic_term = np.zeros_like(bins)\n    quadratic_term[:7] = (bins[:7] ** 2) / 4\n    \n    power_factor = np.power(\n        weight * np.power(np.abs(bins - item) / (average_capacity * std_dev), power),\n        np.arange(1, len(bins)+1)\n    )\n    \n    scores = (\n        linear_term\n        + exponential_term\n        + ratio_term\n        + exponential_term_2\n        + quadratic_term\n        + power_factor\n    ) / (\n        np.max(\n            linear_term\n            + exponential_term\n            + ratio_term\n            + exponential_term_2\n            + quadratic_term\n            + power_factor\n        )\n    )\n    \n    return scores",
+          "objective": 0.00745,
+          "other_inf": null
+     }
+]

@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm: The new algorithm assigns scores to the bins based on the sum of the rest capacities of each bin divided by the item size, the logarithm of the ratio of the item size to the maximum capacity, the square root of the ratio of the item size to the maximum capacity, and a penalty factor based on the square root of the inverse of the rest capacity of each bin. The final scores are normalized to ensure self-consistency.\n\nHere's the implementation of the new algorithm in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_rest_capacity = np.max(bins)\n    max_capacity = np.max([item, max_rest_capacity])\n    ratio = item / max_capacity\n    sqrt_ratio = np.sqrt(ratio)\n\n    # Calculate the penalty factor dynamically based on the square root of the inverse of the rest capacity of each bin\n    penalty_factor = np.sqrt(1 / bins)\n\n    # Calculate the adjusted scores based on the sum of the rest capacities of each bin divided by the item size,\n    # the logarithm of the ratio of the item size to the maximum capacity, the square root of the ratio of the item size\n    # to the maximum capacity, and the penalty factor\n    adjusted_scores = (np.sum(bins) / item) * np.log(ratio) * sqrt_ratio * penalty_factor\n    \n    # Normalize the adjusted scores to ensure self-consistency\n    scores = adjusted_scores / np.sum(adjusted_scores)\n\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

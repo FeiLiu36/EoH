@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the score for each bin based on the remaining capacities of the bins and the difference between the current item size and the bin capacity. The scores are further adjusted by a modified formula that takes into account the exponential sum of all remaining capacities, ensuring that bins with larger remaining capacities are penalized more. The scores are then scaled and normalized to a range between 0 and 1.\n\nHere's the implementation of the new algorithm:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    diff_capacity = np.abs(item - bins)\n\n    scores = np.exp(-diff_capacity / np.sum(remaining_capacity))\n\n    adjusted_scores = scores / np.sum(scores)\n    normalized_scores = (adjusted_scores - np.min(adjusted_scores)) / (np.max(adjusted_scores) - np.min(adjusted_scores))\n\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

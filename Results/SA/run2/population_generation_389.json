@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New Algorithm Description: Create a modified version of the algorithm that assigns a score to each bin based on the remaining capacity, the ratio of the item size to the remaining capacity, and a weighting factor calculated based on the sum of remaining capacities, the maximum remaining capacity, and a predetermined scale factor multiplied by the ratio of the item size to the maximum remaining capacity. The algorithm should also consider a penalty factor for bins that are at maximum capacity.\n\nNew Algorithm Code:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    ratio_capacity = item / remaining_capacity\n    penalty_factor = np.where(remaining_capacity == np.max(bins), -1, 0)  # Penalty factor for bins at maximum capacity\n    \n    sum_remaining_capacity = np.sum(remaining_capacity)\n    max_remaining_capacity = np.max(remaining_capacity)\n    scale_factor = 0.5  # Predetermined scale factor\n    weighting_factor = (remaining_capacity / sum_remaining_capacity) * (max_remaining_capacity * scale_factor) * (item / max_remaining_capacity)\n    \n    scores = ratio_capacity + weighting_factor + penalty_factor\n    \n    sorted_scores = np.sort(scores)[::-1]\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

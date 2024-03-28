@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "Main steps: Penalize bins with more than 30% of the item's capacity while increasing the penalty term; prioritize bins with less than 5% free capacity and decrease the priority term.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the maximum capacity of the bins\n    max_capacity = np.max(bins)\n    \n    # Calculate the remaining capacity of the bins\n    remaining_capacity = bins - item\n    \n    # Calculate the percentage of the item's capacity used by each bin\n    usage_percentage = (remaining_capacity / max_capacity) * 100\n    \n    # Calculate the penalty term based on the usage percentage\n    penalty_term = np.where(usage_percentage > 30, 100 - usage_percentage, 0)\n    \n    # Calculate the priority term based on the remaining capacity\n    priority_term = np.where(remaining_capacity < 5, 100 - remaining_capacity, 0)\n    \n    # Combine the penalty and priority terms to get the final score\n    scores = penalty_term + priority_term\n    \n    return scores",
+          "objective": 0.01751,
+          "other_inf": null
+     },
+     {
+          "algorithm": "A new algorithm to prioritize bins that have less than 10% free capacity and penalizing bins that have more than 40% of the item's capacity while increasing the penalty term .",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the percentage of free capacity for each bin\n    free_capacity = (bins - item) / bins\n    \n    # Penalize bins with more than 40% of the item's capacity\n    penalty = np.where(free_capacity > 0.4, 1, 0)\n    \n    # Prioritize bins with less than 10% free capacity\n    priority = np.where(free_capacity < 0.1, 1, 0)\n    \n    # Combine the penalty and priority scores\n    scores = penalty + priority\n    \n    return scores",
+          "objective": 0.01841,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Prioritizing bins with less than 10% free capacity and penalizing bins that have more than 40% of the item's capacity while decreasing the penalty term.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the free capacity of each bin\n    free_capacity = np.maximum(bins - item, 0)\n    \n    # Prioritize bins with less than 10% free capacity\n    priority = np.where(free_capacity < 0.1 * bins, 1, 0)\n    \n    # Penalize bins that have more than 40% of the item's capacity\n    penalty = np.where(free_capacity > 0.4 * item, 1, 0)\n    \n    # Decrease the penalty term for bins with less than 50% free capacity\n    penalty = np.where(free_capacity < 0.5 * bins, 0.5 * penalty, penalty)\n    \n    # Calculate the final score for each bin\n    scores = priority + penalty\n    \n    return scores",
+          "objective": 0.02073,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign priority to bins with close capacity to the size of the item, while penalizing bins with smaller capacities and omitting those with higher capacities.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the difference between the bin capacity and the item size\n    diff = np.abs(bins - item)\n    \n    # Penalize bins with smaller capacities\n    penalty = np.where(diff < 0.5 * item, 0.5 * diff, 0)\n    \n    # Calculate the score for each bin\n    scores = np.exp(-penalty / (0.5 * item))\n    \n    return scores",
+          "objective": 0.03059,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Prioritizing bins that have less than 20% free capacity and penalizing bins that have more than 60% of the item's capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the free capacity of each bin\n    free_capacity = np.maximum(bins - item, 0)\n    \n    # Prioritize bins with less than 20% free capacity\n    priority = np.where(free_capacity < 0.2 * bins, 1, 0)\n    \n    # Penalize bins with more than 60% of the item's capacity\n    penalty = np.where(free_capacity > 0.6 * item, 1, 0)\n    \n    # Calculate the score for each bin\n    scores = (priority + penalty) / (1 + penalty)\n    \n    return scores",
+          "objective": 0.03562,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm prioritizing bins with less than 20% free capacity and penalizing bins that have more than 30% of the item's capacity while decreasing the penalty term to zero for bins with less than 40% free capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the free capacity of each bin\n    free_capacity = np.maximum(bins - item, 0)\n    \n    # Prioritize bins with less than 20% free capacity\n    priority = np.where(free_capacity < 0.2 * bins, 1, 0)\n    \n    # Penalize bins that have more than 30% of the item's capacity\n    penalty = np.where(free_capacity > 0.3 * item, 1, 0)\n    \n    # Decrease the penalty term to zero for bins with less than 40% free capacity\n    penalty = np.where(free_capacity < 0.4 * bins, 0, penalty)\n    \n    # Calculate the final score for each bin\n    scores = priority + penalty\n    \n    return scores",
+          "objective": 0.03572,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Algorithm for minimizing the number of used bins: Prioritize bins that can fit the item leaving less than 20% free capacity, and penalize bins that leave more than 40% free capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the free capacity of each bin\n    free_capacity = bins - item\n    \n    # Prioritize bins that can fit the item leaving less than 20% free capacity\n    priority_bins = np.where(free_capacity < 0.2 * bins, 1, 0)\n    \n    # Penalize bins that leave more than 40% free capacity\n    penalty_bins = np.where(free_capacity > 0.4 * bins, 1, 0)\n    \n    # Combine the prioritization and penalization scores\n    scores = priority_bins + penalty_bins\n    \n    return scores",
+          "objective": 0.03582,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Prioritizing bins that have less than 25% free capacity and penalizing bins that have more than 75% of the item's capacity",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the free capacity of each bin\n    free_capacity = np.maximum(0, bins - item)\n    \n    # Calculate the score for each bin based on its free capacity\n    scores = np.where(free_capacity < 0.25 * bins, 1 + (0.25 - free_capacity / bins), 0)\n    scores = np.where(free_capacity > 0.75 * bins, 1 - (free_capacity - 0.75 * bins) / bins, scores)\n    \n    return scores",
+          "objective": 0.03632,
+          "other_inf": null
+     },
+     {
+          "algorithm": " Penalize bins with more than 20% excessive capacity and reward bins with more than 65% of their capacity, considering the item's size and the average capacity utilization of all bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the excess capacity of each bin\n    excess_capacity = bins - item\n    \n    # Calculate the percentage of excess capacity for each bin\n    percent_excess = excess_capacity / bins * 100\n    \n    # Penalize bins with more than 20% excess capacity\n    penalized_bins = np.where(percent_excess > 20, 0, 1)\n    \n    # Reward bins with more than 65% of their capacity\n    rewarded_bins = np.where(percent_excess > 65, 1, 0)\n    \n    # Combine the penalties and rewards\n    scores = penalized_bins + rewarded_bins\n    \n    return scores",
+          "objective": 0.03652,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Penalizing bins with more than 15% excessive capacity and rewarding bins with more than 75% of their capacity, considering the item's size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the excess capacity of each bin\n    excess_capacity = bins - item\n    \n    # Calculate the percentage of excess capacity for each bin\n    percent_excess = excess_capacity / bins * 100\n    \n    # Reward bins with more than 75% of their capacity\n    rewards = np.where(percent_excess > 75, 1, 0)\n    \n    # Penalize bins with more than 15% excess capacity\n    penalties = np.where(percent_excess > 15, -1, 0)\n    \n    # Combine rewards and penalties to get the final score\n    scores = rewards + penalties\n    \n    return scores",
+          "objective": 0.03753,
+          "other_inf": null
+     },
+     {
+          "algorithm": " Prioritize bins that can fit the item leaving less than 30% free capacity, penalized bins that have more than 30% free capacity, and assign a small bonus to bins that leave less than 10% free capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the free capacity of each bin\n    free_capacity = bins - item\n    \n    # Penalize bins with more than 30% free capacity\n    penalty = np.where(free_capacity > (bins * 0.3), 0, (bins * 0.3) - free_capacity)\n    \n    # Bonus for bins with less than 10% free capacity\n    bonus = np.where(free_capacity < (bins * 0.1), (bins * 0.1) - free_capacity, 0)\n    \n    # Calculate the total score for each bin\n    scores = penalty + bonus\n    \n    return scores",
+          "objective": 0.03803,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm: Reduce the favoring threshold for bins with capacities closely matching the item size by a variable amount.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the difference between the item size and the bin capacities\n    diff = np.abs(item - bins)\n    \n    # Calculate the favoring threshold based on the difference\n    fav_thresh = np.minimum(diff / (item + 1), 0.5)\n    \n    # Calculate the score for each bin\n    scores = np.zeros(len(bins))\n    for i in range(len(bins)):\n        if bins[i] >= item:\n            scores[i] = 1 - fav_thresh[i]\n        else:\n            scores[i] = 0\n    \n    return scores",
+          "objective": 0.03843,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Prioritize bins with less than 20% free capacity, and penalize bins with more than 60% of their capacity to prefer smaller capacity bins rather than larger ones.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the free capacity of each bin\n    free_capacity = np.maximum(0, bins - item)\n    \n    # Prioritize bins with less than 20% free capacity\n    priority = np.where(free_capacity < 0.2 * bins, 1, 0)\n    \n    # Penalize bins with more than 60% of their capacity\n    penalty = np.where(free_capacity > 0.6 * bins, 1, 0)\n    \n    # Calculate the score for each bin\n    scores = (priority + penalty) / (1 + penalty)\n    \n    return scores",
+          "objective": 0.03874,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Prioritizing bins with less than 10% free capacity and penalizing bins that have more than 50% of the item's capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the free capacity of each bin\n    free_capacity = np.maximum(0, bins - item)\n    \n    # Calculate the score for each bin based on its free capacity\n    scores = np.where(free_capacity < 0.1 * bins, 10 * (1 - free_capacity / bins), 0)\n    scores += np.where(free_capacity > 0.5 * bins, -5 * (free_capacity / bins - 0.5), 0)\n    \n    return scores",
+          "objective": 0.03884,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Prioritizing bins that have less than 10% free capacity and penalizing bins that have more than 90% of the item's capacity",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the free capacity of each bin\n    free_capacity = np.maximum(bins - item, 0)\n    \n    # Calculate the score for each bin based on its free capacity\n    scores = np.where(free_capacity < 0.1 * bins, 10 * (1 - free_capacity / bins), 0)\n    scores += np.where(free_capacity > 0.9 * bins, -10 * (free_capacity / bins - 0.9), 0)\n    \n    return scores",
+          "objective": 0.03894,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm: Calculate the score for each bin as the natural log of the non-positive difference between the bin's rest capacity and item size, and the rest capacity to the power of the positive difference",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the score for each bin\n    scores = np.log(np.abs(bins - item)) + (bins / (bins - item)) ** 2\n    \n    # Return the scores\n    return scores",
+          "objective": 0.03974,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Modified algorithm: Calculate the score for each bin as the exponential of the negative difference between the ratio of bin's rest capacity and item size, and the natural logarithm of the ratio.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the score for each bin\n    scores = np.exp(-np.log(bins / item))\n    \n    # Return the scores\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     },
+     {
+          "algorithm": "For each bin, calculate its ratio of rest capacity to item size; if greater than 1, the score is 0, otherwise, the score is the inverse of the ratio.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the ratio of rest capacity to item size for each bin\n    ratios = (bins - item) / item\n    \n    # Set the score for each bin based on the ratio\n    scores = np.where(ratios > 1, 0, 1 / ratios)\n    \n    return scores",
+          "objective": 0.03994,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm: Reduce the favoring threshold for bins with capacities closely matching the item size by a fixed amount.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the difference between the item size and the bin capacities\n    diff = np.abs(item - bins)\n    \n    # Calculate the favoring threshold for each bin\n    thresholds = np.maximum(0, diff - 1)\n    \n    # Calculate the scores for each bin\n    scores = np.zeros_like(bins)\n    for i in range(len(bins)):\n        if bins[i] >= item:\n            scores[i] = 1 / (thresholds[i] + 1)\n        else:\n            scores[i] = 0\n    \n    return scores",
+          "objective": 0.04014,
+          "other_inf": null
+     },
+     {
+          "algorithm": " Prioritizing bins that have more than 75% of their capacity and penalizing bins that have less than 25% free capacity ",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the available capacity for each bin\n    available_capacity = bins - item\n    \n    # Penalize bins with less than 25% free capacity\n    penalty = np.where(available_capacity < (0.25 * bins), 1, 0)\n    \n    # Prioritize bins with more than 75% free capacity\n    bonus = np.where(available_capacity > (0.75 * bins), 1, 0)\n    \n    # Combine the penalty and bonus to get the final score\n    scores = penalty + bonus\n    \n    return scores",
+          "objective": 0.04035,
+          "other_inf": null
+     }
+]

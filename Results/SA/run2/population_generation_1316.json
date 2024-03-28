@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm description: The new algorithm calculates the score for each bin by multiplying the natural logarithm of the bin's rest capacity plus the item size, by the reciprocal of the square root of the difference between the bin's rest capacity and the item size, and finally, multiplying it by the item size divided by the bin's rest capacity raised to the power of the bin's rest capacity.\n\nHere's the implementation of the new algorithm in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    diff = bins - item  # Step 1\n    sqrt_diff = np.sqrt(diff)  # Step 2\n    ratio = item / bins  # Step 3\n    pow_ratio = np.power(ratio, bins)  # Step 4\n    log_scores = np.log(bins + item)  # Step 5\n    scores = log_scores * (1 / sqrt_diff) * pow_ratio  # Step 6\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

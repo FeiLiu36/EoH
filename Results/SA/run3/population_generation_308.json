@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the score for each bin based on the remaining capacity and the cube root of the ratio between the item size and the remaining capacity, penalizes bins with lower remaining capacity, and adjusts the scores based on the inverse of the logarithm of the remaining capacity, while also taking into account the cube root of the remaining capacity.\n\nHere's the implementation of the new algorithm in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n\n    # Calculate the ratio between the item size and the remaining capacity\n    size_ratio = item / remaining_capacity\n\n    # Calculate the penalty for bins with lower remaining capacity\n    penalty = np.exp(size_ratio)\n\n    # Calculate the factor based on remaining capacity\n    factor = np.exp(-size_ratio)\n\n    # Calculate the adjusted score based on the factors and the cube root of remaining capacity\n    adjusted_score = remaining_capacity * np.cbrt(size_ratio**3 + penalty) * np.cbrt(remaining_capacity) * factor\n\n    # Calculate the final scores, adjusting them based on the inverse of the logarithm of the remaining capacity of the bin\n    scores = np.where(remaining_capacity >= item, 1e9, adjusted_score / np.log(remaining_capacity))\n\n    return scores",
+          "objective": 0.01107,
+          "other_inf": null
+     }
+]

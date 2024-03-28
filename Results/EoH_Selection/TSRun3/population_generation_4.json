@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "Common backbone idea: All of the provided algorithms calculate scores for bins based on their remaining capacity and penalize bins at maximum capacity. They also prioritize bins with larger remaining capacities and smaller differences/differences raised to a power between the item size and bin capacity.\n\nNew algorithm description: The new algorithm calculates the scores for each bin based on the remaining capacity, the square root of the absolute difference between the item size and bin capacity raised to the power of 6, and the logarithmic function of the inverse of the bin index raised to the power of 4. It penalizes bins at maximum capacity and prioritizes bins with larger remaining capacities, smaller sixth power differences between item size and bin capacity, and smaller logarithmic inverse bin indices.\n\nNew algorithm implementation:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    diff_sixth_power = np.power(np.abs(bins - item), 6)\n    inverse_index = np.log(1 / np.arange(1, len(bins) + 1)) ** 4\n    \n    scores = (bins - item) - np.log(np.abs(diff_sixth_power)) - inverse_index\n    \n    # Ensure that bins with maximum capacity are not used\n    scores[(bins == max_capacity)] = 0\n    \n    return scores",
+          "objective": 0.00895,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on the remaining capacity, the absolute difference between the item size and bin capacity raised to the power of 6, the logarithm of the inverse of the bin index raised to the power of 4, and a penalty value proportional to the inverse of the difference between the maximum capacity and the bin capacity, prioritizing bins with larger remaining capacities, smaller absolute differences, smaller bin indices, and smaller penalty values.\n\nPython code:\n\n``` ",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    abs_diff = np.abs(bins - item) ** 6\n    inverse_index = 1 / np.log(np.arange(1, len(bins) + 1)) ** 4\n    penalty = 1 / (max_capacity - bins + 1)\n    \n    scores = (bins - item) - np.log(abs_diff) - inverse_index + penalty\n    \n    scores[(bins == max_capacity)] = 0\n    \n    return scores",
+          "objective": 0.00906,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on the remaining capacity, the absolute difference between the item size and bin capacity raised to the power of 6, the logarithm of the inverse of the bin index raised to the power of 4, and a penalty value proportional to the inverse of the difference between the maximum capacity and the bin capacity, prioritizing bins with larger remaining capacities, smaller absolute differences, smaller bin indices, and smaller penalty values.\n\nPython code:\n\n``` ",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    abs_diff = np.abs(bins - item) ** 6\n    penalty = 1\n    \n    scores = (bins - item) - np.log(abs_diff) + penalty\n    \n    scores[(bins == np.max(bins))] = 0\n    \n    return scores",
+          "objective": 0.01469,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on the remaining capacity, the absolute difference between the item size and bin capacity raised to the power of 5, the reciprocal of the bin index raised to the power of 3, and a penalty based on the difference between the maximum capacity and the bin capacity, prioritizing bins with larger remaining capacities, smaller absolute differences, smaller reciprocal bin indices, and smaller penalty values.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    abs_diff = np.abs(bins - item) ** 5\n    reciprocal_index = 1 / np.arange(1, len(bins) + 1) ** 3\n    penalty = 1 / (1 + np.abs(bins - max_capacity))\n    \n    scores = (bins - item) - np.log(np.abs(abs_diff)) - reciprocal_index + penalty\n    \n    # Ensure that bins with maximum capacity are not used\n    scores[(bins == max_capacity)] = 0\n    \n    return scores",
+          "objective": 0.01922,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on the remaining capacity, the square root of the absolute difference between the item size and bin capacity raised to the power of 5, the reciprocal of the bin index raised to the power of 3, and a penalty value proportional to the inverse of the difference between the maximum capacity and the bin capacity, prioritizing bins with larger remaining capacities, smaller absolute differences, smaller bin indices, and smaller penalty values.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    abs_diff = np.abs(bins - item) ** 5\n    scaling_factor = 10 / len(bins) # Adjust the scaling factor to control the range of the index\n    \n    penalty = 1 / (max_capacity - bins + 1)\n    \n    scores = (bins - item) - np.log(np.abs(abs_diff)) - scaling_factor * np.arange(1, len(bins) + 1) + penalty\n    \n    scores[(bins == max_capacity)] = 0\n    \n    return scores",
+          "objective": 0.02133,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: All of the provided algorithms calculate the scores for each bin based on the remaining capacity and certain additional factors.\n\nNew algorithm description: The new algorithm calculates the scores for each bin based on the remaining capacity, the absolute difference between the item size and bin capacity raised to the power of 4, the inverse of the bin index raised to the power of 2, and a penalty based on the difference between the maximum capacity and the bin capacity, prioritizing bins with larger remaining capacities, smaller absolute differences, smaller inverse bin indices, and smaller penalty values.\n\nPython code:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    abs_diff = np.abs(bins - item) ** 4\n    inverse_index = 1 / np.log(np.arange(1, len(bins) + 1)) ** 2\n    penalty = 1 / (1 + np.abs(bins - max_capacity))\n    \n    scores = (bins - item) - np.log(np.abs(abs_diff)) - inverse_index + penalty\n    \n    # Ensure that bins with maximum capacity are not used\n    scores[(bins == max_capacity)] = 0\n    \n    return scores",
+          "objective": 0.02274,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: The provided algorithms calculate scores for bins based on their remaining capacity and penalize/penalize bins at maximum capacity. They also prioritize bins with larger remaining capacities and smaller differences/squared differences between item size and bin capacity.\n\nNew algorithm description: The new algorithm calculates the scores for each bin based on the remaining capacity, the difference between the item size and bin capacity raised to the power of 4, and the exponential function of the inverse of the bin index. It penalizes bins at maximum capacity and prioritizes bins with larger remaining capacities, smaller quartic differences between item size and bin capacity, and smaller exponential inverse bin indices.\n\nNew algorithm implementation:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    diff = bins - item\n    inverse_index = np.exp(1 / np.arange(1, len(bins) + 1))\n\n    scores = diff - np.log(np.abs(np.power(diff, 4))) - inverse_index\n\n    # Ensure that bins with maximum capacity are not used\n    scores[(bins == max_capacity)] = 0\n\n    return scores",
+          "objective": 0.02475,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: The provided algorithms calculate scores for bins based on their remaining capacity and penalize/penalize bins at maximum capacity. They also prioritize bins with larger remaining capacities and smaller differences/squared differences between item size and bin capacity.\n\nNew algorithm description: The new algorithm calculates the scores for each bin based on the remaining capacity, the absolute difference between the item size and bin capacity raised to the power of 3, the inverse of the bin index raised to the power of 4, and a penalty based on the difference between the maximum capacity and the bin capacity, prioritizing bins with larger remaining capacities, smaller absolute differences, smaller inverse bin indices, and smaller penalty values.\n\nPython code:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    abs_diff = np.abs(bins - item) ** 3\n    inverse_index = 1 / np.log(np.arange(1, len(bins) + 1)) ** 4\n    penalty = 1 / (1 + np.abs(bins - max_capacity))\n    \n    scores = (bins - item) - np.log(np.abs(abs_diff)) - inverse_index + penalty\n    \n    # Ensure that bins with maximum capacity are not used\n    scores[(bins == max_capacity)] = 0\n    \n    return scores",
+          "objective": 0.02495,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: All of the provided algorithms calculate scores for bins based on their remaining capacity and penalize bins at maximum capacity. They also prioritize bins with larger remaining capacities and smaller differences/differences raised to a power between the item size and bin capacity.\n\nNew algorithm description: The new algorithm calculates the scores for each bin based on the remaining capacity, the absolute difference between the item size and bin capacity raised to the power of 5, and the logarithmic function of the inverse of the bin index raised to the power of 3. It penalizes bins at maximum capacity and prioritizes bins with larger remaining capacities, smaller fifth power differences between item size and bin capacity, and smaller logarithmic inverse bin indices.\n\nNew algorithm implementation:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    abs_diff_fifth_power = np.power(np.abs(bins - item), 5)\n    inverse_index_cubed = np.log(1 / np.arange(1, len(bins) + 1)) ** 3\n    \n    scores = (bins - item) - np.log(np.abs(abs_diff_fifth_power)) - inverse_index_cubed\n    \n    # Ensure that bins with maximum capacity are not used\n    scores[(bins == max_capacity)] = 0\n    \n    return scores",
+          "objective": 0.02535,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The common backbone idea in the provided algorithms is to calculate scores for each bin based on their remaining capacity and certain additional factors.\n\nNew algorithm description: The new algorithm calculates the scores for each bin based on the square root of the remaining capacity, the logarithm of the product of the absolute difference between the item size and bin capacity and the inverse of the bin index, and a penalty based on the difference between the maximum capacity and the bin capacity. It prioritizes bins with larger remaining capacities, smaller absolute differences multiplied by inverse bin indices, and smaller penalty values.\n\nPython code:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacity = bins - item\n    sqrt_remaining_capacity = np.sqrt(remaining_capacity)\n    abs_diff_inverse_index = np.log(np.abs(bins - item) * (1 / np.log(np.arange(1, len(bins) + 1))))\n    penalty = 1 / (1 + np.abs(bins - max_capacity))\n    \n    scores = sqrt_remaining_capacity - abs_diff_inverse_index + penalty\n    \n    # Ensure that bins with maximum capacity are not used\n    scores[(bins == max_capacity)] = 0\n    \n    return scores",
+          "objective": 0.02556,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on the remaining capacity, the cube of the difference between the item size and bin capacity, the logarithm of the inverse of the bin index, and a penalty value proportional to the difference between the maximum capacity and the bin capacity, prioritizing bins with larger remaining capacities, smaller cubed differences, smaller logarithmic inverse bin indices, and smaller penalty values.\n\nPython code:\n\n```\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    diff_cubed = np.power(bins - item, 3)\n    inverse_index = 1 / np.log(np.arange(1, len(bins) + 1))\n    penalty = (max_capacity - bins) / max_capacity\n    \n    scores = (bins - item) - np.log(np.abs(diff_cubed)) - inverse_index + penalty\n    \n    scores[(bins == max_capacity)] = 0\n    \n    return scores",
+          "objective": 0.02676,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on the remaining capacity, the logarithm of the absolute difference between the item size and bin capacity raised to the power of 3, the reciprocal of the bin index raised to the power of 2, and a penalty value proportional to the inverse of the difference between the maximum capacity and the bin capacity, prioritizing bins with larger remaining capacities, smaller absolute differences, smaller bin indices, and smaller penalty values.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    abs_diff = np.abs(bins - item) ** 3\n    inverse_index = 1 / np.log(np.arange(1, len(bins) + 1)) ** 2\n    penalty = 1 / (max_capacity - bins + 1)\n    \n    scores = (bins - item) - np.log(abs_diff) - inverse_index + penalty\n    \n    scores[(bins == max_capacity)] = 0\n    \n    return scores",
+          "objective": 0.02686,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: The new algorithm calculates the scores for each bin based on the remaining capacity, the product of the difference and inverse of the item size and bin capacity, the logarithm of the squared inverse bin index, and the exponential function of the inverse bin index divided by the difference between the item size and bin capacity. It penalizes bins at maximum capacity and prioritizes bins with larger remaining capacities, smaller differences between item size and bin capacity, smaller logarithmic inverse bin indices, and smaller exponential inverse bin indices divided by the difference between the item size and bin capacity.\n\nNew algorithm implementation:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    diff_inverse_product = (bins - item) * (1 / (item * bins))\n    squared_inverse_index = np.square(1 / np.log(np.arange(1, len(bins) + 1)))\n    exponential_inverse_index = np.exp(-1 / np.abs(bins - item))\n    \n    scores = (bins - item) - np.log(np.abs(diff_inverse_product)) - squared_inverse_index - exponential_inverse_index\n    \n    # Ensure that bins with maximum capacity are not used\n    scores[(bins == max_capacity)] = 0\n    \n    return scores",
+          "objective": 0.02707,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: The provided algorithms calculate scores for bins based on their remaining capacity and penalize/penalize bins at maximum capacity. They also prioritize bins with larger remaining capacities and smaller differences/squared differences between item size and bin capacity.\n\nNew algorithm description: The new algorithm calculates the scores for each bin based on the remaining capacity, the product of the difference and inverse of the item size and bin capacity, and the logarithm of the squared inverse bin index. It penalizes bins at maximum capacity and prioritizes bins with larger remaining capacities, smaller differences between item size and bin capacity, and smaller logarithmic inverse bin indices.\n\nNew algorithm implementation:\n\n```\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    diff_inverse_product = (bins - item) * (1 / (item * bins))\n    squared_inverse_index = np.square(1 / np.log(np.arange(1, len(bins) + 1)))\n    \n    scores = (bins - item) - np.log(np.abs(diff_inverse_product)) - squared_inverse_index\n    \n    # Ensure that bins with maximum capacity are not used\n    scores[(bins == max_capacity)] = 0\n    \n    return scores",
+          "objective": 0.02717,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm calculates the scores for each bin based on the remaining capacity, the logarithm of the absolute difference between the item size and bin capacity raised to the power of 3, the product of the inverse bin index and the utilization ratio, and a penalty based on the difference between the maximum capacity and the bin capacity. It prioritizes bins with larger remaining capacities, smaller logarithmic absolute differences, smaller inverse bin indices multiplied by utilization ratios, and smaller penalty values.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacity = bins - item\n    abs_diff_log = np.log(np.abs(bins - item) ** 3)\n    inverse_index_utilization = (1 / np.log(np.arange(1, len(bins) + 1))) * (remaining_capacity / bins)\n    penalty = 1 / (1 + np.abs(bins - max_capacity))\n    \n    scores = remaining_capacity - abs_diff_log - inverse_index_utilization + penalty\n    \n    # Ensure that bins with maximum capacity are not used\n    scores[(bins == max_capacity)] = 0\n    \n    return scores",
+          "objective": 0.02727,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on the remaining capacity, the square root of the difference between the item size and bin capacity, the natural logarithm of the inverse of the bin index, and a penalty based on the difference between the maximum capacity and the bin capacity, prioritizing bins with larger remaining capacities, smaller square root differences, smaller logarithmic inverse bin indices, and smaller penalty values.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    sqrt_diff = np.sqrt(np.abs(bins - item))\n    inverse_index = 1 / np.log(np.arange(1, len(bins) + 1))\n    penalty = 1 / (1 + np.abs(bins - max_capacity))\n    \n    scores = (bins - item) - np.log(np.abs(sqrt_diff)) - inverse_index + penalty\n    \n    # Ensure that bins with maximum capacity are not used\n    scores[(bins == max_capacity)] = 0\n    \n    return scores",
+          "objective": 0.02777,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: The new algorithm calculates the scores for each bin based on the remaining capacity, the product of the difference and inverse of the item size and bin capacity, the logarithm of the squared inverse bin index, and the exponential function of the inverse bin index divided by the difference between the item size and bin capacity. It penalizes bins at maximum capacity and prioritizes bins with larger remaining capacities, smaller differences between item size and bin capacity, smaller logarithmic inverse bin indices, and smaller exponential inverse bin indices divided by the difference between the item size and bin capacity.\n\nNew algorithm implementation:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    diff = (bins - item)\n    squared_inverse_index = np.square(1 / np.log(np.arange(1, len(bins) + 1)))\n    \n    scores = diff - np.log(np.abs(diff)) - squared_inverse_index\n    \n    # Ensure that bins with maximum capacity are not used\n    scores[(bins == max_capacity)] = 0\n    \n    return scores",
+          "objective": 0.02787,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: The provided algorithms calculate scores for bins based on their remaining capacity and penalize/penalize bins at maximum capacity. They also prioritize bins with larger remaining capacities and smaller differences/squared differences between item size and bin capacity.\n\nNew algorithm description: The new algorithm calculates the scores for each bin based on the remaining capacity, the cube of the difference between the item size and bin capacity, and the natural logarithm of the inverse of the bin index. It penalizes bins at maximum capacity and prioritizes bins with larger remaining capacities, smaller cubed differences between item size and bin capacity, and smaller logarithmic inverse bin indices.\n\nNew algorithm implementation:\n\n```\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    diff = bins - item\n    inverse_index = 1 / np.log(np.arange(1, len(bins) + 1))\n    \n    scores = diff - np.log(np.abs(diff)) - inverse_index\n    \n    # Ensure that bins with maximum capacity are not used\n    scores[(bins == max_capacity)] = 0\n    \n    return scores",
+          "objective": 0.02797,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on the remaining capacity, the square root of the absolute difference between the item size and bin capacity raised to the power of 5, the reciprocal of the bin index raised to the power of 3, and a penalty value proportional to the inverse of the difference between the maximum capacity and the bin capacity, prioritizing bins with larger remaining capacities, smaller absolute differences, smaller bin indices, and smaller penalty values.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    abs_diff = np.sqrt(np.abs(bins - item) ** 5)\n    inverse_index = 1 / np.log(np.arange(1, len(bins) + 1)) ** 3\n    penalty = 1 / (max_capacity - bins + 1)\n    \n    scores = (bins - item) - np.log(np.abs(abs_diff)) - inverse_index + penalty\n    \n    scores[(bins == max_capacity)] = 0\n    \n    return scores",
+          "objective": 0.02817,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: All of the provided algorithms calculate the scores for each bin based on the remaining capacity and certain additional factors.\n\nNew algorithm description: The new algorithm calculates the scores for each bin based on the remaining capacity, the square of the difference between the item size and bin capacity, the logarithm of the inverse of the bin index, and a penalty based on the difference between the maximum capacity and the bin capacity, prioritizing bins with larger remaining capacities, smaller squared differences, smaller logarithmic inverse bin indices, and smaller penalty values.\n\nPython code:\n\n```\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    diff_squared = np.square(bins - item)\n    inverse_index = 1 / np.log(np.arange(1, len(bins) + 1))\n    penalty = 1 / (1 + np.abs(bins - max_capacity))\n    \n    scores = (bins - item) - np.log(np.abs(diff_squared)) - inverse_index + penalty\n    \n    # Ensure that bins with maximum capacity are not used\n    scores[(bins == max_capacity)] = 0\n    \n    return scores",
+          "objective": 0.02857,
+          "other_inf": null
+     }
+]

@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New Algorithm (Modified Version): \n\nThe modified algorithm updates the scoring formula to be the sum of two components: (1) the square root of the ratio between the remaining capacity of the bin and the maximum remaining capacity of all bins, and (2) the logarithm of the inverse of the index of the bin starting from 1 and going up to the number of bins plus one. The bin with the maximum score is selected for assignment.\n\n\nModified Algorithm Implementation:\n\n```\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    max_remaining_capacity = np.max(bins)\n    bin_indices = np.arange(1, len(bins) + 1)\n\n    scores = (\n        np.sqrt(remaining_capacity / max_remaining_capacity)\n        + np.log(1 / (bin_indices + 1))\n    )\n\n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

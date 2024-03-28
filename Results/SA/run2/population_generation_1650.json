@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New Algorithm:\nThe new algorithm assigns scores to each bin based on a modified formula: (item size * bin capacity) / (bin capacity - item size). Next, it adds a penalty factor of 0.5 to the scores of bins that are closer to the item size. The scores of each bin are then normalized by dividing them by the maximum score across all bins.\n\nCode:\n\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the scores for the bins\n    scores = (item * bins) / (bins - item)\n    \n    # Penalize bins closer to the item size\n    penalty_scores = 0.5 * np.abs(bins - item)\n    scores = scores + penalty_scores\n    \n    # Normalize the scores by dividing by the maximum score\n    max_score = np.max(scores)\n    scores = scores / max_score\n    \n    return scores",
+          "objective": 0.03914,
+          "other_inf": null
+     }
+]

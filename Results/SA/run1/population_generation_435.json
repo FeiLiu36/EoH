@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the score for each bin by taking the product of three factors: a similarity factor that measures the similarity between the item size and the rest capacity of each bin, a weight factor that is inversely proportional to the current capacity of the bin divided by the maximum capacity of all bins, and a penalty factor that is inversely proportional to the number of already assigned items to each bin divided by the maximum number of items that can be assigned to any bin.\nCode:\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the maximum capacity of the bins\n    max_capacity = np.max(bins)\n    \n    # Calculate the similarity factor\n    similarity_factor = 1 - np.abs(item - bins) / max_capacity\n    \n    # Calculate the weight factor\n    weight_factor = max_capacity / bins\n    \n    # Calculate the penalty factor\n    max_assigned_items = np.max(np.sum(bins - item, axis=0))\n    penalty_factor = 1 / (bins - item) / max_capacity / max_assigned_items\n    \n    # Calculate the product of the similarity factor, weight factor, and penalty factor\n    scores = similarity_factor * weight_factor * penalty_factor\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

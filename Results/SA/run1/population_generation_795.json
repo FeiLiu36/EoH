@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the scores for the bins by taking the sum of the item size divided by the absolute differences between the bin capacities and the item size, and then adds the square root of the item size multiplied by the logarithm of the total sum of bin capacities.\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    bin_capacity = len(bins)\n\n    scores = (item / np.abs(bins - item)) + (np.sqrt(item) * np.log(np.sum(bins)))\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the sum of the logarithms of the absolute differences between the remaining capacity and the maximum capacity for each bin (after deducting the item size), squares it, and assigns it to a variable called 'sum_squared_log_diff'. Next, it calculates the product of the squared differences between the remaining capacity and the maximum capacity for each bin (after deducting the item size), and the squared log differences, and assigns it to a variable called 'product_squared_diff_log_diff'. Then, it calculates the scores for each bin by multiplying the 'sum_squared_log_diff' array by the 'product_squared_diff_log_diff' array. The scores are then sorted in descending order and returned. Finally, a check is performed to ensure that no bin with a remaining capacity equal to the maximum capacity is used.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    remaining_capacity = bins - item\n\n    log_diff = np.log(np.abs(remaining_capacity - max_capacity))\n    squared_diff = (remaining_capacity - max_capacity) ** 2\n\n    sum_squared_log_diff = np.sum(log_diff) ** 2\n    product_squared_diff_log_diff = squared_diff * log_diff ** 2\n\n    scores = sum_squared_log_diff * product_squared_diff_log_diff\n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n\n    if remaining_capacity[int(sorted_indices[0])] == max_capacity:\n        scores[0] = 0\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

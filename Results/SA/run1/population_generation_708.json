@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "This algorithm calculates the scores for the bins by finding the bin with the maximum remaining capacity, taking the element-wise division of the remaining capacities of the bins by the item size, subtracting the minimum capacity from the obtained quotients, raising the subtracted quotients to the power of item size divided by the maximum capacity, normalizing the scores by dividing them by the sum of the raised quotients, and finally multiplying the normalized scores by a factor based on the logarithm of the maximum capacity squared multiplied by the item size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    quotients = np.divide(bins, item)\n    subtracted_quotients = np.subtract(quotients, np.min(bins))\n    raised_quotients = np.power(subtracted_quotients, item/ max_capacity)\n    normalized_scores = raised_quotients / np.sum(raised_quotients)\n    scores = normalized_scores * np.log((max_capacity**2) * item)\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

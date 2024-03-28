@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The Fast Approximate Score Algorithm calculates the scores as the product of the remaining capacities of the bins divided by the item size, and a factor that is the difference between the maximum capacity and the remaining capacity of each bin, raised to the power of 2, then subtracted by 1.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"The Fast Approximate Score Algorithm calculates the scores as the product of the remaining capacities of the bins\n    divided by the item size, and a factor that is the difference between the maximum capacity and the remaining capacity\n    of each bin, raised to the power of 2, then subtracted by 1.\"\"\"\n    \n    # Calculate the product of the remaining capacities of the bins divided by the item size\n    ratio = np.prod(bins) / item\n    \n    # Calculate the factor as the difference between the maximum capacity and the remaining capacity, raised to the power of 2, then subtracted by 1\n    max_capacity = np.max(bins)\n    factor = np.power((max_capacity - bins), 2) - 1\n    \n    # Calculate the scores as the product of the ratio and the factor\n    scores = ratio * factor\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

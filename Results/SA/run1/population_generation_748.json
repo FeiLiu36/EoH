@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the scores for the bins by taking the square root of the item size divided by the remaining capacities, raising the differences between each value and the average capacity to the power of 3, summing up all the powered differences, dividing the scores by the average capacity plus a factor based on the cube root of the item size, multiplying the scores by the cube root of the minimum capacity, and finally applying the sigmoid function to adjust the scores to a range between 0 and 1.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacities = np.asarray(bins)\n    sqrt_ratios = np.sqrt(item) / remaining_capacities\n    powered_diff = np.power(remaining_capacities - np.mean(bins), 3)\n    sum_powered_diff = np.sum(powered_diff)\n    scores = sum_powered_diff / (np.mean(bins) + np.cbrt(item))\n    \n    scores = scores * np.cbrt(np.min(bins))\n    \n    sigmoid_scores = 1 / (1 + np.exp(-scores))\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

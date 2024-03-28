@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the score for each bin based on the ratio of the item size to the rest capacity of the bin, with the scores weighted by a multiplier that decreases as the bin's rest capacity approaches its maximum capacity up to a certain threshold, aiming to minimize the number of used bins. In this modified version, the multiplier decreases exponentially instead of linearly, and the penalty factor is based on the difference between the bin's rest capacity and the item size, rather than the absolute difference.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the maximum rest capacity of the bins\n    max_rest_capacity = np.max(bins)\n    \n    # Calculate the ratio of the item size to the rest capacity of each bin\n    ratios = item / bins\n    \n    # Calculate the weight multiplier for bins closer to their maximum rest capacity up to the maximum rest capacity\n    weight_multiplier = np.where(bins > 0, np.exp(-1*(bins / max_rest_capacity)), 1)\n    \n    # Calculate a penalty factor for bins based on the difference between the rest capacity and the item size\n    penalty_factor = np.where(bins < item, np.exp(-1*(item - bins) / (item - bins.min())), 1)\n    \n    # Calculate the combined weight multiplier and penalty factor for each bin\n    combined_multiplier = weight_multiplier * penalty_factor\n    \n    # Calculate the weighted score for each bin by combining the ratio and combined multiplier\n    scores = ratios * combined_multiplier\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

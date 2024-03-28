@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "New algorithm description: The new algorithm calculates the score for each bin based on the inverse of the ratio between the bin capacity and the difference between the capacity and the item size, multiplied by the square root of the bin capacity raised to the power of two times the bin index, divided by the logarithm of the bin capacity plus 2, and then multiplied by a constant factor of 7 instead of 5.\n\nCode:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    ratio_inv = (bins - item) / bins\n    scores = 7 * (1 / ratio_inv) * (np.sqrt(bins) ** (2 * np.arange(len(bins)))) / (np.log(bins) + 2)\n    return scores",
+          "objective": 0.00674,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for the bins based on the item size and the rest capacities of the bins, giving higher scores to bins that have more available capacity and lower scores to bins that are already close to their maximum capacity, thereby promoting the assignment of items to bins with maximum rest capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.exp((np.log(bins) / (bins - item)) + np.log(item) * np.arange(len(bins))) ** np.log(bins+1) - np.log(bins) / (np.log(item)+1)\n    return scores",
+          "objective": 0.00684,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: The new algorithm calculates the scores for the bins based on the item size, the rest capacities of the bins, and a scaling factor, giving higher scores to bins that have less available capacity and lower scores to bins that are already close to their maximum capacity, thereby promoting the assignment of items to bins with minimum rest capacity.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scaling_factor = 2.0\n    scores = np.exp((np.log(bins) / (item - bins)) + np.log(item) * np.arange(len(bins))) ** np.log(bins+1) + np.log(bins) / (np.log(item)+1) + scaling_factor * (item - bins)\n    return scores",
+          "objective": 0.00694,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: The new algorithm calculates the scores for the bins based on the item size, the rest capacities of the bins, and a scaling factor, giving higher scores to bins that have less available capacity and lower scores to bins that are further away from their maximum capacity, thereby promoting the assignment of items to bins with higher rest capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scaling_factor = 1.5\n    scores = np.exp((np.log(bins) / (item - bins)) + np.log(item) * np.arange(len(bins))) ** np.log(bins+1) + np.log(bins) / (np.log(item)+1) + scaling_factor * (bins - item)\n    return scores",
+          "objective": 0.00704,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for the bins based on the item size, the rest capacities of the bins, and a scaling factor, giving higher scores to bins that have more available capacity and lower scores to bins that are already close to their maximum capacity, thereby promoting the assignment of items to bins with maximum rest capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scaling_factor = 0.5\n    scores = np.exp((np.log(bins) / (bins - item)) + np.log(item) * np.arange(len(bins))) ** np.log(bins+1) - np.log(bins) / (np.log(item)+1) + scaling_factor * (bins - item)\n    return scores",
+          "objective": 0.00714,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for the bins based on the item size and the rest capacities of the bins, considering the goal of minimizing the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins / (bins - item)) + np.exp(np.log(item) * np.arange(len(bins))) ** np.log(bins+1) - np.log(bins) / (np.log(item)+1)\n    return scores",
+          "objective": 0.00734,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: The new algorithm calculates the scores for the bins based on the item size, the rest capacities of the bins, a scaling factor, and a distance factor, giving higher scores to bins that have less available capacity and are closer to their maximum capacity, thereby promoting the assignment of items to bins with higher rest capacity and closer to their maximum capacity.\n\nCode:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scaling_factor = 2.0\n    distance_factor = 0.5\n    scores = np.exp((np.log(bins) / (item - bins)) + np.log(item) * np.arange(len(bins))) ** (np.log(bins+1) + distance_factor * np.log(item+1)) + np.log(bins) / (np.log(item)+1) + scaling_factor * (bins - item)\n    return scores",
+          "objective": 0.00825,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm will calculate the scores for the bins based on the item size, the rest capacities of the bins, and two scaling factors, emphasizing both bins closer to their maximum capacity and bins with larger capacity to promote the assignment of items to bins with maximum rest capacity.\n\nNew algorithm:\n1. Initialize two scaling factors: scaling_factor_1 and scaling_factor_2.\n2. Calculate the scores for each bin using the following formula:\n   scores = (np.exp((np.log(bins) / (item - bins)) + np.log(item) * np.arange(len(bins))) ** np.log((bins+1) * scaling_factor_1) + np.log(bins) ** 2 / (np.log(item)+1) * scaling_factor_2 + scaling_factor_2 * (bins - item))\n3. Return the scores.\n\nPython implementation:\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scaling_factor_1 = 3.0\n    scaling_factor_2 = 2.0\n    scores = (np.exp((np.log(bins) / (item - bins)) + np.log(item) * np.arange(len(bins))) ** np.log((bins+1) * scaling_factor_1) + np.log(bins) ** 2 / (np.log(item)+1) * scaling_factor_2 + scaling_factor_2 * (bins - item))\n    return scores",
+          "objective": 0.00865,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm will calculate the scores for the bins based on the item size, the rest capacities of the bins, and two scaling factors, emphasizing both bins closer to their maximum capacity and bins with larger capacity to promote the assignment of items to bins with maximum rest capacity. It will also include a penalty term to penalize bins with rest capacity equal to the maximum capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scaling_factor_1 = 5.0\n    scaling_factor_2 = 3.0\n    \n    # Calculate distance of bins from maximum capacity\n    max_capacity = np.max(bins)\n    distance_from_max = max_capacity - bins\n    \n    # Calculate scores using the modified formula\n    scores = (np.exp((np.log(bins) / (item - bins)) + np.log(item) * np.arange(len(bins))) ** np.log((bins+1) * scaling_factor_1) \n              + np.log(bins) ** 2 / (np.log(item)+1) * scaling_factor_2 \n              + scaling_factor_2 * (bins - item)\n              + scaling_factor_2 * distance_from_max)\n    \n    return scores",
+          "objective": 0.01026,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: The new algorithm calculates the score for each bin based on the logarithm of the ratio between the bin capacity and the difference between the capacity and the item size, multiplied by the square root of the bin capacity raised to the power of the bin index, divided by the logarithm of the bin capacity plus 1, and then multiplied by a constant factor of 5 instead of 3.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    ratio = np.log(bins / (bins - item))\n    scores = 5 * (ratio * (np.sqrt(bins) ** np.arange(len(bins)))) / (np.log(bins) + 1)\n    return scores",
+          "objective": 0.01046,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: The new algorithm calculates the score for each bin based on the logarithm of the ratio between the bin capacity and the difference between the capacity and the item size, multiplied by the square root of the bin capacity raised to the power of the bin index, divided by the logarithm of the bin capacity plus 1, and then multiplied by a constant factor of 3.\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    ratio = np.log(bins / (bins - item))\n    scores = 3 * (ratio * (np.sqrt(bins) ** np.arange(len(bins)))) / (np.log(bins) + 1)\n    return scores",
+          "objective": 0.01087,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: The new algorithm calculates the score for each bin based on the logarithm of the ratio between the bin capacity and the difference between the capacity and the item size, multiplied by the square root of the bin capacity raised to the power of the bin index plus 1, divided by the bin capacity.\n\nNew algorithm implementation in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    ratio = np.log(bins / (bins - item))\n    scores = ratio * (np.sqrt(bins) ** (np.arange(len(bins)) + 1)) / bins\n    return scores",
+          "objective": 0.01117,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: The new algorithm calculates the score for each bin based on the exponential function raised to the power of the ratio between the bin capacity and the difference between the capacity and the item size, multiplied by the square root of the bin capacity raised to the power of the bin index plus 1, divided by the logarithm of the bin capacity plus 1, and then multiplied by a constant factor of 2.\n\nNew algorithm implementation in Python:\n\n```\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    ratio = bins / (bins - item)\n    scores = 2 * np.exp(ratio) * (np.sqrt(bins) ** (np.arange(len(bins)) + 1)) / (np.log(bins) + 1)\n    return scores",
+          "objective": 0.01227,
+          "other_inf": null
+     },
+     {
+          "algorithm": "",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scaling_factor_1 = 10.0\n    scaling_factor_2 = 2.0\n    \n    # Calculate distance of bins from maximum capacity\n    max_capacity = np.max(bins)\n    distance_from_max = max_capacity - bins\n    \n    # Calculate scores using the modified formula\n    scores = (np.exp((np.log(bins) / (item - bins)) + np.log(item) * np.arange(len(bins))) ** np.log((bins+1) * scaling_factor_1) \n              + np.log(bins) ** 3 / (np.log(item)+1) * scaling_factor_2 \n              + scaling_factor_2 * (bins - item)\n              + scaling_factor_2 * distance_from_max)\n    \n    return scores",
+          "objective": 0.01368,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for the bins based on the item size, the rest capacities of the bins, and a scaling factor, giving higher scores to bins that have less available capacity and lower scores to bins that are already close to their maximum capacity, thereby promoting the assignment of items to bins with minimum rest capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scaling_factor = 3.0\n    scores = np.exp((np.log(bins) / (item - bins + 1)) + np.log(item) * np.arange(len(bins))) ** np.log(bins+2) + np.log(bins) / (np.log(item)+2) + scaling_factor * (item - bins + 1)\n    return scores",
+          "objective": 0.01741,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description:\nThe new algorithm calculates the scores for each bin using the formula: (bins / (bins - item)) * (item / ((np.log(bins) + 1) * np.log(item + 1))) + np.exp(np.log(item + 1) * np.arange(len(bins))) - np.log(bins) / (np.log(item + 1) + 1).\n\nCode:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins / (bins - item)) * (item / ((np.log(bins) + 1) * np.log(item + 1))) + np.exp(np.log(item + 1) * np.arange(len(bins))) - np.log(bins) / (np.log(item + 1) + 1)\n    return scores",
+          "objective": 0.01811,
+          "other_inf": null
+     },
+     {
+          "algorithm": "```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins / (bins - item)) + np.exp(np.log(item) * np.arange(len(bins))) - np.log(bins) / (np.log(item)+1)\n    return scores",
+          "objective": 0.01902,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description:\n\nThe new algorithm calculates the scores for each bin using the formula: (bins / (bins - item)) * (item / (np.log(bins) * np.log(item))) + np.exp(np.log(item) * np.arange(len(bins))) - np.log(bins) / (np.log(item)+1).\n\nCode:\n\n```\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins / (bins - item)) * (item / (np.log(bins) * np.log(item))) + np.exp(np.log(item) * np.arange(len(bins))) - np.log(bins) / (np.log(item)+1)\n    return scores",
+          "objective": 0.01912,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for the bins based on the item size and the rest capacities of the bins, with an updated scoring formula that takes into account the maximum capacity and the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    used_bins = len(bins) - np.count_nonzero(bins == max_capacity)\n    scores = (bins.itemsize * (bins / (bins - item))) + np.exp(np.log(item) * np.arange(len(bins))) ** np.log(max_capacity+1) - np.log(max_capacity) / (np.log(item)+1) * ((used_bins+1)*(item/max_capacity))\n    return scores",
+          "objective": 0.02143,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm:\nThe new algorithm calculates the score for each bin based on the inverse of the bin capacity divided by the difference between the capacity and the item size, multiplied by the square root of the item size raised to the power of the bin index divided by the weight factor.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    weight = 1 / (np.arange(len(bins)) ** 2 + 1)\n    scores = (1 / bins) / (bins - item) * (np.sqrt(item) ** np.arange(len(bins))) / weight\n    return scores",
+          "objective": 0.02163,
+          "other_inf": null
+     }
+]

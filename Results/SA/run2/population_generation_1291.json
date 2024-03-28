@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "Algorithm description: In the new algorithm, the score for each bin is calculated by taking the reciprocal of the ratio of the bin rest capacity to the item size, and then subtracting the inverse of this ratio.\n\nCode:\n\n```\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    ratios = bins / item  # Step 1\n    reciprocal_ratios = 1 / ratios  # Step 2\n    scores = reciprocal_ratios - ratios  # Step 3\n\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

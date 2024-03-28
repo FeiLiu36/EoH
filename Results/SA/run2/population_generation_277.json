@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "My new algorithm calculates the score for each bin based on the ratio of its remaining capacity to the maximum capacity among all the bins, where the maximum capacity is the capacity of the bin with the largest remaining capacity. The bins are then sorted in descending order based on their scores, and the scores are returned as the output.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    max_capacity = np.max(bins)\n\n    scores = np.full_like(bins, -np.inf)\n    largest_capacity_indices = np.where(bins == max_capacity)[0]\n\n    for i in largest_capacity_indices:\n        scores[i] = remaining_capacity[i] / max_capacity\n\n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

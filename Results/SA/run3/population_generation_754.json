@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "Algorithm description: The new algorithm calculates the score for each bin by taking the reciprocal of the square root of the ratio between the remaining capacity and the maximum capacity multiplied by the cube root of the item size divided by the sum of the remaining capacities plus a constant value, and then multiplies it by the logarithm of the difference between the maximum capacity and the remaining capacity.\nCode:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n\n    # Define constant factor\n    constant_factor = 2.0\n\n    # Calculate the score for each bin\n    scores = 1 / np.sqrt(remaining_capacity / bins) * np.cbrt(item / (np.sum(remaining_capacity) + constant_factor)) * np.log(bins - remaining_capacity)\n\n    # Assign maximum scores for bins with remaining capacity >= item size\n    scores = np.where(remaining_capacity >= item, np.inf, scores)\n\n    return scores",
+          "objective": 0.0157,
+          "other_inf": null
+     }
+]

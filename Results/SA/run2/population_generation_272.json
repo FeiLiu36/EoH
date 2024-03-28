@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "\nMy new algorithm is a modified version of the provided algorithm. In each step, the scores are calculated by multiplying the remaining capacity of the bin by a logarithm of the item size plus one, dividing it by the maximum capacity, and adding a small constant. The scores are then returned in descending order.\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    max_capacity = np.max(bins)\n\n    scores = (remaining_capacity * np.log(item + 1)) / max_capacity + 0.001\n\n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

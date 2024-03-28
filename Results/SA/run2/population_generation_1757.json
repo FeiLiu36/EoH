@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "Algorithm: The new algorithm assigns scores to the bins based on their remaining capacities after assigning the item using a mathematical function that involves logarithmic scaling and exponentiation, and it penalizes the bins with larger remaining capacities by reducing their scores.\n\nCode:\n\n``` ",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the remaining capacities of the bins after assigning the item\n    remaining_capacity = bins - item\n    \n    # Calculate the scaled scores for the bins based on remaining capacity\n    scores = np.exp(-np.log(remaining_capacity))\n    \n    # Set the scores of bins that are not used to a large negative value\n    scores[remaining_capacity >= bins] = -np.inf\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

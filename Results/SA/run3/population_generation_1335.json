@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm description: The new algorithm calculates the scores for each bin based on a combination of the inverse of the remaining capacity of the bins, the logarithm of the number of items already assigned to the bins plus one, and the square root of the bin index divided by the item size plus one, multiplied by the exponential function of the square of the remaining capacity divided by the bin index plus one. The algorithm also introduces a new step where the scores are raised to the power of the inverse of the logarithm of the bin indices plus one, to further promote performance.\n\nNew algorithm code:\n\n``` \nCode:\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    num_items_assigned = np.count_nonzero(remaining_capacity < bins) + 1\n    bin_indices = np.arange(len(bins)) + 1\n\n    remaining_capacity_ratio = 1 / remaining_capacity\n    num_items_assigned_ratio = np.log(num_items_assigned)\n\n    scores = (remaining_capacity_ratio * num_items_assigned_ratio *\n              np.sqrt(bin_indices / (item + 1)) *\n              np.exp((remaining_capacity**2) / (bin_indices + 1)))\n\n    # New step: Raise scores to the power of the inverse of the logarithm of the bin indices plus one\n    scores = scores**(1 / (np.log(bin_indices) + 1))\n\n    return scores",
+          "objective": 0.01087,
+          "other_inf": null
+     }
+]

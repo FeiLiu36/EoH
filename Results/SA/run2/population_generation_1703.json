@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "Algorithm: The new algorithm calculates the scores for the bins by taking the product of the reciprocal of the square root of the absolute difference between the bin capacity and the item size, exponentiated by the reciprocal of the cube root of the bin capacity, multiplied by the item size, and finally normalized by dividing them by the maximum score.\n\nCode:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the scores for the bins\n    difference = bins - item\n    scores = (1 / np.sqrt(np.abs(difference))) ** (1 / np.cbrt(bins))\n    scores *= item\n    normalized_scores = scores / np.max(scores)\n    \n    return scores",
+          "objective": 0.03974,
+          "other_inf": null
+     }
+]

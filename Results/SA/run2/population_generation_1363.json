@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "\nThe new algorithm calculates the score for each bin by taking the sum of the product of the reciprocal of the difference between the item size and the rest capacity of each bin, and the reciprocal of the maximum capacity of the bins, then subtracting a small constant value. Finally, it adds a small constant value to ensure non-zero scores and subtracts the minimum score from all the scores.\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    rest_capacity = max_capacity - bins\n    constant_value = 0.001    # Change the constant value as desired\n    \n    scores = np.sum((1 / (item - rest_capacity)) * (1 / max_capacity)) - constant_value\n    min_score = np.min(scores)\n    small_constant = 1e-10   # Small constant value\n    \n    scores = (scores - min_score) + small_constant\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

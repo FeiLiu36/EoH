@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on the exponential function raised to the power of the square root of the item size multiplied by the bin capacity divided by the absolute difference between the bin capacity and the item size, then subtracts the minimum score from each bin score to adjust the range of scores. The scores of each bin are then normalized by dividing them by the maximum score across all bins.\n\nHere is the implementation of the new algorithm in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the scores for the bins\n    scores = np.exp((np.sqrt(item) * bins) / np.abs(bins - item))\n    \n    # Adjust the range of scores by subtracting the minimum score\n    min_score = np.min(scores)\n    scores = scores - min_score\n    \n    # Normalize the scores by dividing by the maximum score\n    max_score = np.max(scores)\n    scores = scores / max_score\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

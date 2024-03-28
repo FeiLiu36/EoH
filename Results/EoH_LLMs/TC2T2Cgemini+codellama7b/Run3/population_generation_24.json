@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "Compute the bin scores by multiplying the tanh of the negative difference between the bin capacity and the item size with the square root of the positive difference between the bin's index and the number of bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Compute the tanh of the negative difference between the bin capacity and the item size\n    diff = np.tanh(-(bins - item))\n    \n    # Compute the square root of the positive difference between the bin's index and the number of bins\n    sqrt_diff = np.sqrt(np.abs(bins - np.arange(len(bins))))\n    \n    # Multiply the tanh and square root differences to get the final scores\n    scores = diff * sqrt_diff\n    \n    return scores",
+          "objective": 0.01429,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Calculate bins scores by summing the hyperbolic tangent of the negative difference between the bin capacity and the item size, and the cube root of the positive difference between the bin's index and the number of bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the hyperbolic tangent of the negative difference between the bin capacity and the item size\n    t = np.tanh(-(bins - item))\n    \n    # Calculate the cube root of the positive difference between the bin's index and the number of bins\n    r = np.cbrt(bins - np.arange(len(bins)))\n    \n    # Sum the hyperbolic tangent and cube root\n    scores = t + r\n    \n    return scores",
+          "objective": 0.01439,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign the item to the bin with the maximum score computed by taking the sum of the inverse of the difference between the bin's capacity and the item's size multiplied by the sine of the rest capacity divided by the item's size, and the square root of the inverse of the square of the bin's index multiplied by the cosine of the rest capacity divided by the item's size.\\",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Compute the inverse of the difference between the bin's capacity and the item's size\n    inv_diff = 1 / (bins - item)\n    \n    # Compute the sine of the rest capacity divided by the item's size\n    sin_rest = np.sin(inv_diff * item)\n    \n    # Compute the square root of the inverse of the square of the bin's index\n    sqrt_index = np.sqrt(inv_diff ** 2)\n    \n    # Compute the cosine of the rest capacity divided by the item's size\n    cos_rest = np.cos(sqrt_index * item)\n    \n    # Compute the final score for each bin\n    scores = inv_diff + sin_rest + cos_rest\n    \n    return scores",
+          "objective": 0.02636,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Modified algorithm: Assign item to the bin with the maximum score computed by finding the square of the sum of the square root of the bin's capacity divided by the item's size and the square of the cosine of the rest capacity divided by the item's size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Compute the square of the sum of the square root of the bin's capacity divided by the item's size\n    sqrt_capacity = np.sqrt(bins)\n    capacity_sum = np.sum(sqrt_capacity)\n    capacity_sqr = capacity_sum ** 2\n    \n    # Compute the square of the cosine of the rest capacity divided by the item's size\n    cosine = np.cos(np.pi * (bins - item) / item)\n    cosine_sqr = cosine ** 2\n    \n    # Compute the final score\n    scores = capacity_sqr + cosine_sqr\n    \n    return scores",
+          "objective": 0.02666,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Algorithm: Score each bin by summing the inverse of the rest capacity divided by the item size, the square root of the inverse of the square of the bin's index, and the square of the sine of the rest capacity divided by the item's size",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse of the rest capacity divided by the item size\n    inv_rest_capacity = 1 / (bins - item)\n    # Calculate the square root of the inverse of the square of the bin's index\n    sqrt_bin_index = np.sqrt(np.arange(len(bins)))\n    # Calculate the square of the sine of the rest capacity divided by the item's size\n    sin_rest_capacity = np.sin(inv_rest_capacity * item) ** 2\n    # Calculate the total score for each bin\n    scores = inv_rest_capacity + sqrt_bin_index + sin_rest_capacity\n    return scores",
+          "objective": 0.02707,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Score each bin by summing the inverse of the rest capacity divided by the item size, the natural logarithm of the bin index, and the sine of the rest capacity divided by the item's size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse of the rest capacity divided by the item size\n    inv_rest_capacity = 1 / (bins - item)\n    # Calculate the natural logarithm of the bin index\n    log_bin_index = np.log(np.arange(len(bins)))\n    # Calculate the sine of the rest capacity divided by the item's size\n    sin_rest_capacity = np.sin(inv_rest_capacity * item)\n    \n    # Combine the three components into a single score\n    scores = inv_rest_capacity + log_bin_index + sin_rest_capacity\n    \n    return scores",
+          "objective": 0.02908,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Assign the item to the bin with the maximum score computed by finding the sum of the inverse of the square of the difference between the bin's capacity and the item's size, the square root of the inverse of the square of the bin's index, and the square of the cosine of the rest capacity divided by the item's size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Compute the inverse of the square of the difference between the bin's capacity and the item's size\n    inv_sq_diff = 1 / (np.square(bins - item))\n    \n    # Compute the square root of the inverse of the square of the bin's index\n    sqrt_inv_sq_idx = np.sqrt(inv_sq_diff)\n    \n    # Compute the square of the cosine of the rest capacity divided by the item's size\n    cos_rest_capacity = np.cos(np.pi * (bins - item) / item)\n    sq_cos_rest_capacity = np.square(cos_rest_capacity)\n    \n    # Compute the final score\n    scores = inv_sq_diff + sqrt_inv_sq_idx + sq_cos_rest_capacity\n    \n    return scores",
+          "objective": 0.02998,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Score each bin by summing the inverse of the rest capacity divided by the item size, the square root of the inverse of the square of the bin's index, and the square of the cosine of the rest capacity divided by the item's size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse of the rest capacity divided by the item size\n    inv_rest_capacity = 1 / (bins - item)\n    # Calculate the square root of the inverse of the square of the bin's index\n    sqrt_bin_index = np.sqrt(np.arange(len(bins)))\n    # Calculate the square of the cosine of the rest capacity divided by the item's size\n    cos_rest_capacity = np.cos(np.pi * (bins - item) / item) ** 2\n    # Calculate the final score\n    scores = inv_rest_capacity + sqrt_bin_index + cos_rest_capacity\n    return scores",
+          "objective": 0.03008,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Assign the item to the bin with the maximum score computed by finding the sum of the inverse of the square of the difference between the bin's capacity and the item's size, and the square of the cosine of the rest capacity divided by the item's size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Compute the inverse of the square of the difference between the bin's capacity and the item's size\n    inv_sq_diff = 1 / (np.square(bins - item))\n    \n    # Compute the square of the cosine of the rest capacity divided by the item's size\n    sq_cos_rest = np.square(np.cos(bins * item))\n    \n    # Compute the total score for each bin\n    scores = inv_sq_diff + sq_cos_rest\n    \n    return scores",
+          "objective": 0.03039,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Score each bin by summing the inverse of the rest capacity divided by the item size, the square root of the inverse of the square of the bin's index multiplied by 0.5, and the square of the cosine of the rest capacity multiplied by item size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse of the rest capacity divided by the item size\n    inv_rest_capacity = 1 / (bins - item)\n    # Calculate the square root of the inverse of the square of the bin's index multiplied by 0.5\n    sqrt_bin_index = np.sqrt(np.arange(len(bins)) * 0.5)\n    # Calculate the square of the cosine of the rest capacity multiplied by item size\n    cos_rest_capacity = np.cos(np.deg2rad(bins) * item) ** 2\n    \n    # Calculate the total score for each bin\n    scores = inv_rest_capacity + sqrt_bin_index + cos_rest_capacity\n    \n    return scores",
+          "objective": 0.03391,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm: Assign the item to the bin with the maximum score computed by finding the sum of the inverse of the difference between the bin's capacity and the item's size, and the bin's index multiplied by the cosine of the square of the rest capacity divided by the item's size. ",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Compute the inverse of the difference between the bin's capacity and the item's size\n    inv_diff = 1 / (bins - item)\n    \n    # Compute the cosine of the square of the rest capacity divided by the item's size\n    cos_sqr = np.cos(np.square(bins * inv_diff))\n    \n    # Compute the sum of the inverse of the difference and the cosine\n    scores = inv_diff + cos_sqr\n    \n    return scores",
+          "objective": 0.03431,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign the item to the bin with the maximum score computed by finding the sum of the inverse of the square of the cube of the difference between the bin's capacity and the item's size, the cube root of the sum of the inverse of the square of the bin's index, and the square of the cosine of the square of the rest capacity divided by the item's size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Compute the inverse of the square of the cube of the difference between the bin's capacity and the item's size\n    inv_sq_cube_diff = 1 / (np.square(bins - item) ** 3)\n    \n    # Compute the cube root of the sum of the inverse of the square of the bin's index\n    cube_root_sum = np.sqrt(np.sum(inv_sq_cube_diff))\n    \n    # Compute the square of the cosine of the square of the rest capacity divided by the item's size\n    cos_sq_rest_capacity = np.cos(np.square(bins - item) / item) ** 2\n    \n    # Compute the final score\n    scores = inv_sq_cube_diff + cube_root_sum + cos_sq_rest_capacity\n    \n    return scores",
+          "objective": 0.03481,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign the item to the bin with the maximum score computed by finding the sum of the inverse of the square of the difference between the bin's capacity and the item's size, and the inverse of the square of the bin's index, multiplied by the cosine of the square of the rest capacity divided by the item's size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Compute the inverse of the square of the difference between the bin's capacity and the item's size\n    inv_sq_diff = 1 / (np.square(bins - item) + 1e-8)\n    \n    # Compute the inverse of the square of the bin's index\n    inv_sq_idx = 1 / (np.square(np.arange(len(bins))) + 1e-8)\n    \n    # Compute the cosine of the square of the rest capacity divided by the item's size\n    cos_sq_rest_capacity = np.cos(np.square(bins - item) / item)\n    \n    # Multiply the inverse of the square of the difference between the bin's capacity and the item's size, and the inverse of the square of the bin's index, by the cosine of the square of the rest capacity divided by the item's size\n    scores = inv_sq_diff * inv_sq_idx * cos_sq_rest_capacity\n    \n    return scores",
+          "objective": 0.03501,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Assign the item to the bin with the maximum score computed as the sum of the inverse of the difference between the bin's capacity and the item's size, and the inverse of the square of the bin's index, multiplied by the sine of the square of the rest capacity divided by the item's size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Compute the inverse of the difference between the bin's capacity and the item's size\n    inv_diff = 1 / (bins - item)\n    # Compute the inverse of the square of the bin's index\n    inv_sq_idx = 1 / (bins ** 2)\n    # Compute the sine of the square of the rest capacity divided by the item's size\n    sin_sq_rest_capacity = np.sin(np.square(bins - item))\n    # Multiply the three terms together\n    scores = inv_diff * inv_sq_idx * sin_sq_rest_capacity\n    return scores",
+          "objective": 0.03552,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the score by multiplying the inverse square of the sum of the difference between the bin's capacity and the item's size, and the square of the cosine of the rest capacity divided by the item's size, by the square root of the sum of the inverse of the square of the bin's index and the sine of the rest capacity divided by the item's size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse square of the sum of the difference between the bin's capacity and the item's size\n    inv_sq_diff = 1 / (np.square(bins - item) + 1e-8)\n    \n    # Calculate the square of the cosine of the rest capacity divided by the item's size\n    cos_rest_capacity = np.cos(bins * item)\n    sq_cos_rest_capacity = np.square(cos_rest_capacity)\n    \n    # Calculate the square root of the sum of the inverse of the square of the bin's index and the sine of the rest capacity divided by the item's size\n    sqrt_inv_sq_bin_index = np.sqrt(np.square(np.arange(len(bins))) + 1e-8)\n    sin_rest_capacity = np.sin(bins * item)\n    sq_sin_rest_capacity = np.square(sin_rest_capacity)\n    \n    # Multiply the inverse square of the sum of the difference between the bin's capacity and the item's size, and the square of the cosine of the rest capacity divided by the item's size\n    scores = inv_sq_diff * sq_cos_rest_capacity\n    \n    # Add the square root of the sum of the inverse of the square of the bin's index and the sine of the rest capacity divided by the item's size\n    scores += sqrt_inv_sq_bin_index * sq_sin_rest_capacity\n    \n    return scores",
+          "objective": 0.03733,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign the item to the bin with the maximum score computed by multiplying the inverse of the sum of the square of the inverse of the difference between the bin's capacity and the item's size, and the cosine of the square of the rest capacity divided by the item's size, by the square root of the sum of the inverse of the square of the bin's index, and the sine of the square of the rest capacity divided by the item's size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Compute the inverse of the sum of the square of the inverse of the difference between the bin's capacity and the item's size\n    inv_sum_sq_diff = 1 / (np.square(bins - item) + 1e-8)\n    \n    # Compute the cosine of the square of the rest capacity divided by the item's size\n    cos_rest_capacity = np.cos(np.square(bins - item))\n    \n    # Compute the square root of the sum of the inverse of the square of the bin's index\n    sqrt_inv_bin_index = np.sqrt(np.square(np.arange(len(bins))))\n    \n    # Compute the sine of the square of the rest capacity divided by the item's size\n    sin_rest_capacity = np.sin(np.square(bins - item))\n    \n    # Multiply the inverse of the sum of the square of the inverse of the difference between the bin's capacity and the item's size, and the cosine of the square of the rest capacity divided by the item's size\n    scores = inv_sum_sq_diff * cos_rest_capacity\n    \n    # Add the square root of the sum of the inverse of the square of the bin's index\n    scores += sqrt_inv_bin_index\n    \n    # Add the sine of the square of the rest capacity divided by the item's size\n    scores += sin_rest_capacity\n    \n    return scores",
+          "objective": 0.03743,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Assign the item to the bin with the maximum score computed as the sum of the inverse of the square of the difference between the bin's capacity and the item's size, and the inverse of the cube of the bin's index, multiplied by the sine of the cube of the rest capacity divided by the item's size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Compute the inverse of the square of the difference between the bin's capacity and the item's size\n    inv_sq_diff = 1 / (np.square(bins - item))\n    \n    # Compute the inverse of the cube of the bin's index\n    inv_cube_idx = 1 / (np.power(np.arange(len(bins)), 3))\n    \n    # Compute the sine of the cube of the rest capacity divided by the item's size\n    sin_cube_rest = np.sin(np.power(bins - item, 3) / item)\n    \n    # Multiply the inverse of the square of the difference between the bin's capacity and the item's size, and the inverse of the cube of the bin's index, by the sine of the cube of the rest capacity divided by the item's size\n    scores = inv_sq_diff * inv_cube_idx * sin_cube_rest\n    \n    return scores",
+          "objective": 0.03793,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Calculate bins scores by summing the exponential of the negative difference between bin capacity and item size, and the logarithm of the negative difference between the bin's index and the number of bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the exponential of the negative difference between bin capacity and item size\n    exp_diff = np.exp(-(bins - item))\n    \n    # Calculate the logarithm of the negative difference between the bin's index and the number of bins\n    log_diff = np.log(-(np.arange(len(bins)) - len(bins)))\n    \n    # Sum the two terms to get the total score for each bin\n    scores = exp_diff + log_diff\n    \n    return scores",
+          "objective": 0.03833,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Score each bin by dividing the sum of item size and half of rest capacity by their difference, then subtracting the square of the bin index.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the scores for each bin\n    scores = (item + bins / 2) / (bins - item)\n    \n    # Subtract the square of the bin index from the scores\n    scores -= np.square(np.arange(len(bins)))\n    \n    return scores",
+          "objective": 0.03864,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Score each bin by dividing the sum of item size and rest capacity by their difference, then subtracting the square of the bin index.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the scores for each bin\n    scores = (item + bins) / (bins - item) - (np.arange(len(bins)) ** 2)\n    \n    # Return the scores as a NumPy array\n    return scores",
+          "objective": 0.03874,
+          "other_inf": null
+     }
+]

@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "Algorithm description: My new algorithm calculates a score for each bin based on the percentage of remaining capacity to the maximum capacity, the average capacity, and the deviation of the remaining capacity from the average capacity. The algorithm then penalizes bins that are close to their maximum capacity. Finally, the bins are sorted based on their scores, and the item is assigned to the bin with the maximum score. If two or more bins have the same maximum score, the bin with the smallest remaining capacity is chosen.\n\nCode:\n\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    max_capacity = np.max(bins)\n    avg_capacity = np.mean(bins)\n\n    percentage_score = remaining_capacity / max_capacity\n    deviation_score = np.abs(remaining_capacity - avg_capacity)\n    \n    penalty_score = np.where(remaining_capacity > (max_capacity * 0.8), -0.2 * max_capacity, 0)\n\n    scores = percentage_score + deviation_score + penalty_score\n    \n    sorted_indices = np.lexsort((bins, scores))\n    sorted_bins = bins[sorted_indices]\n    \n    assigned_bins = np.where(sorted_bins >= item, sorted_bins, np.inf)\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

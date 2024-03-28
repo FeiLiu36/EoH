@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "My new algorithm subtracts a normalized logarithmic component and the exponential function, then multiplied by a cubic form of the available rest capacity",
+          "code": "import numpy as np\ndef score(item, bins):\n    avg_bin = np.mean(bins)\n    scores = (bins / (bins - item) + np.log(bins) ** (np.arange(len(bins)) ** 1) * bins.max()) ** 3 * (bins ** 3 / avg_bin ** 2) - np.exp(bins / avg_bin)\n    return scores",
+          "objective": 0.00614,
+          "other_inf": null
+     },
+     {
+          "algorithm": " New algorithm: The score is determined by how much remaining capacity a bin has, how many items are already in the bin, and the size of the current item. ",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = bins / (bins - item) + np.log(bins) ** (np.arange(len(bins)) ** 1.2)\n    return scores",
+          "objective": 0.00644,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm subtracts the multiplication of the item size and the bin's maximum capacity from the square of the score function multiplied by the maximum capacity of the bin.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.square(bins/(bins - item) + np.log(bins)**(np.arange(len(bins))**1) * bins.max())\n    return scores",
+          "objective": 0.00664,
+          "other_inf": null
+     },
+     {
+          "algorithm": " New algorithm: The score is determined by how much remaining capacity a bin has, how many items are already in the bin, and the size of the current item. ",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = bins / (bins - item) + np.log(bins) ** (np.arange(len(bins)) ** 1.2) * np.log(np.arange(len(bins)) + 1)\n    return scores",
+          "objective": 0.00684,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Algorithm: Raise the input item size to the power of maximum capacity, and then square the score function.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = ((bins / (bins - item) + np.log(bins + item) ** (np.arange(len(bins)) ** 1) * bins.max()) ** 2) ** 2\n    return scores",
+          "objective": 0.00694,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm comprises the subtraction of the square of the item size multiplied by the sum of the bin's rest capacity and the average of all bins from the quotient of the normalized logarithmic component and the cube of the bin's maximum capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    avg_bin = np.mean(bins)\n    numerator = (bins / (bins - item) + np.log(bins) ** (np.arange(len(bins)) ** 1))\n    denominator = bins.max() ** 3 * (bins + avg_bin)\n    scores = ((numerator / denominator) - item ** 2) ** 2\n    return scores",
+          "objective": 0.00704,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm multiplies the score function by the square root of the bin's rest capacity and adds the product of item size and the bin's maximum capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.sqrt(bins) * ((bins / (bins - item) + np.log(bins) ** (np.arange(len(bins)) ** 1)) ** 2 + np.sqrt(bins.max())) +  item * bins.max()\n    return scores",
+          "objective": 0.00724,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm subtracts the multiplication of the item size and the bin's maximum capacity from the square of the score function multiplied by the maximum capacity of the bin.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = ((bins / (bins - item) + np.log(bins) ** (np.arange(len(bins)) ** 1) * bins.max()) ** 2 * bins.max() - item * bins.max()) ** 2\n    return scores",
+          "objective": 0.00785,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Multiplies the remaining capacity with its logarithm to prioritize bins with higher capacity and discourage assigning to bins that are nearly full.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = bins[-1]\n    remaining_capacities = bins - item\n    scores = np.log(max_capacity / remaining_capacities) * remaining_capacities\n    return scores",
+          "objective": 0.00805,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm multiplies the score function by the square root of the bin's maximum capacity and adds the square of both the item size and the bin's maximum capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = ((bins / (bins - item) + np.log(bins) ** (np.arange(len(bins)) ** 1)) ** 2 + np.sqrt(bins.max())) ** 2 + (item ** 2 + bins.max())\n    return scores",
+          "objective": 0.00825,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Modified algorithm: The score is determined by the number of items the bin could accommodate besides the current item, the number of items the bin already contains, and the difference between the bin's capacity and the current item size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins - item) * np.log(bins - item) * bins / (bins - item + np.arange(len(bins)) ** 2)\n    return scores",
+          "objective": 0.00845,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The score is determined by the square root of how many items are already in the bin, the remaining capacity of the bin, and the size of the current item.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.sqrt(bins) / (bins - item) * np.log(bins) ** (np.arange(len(bins)) ** 1.3)\n    return scores",
+          "objective": 0.00865,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Multiplies the remaining capacity with its logarithm to prioritize bins with higher capacity and discourage assigning to bins that are nearly full.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    avg_capacity = np.mean(bins)\n    remaining_capacities = (bins - item) / avg_capacity\n    scores = np.log(1. / remaining_capacities) * remaining_capacities\n    return scores",
+          "objective": 0.00916,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm aims to maximize the normalized logarithmic component multiplied by the third power of distance between the bin capacity and the average of bin capacities",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    avg_bin = np.mean(bins)\n    scores = (bins / (bins - item) + np.log(bins) ** (np.arange(len(bins)) ** 1)) * (np.square(bins - avg_bin))\n    return scores",
+          "objective": 0.01026,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Divide the cube of the score function multiplied by the bin's maximum capacity by the bin's rest capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = ((bins / (bins - item) + np.log(bins) ** (np.arange(len(bins)) ** 1) * bins.max()) ** 3 / bins) ** 2\n    return scores",
+          "objective": 0.01046,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm subtracts the square of the item size multiplied by the sum of the bin's rest capacity and the average of all bins from the product of the normalized logarithmic component and the cube of the bin's maximum capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    avg_bin = np.mean(bins)\n    scores = ((bins / (bins - item) + np.log(bins) ** (np.arange(len(bins)) ** 1) * bins.max()) ** 3 * (bins + avg_bin) - item ** 2) ** 2\n    return scores",
+          "objective": 0.01056,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm boosts the weight of the logarithmic part with the power of the rest capacity of the bin.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = bins / (bins - item) * np.log(bins + 1) ** np.arange(len(bins))\n    return scores",
+          "objective": 0.01067,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Adjusted Algorithm: Assigns bins with less remaining capacity and higher scores to the current item, considering their occupancy.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacities = bins - item\n    score_1 = (bins / bins + 1) * np.log(bins + 2) ** np.arange(len(bins))\n    score_2 = 1.0 / ((remaining_capacities / item) * (bins / item))\n    scores = score_1 * score_2 * remaining_capacities / max_capacity\n    return scores",
+          "objective": 0.01097,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm multiplies the logarithmic part of the score function with the item size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = bins * item / (bins - item) * np.log(bins) ** np.arange(len(bins))\n    return scores",
+          "objective": 0.01107,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm multiplies the logarithmic component by the square of the maximum capacity of the bin",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = bins / (bins - item) + np.log(bins) ** (np.arange(len(bins)) ** 1) * (bins.max()) ** 2\n    return scores",
+          "objective": 0.01117,
+          "other_inf": null
+     }
+]

@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm aims to score the bins based on the remaining capacity and item size using a different formula. The main steps of the algorithm are as follows:\n\n1. Calculate the maximum capacity of the bins by finding the maximum value in the 'bins' array.\n2. Calculate the remaining capacity of each bin by subtracting the 'bins' array from the maximum capacity.\n3. Calculate the penalties for each bin based on the remaining capacity and item size using a modified formula.\n4. Calculate the scores for each bin using the penalties and remaining capacity.\n5. Return the scores array.\n\nHere's the implementation of the 'score' function:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    remaining_capacity = max_capacity - bins\n\n    # Calculate the penalties based on remaining capacity and item size\n    capacity_penalty = np.power(2, -(remaining_capacity / max_capacity))\n    item_penalty = np.power(2, -(item / max_capacity))\n\n    # Calculate the scores for each bin\n    scores = np.log(remaining_capacity + 1) - capacity_penalty - item_penalty\n\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

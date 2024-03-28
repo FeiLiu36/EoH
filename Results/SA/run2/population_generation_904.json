@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "My new algorithm, named \"Modified Logarithmic Algorithm,\" assigns scores to the bins by calculating the logarithm of the ratio between the maximum bin capacity and the remaining bin capacity, aiming to prioritize bins with smaller remaining capacity and minimize the number of used bins by assigning the item to the bin with the maximum score.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the ratio between maximum bin capacity and remaining bin capacity\n    ratios = np.log(np.max(bins) / bins)\n    \n    # Calculate the scores using the logarithmic function\n    scores = ratios\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

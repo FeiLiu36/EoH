@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "\nThe new algorithm scores each bin based on a function that takes into account the rest capacity of the bin, the difference between the maximum capacity of the bin and the rest capacity, and the ratio of the item size to the max capacity. The scores are then normalized to ensure they sum up to 1.\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    rest_capacity = max_capacity - bins\n    ratio = item / max_capacity\n    \n    # Calculate the score for each bin\n    scaling_factor = 0.1  # Adjust this value based on your needs\n    \n    # New scoring function\n    scores = (rest_capacity**2) * np.exp(-(max_capacity - rest_capacity) / scaling_factor) * ratio\n    \n    scores /= np.sum(scores)\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

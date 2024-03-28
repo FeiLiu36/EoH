@@ -1,0 +1,62 @@
+[
+     {
+          "algorithm": "The common backbone idea in the provided algorithms is to calculate the scores for assigning items to bins based on a combination of the residual capacity of the bin, the index of the bin, and various mathematical functions applied to the residual capacity and the item size.\n\nMy new algorithm assigns items to bins based on a score function that combines the residual capacity of the bin, the index of the bin, the square root of the logarithm of the residual capacity, and the absolute difference between the residual capacity and the item size, while minimizing the number of used bins.\n\n```\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    residual_capacity = bins - item\n    weights = (residual_capacity / np.arange(1, len(bins)+1)) * (1 / np.sqrt(np.abs(residual_capacity - item))) * np.sqrt(np.log(residual_capacity))\n    scores = residual_capacity * weights\n    return scores",
+          "objective": 0.00654,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns items to bins based on a score function that combines the square root of the logarithm of the residual capacity divided by the sum of the index of the bin and the square root of the absolute difference between the residual capacity and the item size, while minimizing the number of used bins.\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    residual_capacity = bins - item\n    weights = (np.sqrt(np.log(residual_capacity)) / (np.arange(1, len(bins)+1) + np.sqrt(np.abs(residual_capacity - item))))\n    scores = residual_capacity * weights\n    return scores",
+          "objective": 0.00664,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns items to bins based on a score function that combines the logarithm of the residual capacity of the bin, the index of the bin, and the cube root of the square of the difference between the residual capacity and the item size, while minimizing the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    residual_capacity = bins - item\n    weights = (np.log(residual_capacity) / np.arange(1, len(bins)+1)) * (1 / np.cbrt(np.square(residual_capacity - item)))\n    scores = residual_capacity * weights\n    return scores",
+          "objective": 0.00674,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The common backbone idea in the provided algorithms is to calculate a score for each bin based on various combinations of the residual capacity, item size, and the index of the bin. \n\nMy new algorithm assigns items to bins based on a score function that combines the logarithm of the residual capacity divided by the product of the index of the bin and the square root of the absolute difference between the residual capacity and the item size, while minimizing the number of used bins. \n\nHere is the implementation of the new algorithm:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    residual_capacity = bins - item\n    weights = (np.log(residual_capacity) / (np.arange(1, len(bins)+1) * np.sqrt(np.abs(residual_capacity - item))))\n    scores = residual_capacity * weights\n    return scores",
+          "objective": 0.00684,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm description: The new algorithm assigns items to bins based on a score function that combines the residual capacity of the bin, the index of the bin, and the logarithm of the absolute difference between the residual capacity and the item size, while minimizing the number of used bins. In this new algorithm, the residual capacity is adjusted by a factor that depends on the index of the bin.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    residual_capacity = bins - item\n    weights = (residual_capacity / np.arange(1, len(bins)+1)) * np.log(np.abs(residual_capacity))\n    adjusted_residual_capacity = residual_capacity * np.exp(-np.arange(1, len(bins)+1) * 0.1)\n    scores = adjusted_residual_capacity * weights\n    return scores",
+          "objective": 0.00694,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns items to bins based on a score function that combines the residual capacity of the bin, the logarithm of the index of the bin, and the cube root of the absolute difference between the residual capacity and the item size, while minimizing the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    residual_capacity = bins - item\n    weights = (1 / np.arange(1, len(bins)+1)) * (1 / np.cbrt(np.abs(residual_capacity)))\n    scores = residual_capacity * np.log(np.arange(1, len(bins)+1)) * weights\n    return scores",
+          "objective": 0.00714,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns items to bins based on a score function that considers the residual capacity of the bin, the logarithm of the index of the bin, and the square root of the absolute difference between the residual capacity and the item size, while minimizing the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    residual_capacity = bins - item\n    weights = (1 / np.arange(1, len(bins)+1)) * (1 / np.sqrt(np.abs(residual_capacity)))\n    scores = residual_capacity * np.log(np.arange(1, len(bins)+1)) * weights\n    return scores",
+          "objective": 0.00724,
+          "other_inf": null
+     },
+     {
+          "algorithm": "algorithm = The new algorithm assigns items to bins based on a score function that combines the logarithm of the residual capacity divided by the sum of the index of the bin and the square root of the absolute difference between the residual capacity and the item size, while minimizing the number of used bins.\n\nImplementation in Python:\n\n```\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    residual_capacity = bins - item\n    weights = (np.log(residual_capacity) / (np.arange(1, len(bins)+1) + np.sqrt(np.abs(residual_capacity - item))))\n    scores = residual_capacity * weights\n    return scores",
+          "objective": 0.00734,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: The algorithms calculate scores for assigning items to bins based on the residual capacity of the bin, the index of the bin, and various mathematical functions applied to the residual capacity and the item size.\n\nNew algorithm: My new algorithm assigns items to bins based on a score function that combines the residual capacity of the bin, the index of the bin, the natural logarithm of the residual capacity, and the reciprocal of the absolute difference between the residual capacity and the item size, while minimizing the number of used bins.\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    residual_capacity = bins - item\n    weights = (residual_capacity / np.arange(1, len(bins)+1)) * (1 / np.abs(residual_capacity - item))\n    scores = residual_capacity * np.log(residual_capacity) * weights\n    return scores",
+          "objective": 0.00765,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns items to bins based on a score function that combines the logarithm of the residual capacity multiplied by the exponential of the index of the bin, the square root of the absolute difference between the residual capacity and the item size, and the cube of the residual capacity, while minimizing the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    residual_capacity = bins - item\n    weights = np.log(residual_capacity) * np.exp(np.arange(1, len(bins)+1)) * np.sqrt(np.abs(residual_capacity - item)) * (residual_capacity**3)\n    scores = residual_capacity * weights\n    return scores",
+          "objective": 0.00785,
+          "other_inf": null
+     }
+]

@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = np.zeros_like(bins)\n\n    diff = bins - item\n    used_bins = diff < max_capacity\n\n    abs_diff = np.abs(diff[used_bins] - item)\n    scores[used_bins] = (item - abs_diff)**2 + np.log(item + 2) / (diff[used_bins] + 0.001)\n\n    return scores",
+          "objective": 0.01942,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = np.zeros_like(bins)\n    remaining_capacity = bins - item\n\n    scores[remaining_capacity > 0] = (remaining_capacity[remaining_capacity > 0] + 1) / (item + 0.001)\n    scores[remaining_capacity == item] = item\n    scores[remaining_capacity < item] = item / (remaining_capacity[remaining_capacity < item]**2 + 0.001)\n\n    return scores",
+          "objective": 0.02777,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = np.zeros_like(bins)\n\n    diff = bins - item\n    mask = diff >= 0\n\n    scores[mask] = (3 * item ** 2 + 5) * np.exp(-np.abs(diff[mask] - item)) + np.log(item + 3) / (diff[mask] + 0.001) + np.sqrt(item)\n    scores[diff == item] = (item + 2) * np.log(item + 2)\n\n    return scores",
+          "objective": 0.02847,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = np.zeros_like(bins)\n\n    diff = bins - item\n    mask = diff >= 0\n\n    scores[mask] = (10 * item ** 2) * np.exp(-np.abs(diff[mask] - item)) + np.log(item + 5) / (diff[mask] + 0.001)\n    scores[diff == item] = item + 3\n\n    return scores",
+          "objective": 0.02898,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = np.zeros_like(bins)\n\n    diff = bins - item\n    mask = diff >= 0\n\n    scores[mask] = (5 * item ** 2 + 7) * np.exp(-np.abs(diff[mask] - item)) + np.log(item + 4) / (diff[mask] + 0.001)\n    scores[diff == item] = item + 2\n\n    return scores",
+          "objective": 0.02908,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = np.zeros_like(bins)\n\n    diff = bins - item\n    mask = diff >= 0\n\n    scores[mask] = (3 * item ** 2 + 7) * np.exp(-np.abs(diff[mask] - item)) + np.log(item + 4) / (diff[mask] + 0.001)\n    scores[diff == item] = item + 3\n\n    return scores",
+          "objective": 0.02918,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    diff = bins - item\n    scores = np.zeros_like(bins)\n\n    mask = diff >= 0\n    scores[mask] = (3 * item ** 2 + 5) * np.exp(-np.abs(diff[mask] - item)) + np.log(item + 3) / (diff[mask] + 0.001)\n    scores[diff == item] = item * 2\n\n    return scores",
+          "objective": 0.02928,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = np.zeros_like(bins)\n\n    diff = bins - item\n    mask = diff >= 0\n\n    scores[mask] = (4 * item ** 2 + 8) * np.exp(-np.abs(diff[mask] - item)) + np.log(item + 3) / (diff[mask] + 0.001)\n    scores[diff == item] = item + 2\n\n    return scores",
+          "objective": 0.02938,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = np.zeros_like(bins)\n\n    diff = bins - item\n    mask = diff >= 0\n\n    scores[mask] = (2 * item ** 2 + 5) * np.exp(-np.abs(diff[mask] - item)) + np.log(item + 7) / (diff[mask] + 0.001)\n    scores[diff == item] = item + 2\n\n    return scores",
+          "objective": 0.02948,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = np.zeros_like(bins)\n\n    diff = bins - item\n    mask = diff >= 0\n\n    scores[mask] = (3 * item ** 2 + 6) * np.exp(-np.abs(diff[mask] - item)) + np.log(item + 2) / (diff[mask] + 0.001)\n    scores[diff == item] = item + 1\n\n    return scores",
+          "objective": 0.02968,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    diff = bins - item\n    scores = np.zeros_like(bins)\n    \n    # Calculate the scores based on the size of the item and the difference from the bin capacity\n    scores = (3 * item ** 2 + 5) * np.exp(-np.abs(diff - item)) + np.log(item + 3) / (diff + 0.001)\n    \n    # Set the scores for bins with the same capacity as the item to be twice the item size\n    scores[diff == item] = item * 2\n\n    return scores",
+          "objective": 0.03028,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = np.zeros_like(bins)\n\n    diff = bins - item\n    mask = diff >= 0\n\n    scores[mask] = (item ** 2 + 5) * np.exp(-np.abs(diff[mask] - item)) + np.log(item + 10) / (diff[mask] + 0.001)\n    scores[diff == item] = item\n\n    return scores",
+          "objective": 0.03039,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = np.zeros_like(bins)\n\n    diff = bins - item\n    mask = diff >= 0\n\n    scores[mask] = (item ** 2 + 3) * np.exp(-np.abs(diff[mask] - item)) + np.log(item + 5) / (diff[mask] + 0.001)\n    scores[diff == item] = item\n\n    return scores",
+          "objective": 0.03059,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = np.zeros_like(bins)\n\n    diff = bins - item\n    mask = diff >= 0\n\n    scores[mask] = (item ** 2 + 4) * np.exp(-np.abs(diff[mask] - item)) + np.log(item + 3) / (diff[mask] + 0.001)\n    scores[diff == item] = item\n\n    return scores",
+          "objective": 0.03069,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = np.zeros_like(bins)\n    diff = bins - item\n    mask = diff >= 0\n    scores[mask] = ((np.exp(-np.abs(diff[mask] - item)) * item ** 2 + 3) + np.log(item + 5) / (diff[mask] + 0.001))\n    scores[diff == item] = item\n    return scores",
+          "objective": 0.03089,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    diff = bins - item\n    \n    scores = (item ** 2 + 10) * np.exp(-np.abs(diff - item)) + np.log(item + 7) / (diff + 0.001)\n    scores[diff == item] = item\n    \n    return scores",
+          "objective": 0.03099,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    diff = bins - item\n    scores = np.zeros_like(bins)\n\n    mask = bins < max_capacity\n    scores[mask] = (item ** 3 + 7) * np.exp(-np.abs(diff[mask] - item)) + np.log(item + 7) / (diff[mask] + 0.001)\n    scores[diff == item] = item\n\n    return scores",
+          "objective": 0.03109,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    diff = bins - item\n    scores = np.zeros_like(bins)\n\n    mask = bins < max_capacity\n    scores[mask] = (item ** 3 + 10) * np.exp(-np.abs(diff[mask] - item)) + np.log(item + 5) / (diff[mask] + 0.001)\n    scores[diff == item] = item\n\n    return scores",
+          "objective": 0.03119,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = np.zeros_like(bins)\n\n    diff = bins - item\n    mask = diff >= 0\n\n    scores[mask] = (item ** 3 + 5) * np.exp(-np.abs(diff[mask] - item)) + np.log(item + 10) / (diff[mask] + 0.001)\n    scores[diff == item] = item ** 2\n\n    return scores",
+          "objective": 0.03159,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    diff = bins - item\n    scores = np.zeros_like(bins)\n\n    mask = bins < max_capacity\n    scores[mask] = (item ** 3 + 15) * np.exp(-np.abs(diff[mask] - item)) + np.log(item + 20) / (diff[mask] + 0.001)\n    scores[diff == item] = item\n\n    return scores",
+          "objective": 0.03169,
+          "other_inf": null
+     }
+]

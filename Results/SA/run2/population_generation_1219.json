@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    remaining_capacities_sum = np.sum(bins)\n    \n    log_item_size = np.log(item)\n    exp_max_capacity = np.exp(max_capacity)\n    \n    # Calculate the scores using a modified formula\n    scores = (log_item_size / bins) * (exp_max_capacity / (remaining_capacities_sum - bins))\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "Add a penalty to the score of any bin with remaining capacity greater than two times the item size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    inf = np.inf\n    scores = (bins - item) * (1-((bins - item) > 2 * item)) * 1e6\n    scores[bins == item] = inf\n    scores[bins < item] = -inf\n    return scores",
+          "objective": 0.01006,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: (bins - item)**2 * (-1e6) * (1 - ((bins - item) > 0.5 * bins))",
+          "code": "import numpy as np\n\ndef score(item, bins):\n  scores = (bins - item)**2 * (-1e6) * (1 - ((bins - item) > 0.5 * bins))\n  return scores",
+          "objective": 0.01157,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: log(bins - item)/(1 + (bins - item)/item) * (1-((bins - item) > 0.9 * item)) * (-1e6)",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.log(bins - item) / (1 + (bins - item) / item) * (1-((bins - item) > 0.9 * item)) * (-1e6)\n    return scores",
+          "objective": 0.01258,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Divide the remaining capacity of each bin by the item size to calculate a penalty, and add the penalty to the score of the bin.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    penalty = np.ceil(bins / item)\n    scores = bins - penalty * item\n    return scores",
+          "objective": 0.01298,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Modified version: Assigns score as (bins - item)^{1/((bins - item)/item) * (1 - (bins >= 2*item)) * (-1e6)",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    \"\"\"\n    This function assigns a score to each bin in 'bins' for the item of size 'item'.\n    The score is computed as follows:\n    score = (bins - item)**(1/((bins - item)/item) * (1 - (bins >= 2*item)) * (-1e6))\n    The bin with the maximum score is selected for assignment. If the rest capacity of a bin equals the maximum capacity, it will not be used.\n    The goal is to minimize the number of used bins.\n\n    Args:\n        item (int): The size of the item to be assigned.\n        bins (np.array): A numpy array of the rest capacities of the feasible bins, which are larger than the item size.\n\n    Returns:\n        np.array: A numpy array of the scores for the bins.\n    \"\"\"\n\n    # Compute the scores for each bin.\n    scores = (bins - item)**(1/((bins - item)/item) * (1 - (bins >= 2 * item)) * (-1e6))\n\n    # Return the scores.\n    return scores",
+          "objective": 0.01348,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the score as the product of the difference between the bin rest capacity and the item size, the ratio of the item size to the bin rest capacity, and a penalty if the rest capacity is less than the sum of the item size and a margin value.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.array) -> np.array:\n    \"\"\"\n    Calculates the score for each bin in bins for assigning an item of size item.\n\n    Args:\n        item (int): The size of the item to be assigned.\n        bins (np.array): A numpy array of the rest capacities of feasible bins, which are larger than the item size.\n\n    Returns:\n        np.array: A numpy array of scores for each bin in bins.\n    \"\"\"\n    # Calculate the difference between the bin rest capacity and the item size\n    diff = bins - item\n\n    # Calculate the ratio of the item size to the bin rest capacity\n    ratio = item / bins\n\n    # Calculate a penalty if the rest capacity is less than the sum of the item size and a margin value\n    penalty = np.where(diff < item, diff - item, 0)\n\n    # Calculate the score as the product of the difference, ratio, and penalty\n    scores = diff * ratio * penalty\n\n    return scores",
+          "objective": 0.01358,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assigns a score as (bins - item) * ((bins - item)/item)^(1/(bins - item)) * (1 - (bins >=2*item)) * (-1e6)",
+          "code": "import numpy as np\n\ndef score(item, bins):\n  scores = (bins - item) * ((bins - item)/item)**(1/(bins - item)) * (1 - (bins >=2*item)) * (-1e6)\n  return scores",
+          "objective": 0.0157,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Modified Algorithm: Assigns score as 1/((bins - item)/item)^(1/(bins-item)) * (bins - item) * (1 - (bins > 2*item)) * log(bins + 1) * (-1e5)",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = 1 / (np.maximum((bins - item) / item, 1e-10))**(1 / (bins - item)) * (bins - item) * (1 - (bins > 2 * item)) * np.log(bins + 1) * (-1e5)\n    return scores",
+          "objective": 0.0163,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign score as 1/((bins - item)/item)^2 * (bins-item) * (1 - (bins>2*item)) * (-1e6)",
+          "code": "import numpy as np\n\ndef score(item, bins):\n  scores = 1 / (((bins - item) / item)**2) * (bins-item) * (1 - (bins > (2*item))) * (-1e6)\n  return scores",
+          "objective": 0.0164,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm: Modified Algorithm: (bins - item)^3 * (1-((bins - item) > 0.85 * item)) * (-1e5)",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.array) -> np.array:\n  \"\"\"\n  Calculate the score for each bin in bins for assigning an item of size item.\n\n  Args:\n    item (int): The size of the item to be assigned.\n    bins (np.array): A numpy array of integers representing the remaining capacities of feasible bins, \n                     which are larger than the item size.\n\n  Returns:\n    np.array: A numpy array of scores for the bins.\n  \"\"\"\n\n  # Calculate the difference between the bin capacities and the item size.\n  diff = bins - item\n\n  # Calculate the score for each bin using the given formula.\n  scores = np.power(diff, 3) * (1 - (diff > 0.85 * item)) * (-1e5)\n\n  # Return the scores.\n  return scores",
+          "objective": 0.0165,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: (bins - item)^2 * (1-((bins - item) > 0.8 * item)) * (-1e6)",
+          "code": "def score(item, bins):\n    scores = (bins - item)**2 * (1-((bins - item) > 0.8 * item)) * (-1e6)\n    return scores",
+          "objective": 0.0167,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: (bins - item) ** 2 * (1 - ((bins - item) > threshold * item)) * (-1e6)",
+          "code": "import numpy as np\n\ndef score(item, bins):\n  scores = (bins - item) ** 2 * (1 - ((bins - item) > item * 0.9)) * (-1e6)\n  return scores",
+          "objective": 0.01761,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Modified algorithm: (bins - item)^2 * (1-((bins - item) > 0.75 * item)) * (-1e6)",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins - item)**2 * (1 - (bins - item > 0.75*item)) * (-1e6)\n    return scores",
+          "objective": 0.01861,
+          "other_inf": null
+     },
+     {
+          "algorithm": " New algorithm: (bins - item)**2 * (1-((bins - item) > 0.9 * item)) * (-10**6) ",
+          "code": "import numpy as np\ndef score(item, bins):\n    scores = (bins - item)**2 * (1-((bins - item) > 0.9 * item)) * (-10**6)\n    return scores",
+          "objective": 0.01922,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: (bins - item)^4 * (1-((bins - item) > 0.95 * item)) * (-1e6)",
+          "code": "import numpy as np\n\ndef score(item, bins):\n  scores = (bins - item)**4 * (1-((bins - item) > 0.95 * item)) * (-1e6)\n  return scores",
+          "objective": 0.01942,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: (bins - item)^6 * (1-((bins - item) > 0.9 * item)) * (-1e6)",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"\n    I need help designing a novel score function that scoring a set of bins to assign an item. In each step, the item will be assigned to the bin with the maximum score. If the rest capacity of a bin equals the maximum capacity, it will not be used. The final goal is to minimize the number of used bins.\n    I have existing algorithm idea as follows: \n    New algorithm: (bins - item)^6 * (1-((bins - item) > 0.9 * item)) * (-1e6)\n    Please implement it in Python as a function named score. This function should accept 2 input(s): 'item', 'bins'. The function should return 1 output(s): 'scores'. 'item' and 'bins' are the size of current item and the rest capacities of feasible bins, which are larger than the item size. The output named 'scores' is the scores for the bins for assignment.  Note that 'item' is of type int, 'bins' is a Numpy array include integer values, and 'scores' should be Numpy array. The function should be complicated enough to promote performance. Avoid utilizing the random component, and it is crucial to maintain self-consistency.\n    Do not give any additional explanations!\n    \"\"\"\n    delta = bins - item\n    scores = np.power(delta, 6) * (1 - (delta > 0.9 * item)) * (-1e6)\n    return scores",
+          "objective": 0.02163,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Modified Algorithm: (bins - item)^2 * (1-((bins - item) > 0.7 * item)) * (-1e5)",
+          "code": "def score(item, bins):\n    scores = (bins - item)**2 * (1-((bins - item) > 0.7 * item)) * (-1e5)\n    return scores",
+          "objective": 0.02385,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: (bins - item)^3 * (1 - e^(-1*(bins - item)/item)) * (1-((bins - item) > 0.6 * item)) * (-1e6)",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins - item)**3 * (1 - np.exp(-1*(bins - item)/item)) * (1-((bins - item) > 0.6 * item)) * (-1e6)\n    return scores",
+          "objective": 0.02475,
+          "other_inf": null
+     },
+     {
+          "algorithm": " New algorithm: (bins - item)^2.5 * (1-((bins - item) > 0.5 * item)) * (-1e6) ",
+          "code": "def score(item, bins):\n    scores = (bins - item)**2.5 * (1 - ((bins - item) > 0.5 * item)) * (-1e6)\n    return scores",
+          "objective": 0.02757,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The score is the reciprocal of the product of the maximum bin capacity, the difference between the bin rest capacity and the item size, and the bin number, penalized if the rest capacity is less than twice the item size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    \"\"\"Score a set of bins to assign an item.\n\n    In each step, the item will be assigned to the bin with the maximum score.\n    If the rest capacity of a bin equals the maximum capacity, it will not be used.\n    The final goal is to minimize the number of used bins.\n\n    Args:\n        item: The size of the current item.\n        bins: The rest capacities of feasible bins, which are larger than the item size.\n\n    Returns:\n        The scores for the bins for assignment.\n    \"\"\"\n\n    # Calculate the maximum bin capacity.\n    max_capacity = np.max(bins)\n\n    # Calculate the difference between the bin rest capacity and the item size.\n    diff = bins - item\n\n    # Calculate the bin number.\n    bin_num = np.arange(len(bins)) + 1\n\n    # Calculate the reciprocal of the product of the maximum bin capacity, the difference between the bin rest capacity and the item size, and the bin number.\n    scores = 1 / (max_capacity * diff * bin_num)\n\n    # Penalize if the rest capacity is less than twice the item size.\n    scores[diff < 2 * item] -= 1\n\n    return scores",
+          "objective": 0.02777,
+          "other_inf": null
+     }
+]

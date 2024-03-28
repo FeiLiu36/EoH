@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "\nThe new algorithm calculates the scores of the bins based on the ratio of the item size to the rest capacity, the square root of the rest capacity, and a penalty factor that penalizes bins with rest capacities less than a fixed fraction of the maximum capacity. The scores are then adjusted based on the weighted ratio of the rest capacities to the maximum capacity and the maximum capacity itself. The final scores are normalized to ensure self-consistency.\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_rest_capacity = np.max(bins)\n    max_capacity = np.max([item, max_rest_capacity])\n\n    # Calculate the penalty fraction dynamically based on the maximum capacity\n    penalty_fraction = max_rest_capacity / max_capacity\n\n    # Calculate the adjusted scores based on the ratio of the item size to the rest capacity,\n    # the square root of the rest capacity, and the penalty factor\n    adjusted_scores = (item / bins) * np.sqrt(bins) * (1 - penalty_fraction)\n\n    # Calculate the weighted ratio of the rest capacities to the maximum capacity\n    rest_capacity_ratio = bins / max_capacity\n\n    # Create a new array of scores\n    scores = adjusted_scores * rest_capacity_ratio\n\n    # Normalize the final scores to ensure self-consistency\n    scores /= np.sum(scores)\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

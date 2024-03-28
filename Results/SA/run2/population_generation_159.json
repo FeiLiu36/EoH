@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "\nThe new algorithm calculates the score for each bin by taking the product of the remaining capacity of the bin divided by the item size and the exponential decay factor raised to the power of the difference between the maximum capacity and the remaining capacity of the bin, and finally sorts the scores in descending order.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    max_capacity = np.max(bins)\n    decay_factor = 0.5\n    scores = (remaining_capacity / item) * np.exp(decay_factor * (max_capacity - remaining_capacity))\n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

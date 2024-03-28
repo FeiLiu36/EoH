@@ -1,0 +1,32 @@
+[
+     {
+          "algorithm": "The algorithm accepts an item and a set of bins as input and returns the scores for the bins, calculated based on their rest capacities and the item size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    max_capacity = np.max(bins)\n    \n    for i in range(len(bins)):\n        if bins[i] == max_capacity:\n            scores[i] = 0\n        else:\n            scores[i] = max_capacity - bins[i]\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nAlgorithm: The algorithm assigns an item to a bin by calculating a score for each bin based on its remaining capacity. The bin with the maximum score is chosen for assignment, and the process is repeated until all items are assigned or there are no more available bins.\nSteps:\n1. Create an empty Numpy array named \"scores\" with the same length as \"bins\" to store the scores for each bin.\n2. Calculate the scores for each bin by dividing its remaining capacity by the maximum remaining capacity among all bins.\n3. Set the score of any bin with remaining capacity equal to the maximum capacity as 0.\n4. Return the \"scores\" array.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = np.zeros_like(bins)\n    scores[bins == max_capacity] = 0\n    scores[bins != max_capacity] = bins[bins != max_capacity] / max_capacity\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nAlgorithm Description:\n- Calculate the scores for each bin based on the rest capacity.\n- If the rest capacity of a bin equals the maximum capacity, assign a score of 0 to that bin.\n- Otherwise, calculate the score as the difference between the rest capacity and the item size.\n\nMain Steps:\n1. Create an empty array named 'scores' with the same length as the 'bins' array.\n2. Calculate the maximum capacity by finding the maximum value in the 'bins' array.\n3. Iterate over each bin in the 'bins' array.\n4. If the rest capacity of the bin equals the maximum capacity, assign a score of 0 to that bin in the 'scores' array.\n5. Otherwise, calculate the score as the difference between the rest capacity and the item size, and assign it to the corresponding index in the 'scores' array.\n6. Return the 'scores' array as the output.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    max_capacity = np.max(bins)\n    for i in range(len(bins)):\n        if bins[i] == max_capacity:\n            scores[i] = 0\n        else:\n            scores[i] = bins[i] - item\n    return scores",
+          "objective": 0.13211,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns items to bins based on a score function that maximizes the score of each bin and minimizes the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    max_capacity = np.max(bins)\n    feasible_bins = bins[bins > item]\n    if len(feasible_bins) == 0:\n        return scores\n    \n    max_score = max_capacity - item\n    scores[bins == max_capacity] = max_score\n    \n    for size in range(item, max_capacity):\n        bins_with_capacity = feasible_bins[feasible_bins >= size]\n        if len(bins_with_capacity) == 0:\n            break\n        scores[np.where(bins == bins_with_capacity[0])] = size\n    \n    return scores",
+          "objective": 1.51524,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe algorithm assigns an item to the bin with the maximum score in each step, taking into account the rest capacity of the bins and minimizing the number of used bins.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    capacities = bins.copy()\n    capacities[capacities == item] = -1\n    scores = np.divide(capacities, item)\n    scores[scores < 0] = -np.inf\n    return scores",
+          "objective": 1.51534,
+          "other_inf": null
+     }
+]

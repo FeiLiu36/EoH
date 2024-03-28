@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm assigns a score of 1 to bins with the same capacity as the item, assigns a positive score to bins with a lower capacity than the item based on the ratio of their difference to the item size, and assigns a negative score to bins with a higher capacity than the item based on the ratio of their difference to the item size. Finally, the scores of bins that are not used are set to a large negative value.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the difference between the remaining capacity and the item size\n    difference = bins - item\n    \n    # Create an array 'scores' with the size of 'bins' and initialize it with a large negative value\n    scores = np.full_like(bins, -np.inf)\n    \n    # Assign a score of 1 to bins that have the same capacity as the item\n    scores[difference == 0] = 1\n    \n    # Assign a positive score to bins with a lower capacity than the item, based on the ratio of their difference to the item size\n    scores[difference < 0] = -difference[difference < 0] / item\n    \n    # Assign a negative score to bins with a higher capacity than the item, based on the ratio of their difference to the item size\n    scores[difference > 0] = -difference[difference > 0] / item\n    \n    return scores",
+          "objective": 0.04125,
+          "other_inf": null
+     }
+]

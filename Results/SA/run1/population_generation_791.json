@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the scores for the bins by taking the sum of the square of the item size, the sum of the absolute differences between the bin capacities and the item size, and the sum of the absolute differences between the average bin capacity and each bin capacity. Then, it calculates the exponential of the sum and divides it by the bin capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    bin_avg = np.mean(bins)\n    bin_capacity = len(bins)\n\n    scores = np.exp(np.sum(item**2) + np.sum(np.abs(bins - item)) + np.sum(np.abs(bin_avg - bins))) / bin_capacity\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

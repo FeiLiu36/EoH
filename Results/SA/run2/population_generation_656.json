@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New Algorithm Description: The new algorithm scores the bins based on the difference between the rest capacity and the item size, adjusts the scores to ensure self-consistency, and assigns additional bonus scores based on the logarithm of the rest capacity of each bin, squared.\n    \nNew Algorithm Code:\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    scaling_factor = 0.5\n    \n    # Calculate the difference between the rest capacity and the item size\n    capacity_diff = bins - item\n\n    # Adjust the scores using the difference\n    adjusted_scores = 1 / np.square(capacity_diff)\n\n    # Normalize the adjusted scores to ensure self-consistency\n    normalized_scores = adjusted_scores / np.sum(adjusted_scores)\n\n    # Calculate the logarithm of the rest capacity of each bin, squared and assign bonus scores\n    bonus_scores = np.square(np.log(bins))\n\n    # Normalize the bonus scores to ensure self-consistency\n    normalized_bonus_scores = bonus_scores / np.sum(bonus_scores)\n\n    # Combine the normalized scores and normalized bonus scores\n    scores = normalized_scores + normalized_bonus_scores\n\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "Description: The new algorithm involves calculating a score for each bin by multiplying the item size by a weight factor, subtracting the remaining capacity of the bin, and dividing the result by the total capacity of the bin.\n\nImplementation:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the remaining capacity\n    remaining_capacity = bins - item\n    \n    # Calculate the scores for each bin\n    scores = (item * np.exp(-remaining_capacity / bins)) / bins\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

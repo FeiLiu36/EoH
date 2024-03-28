@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "\nNew algorithm:\nThe new algorithm assigns scores to the bins based on the product of the logarithm of the remaining capacity and the square root of the item size factor, where the score is calculated as a modified exponential function with a base of 3, the exponent being the product of the logarithm of the remaining capacity and the square root of the item size factor, and normalized by the maximum score.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacity = max_capacity - bins\n\n    scores = (np.exp((np.log(remaining_capacity) * np.sqrt(item)) / 3) - 1) / (np.exp((np.log(max_capacity) * np.sqrt(item)) / 3) - 1)\n\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

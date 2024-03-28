@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on the logarithm of the item size multiplied by the logarithm of the inverse of the rest capacities of the bins, to minimize the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    log_item = np.log(item)\n    log_inv_rest_cap = np.log(1 / bins)\n    scores = log_item * log_inv_rest_cap\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

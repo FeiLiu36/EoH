@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "Prioritize bins by remaining space and penalized by distance from the item size using a Guassian distribution function.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the remaining space in each bin\n    remaining_space = bins - item\n    \n    # Penalize bins that are already full\n    penalties = np.where(remaining_space <= 0, 1e9, 0)\n    \n    # Calculate the Gaussian distribution function for each bin\n    gaussian_dist = np.exp(-((remaining_space - item) ** 2) / (2 * (item ** 2)))\n    \n    # Combine the penalties and Gaussian distribution functions\n    scores = penalties + gaussian_dist\n    \n    return scores",
+          "objective": 0.01429,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Modified Algorithm: Calculate the score based on the product of the exponential of the difference between the item size and bin capacity and the penalty for distance from the optimal item size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the score based on the product of the exponential of the difference between the item size and bin capacity and the penalty for distance from the optimal item size\n    scores = np.exp(-np.abs(item - bins)) * (1 - np.abs(item - bins) / item)\n    \n    # Return the scores for the bins\n    return scores",
+          "objective": 0.03803,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The novel score function is a product of the inverse of the ratio between the rest capacity of a bin and the item size, multiplied by a weight that is exponentially proportional to the bin index.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse of the ratio between the rest capacity of a bin and the item size\n    inv_ratios = 1 / (bins - item)\n    \n    # Calculate the exponential weight based on the bin index\n    weights = np.exp(-np.arange(len(bins)) * 0.5)\n    \n    # Multiply the inverse ratios and weights to get the final scores\n    scores = inv_ratios * weights\n    \n    return scores",
+          "objective": 0.03864,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Calculate the score for each bin based on the exponential decay function of its rest capacity and a weight inversely proportional to its index squared.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the score for each bin based on the exponential decay function of its rest capacity and a weight inversely proportional to its index squared\n    scores = np.exp(-bins / (item + 1)) * (1 - (bins / (item + 1)) ** 2)\n    \n    # Return the scores for the bins\n    return scores",
+          "objective": 0.03874,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Modified Algorithm: The score for each bin is calculated as the product of the inverse of its index multiplied by the inverse of its rest capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse of the index and rest capacity for each bin\n    inv_index = 1 / (np.arange(len(bins)) + 1)\n    inv_rest_capacity = 1 / (bins - item)\n    \n    # Calculate the score for each bin\n    scores = inv_index * inv_rest_capacity\n    \n    # Return the scores\n    return scores",
+          "objective": 0.03884,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Calculate the score for each bin based on the exponential decay function of its rest capacity and a weight inversely proportional to its index.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the score for each bin based on the exponential decay function\n    # of its rest capacity and a weight inversely proportional to its index\n    weights = 1 / (np.arange(len(bins)) + 1)\n    scores = np.exp(-weights * (bins - item))\n    \n    # Remove bins that are at full capacity\n    scores[bins == bins.max()] = 0\n    \n    return scores",
+          "objective": 0.03894,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm calculates the score for each bin as the combination of the inverse of its rest capacity and the square root of the inverse of its index.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse of the rest capacity for each bin\n    inv_rest_capacity = 1 / (bins - item)\n    \n    # Calculate the square root of the inverse of the index for each bin\n    sqrt_inv_index = np.sqrt(1 / (np.arange(len(bins)) + 1))\n    \n    # Combine the two scores using element-wise multiplication\n    scores = inv_rest_capacity * sqrt_inv_index\n    \n    return scores",
+          "objective": 0.03934,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Score is calculated as the product of the bin's rest capacity and exponential decay function of the bin's size, divided by the difference between the item size and the bin's rest capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the rest capacity of each bin\n    rest_capacity = np.maximum(0, bins - item)\n    \n    # Calculate the exponential decay function of the bin's size\n    decay_function = np.exp(-np.log(rest_capacity))\n    \n    # Calculate the score for each bin\n    scores = decay_function * rest_capacity / (item - rest_capacity + 1)\n    \n    return scores",
+          "objective": 0.03944,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Prioritize bins with less remaining capacity and penalize bins closer to the item size using a linear decay function for the penalty and a Gaussian distribution function for the priority.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the remaining capacity of each bin\n    remaining_capacity = bins - item\n    \n    # Prioritize bins with less remaining capacity\n    priority = np.exp(-remaining_capacity)\n    \n    # Penalize bins closer to the item size\n    penalty = np.exp(-np.abs(remaining_capacity - item))\n    \n    # Combine the priority and penalty to get the final score\n    scores = priority * (1 - penalty)\n    \n    return scores",
+          "objective": 0.03954,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The novel algorithm combines the inverse of the rest capacity with a logarithmic transformation of the bin's index and then scales it by the item size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse of the rest capacity\n    inv_rest_capacity = 1 / (bins - item)\n    \n    # Apply a logarithmic transformation to the bin's index\n    log_index = np.log(np.arange(len(bins)))\n    \n    # Scale the logarithmic transformation by the item size\n    scaled_log_index = log_index * item\n    \n    # Combine the inverse of the rest capacity and the scaled logarithmic transformation\n    scores = inv_rest_capacity + scaled_log_index\n    \n    return scores",
+          "objective": 0.03964,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the score for each bin as the product of the inverse of its rest capacity and the inverse of the sum of its index and the item size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse of the rest capacity of each bin\n    inv_rest_capacity = 1 / (bins - item)\n    \n    # Calculate the inverse of the sum of the index and the item size\n    inv_sum = 1 / (np.arange(len(bins)) + item)\n    \n    # Multiply the two inverse quantities to get the score for each bin\n    scores = inv_rest_capacity * inv_sum\n    \n    return scores",
+          "objective": 0.03974,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Modified Algorithm: The score for each bin is calculated as the square root of the inverse of the sum of the square of its rest capacity and the inverse of its index.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the score for each bin\n    scores = np.sqrt(1 / (bins + item))\n    \n    # Return the scores\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Calculate the score for each bin as the sum of the inverse of its rest capacity and the inverse of its index.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the score for each bin as the sum of the inverse of its rest capacity and the inverse of its index\n    scores = np.zeros(len(bins))\n    for i, bin in enumerate(bins):\n        if bin >= item:\n            scores[i] = 1 / (bin - item) + 1 / (i + 1)\n    return scores",
+          "objective": 0.04014,
+          "other_inf": null
+     },
+     {
+          "algorithm": "{ The new algorithm uses a score function that is the product of the inverse of the ratio between the remaining capacity of a bin and the item size, multiplied by a weight that is exponentially proportional to the bin index, where the weight for the first bin is 2 and the weight of each subsequent bin is 1.2 times the weight of the previous bin. }",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse of the ratio between the remaining capacity of a bin and the item size\n    inv_ratios = np.divide(np.ones(len(bins)), np.subtract(bins, item))\n    \n    # Calculate the weight for each bin based on its index\n    weights = np.power(1.2, np.arange(len(bins)))\n    \n    # Calculate the score for each bin\n    scores = np.multiply(inv_ratios, weights)\n    \n    return scores",
+          "objective": 0.04095,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The score function will calculate the scores for each bin based on the remaining capacity, with a penalty for bins with maximum capacity to minimize the number of used bins.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = (max_capacity - bins) + (bins == max_capacity) * item\n    return scores",
+          "objective": 0.04105,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The score is calculated as the product of the bin\u2019s rest capacity and exponential decay function of the bin\u2019s index, divided by the distance between the item size and the bin\u2019s size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the rest capacity of each bin\n    rest_capacity = bins - item\n    \n    # Calculate the exponential decay function of the bin's index\n    decay_function = np.exp(-np.arange(len(bins)) / len(bins))\n    \n    # Calculate the score for each bin\n    scores = rest_capacity * decay_function / (item - bins)\n    \n    return scores",
+          "objective": 0.04115,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Score is calculated as the sum of a linear function of the bin's size and a logarithmic function of the rest capacity, divided by the difference between the item size and the bin's rest capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the linear function of the bin's size\n    linear_function = np.sum(bins) / (np.max(bins) - np.min(bins))\n    \n    # Calculate the logarithmic function of the rest capacity\n    logarithmic_function = np.log(bins / np.max(bins))\n    \n    # Calculate the score for each bin\n    scores = (linear_function + logarithmic_function) / (item - np.min(bins))\n    \n    # Return the scores for the bins\n    return scores",
+          "objective": 0.04165,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Calculate the score for each bin by multiplying the remaining capacity by the inverse of the item size and adding the index of the bin.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the score for each bin\n    scores = np.multiply(bins - item, 1 / (item + 1)) + np.arange(len(bins))\n    return scores",
+          "objective": 0.04196,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Calculate the score of each bin as the ratio of its residual capacity to its distance from the item size, and apply random sampling to break ties.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the score for each bin\n    scores = np.divide(bins - item, bins)\n    \n    # Apply random sampling to break ties\n    scores = np.random.permutation(scores)\n    \n    # Return the scores\n    return scores",
+          "objective": 0.04216,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: \n1. Initialize an empty array named 'scores' with the same length as the input array 'bins'.\n2. Calculate the scores for each bin by taking the minimum between the rest capacity of the bin and the size of the item.\n3. Set the score of a bin with maximum capacity to a very small negative value to prevent it from being used.\n4. Return the 'scores' array.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.minimum(bins, item)\n    max_capacity_bin_index = np.argmax(bins)\n    scores[max_capacity_bin_index] = -99999999\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

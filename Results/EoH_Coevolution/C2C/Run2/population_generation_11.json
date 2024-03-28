@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    diff = bins - item\n    scores = np.zeros_like(bins)\n    scores[diff > 0] = item / (diff[diff > 0] + 0.001)\n    scores[bins == max_capacity] = 0\n    scores[bins == item] = item\n    return scores",
+          "objective": 0.03904,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = np.zeros_like(bins)\n    scores[bins != max_capacity] = item / (bins[bins != max_capacity] - item + 1)\n    scores[bins == max_capacity] = 0\n    return scores",
+          "objective": 0.03914,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = np.zeros_like(bins)\n    scores[bins != max_capacity] = item / np.maximum((bins[bins != max_capacity] - item), 1)\n    return scores",
+          "objective": 0.03974,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.where(bins == bins.max(), 0, item / bins)\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = bins.max()\n    scores = np.zeros_like(bins)\n    \n    scores[bins != max_capacity] = 1 / np.maximum((bins[bins != max_capacity] - item), 1)\n    \n    return scores",
+          "objective": 0.04014,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = (bins != max_capacity) * (item / np.maximum((bins - item), 1))\n    return scores",
+          "objective": 0.04045,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = bins.max()\n    scores = np.zeros_like(bins)\n    scores[bins != max_capacity] = item / bins[bins != max_capacity]\n    return scores",
+          "objective": 0.04095,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The score function will calculate the scores for each bin based on the remaining capacity, with a penalty for bins with maximum capacity to minimize the number of used bins.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = (max_capacity - bins) + (bins == max_capacity) * item\n    return scores",
+          "objective": 0.04105,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\ndef score(item, bins):\n    scores = np.maximum(0, item - bins) / bins\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_cap = bins.max()\n    scores = np.zeros_like(bins)\n    mask = bins != max_cap\n    scores[mask] = bins[mask] / np.maximum(1, bins[mask] - item)\n    return scores",
+          "objective": 0.04256,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nDescription: \nThe algorithm calculates the scores for each bin based on their rest capacities and assigns the item to the bin with the maximum score, minimizing the number of used bins.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = bins / np.maximum((bins - item), 1)\n    scores[bins == bins.max()] = 0\n    return scores",
+          "objective": 0.04306,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_cap = np.max(bins)\n    scores = np.zeros_like(bins)\n    mask = bins != max_cap\n    scores[mask] = np.minimum(1, item / (bins[mask] - item))\n    return scores",
+          "objective": 0.04316,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    min_capacity = np.min(bins)\n    num_bins = len(bins)\n    \n    scores = np.zeros(num_bins)\n    \n    mask = (bins != max_capacity) & (bins != min_capacity)\n    scores[mask] = item / (bins[mask] - item)\n    \n    scores[bins == max_capacity] = 0\n    scores[bins == item] = item\n    \n    return scores",
+          "objective": 0.04437,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = np.zeros_like(bins)\n    \n    scores[bins == max_capacity] = 0\n    scores[bins > item] = 1 / (bins[bins > item] - item)\n    \n    return scores",
+          "objective": 0.04457,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    max_cap = np.max(bins)\n    min_cap = np.min(bins)\n    scores = np.where(bins == max_cap, -np.inf, scores)\n    scores = np.where(bins == min_cap, 0, scores)\n    scores = np.where((bins > min_cap) & (bins < max_cap), (item - min_cap) / (item - bins), scores)\n    return scores",
+          "objective": 0.04548,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    diff = bins - item\n    scores = np.zeros_like(bins)\n    scores[diff > 0] = item / (diff[diff > 0] + 0.001)\n    scores[bins == max_capacity] = 0\n    return scores",
+          "objective": 0.04658,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = np.zeros_like(bins)\n    \n    mask = bins > item\n    scores[mask] = item / (bins[mask] - item + 1)\n    \n    scores[bins == max_capacity] = 0\n    \n    return scores",
+          "objective": 0.04668,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_cap = np.max(bins)\n    scores = np.zeros_like(bins)\n    mask = bins > item\n    scores[mask] = bins[mask] / (bins[mask] - item)\n    scores[bins == max_cap] = 0\n    return scores",
+          "objective": 0.04709,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    diff = bins - item\n    scores = np.zeros_like(bins)\n    scores[diff > 0] = item / diff[diff > 0]\n    return scores",
+          "objective": 0.04719,
+          "other_inf": null
+     },
+     {
+          "algorithm": null,
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_cap = bins.max()\n    scores = np.zeros_like(bins)\n    \n    mask = bins > item\n    scores[mask] = (max_cap - bins[mask] + 1) / (bins[mask] - item + 1)\n    \n    scores[bins == max_cap] = 0\n    \n    return scores",
+          "objective": 0.04729,
+          "other_inf": null
+     }
+]

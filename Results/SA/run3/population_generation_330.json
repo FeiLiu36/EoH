@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "Algorithm description: The new algorithm calculates the score for each bin based on the inverse of the item size multiplied by the remaining capacity, adjusts the scores based on the logarithm of the remaining capacity divided by the item size, and penalizes bins with higher remaining capacity by using a logarithmic function.\n\nCode:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n\n    # Calculate the inverse of the item size multiplied by the remaining capacity\n    inverse_item_size = 1 / (item * remaining_capacity)\n\n    # Calculate the logarithm of the remaining capacity divided by the item size\n    log_capacity = np.log(remaining_capacity / item)\n\n    # Calculate the penalty for bins with higher remaining capacity using a logarithmic function\n    penalty = np.log(remaining_capacity)\n\n    # Calculate the adjusted score based on the inverse of the item size, the logarithm of the remaining capacity, and the penalty\n    adjusted_score = inverse_item_size * log_capacity * penalty\n\n    # Calculate the final scores, adjusting them based on the inverse of the logarithm of the remaining capacity of the bin\n    scores = np.where(remaining_capacity >= item, 1e9, adjusted_score / np.log(remaining_capacity))\n\n    return scores",
+          "objective": 0.01409,
+          "other_inf": null
+     }
+]

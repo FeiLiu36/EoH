@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm description: The new algorithm assigns scores to bins based on the remaining capacity, the maximum capacity, and the average capacity of the bins. It then calculates a penalty score for each bin based on the difference between the remaining capacity and the average capacity, and adjusts the scores using priority scores.\n\nNew algorithm implementation:\n\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    max_capacity = np.max(bins)\n    avg_capacity = np.mean(bins)\n    \n    penalty_score = np.maximum(0, remaining_capacity - avg_capacity)  # Calculate penalty score based on the difference between remaining capacity and average capacity\n\n    priority_scores = np.array([0.5, 0.3, 0.2])  # Example priority scores for bins, can be customized\n    \n    scores = priority_scores[:, np.newaxis] - penalty_score\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

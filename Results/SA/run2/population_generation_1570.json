@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm: \nThe new algorithm assigns scores to the bins based on the inverse of the difference between the maximum capacity and the rest capacity of each bin, multiplied by the square root of the item size, and subtracts the inverse of the sum of the square roots of the remaining capacities of all the bins.\n\nModified code:\n\n```\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    rest_capacity = max_capacity - bins\n    rest_capacity_sum = np.sum(rest_capacity)\n    scores = (1 / (max_capacity - rest_capacity)) * np.sqrt(item) - (1 / np.sum(np.sqrt(rest_capacity)))\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "\nAlgorithm Description: \nThe new algorithm involves calculating a score for each bin by multiplying the item size by a weight factor, subtracting the remaining capacity of the bin multiplied by a discount factor, and dividing the result by the total capacity of the bin.\n\nMain Steps:\n1. Calculate the remaining capacity for each bin: remaining_capacity = bins - item.\n2. Calculate the discount factor for each bin: discount_factor = np.exp(-remaining_capacity / bins).\n3. Calculate the scores for each bin: scores = (item * discount_factor) / bins.\n4. Return the scores.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the remaining capacity for each bin\n    remaining_capacity = bins - item\n    \n    # Calculate the discount factor for each bin\n    discount_factor = np.exp(-remaining_capacity / bins)\n    \n    # Calculate the scores for each bin\n    scores = (item * discount_factor) / bins\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

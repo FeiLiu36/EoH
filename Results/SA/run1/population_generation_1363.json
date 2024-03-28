@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "Algorithm Description: The Modified Enhanced Ratio Score Function Algorithm assigns a score to each bin by considering four factors: a ratio term, a capacity term, a penalty term, and a proximity term. The ratio term is the ratio of the inverse of the difference between the item and the bin size and the square of the capacity plus 1, similar to the original algorithm. The capacity term remains the same as before. The penalty term penalizes bins that are close to maximum capacity, similar to the original algorithm. The proximity term penalizes bins that are farther away from the maximum capacity, encouraging the use of bins with lower capacities. The scores are then sorted in descending order.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    num_bins = bins.shape[0]\n    item_count = num_bins - np.count_nonzero(bins)\n\n    difference = item - bins\n\n    # Ratio term\n    ratio_term = (1 / (difference / (bins**2 + 1)))\n\n    # Capacity term\n    capacity_term = 1 - bins / max_capacity\n\n    # Penalty term\n    penalty_term = ((bins - max_capacity) / max_capacity) ** 2\n\n    # Proximity term\n    proximity_term = (bins / max_capacity) ** 2\n\n    # Calculate scores\n    scores = ratio_term + capacity_term - penalty_term - proximity_term\n\n    # Sort scores in descending order\n    sorted_scores = np.sort(scores)[::-1]\n\n    return scores",
+          "objective": 0.01439,
+          "other_inf": null
+     }
+]

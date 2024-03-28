@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the score for each bin using a mathematical formula that includes multiple operations such as exponentiation, logarithm, and division, and returns the scores in descending order.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    remaining_capacity = bins - item\n    ratio = remaining_capacity / max_capacity\n    scores = ((ratio ** 2) + (1 / ratio) + (ratio ** 0.5) - np.log(ratio))\n\n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

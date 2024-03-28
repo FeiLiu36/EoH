@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm: The new algorithm calculates the score for each bin by taking the sum of the item size to maximum capacity ratio and the ratio of the rest capacity to the maximum capacity of each bin to the power of -1, subtracts the minimum score from all scores to make the minimum score zero, and then normalizes the scores so that the sum of the scores is equal to the number of bins used.\n\nHere's the implementation of the new algorithm in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the maximum capacity of the bins\n    max_capacity = np.max(bins)\n    \n    # Calculate the item size to maximum capacity ratio\n    item_ratio = item / max_capacity\n    \n    # Calculate the ratio of rest capacity to maximum capacity of each bin\n    capacity_ratio = bins / max_capacity\n    \n    # Calculate the score for each bin\n    scores = item_ratio + (capacity_ratio ** -1)\n    \n    # Subtract the minimum score from all scores to make the minimum score zero\n    scores -= np.min(scores)\n    \n    # Normalize the scores\n    scores /= np.sum(scores)\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

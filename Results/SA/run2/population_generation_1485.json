@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "Algorithm description: The new algorithm computes the scores for each bin based on the logarithm of the absolute difference between the rest capacity of each bin and the item size, the exponential of the square root of the sum of the rest capacities of all the bins, and the reciprocal of the difference between the rest capacity of each bin and the maximum capacity among all bins. The scores for each component are multiplied by a set of weights, determined by the proportion of the modified scores contributed by each component in the original algorithm.\n\nCode:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    log_diff = np.log(np.abs(bins - item))\n    exp_sqrt_sum_rest_capacities = np.exp(np.sqrt(np.sum(bins)))\n    reciprocal_diff = 1 / (bins - np.max(bins))\n  \n    modified_scores = log_diff * 0.2 + exp_sqrt_sum_rest_capacities * 0.5 + reciprocal_diff * 0.3\n    weights = [np.sum(modified_scores) for _ in range(3)]\n    weights = np.divide(weights, np.sum(modified_scores))\n    \n    # Adjusted scores with weighted components\n    adjusted_scores = (\n        weights[0] * np.divide(log_diff, (1 + np.exp(bins - np.mean(bins)))) +\n        weights[1] * np.divide(exp_sqrt_sum_rest_capacities, (1 + np.exp(bins - np.mean(bins)))) +\n        weights[2] * np.divide(reciprocal_diff, (1 + np.exp(bins - np.mean(bins))))\n    )\n  \n    sum_modified_scores = np.sum(adjusted_scores)\n    scores = adjusted_scores / (sum_modified_scores + len(bins))\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

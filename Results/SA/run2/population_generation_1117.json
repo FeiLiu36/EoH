@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "Algorithm Description: In this new algorithm, the score for each bin is calculated by taking the ratio of the remaining capacity to the maximum capacity, multiplying it by a power factor that increases as the remaining capacity approaches the maximum capacity, and subtracting a penalty term to penalize bins with large remaining capacities. The power factor is calculated using a logarithmic function, and the penalty term is normalized to ensure values are between 0 and 1.\n\nHere's the implementation of the new algorithm in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the remaining capacity\n    remaining_capacity = bins - item\n\n    # Calculate the power factor using a logarithmic function\n    power_factor = np.log(1 + remaining_capacity) / np.log(1 + np.max(bins))\n\n    # Calculate the penalty term to penalize bins with large remaining capacities and normalize it\n    penalty_term = (remaining_capacity - np.min(remaining_capacity)) / np.ptp(remaining_capacity)\n\n    # Initialize an array to store the scores\n    scores = np.zeros_like(bins)\n\n    # Calculate the scores for each bin\n    scores[bins >= item] = (\n        remaining_capacity[bins >= item] / np.max(bins) * power_factor[bins >= item] - penalty_term[bins >= item]\n    )\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

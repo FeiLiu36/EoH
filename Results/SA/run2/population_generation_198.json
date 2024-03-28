@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm assigns scores to bins based on a combination of trigonometric and exponential functions. The scores are then sorted in descending order and returned.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the remaining capacity after assigning the item to each bin\n    remaining_capacity = bins - item\n    \n    # Calculate the scores for each bin using trigonometric and exponential functions (scaled by 1000)\n    scores = 1000 * np.sin(remaining_capacity) + 1000 * np.exp(remaining_capacity)\n    \n    # Sort the indices of bins in descending order based on the scores\n    sorted_indices = np.argsort(scores)[::-1]\n    \n    # Reorder the scores based on the sorted indices\n    scores = scores[sorted_indices]\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

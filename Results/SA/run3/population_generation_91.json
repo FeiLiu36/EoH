@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the score for each bin by taking the product of the remaining capacity of the bins and the reciprocal of the item size, adding the reciprocal of the ratio, subtracting the logarithm of the remaining capacity, multiplying by a constant factor of 100, and adding a square root of the item size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    scores = (remaining_capacity * (1/item)) + (1/item) - np.log(remaining_capacity) * 100 + np.sqrt(item)\n    scores = np.where(remaining_capacity >= item, np.full_like(scores, np.inf), scores)\n    return scores",
+          "objective": 0.0157,
+          "other_inf": null
+     }
+]

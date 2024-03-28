@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm will calculate the score for each bin based on the remaining capacity and the size of the item, and then return the scores as a Numpy array.\nIn this algorithm, we will calculate the score for each bin by subtracting the size of the item from the remaining capacity of the bin and taking the reciprocal. Bins with no remaining capacity will be assigned a score of -infinity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (1 / (bins - item)).astype(float)\n    scores[bins == 0] = -np.inf\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

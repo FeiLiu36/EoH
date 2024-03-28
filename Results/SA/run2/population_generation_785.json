@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm description: The new algorithm assigns scores to the bins based on the absolute difference between the rest capacity of each bin and the item size, multiplied by the ratio of the item size to the rest capacity plus a small constant epsilon, and then adding a constant value equal to the square root of the maximum capacity divided by the item size, followed by a power transformation with a power value of 0.5.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the difference between the rest capacity of each bin and the item size\n    difference_capacity = bins - item\n    \n    # Calculate the ratio of the item size to the rest capacity of each bin plus epsilon\n    epsilon = 1e-8\n    ratio_capacity = item / (bins + epsilon)\n    \n    # Calculate the scores based on the absolute difference_capacity and the ratio of the item size to the rest capacity\n    scores = np.abs(difference_capacity) * ratio_capacity\n    \n    # Add a constant value equal to the square root of the maximum capacity divided by the item size\n    constant_value = np.sqrt(np.max(bins) / item)\n    scores += constant_value\n    \n    # Apply a power transformation with a power value of 0.5\n    scores = np.power(scores, 0.5)\n    \n    # Adjust the scores to ensure self-consistency by dividing them by the maximum value\n    scores = scores / np.max(scores)\n    \n    # Sort the scores in descending order\n    scores = np.sort(scores)[::-1]\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

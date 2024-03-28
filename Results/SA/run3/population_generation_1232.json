@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "My new algorithm calculates the scores for each bin based on their remaining capacity, with the aim of minimizing the number of used bins. It incorporates a logarithmic factor of the bin index plus one, divided by the square root of the item size.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    max_capacity = np.max(bins)\n    \n    remaining_capacity_ratio = remaining_capacity / max_capacity\n    scores = ((remaining_capacity_ratio * (1 / np.sqrt(np.arange(len(bins)) + 1))) /\n              np.sqrt(remaining_capacity * np.log(remaining_capacity)))\n    \n    scores -= remaining_capacity_ratio - np.sqrt(np.arange(len(bins)) + 1)\n    \n    scores = np.where(remaining_capacity >= item, np.inf, scores)\n    scores *= np.arange(len(bins)) + 1\n    scores -= np.where(remaining_capacity < item, np.log(item), 0)\n    \n    threshold_ratio = 0.5\n    scores -= np.where(remaining_capacity_ratio < threshold_ratio,\n                       np.log(1 + threshold_ratio - remaining_capacity_ratio), 0) \n    \n    # New step: Multiply scores by a logarithmic factor of the bin index plus one, divided by the square root of the item size\n    scores *= np.log(np.arange(len(bins)) + 1) / np.sqrt(item)\n    \n    return scores",
+          "objective": 0.00976,
+          "other_inf": null
+     }
+]

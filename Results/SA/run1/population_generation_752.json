@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "Algorithm description: \n\nThe new algorithm calculates the scores for the bins by taking the square of the absolute differences between each value and the item size, summing up all the squared differences, and dividing the scores by the maximum capacity multiplied by the square root of the item size.\n\nCode:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    abs_diff = np.abs(bins - item)\n    squared_diff = np.square(abs_diff)\n    sum_diff = np.sum(squared_diff)\n    scores = sum_diff / (np.max(bins) * np.sqrt(item))\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

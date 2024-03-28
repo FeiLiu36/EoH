@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "New algorithm: Calculate the score for each bin as the inverse of the difference between the bin capacity and the item size, with a penalty for bins that reach half of the maximum capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n  \"\"\"Calculate the score for each bin as the inverse of the difference between the bin capacity and the item size, with a penalty for bins that reach half of the maximum capacity.\n\n  Args:\n    item: The size of the current item.\n    bins: The rest capacities of feasible bins, which are larger than the item size.\n\n  Returns:\n    The scores for the bins for assignment.\n  \"\"\"\n\n  max_capacity = np.max(bins)\n  half_capacity = max_capacity / 2\n  scores = 1 / (bins - item)\n  scores[bins <= half_capacity] -= 1\n  return scores",
+          "objective": 0.00986,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Calculate the score for each bin as the inverse of the difference between the bin capacity and the item size, with a bonus for bins that reach half of the maximum capacity. ",
+          "code": "import numpy as np\n\ndef score(item, bins):\n  \"\"\"Calculate the score for each bin as the inverse of the difference between the bin capacity and the item size, with a bonus for bins that reach half of the maximum capacity.\n\n  Args:\n    item: The size of the current item.\n    bins: The rest capacities of feasible bins, which are larger than the item size.\n\n  Returns:\n    The scores for the bins for assignment.\n  \"\"\"\n\n  # Calculate the difference between the bin capacity and the item size.\n  diff = bins - item\n\n  # Calculate the score for each bin as the inverse of the difference.\n  scores = 1 / diff\n\n  # Add a bonus for bins that reach half of the maximum capacity.\n  max_capacity = np.max(bins)\n  half_max_capacity = max_capacity / 2\n  bonus = np.where(bins >= half_max_capacity, 1, 0)\n  scores += bonus\n\n  return scores",
+          "objective": 0.01087,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: the score function will calculate the score of a bin based on an indicator function that checks if the rest capacity is more than twice the item size, and then takes the difference between the bin index and the number of feasible bins.",
+          "code": "def score(item, bins):\n    indicator = np.where(bins > 2 * item, 1, 0)\n    num_feasible = np.count_nonzero(indicator)\n    scores = indicator * (bins - item) - (bins - num_feasible)\n    return scores",
+          "objective": 0.01157,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Prioritize bins that have capacities 7 times the item size, penalized if the remaining capacity is less than half of the item size: scores = 1.0 / (bins - item) * (bins <= 7 * item) - 0.2 * (bins - item <= 0.5 * item)",
+          "code": "def score(item, bins):\n    \"\"\"Calculate the score for each bin for item assignment.\n\n    Args:\n    item: The size of the item to be assigned.\n    bins: A numpy array of the remaining capacities of feasible bins.\n\n    Returns:\n    scores: A numpy array of the scores for each bin.\n    \"\"\"\n\n    # Prioritize bins with enough capacity to fit the item.\n    scores = np.where(bins >= item, 1.0 / (bins - item), 0.0)\n\n    # Penalize bins that are nearly full.\n    scores -= 0.2 * np.where(bins - item <= 0.5 * item, 1.0, 0.0)\n\n    # Penalize bins that are too big.\n    scores *= np.where(bins <= 7 * item, 1.0, 0.0)\n\n    return scores",
+          "objective": 0.0162,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Score bins based on the sum of the inverse of the remaining capacity and the inverse of the item size, with a higher penalty for bins with smaller remaining capacity: scores = 1.0 / (bins - item) + 1.0 / item - 0.2 * (bins - item < 0.5 * item)",
+          "code": "import numpy as np\n\ndef score(item, bins):\n  \"\"\"Score bins based on the sum of the inverse of the remaining capacity and the inverse of the item size, with a higher penalty for bins with smaller remaining capacity.\n\n  Args:\n    item: The size of current item.\n    bins: The rest capacities of feasible bins, which are larger than the item size.\n\n  Returns:\n    The scores for the bins for assignment.\n  \"\"\"\n\n  scores = 1.0 / (bins - item) + 1.0 / item - 0.2 * (bins - item < 0.5 * item)\n  return scores",
+          "objective": 0.0164,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Score bins based on the sum of the inverse of the remaining capacity and the item size, with a higher penalty for bins with smaller remaining capacity: scores = 1.0 / (bins - item) - 0.2 * (bins - item < 0.5 * item)",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = 1.0 / (bins - item) - 0.2 * (bins - item < 0.5 * item)\n    return scores",
+          "objective": 0.0166,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Prioritize bins that have capacities between half and 2 times the item size, penalized if the remaining capacity is less than half of the item size: score = 1.0 / (bins - item) * (0.5 * item <= bins <= 2 * item) - 0.4 * (bins - item <= 0.5 * item)",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the bin factor\n    bins_factor = 1.0 / (bins - item)\n\n    # Calculate the bin capacity range\n    lower_capacity_bound = 0.5 * item\n    upper_capacity_bound = 2 * item\n\n    # Calculate the bin capacity range score\n    capacity_range_score = (0.5 * item <= bins) * (bins <= 2 * item)\n\n    # Calculate the bin remaining capacity score\n    remaining_capacity_score = -0.4 * (bins - item <= 0.5 * item)\n\n    # Calculate the final score\n    scores = bins_factor * capacity_range_score + remaining_capacity_score\n\n    return scores",
+          "objective": 0.01741,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Prioritize bins that have capacities 2 times the item size, penalized if the remaining capacity is less than half of the item size: scores = 1.0 / (bins - item) * (bins <= 2 * item) - 0.2 * (bins - item <= 0.5 * item)",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Prioritize bins that have capacities 2 times the item size, penalized if the remaining capacity is less than half of the item size:\n    scores = 1.0 / (bins - item) * (bins <= 2 * item) - 0.2 * (bins - item <= 0.5 * item)\n    \"\"\"\n    scores = 1.0 / (bins - item) * (bins <= 2 * item) - 0.2 * (bins - item <= 0.5 * item)\n    return scores",
+          "objective": 0.01761,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Algorithm: The new algorithm computes a score for each bin based on the sum of the reciprocal of the difference between the bin capacity and the item size and a penalty for bins with smaller remaining capacity.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n  \"\"\"Computes a score for each bin based on the sum of the reciprocal of the difference between the bin capacity and the item size and a penalty for bins with smaller remaining capacity.\n\n  Args:\n    item: The size of current item.\n    bins: The rest capacities of feasible bins, which are larger than the item size.\n\n  Returns:\n    The scores for the bins for assignment.\n  \"\"\"\n\n  # Calculate the difference between the bin capacity and the item size.\n  diff = bins - item\n\n  # Calculate the reciprocal of the difference.\n  reciprocal = 1.0 / diff\n\n  # Calculate the penalty for bins with smaller remaining capacity.\n  penalty = np.where(diff <= 0.5 * bins, 1.0, 0.0)\n\n  # Calculate the score for each bin.\n  scores = reciprocal - penalty\n\n  return scores",
+          "objective": 0.01861,
+          "other_inf": null
+     },
+     {
+          "algorithm": " New Algorithm: Prioritize bins that have capacities between 2.5 and 3 times the item size, penalized if the remaining capacity is less than half of the item size: scores = 1.0 / (bins - item) * (2.5 * item <= bins <= 3 * item) - 0.5 * (bins - item <= 0.5 * item) ",
+          "code": "def score(item, bins):\n  scores = 1.0 / (bins - item) * ((2.5 * item <= bins) & (bins <= 3 * item)) - 0.5 * (bins - item <= 0.5 * item)\n  return scores",
+          "objective": 0.01871,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The score for a bin is computed as the product of the inverse of the square root of the rest capacity and the inverse of the square root of the bin number.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n  \"\"\"Computes the score for a bin.\n\n  The score is computed as the product of the inverse of the square root of the\n  rest capacity and the inverse of the square root of the bin number.\n\n  Args:\n    item: The size of the current item.\n    bins: The rest capacities of feasible bins.\n\n  Returns:\n    The scores for the bins.\n  \"\"\"\n\n  rest_capacities = np.maximum(bins - item, 0)\n  bin_numbers = np.arange(len(bins)) + 1\n  scores = rest_capacities / np.sqrt(rest_capacities) * 1 / np.sqrt(bin_numbers)\n  return scores",
+          "objective": 0.02495,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Prioritize bins that have capacities at most three times the item size, penalized if the remaining capacity is less than half of the item size: scores = 1.0 / (bins - item) * (bins <= 3 * item) - 0.2 * (bins - item <= 0.5 * item)",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the bin scores\n    scores = 1.0 / (bins - item) * (bins <= 3 * item) - 0.2 * (bins - item <= 0.5 * item)\n    # Penalize bins with remaining capacity less than half of the item size\n    scores[bins - item <= 0.5 * item] -= 0.5\n    # Mask out invalid bins (remaining capacity less than the item size)\n    scores[bins - item < 0] = -np.inf\n    return scores",
+          "objective": 0.02546,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm: Prioritize bins that have capacities 3 times the item size, penalized if the remaining capacity is less than half of the item size: scores = 1.0 / (bins - item) * (bins <= 3 * item) - 0.5 * (bins - item <= 0.5 * item)",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = 1.0 / (bins - item) * (bins <= 3 * item) - 0.5 * (bins - item <= 0.5 * item)\n    return scores",
+          "objective": 0.02596,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Prioritize bins that have smaller differences between their capacity and the item size, penalized if the remaining capacity is less than half of the item size: scores = 1.0 / (bins - item) - 0.2 * (bins - item <= 0.5 * item)",
+          "code": "import numpy as np\ndef score(item, bins):\n    scores = 1.0 / (bins - item) - 0.2 * (bins - item <= 0.5 * item)\n    scores[bins - item <= 0] = -np.inf\n    return scores",
+          "objective": 0.02747,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The proposed algorithm computes a score for each bin based on the reciprocal of the difference between the bin capacity and the item size, and a penalty for bins with smaller remaining capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    \n    scores = 1.0 / np.maximum((bins - item), 1e-12) - 0.1 * (bins - item < 0.5 * item)\n    \n    return scores",
+          "objective": 0.02847,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Prioritize bins that have capacities 1.5 times the item size, penalized if the remaining capacity is less than a third of the item size: scores = 1.0 / (bins - item) * (bins <= 1.5 * item) - 0.3 * (bins - item <= 0.33 * item)",
+          "code": "import numpy as np\n\ndef score(item, bins):\n  \"\"\"Score bins for assigning an item.\n\n  Args:\n    item: Size of the item to be assigned.\n    bins: Remaining capacities of feasible bins, which are larger than the item size.\n\n  Returns:\n    Scores for the bins for assignment.\n  \"\"\"\n  \n  scores = 1.0 / (bins - item)\n  scores *= bins <= 1.5 * item\n  scores -= 0.3 * (bins - item <= 0.33 * item)\n  return scores",
+          "objective": 0.0329,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Prioritize bins that have capacities 5 times the item size, penalized if the remaining capacity is less than one third of the item size: scores = 1.0 / (bins - item) * (bins <= 5 * item) - 0.3 * (bins - item <= 1.0 / 3 * item)",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Scores a set of bins to assign an item. In each step, the item will be assigned to the bin with the maximum score.\n    If the rest capacity of a bin equals the maximum capacity, it will not be used. The final goal is to minimize the number of\n    used bins.\n\n    Args:\n        item: The size of the current item.\n        bins: The rest capacities of feasible bins, which are larger than the item size.\n\n    Returns:\n        The scores for the bins for assignment.\n    \"\"\"\n\n    # Calculate the score for each bin.\n    scores = 1.0 / (bins - item) * (bins <= 5 * item) - 0.3 * (bins - item <= 1.0 / 3 * item)\n\n    # Handle the case where all bins have the same capacity.\n    if np.all(scores == scores[0]):\n        scores = np.ones(len(scores))\n\n    return scores",
+          "objective": 0.03461,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Prioritize bins that have capacities within 30% of the item size, penalized if the remaining capacity is less than 20% of the item size: scores = 1.0 / (bins - item) * (abs(bins - item) <= 0.3 * item) - 0.2 * (bins - item <= 0.2 * item)",
+          "code": "import numpy as np\ndef score(item, bins):\n    scores = 1.0 / (bins - item) * (np.abs(bins - item) <= 0.3 * item) - 0.2 * (bins - item <= 0.2 * item)\n    return scores",
+          "objective": 0.03693,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The common backbone is prioritizing bins based on their remaining capacity relative to the item size, with penalties for bins with smaller remaining capacity. New algorithm: Prioritize bins that have capacities 1.5 times the item size, penalized if the remaining capacity is less than one quarter of the item size: scores = 1.0 / (bins - item) * (bins <= 1.5 * item) - 0.25 * (bins - item <= 0.25 * item)",
+          "code": "import numpy as np\n\ndef score(item, bins):\n  scores = 1.0 / (bins - item) * (bins <= 1.5 * item) - 0.25 * (bins - item <= 0.25 * item)\n  return scores",
+          "objective": 0.03703,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm computes the score for each bin as the weighted sum of the bin's rest capacity and the inverse of its remaining percentage capacity, with the weights determined by the square of the difference between the bin's and item's maximum capacities.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"Compute the score for each bin to assign an item.\n\n    Args:\n        item: The size of current item.\n        bins: The rest capacities of feasible bins, which are larger than the item size.\n\n    Returns:\n        The scores for the bins for assignment.\n    \"\"\"\n    if len(bins) == 0:\n        return np.array([0])\n\n    max_capacity = np.max(bins)\n    if max_capacity == item:\n        return np.zeros_like(bins)\n\n    weights = np.square(bins - max_capacity)\n    rest_capacity = bins - item\n    remaining_percentage_capacity = rest_capacity / max_capacity\n    scores = weights * rest_capacity + 1 / remaining_percentage_capacity\n    return scores",
+          "objective": 0.03793,
+          "other_inf": null
+     }
+]

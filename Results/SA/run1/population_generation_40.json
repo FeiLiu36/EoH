@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm assigns scores to the bins based on a combination of the remaining capacity and the item size factor, with a weighted consideration for the remaining capacity and a non-linear multiplier.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacity = max_capacity - bins\n\n    scores = (remaining_capacity / (item + 1)) ** 2\n    scores /= np.max(scores)\n\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the score for each bin by taking the cubic root of the bin's rest capacity plus the item size, dividing it by the square root of the bin's rest capacity plus the item size, and finally multiplying it by the item size divided by the bin's rest capacity raised to the power of the bin's rest capacity.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    sum_capacity = bins + item  # Step 1\n    cubic_root = np.cbrt(sum_capacity)  # Step 2\n    sqrt_sum = np.sqrt(sum_capacity)  # Step 3\n    ratio = item / bins  # Step 4\n    pow_ratio = np.power(ratio, bins)  # Step 5\n    scores = cubic_root / sqrt_sum * pow_ratio  # Step 6\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

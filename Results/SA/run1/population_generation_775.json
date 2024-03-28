@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "\nNew algorithm description: The new algorithm calculates the scores for the bins by taking the reciprocal of the sum of the squared differences between the bin capacities and the item size, raised to the power of the logarithm multiplied by the sum of the exponentiated bin capacities, and then multiplied by the natural logarithm of the bin capacities.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (1 / np.sum((bins - item) ** 2)) ** (np.log(np.sum(np.exp(bins))) * np.log(bins))\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

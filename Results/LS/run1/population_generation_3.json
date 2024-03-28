@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "\n  The algorithm will calculate the score for each bin based on the remaining capacity and the size of the item, and then return the scores as a Numpy array.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = (max_capacity - bins) / item\n    scores[bins == max_capacity] = -np.inf\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

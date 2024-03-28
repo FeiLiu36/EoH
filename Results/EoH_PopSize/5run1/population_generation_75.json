@@ -1,0 +1,32 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the score for each bin by taking the product of the bin's rest capacity divided by the item size, multiplied by the sum of the square root of the bin's index and the logarithm of the bin's rest capacity, divided by the square root of the item size plus one minus the square root of the bin's rest capacity plus one.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins / item) * ((np.sqrt(np.arange(len(bins))) + np.log(bins)) / (np.sqrt(item + 1) - np.sqrt(bins + 1)))\n    return scores",
+          "objective": 0.00755,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: My new algorithm calculates the score for each bin by taking the product of the bin's rest capacity divided by the item size, raised to the power of the bin's index divided by the square root of the bin's rest capacity, divided by the logarithm of the item size plus one minus the natural logarithm of the bin's rest capacity plus one, then multiplied by the natural logarithm of the bin's rest capacity.\n\nPython implementation:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = ((bins / item) ** (np.arange(len(bins)) / np.sqrt(bins))) / ((np.log(item + 1) - np.log(bins + 1)) * (np.log(bins)))\n    return scores",
+          "objective": 0.00815,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The main steps of the new algorithm are as follows: \n1. Calculate the square root of the bin's rest capacity minus the item size.\n2. Divide the result by the item size.\n3. Multiply the above result by the exponential of the bin's index divided by the bin's rest capacity plus one.\n4. Divide the above result by the logarithm of the item size minus the logarithm of the bin's rest capacity plus one.\n5. Return the scores as a Numpy array.\n\nHere is the implementation of the new algorithm in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.sqrt(bins - item) / item * np.exp(np.arange(len(bins)) / (bins + 1)) / (np.log(item) - np.log(bins + 1))\n    return scores",
+          "objective": 0.00825,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: All the provided algorithms calculate the score for each bin based on the ratio between the bin's rest capacity and the item size.\n\nNew algorithm description: My new algorithm calculates the score for each bin by taking the logarithm of the bin's rest capacity divided by the item size, multiplied by the exponential of the bin's index divided by the square root of the bin's rest capacity, divided by the logarithm of the item size plus one minus the natural logarithm of the bin's rest capacity plus one.\n\nPython implementation:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (np.log(bins) / item) * (np.exp(np.arange(len(bins)) / np.sqrt(bins)) / (np.log(item + 1) - np.log(bins + 1)))\n    return scores",
+          "objective": 0.00865,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nMy new algorithm calculates the score for each bin by taking the cosine function of the ratio between the bin's rest capacity and the item size, dividing it by the square root of the bin's index multiplied by the square root of the bin's rest capacity, multiplied by the logarithm of the item size minus the logarithm of the bin's rest capacity, and finally returns the scores as a Numpy array.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.cos(bins / item) / (np.sqrt(np.arange(len(bins))) * np.sqrt(bins) * (np.log(item) - np.log(bins)))\n    return scores",
+          "objective": 0.00936,
+          "other_inf": null
+     }
+]

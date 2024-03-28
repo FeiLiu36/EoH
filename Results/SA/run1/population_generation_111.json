@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm assigns the item to the bin with the maximum remaining capacity as the primary bin and calculates the scores for the other bins based on the following modified scoring formula: the ratios of the current bin capacities to the primary bin capacity, the sum of the current bin capacities divided by the primary bin capacity multiplied by the item size raised to the power of 1/3, and the exponential of the product of the current bin capacities divided by the primary bin capacity multiplied by the item size raised to the power of 2/3. The scores are then multiplied together with the ratios and the exponential of the primary bin capacity minus the sum of bin capacities squared.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    primary_bin_capacity = bins - item\n    max_remaining_capacity = np.max(primary_bin_capacity)\n\n    ratios = bins / primary_bin_capacity\n    sum_exponential = np.exp(np.sum(bins) / primary_bin_capacity * item ** (1/3))\n    product_exponential = np.exp(np.prod(bins) / primary_bin_capacity * item ** (2/3))\n    primary_exponential = np.exp(primary_bin_capacity - np.sum(bins)**2)\n\n    scores = ratios * sum_exponential * product_exponential * primary_exponential\n\n    return scores",
+          "objective": 0.04186,
+          "other_inf": null
+     }
+]

@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New Algorithm: Exponential Score Function Algorithm\n\nDescription: \n\nThe new algorithm aims to improve the scoring system by incorporating an exponential function to assign scores to the bins. It takes into account the exponential term to reward bins with larger capacities and penalizes bins with smaller capacities. Additionally, it introduces a penalty term that increases exponentially as the bin capacity exceeds the maximum capacity.\n\nCode:\n\n``` ",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    alpha = 0.1\n    m = 5\n\n    sorted_bins = np.sort(bins)\n    exponential_term = np.exp(bins / max_capacity)\n\n    quadratic_term2 = np.zeros_like(bins)\n    quadratic_term2[:m] = alpha * (bins[:m] ** 2)\n\n    ratio_term = (bins ** 2 + 1) / ((item - bins) + 1)\n    capacity_term = (bins / max_capacity)\n    penalty_term = np.exp((bins - max_capacity) / max_capacity)\n\n    scores = (\n        ratio_term + quadratic_term2 + capacity_term - penalty_term\n        + exponential_term\n    )\n\n    sorted_scores = np.sort(scores)[::-1]\n    \n    return scores",
+          "objective": 0.01137,
+          "other_inf": null
+     }
+]

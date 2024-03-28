@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New Algorithm: Exponential Score Algorithm\n\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"\n    The exponential score algorithm calculates the scores as an exponential function of the ratio between item size and rest capacity,\n    where the exponential base is based on the average capacity of bins.\n    \"\"\"\n    \n    avg_capacity = np.mean(bins)\n    \n    # Get the exponential base\n    exponential_base = avg_capacity\n    \n    # Calculate the exponential scores as a function of the ratio between item size and rest capacity\n    scores = np.exp(item / bins / exponential_base)\n    \n    # Normalize the scores by dividing them by the sum of all scores\n    scores /= np.sum(scores)\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

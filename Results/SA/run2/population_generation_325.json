@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "My new algorithm calculates the score for each bin based on the remaining capacities and the ratio of the current item size to the bin capacity. The score is then adjusted based on a power transformation of the ratio and an exponential transformation of the remaining capacities, followed by a multiplication with a factor that decreases as the bin index increases. The scores are returned in descending order.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    ratio = item / bins\n\n    # Constants for adjusting importance of each term in the scoring formula\n    power_factor = 0.8\n    exponential_factor = 0.4\n\n    power_term = power_factor * np.power(ratio, 2)\n    exponential_term = exponential_factor * np.exp(-remaining_capacity)\n\n    scores = (power_term + exponential_term) * (1 - np.arange(len(bins))/(len(bins)-1))\n\n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

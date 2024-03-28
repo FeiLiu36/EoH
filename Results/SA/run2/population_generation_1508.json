@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "My new algorithm calculates the scores for each bin based on a modified formula. First, I calculate the ratio between the item size and the difference between each bin's capacity and the item size. Then, I increase the score for each bin that has a smaller capacity compared to the average capacity of all bins, to promote more balanced bin utilization. Finally, I return the calculated scores.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    average_capacity = np.mean(bins)\n    scores = item / (bins - item)\n    scores[bins < average_capacity] += 0.5\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

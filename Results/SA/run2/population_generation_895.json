@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm, called the \"Modified Penalty-Only Algorithm,\" assigns scores to the bins based solely on the penalty factor, penalizing bins that cannot accommodate the item. The algorithm aims to minimize the number of used bins by assigning the item to the bin with the maximum score.\n\nCode:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Define the penalty weight\n    penalty_weight = 0.5\n    \n    # Calculate the penalty factor\n    penalty_factor = np.where(bins < item, np.inf, item / bins)\n    \n    # Calculate the scores using the penalty factor only\n    scores = penalty_weight * penalty_factor\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

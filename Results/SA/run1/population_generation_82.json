@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm assigns scores to the bins based on the product of the logarithm of the remaining capacity divided by the item size plus one, multiplied by the square root of the sum of the remaining capacities, all raised to the power of the logarithm of the maximum remaining capacity divided by the item size plus one, multiplied by the square root of the sum of the remaining capacities divided by the maximum capacity plus 1.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacity = max_capacity - bins\n\n    scores = np.power(np.log(remaining_capacity / item + 1) * np.sqrt(np.sum(remaining_capacity)), np.log(max_capacity / item + 1) * np.sqrt(np.sum(remaining_capacity) / (max_capacity + 1)))\n\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

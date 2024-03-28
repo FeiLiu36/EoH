@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm assigns scores to the bins by taking the product of the logarithmic sum of the rest capacities of each bin and the logarithm of the maximum capacity of any bin divided by the item size, and then multiplies it with a constant value that is a function of the item size and the number of bins.\n\nHere's the implementation of the new algorithm:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    num_bins = len(bins)\n    \n    # Calculate the logarithmic sum of the rest capacities of each bin\n    sum_capacity = np.sum(np.log(bins))\n    \n    # Calculate the logarithm of the maximum capacity of any bin divided by the item size\n    ratio_item = np.log(np.max(bins) / item)\n    \n    # Calculate the constant value based on item size and number of bins\n    constant_value = np.exp(-item / num_bins)\n    \n    # Calculate the scores based on the modified formula and the constant value\n    scores = (sum_capacity * ratio_item) * constant_value\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

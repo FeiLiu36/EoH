@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the score for each bin by taking the product of the remaining capacity ratio and a penalty term that encourages efficient usage of bins. The penalty term is calculated as the logarithm of the sum of the item size and the bin size, raised to the power of the remaining capacity divided by the bin size. The remaining capacity ratio is multiplied by the penalty term. Finally, the scores are adjusted based on the inverse of the remaining capacity of the bin squared, with a modified adjustment value of 3, to promote lower scores for bins with higher remaining capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    \n    # Calculate the ratio of remaining capacity to bin size\n    capacity_ratio = remaining_capacity / bins\n    \n    # Calculate the penalty term for more efficient usage of bins\n    penalty = (np.log(item + bins) ** (remaining_capacity / bins))\n    \n    # Calculate the product of the remaining capacity ratio and the penalty term\n    weighted_product = capacity_ratio * penalty\n    \n    # Calculate the final scores, adjusting them based on the inverse of the remaining capacity of the bin squared with a modified adjustment value of 3\n    scores = np.where(remaining_capacity >= item, 1e9, (weighted_product / (remaining_capacity ** 2)) ** 3)\n    \n    return scores",
+          "objective": 0.01358,
+          "other_inf": null
+     }
+]

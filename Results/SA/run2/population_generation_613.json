@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "Algorithm: In the new algorithm, I will assign scores to bins based on a modified formula that takes into account the remaining capacity of each bin, the item size, and a weight parameter. Bins with larger remaining capacity, weighted by the weight parameter, will receive higher scores, while bins with smaller remaining capacity will receive lower scores. The final scores for the bins will be normalized to ensure they sum up to 1. However, in this modified version, I will also introduce a penalty factor for bins that are already close to their maximum capacity, which will result in lower scores for those bins.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    num_bins = len(bins)\n    weight = 0.5  # Set weight value\n    penalty_factor = 0.1  # Set penalty factor value\n\n    # Calculate differences between the remaining capacity and the item size, weighted by the weight parameter\n    diff = bins - item\n    weighted_diff = weight / np.maximum(diff, 1)  # Used np.maximum to avoid division by zero\n\n    # Apply penalty factor to bins that are close to their maximum capacity\n    penalty_diff = np.maximum(bins, 1) / np.maximum(diff, 1)  # Used np.maximum to avoid division by zero\n    weighted_penalty_diff = penalty_factor * penalty_diff\n\n    # Calculate modified scores based on the weighted differences and penalty factors\n    scores = (weighted_diff - weighted_penalty_diff) / np.sum(weighted_diff - weighted_penalty_diff)\n    \n    return scores",
+          "objective": 0.04326,
+          "other_inf": null
+     }
+]

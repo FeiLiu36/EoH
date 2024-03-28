@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    \"\"\"Create a new algorithm that calculates the scores for the bins\n    by finding the maximum remaining capacity across all bins,\n    taking the element-wise division of the remaining capacities of the bins by the item size,\n    subtracting the minimum capacity from the obtained quotients,\n    normalizing the scores by dividing them by the sum of the subtracted quotients,\n    and finally multiplying the normalized scores by a factor based on the logarithm \n    of the maximum capacity squared multiplied by the item size.\"\"\"\n\n    max_capacity = np.max(bins)\n    quotients = np.divide(bins, item)\n    subtracted_quotients = np.subtract(quotients, np.min(bins))\n    normalized_scores = subtracted_quotients / np.sum(subtracted_quotients)\n    scores = normalized_scores * np.log((max_capacity**2) * item)\n\n    return scores",
+          "objective": 0.04165,
+          "other_inf": null
+     }
+]

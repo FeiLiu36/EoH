@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "\nThe new algorithm calculates the score for each bin by taking the reciprocal of the item size multiplied by the square of the rest capacity of the bin divided by the maximum bin capacity, and subtracting the item size from each of the calculated scores.  \n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    rest_capacity = max_capacity - bins\n    scores = (1/item) * (rest_capacity**2 / max_capacity) - item\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

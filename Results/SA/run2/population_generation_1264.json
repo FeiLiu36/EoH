@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New Algorithm Description: The new algorithm calculates the scores for each bin based on the following steps:\n1. Calculate the exponential decay of the bin rest capacity, where the decay rate is determined by the item size.\n2. Normalize the exponential decay values to be between 0 and 1.\n3. Square the normalized values obtained in step 2.\n4. Multiply the squared values obtained in step 3 by the bin rest capacity.\n5. Calculate the logarithm of the product values obtained in step 4.\n6. Return the calculated scores for each bin.\n\nCode:\n\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    decay = np.exp(-bins/item) # Step 1\n    normalized_decay = (decay - np.min(decay)) / (np.max(decay) - np.min(decay)) # Step 2\n    squared_values = normalized_decay ** 2 # Step 3\n    product_values = squared_values * bins # Step 4\n    logarithm_values = np.log(product_values) # Step 5\n    scores = logarithm_values # Step 6\n\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

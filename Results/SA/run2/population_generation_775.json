@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm assigns scores to the bins based on the sum of the inverse of the rest capacity and the penalty factor that includes the item size, the rest capacity, and the maximum capacity of each bin. The penalty factor is calculated by taking the square root of the product of the item size and the difference between the maximum capacity and the rest capacity of each bin, and multiplying it by the square root of the sum of the rest capacity and the maximum capacity of each bin. The final scores are adjusted to ensure self-consistency by dividing them by the maximum value and the output scores are sorted in descending order.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the inverse of the rest capacity of each bin\n    inverse_capacity = 1 / bins\n\n    # Calculate the difference between the maximum capacity and the rest capacity of each bin\n    diff_capacity = np.max(bins) - bins\n\n    # Calculate the sum of the rest capacity and the maximum capacity of each bin\n    sum_capacity = bins + np.max(bins)\n\n    # Calculate the penalty factor based on the item size, the difference in capacity, and the sum of capacities of each bin\n    penalty_factor = np.sqrt(item * diff_capacity) * np.sqrt(sum_capacity)\n\n    # Calculate the scores based on the sum of the inverse capacity and the penalty factor\n    scores = inverse_capacity + penalty_factor\n\n    # Adjust the scores to ensure self-consistency by dividing them by the maximum value\n    scores = scores / np.max(scores)\n\n    # Sort the scores in descending order\n    scores = np.sort(scores)[::-1]\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

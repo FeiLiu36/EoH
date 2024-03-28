@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm assigns a base score to bins based on their remaining capacity, penalizes bins with larger remaining capacity, and adjusts the scores based on the ratio of the item size to the remaining capacity of the bins. Additionally, it introduces a normalization step to ensure that the scores fall within a specific range.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the remaining capacity of the bins\n    remaining_capacity = bins - item\n    \n    # Calculate the base score for each bin\n    base_score = np.maximum(0, remaining_capacity)\n    \n    # Calculate the penalty factor for bins with larger remaining capacity, squared\n    penalty_factor = 1 / np.sqrt(remaining_capacity)\n    \n    # Adjust the base scores based on the ratio of item size to remaining capacity\n    scores = base_score * (item / remaining_capacity)\n    \n    # Apply the penalty factor to the scores\n    scores *= penalty_factor\n    \n    # Normalize the scores to fall within the range [0, 1]\n    min_score = np.min(scores)\n    max_score = np.max(scores)\n    scores = (scores - min_score) / (max_score - min_score)\n    \n    return scores",
+          "objective": 0.04165,
+          "other_inf": null
+     }
+]

@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm description: The Modified Score Algorithm calculates the scores as the reciprocal of the ratio between the rest capacity of the bins and the item size, multiplied by a constant factor of 100 and rounded up to the nearest integer, with the additional constraint that if the ratio is below a specified threshold, the score is set to zero.\n\nNew algorithm implementation:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"The Modified Score Algorithm calculates the scores as the reciprocal of the ratio between\n    the rest capacity of the bins and the item size, multiplied by a constant factor of 100 and\n    rounded up to the nearest integer, with the additional constraint that if the ratio is below\n    a specified threshold, the score is set to zero.\"\"\"\n\n    # Calculate the ratio of rest capacity of the bins to the item size\n    ratio = bins / item\n\n    # Calculate the scores as the reciprocal of the ratio multiplied by a constant factor of 100\n    scores = np.ceil(1 / ratio * 100)\n\n    # Set scores to zero where the ratio is below a specified threshold (e.g., 0.1)\n    scores[ratio < 0.1] = 0\n\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

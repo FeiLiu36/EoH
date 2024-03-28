@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm assigns scores to the bins based on the exponential of the product of the square root of the item size and the inverse of the proportional residual capacity, where the proportional residual capacity for each bin is calculated as the ratio of the remaining capacity of the bin to the sum of the remaining capacities of all bins.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = np.sum(bins) - bins\n\n    proportional_residual_capacity = bins / np.sum(bins)\n    scores = np.exp(np.sqrt(item) * (1 / proportional_residual_capacity))\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

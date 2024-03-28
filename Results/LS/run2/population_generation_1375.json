@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the scores for assigning an item to each bin based on the remaining capacity of each bin, the size of the item, and a modified version of the reciprocal of the standard deviation of the remaining capacities among all bins. The modified version involves adding a constant value to the standard deviation to avoid division by zero and improve performance.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    std_dev = np.std(remaining_capacity)\n    scaled_capacity = remaining_capacity / (std_dev + 1e-12)  # Adding a small constant value to avoid division by zero\n    scores = 1 / scaled_capacity * np.where(remaining_capacity >= item, remaining_capacity / np.sqrt(item), 0)\n    return scores",
+          "objective": 0.01127,
+          "other_inf": null
+     }
+]

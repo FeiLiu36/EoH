@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the score for each bin as the product between the reciprocal of the difference between the item size and the bin's rest capacity and the square root of the item size. The scores are then normalized to maintain self-consistency.\n\nHere is the implementation of the new algorithm:\n\n",
+          "code": "import numpy as np\nimport math\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    scores = (1 / (item - bins)) * np.sqrt(item)\n    scores /= np.sum(scores)\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

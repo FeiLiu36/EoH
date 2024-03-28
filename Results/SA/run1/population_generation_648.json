@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new modified algorithm calculates the scores for the bins by taking the reciprocal of the sum of the squares of the remaining capacity of each bin and the square root of the item size, subtracts the minimum value across all bins from the obtained scores, adds the maximum value across all bins to the scores, then takes the exponential of each score, and finally normalizes the scores by dividing them by the sum of all exponential scores.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    \"\"\"The new modified algorithm calculates the scores for the bins by taking the reciprocal of the sum of the squares of\n    the remaining capacity of each bin and the square root of the item size, subtracts the minimum value across all bins from\n    the obtained scores, adds the maximum value across all bins to the scores, then takes the exponential of each score, and\n    finally normalizes the scores by dividing them by the sum of all exponential scores.\"\"\"\n     \n    # Calculate the reciprocal of the sum of the squares of the remaining capacity of each bin and the square root of the item size\n    rec_sum = 1 / (np.sum(np.square(bins)) + np.sqrt(item))\n    \n    # Subtract the minimum value across all bins from the scores\n    scores = rec_sum - np.min(rec_sum)\n    \n    # Add the maximum value across all bins to the scores\n    scores += np.max(rec_sum)\n    \n    # Take the exponential of each score\n    scores = np.exp(scores)\n    \n    # Normalize the scores by dividing them by the sum of all exponential scores\n    scores /= np.sum(scores)\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

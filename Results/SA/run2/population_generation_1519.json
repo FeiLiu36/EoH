@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the score for each bin by taking into account the ratio between the item size and the rest capacity of the bin and multiplying it by the ratio between the maximum bin capacity and the sum of the rest capacities of all bins, promoting bin utilization. This score is multiplied by the ratio between the maximum bin capacity and the sum of the squared rest capacities of all bins and then returned as the scores for the bins for assignment.\n\nHere is the implementation of the new algorithm in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    rest_capacities_sum = np.sum(bins)\n    rest_capacities_squared_sum = np.sum(np.square(bins))\n    scores = ((item / bins) * (max_capacity / rest_capacities_sum) * (max_capacity / rest_capacities_squared_sum))\n    scores = np.ceil(scores)\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

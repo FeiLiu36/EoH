@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm description: \nThe new algorithm calculates the scores for the bins by taking the square root of the division of item size by the remaining capacities, multiplying the result with a constant factor, adding 1, dividing the values by the sum of the squared values, multiplying the normalized scores by a factor based on the exponential of the maximum capacity divided by the maximum capacity, and finally multiplying the scores by a factor based on the inverse of the maximum capacity.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacities = np.asarray(bins)\n    divisor = np.sqrt(item / remaining_capacities)\n    multiplied = divisor * 2\n    added_value = multiplied + 1\n    normalized_scores = added_value / np.sum(added_value ** 2)\n    scores = normalized_scores * (np.exp(np.max(bins)) / np.max(bins)) * (1 / np.max(bins))\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

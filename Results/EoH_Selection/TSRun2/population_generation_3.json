@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "Common backbone idea in the provided algorithms: All algorithms calculate scores for each bin based on the remaining capacity, the proximity to the item size, and penalties for bins at maximum capacity and avoiding their usage.\n\nNew algorithm description: The new algorithm will calculate scores for each bin based on the remaining capacity, the proximity to the item size, the difference between the capacities of adjacent bins, the logarithm of the remaining capacity squared, and a new factor that encourages bin utilization by prioritizing bins with lower indices first and penalizing bins with high remaining capacity.\n\nNew algorithm implementation:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    rest_capacities = bins - item\n    scores = ((rest_capacities - np.min(rest_capacities)) / np.arange(1, len(bins) + 1)) - np.log(np.square(rest_capacities))\n    scores[1:] -= np.abs(np.diff(bins))\n    scores -= np.sqrt(rest_capacities) / (np.arange(1, len(bins) + 1) ** 2)\n    return scores",
+          "objective": 0.02334,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on the remaining capacity, the sum of the capacities of adjacent bins, the logarithm of the remaining capacity squared, and a new factor that encourages bin utilization by prioritizing bins with lower indices first and penalizing bins with high remaining capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    rest_capacities = bins - item\n    scores = ((rest_capacities - np.min(rest_capacities)) / np.arange(1, len(bins) + 1)) - np.log(np.square(rest_capacities))\n    scores[1:] += np.abs(np.diff(bins))\n    scores -= np.sqrt(rest_capacities) / (np.arange(1, len(bins) + 1) ** 2)\n    return scores",
+          "objective": 0.02385,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: The new algorithm calculates the scores for each bin based on the remaining capacity, with a penalty for bins at maximum capacity, and an additional penalty for bins that have a capacity within a certain range of the item size. Additionally, it takes into account the ratio of remaining capacity to the item size, penalizing bins with a smaller ratio, but with a different parameter setting.\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    min_capacity = np.min(bins)\n    range_penalty = (bins >= item - 2) & (bins <= item + 2)  # expanded range of penalty\n    ratio_penalty = (max_capacity - bins) / (item + 1)  # increased penalty for smaller ratio\n    scores = (max_capacity - bins) + (bins == max_capacity) * (item + 1) + range_penalty * max_capacity - ratio_penalty\n    return scores",
+          "objective": 0.0326,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on the remaining capacity, with a larger penalty for bins at maximum capacity, and a smaller penalty for bins that have a capacity within a certain range of the item size. Additionally, it takes into account the ratio of remaining capacity to the item size, penalizing bins with a smaller ratio and giving a slight bonus to bins with a larger ratio.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    min_capacity = np.min(bins)\n    range_penalty = (bins >= item - 2) & (bins <= item + 2)\n    ratio_penalty = (max_capacity - bins) / item\n    scores = (max_capacity - bins) + (bins == max_capacity) * item + range_penalty * max_capacity - (bins > max_capacity / item) * ratio_penalty * 0.5 + (bins < max_capacity / item) * ratio_penalty * 0.1\n    return scores",
+          "objective": 0.03552,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on the remaining capacity, with a penalty for bins at maximum capacity, and an additional penalty for bins that have a capacity within a certain range of the item size. Additionally, it takes into account the ratio of remaining capacity to the item size, penalizing bins with a smaller ratio.\n\nHere is the modified code for the new algorithm:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    min_capacity = np.min(bins)\n    range_penalty = (bins >= item - 1) & (bins <= item + 1)\n    ratio_penalty = (max_capacity - bins) / item\n    scores = (max_capacity - bins) + (bins == max_capacity) * item + range_penalty * max_capacity - ratio_penalty\n    return scores",
+          "objective": 0.03652,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Algorithm description: The new algorithm calculates the scores for each bin based on the remaining capacity, with a penalty for bins at maximum capacity, an additional penalty for bins that have a capacity within a certain range of the item size, and takes into account the ratio of remaining capacity to the item size, penalizing bins with a smaller ratio. The new algorithm also introduces a weight for each penalty, allowing for more flexibility in parameter settings.\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    min_capacity = np.min(bins)\n    range_penalty = (bins >= item - 1) & (bins <= item + 1)\n    ratio_penalty = (max_capacity - bins) / item\n    \n    # New parameter settings\n    max_capacity_penalty = 1  # Penalty for bins at maximum capacity\n    range_penalty_weight = 2  # Additional penalty weight for bins in the specified range\n    ratio_penalty_weight = 0.5  # Penalty weight for the ratio of remaining capacity to item size\n    \n    scores = (max_capacity - bins) * max_capacity_penalty + (bins == max_capacity) * item * max_capacity_penalty + range_penalty * max_capacity * range_penalty_weight - ratio_penalty * ratio_penalty_weight\n    return scores",
+          "objective": 0.03672,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: The new algorithm will calculate the scores for each bin based on the remaining capacity, with a penalty for bins at maximum capacity, and an additional penalty for bins that have a capacity within a certain range of the item size.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    min_capacity = np.min(bins)\n    range_penalty = (bins >= item - 1) & (bins <= item + 1)\n    scores = (max_capacity - bins) + (bins == max_capacity) * item + range_penalty * max_capacity\n    return scores",
+          "objective": 0.03682,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm: The score function will calculate scores for each bin based on the product of the remaining capacity and the square root of the item size, minus the sum of the capacities of adjacent bins, and penalties for bins at maximum capacity and avoiding their usage. It will also introduce a new factor, which is the logarithm of the remaining capacity squared, to further penalize bins with high remaining capacity and encourage bin utilization.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    rest_capacities = bins - item\n    scores = (rest_capacities * np.sqrt(item)) - np.sum(np.abs(np.diff(bins)))\n    scores[bins == np.max(bins)] -= np.max(rest_capacities) * 1000\n    scores -= np.log(np.square(rest_capacities))\n    return scores",
+          "objective": 0.03874,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm: The score function will calculate scores for each bin based on the remaining capacity, the proximity to the item size, the difference between the capacities of adjacent bins, and penalties for bins at maximum capacity and avoiding their usage. It will also introduce a new factor, which is the logarithm of the remaining capacity, to further penalize bins with high remaining capacity and encourage bin utilization.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    rest_capacities = bins - item\n    scores = 1 / np.arange(1, len(bins) + 1)\n    scores -= np.log(rest_capacities)\n    return scores",
+          "objective": 0.03894,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm: The score function will calculate scores for each bin based on the remaining capacity, the proximity to the item size, the difference between the capacities of adjacent bins, and penalties for bins at maximum capacity and avoiding their usage. It will also introduce a new factor, which is the logarithm of the remaining capacity, to further penalize bins with high remaining capacity and encourage bin utilization.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    rest_capacities = bins - item\n    scores = ((rest_capacities - np.min(rest_capacities)) / np.arange(1, len(bins) + 1)) - np.square(rest_capacities)\n    scores[bins == np.max(bins)] -= np.max(rest_capacities) * 1000\n    scores[1:] -= np.abs(np.diff(bins))\n    scores -= np.log(rest_capacities)\n    return scores",
+          "objective": 0.03964,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common Backbone Idea: All of the provided algorithms calculate scores for each bin based on the remaining capacity and consider penalties for bins at maximum capacity or within a certain range of the item size.\n\nNew Algorithm Description: The new algorithm assigns scores to each bin based on the inverse of the ratio between the remaining capacity and the item size, penalizing bins with smaller ratios, and introducing a factor that encourages the utilization of bins with lower indices.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    ratios = (bins - item) / item\n    scores = 1 / ratios\n    scores[bins == np.max(bins)] -= np.max(bins) * 1000\n    scores -= np.arange(1, len(bins) + 1) / item\n    return scores",
+          "objective": 0.03974,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm: The score function will calculate scores for each bin based on the remaining capacity, the proximity to the item size, the difference between the capacities of adjacent bins, and penalties for bins at maximum capacity and avoiding their usage. It will also introduce a new factor, which is the logarithm of the remaining capacity, to further penalize bins with high remaining capacity and encourage bin utilization.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    rest_capacities = bins - item\n    scores = 1 / bins\n    scores -= np.log(rest_capacities)\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm: The score function will calculate scores for each bin based on the remaining capacity, the proximity to the item size, the difference between the capacities of adjacent bins, and penalties for bins at maximum capacity and avoiding their usage. It will also introduce a new factor, which is the exponential of the remaining capacity squared, to further penalize bins with high remaining capacity and encourage bin utilization.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    rest_capacities = bins - item\n    scores = ((rest_capacities - np.min(rest_capacities)) / np.arange(1, len(bins) + 1)) - np.square(rest_capacities)\n    scores[bins == np.max(bins)] -= np.max(rest_capacities) * 1000\n    scores[1:] -= np.abs(np.diff(bins))\n    scores -= np.exp(np.square(rest_capacities))\n    return scores",
+          "objective": 0.03994,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm: The score function will calculate scores for each bin based on the remaining capacity, the proximity to the item size, the difference between the capacities of adjacent bins, and penalties for bins at maximum capacity and avoiding their usage. It will also introduce a new factor, which is the square of the remaining capacity, to further penalize bins with high remaining capacity and encourage bin utilization.",
+          "code": "import numpy as np\n\ndef score(item, bins, c=5, k=2):\n    rest_capacities = bins - item\n    scores = ((rest_capacities - np.min(rest_capacities)) / np.full(len(bins), c)) - np.square(rest_capacities)\n    scores[bins == np.max(bins)] -= k * np.max(rest_capacities)\n    scores[1:] -= np.abs(np.diff(bins))\n    return scores",
+          "objective": 0.04004,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the score for each bin based on the remaining capacity, the proximity to the item size, the difference between the capacities of adjacent bins, and a penalty for bins at maximum capacity, aiming to minimize the number of used bins. It also introduces a new factor, which is the square root of the remaining capacity, to further penalize bins with high remaining capacity and encourage bin utilization.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    rest_capacities = bins - item\n    scores = ((rest_capacities - np.min(rest_capacities)) / np.arange(1, len(bins) + 1)) - np.square(rest_capacities)\n    scores[bins == np.max(bins)] -= np.max(rest_capacities) * 1000\n    scores[1:] -= np.abs(np.diff(bins))\n    scores -= np.sqrt(rest_capacities)\n    return scores",
+          "objective": 0.04014,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm: The score function will calculate scores for each bin based on a combination of factors including the remaining capacity, the proximity to the item size, the difference between the capacities of adjacent bins, penalties for bins at maximum capacity and avoiding their usage, and a new factor that penalizes bins with high remaining capacity and encourages bin utilization. It will also introduce a non-linear transformation of the remaining capacity using a sigmoid function to further adjust the scores.",
+          "code": "import numpy as np\n\ndef sigmoid(x):\n    return 1 / (1 + np.exp(-x))\n\ndef score(item, bins):\n    rest_capacities = bins - item\n    scores = ((rest_capacities - np.min(rest_capacities)) / np.arange(1, len(bins) + 1)) - np.square(rest_capacities)\n    scores[bins == np.max(bins)] -= np.max(rest_capacities) * 1000\n    scores[1:] -= np.abs(np.diff(bins))\n    scores -= sigmoid(rest_capacities)\n    return scores",
+          "objective": 0.04025,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm: The score function will calculate scores for each bin based on the remaining capacity, the proximity to the item size, the difference between the capacities of adjacent bins, and penalties for bins at maximum capacity and avoiding their usage. It will also introduce a new factor, which is the square of the remaining capacity, to further penalize bins with high remaining capacity and encourage bin utilization.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    rest_capacities = bins - item\n    scores = ((rest_capacities - np.min(rest_capacities)) / np.arange(1, len(bins) + 1)) - np.square(rest_capacities)\n    scores[bins == np.max(bins)] -= np.max(rest_capacities) * 1000\n    scores[1:] -= np.abs(np.diff(bins))\n    return scores",
+          "objective": 0.04035,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The score function will calculate scores for each bin based on the proximity to the item size, the ratio between the remaining capacities and the item size, and the position of the bin in the sorted order of capacities, aiming to minimize the number of used bins. The scoring will be adjusted based on the standard deviation of the rest capacities, assigning higher scores to bins with lower deviation. The scores will be further modified by subtracting a penalty if the bin has the maximum capacity, making it less likely to be used.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    sorted_bins = np.sort(bins)\n    rest_capacities = sorted_bins - item\n    rest_ratios = rest_capacities / item\n    bin_positions = np.argsort(bins) + 1\n    scores = rest_capacities / bin_positions + bin_positions / np.max(bin_positions) - rest_ratios * item\n\n    scores -= (bins - np.mean(bins)) / np.std(bins)\n    scores[bins == bins.max()] -= np.max(rest_capacities) * 1000\n\n    return scores",
+          "objective": 0.04045,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: The provided algorithms calculate scores for each bin based on the remaining capacity, penalize bins at maximum capacity, and consider the difference between capacities of adjacent bins.\n\nNew algorithm: The score function will calculate scores for each bin based on the remaining capacity, the proximity to the item size, the difference between the capacities of adjacent bins, a penalty for bins at maximum capacity and avoiding their usage, and a new factor that penalizes bins with high remaining capacity and encourages bin utilization. The new factor will be the exponential function of the remaining capacity multiplied by the inverse of the square of the bin index to prioritize filling bins with lower indices first.\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    rest_capacities = bins - item\n    scores = ((rest_capacities - np.min(rest_capacities)) / np.arange(1, len(bins) + 1)) - np.square(rest_capacities)\n    scores[bins == np.max(bins)] -= np.max(rest_capacities) * 1000\n    scores[1:] -= np.abs(np.diff(bins))\n    scores -= np.exp(rest_capacities) * (1 / (np.arange(1, len(bins) + 1) ** 2))\n    return scores",
+          "objective": 0.04065,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on the remaining capacity, the proximity to the item size, the difference between the capacities of adjacent bins, a penalty for bins at maximum capacity and avoiding their usage, and a new factor that penalizes bins with high remaining capacity and encourages bin utilization. The new factor will be the square root of the remaining capacity divided by the square of the bin index to prioritize filling bins with lower indices first.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    rest_capacities = bins - item\n    scores = ((rest_capacities - np.min(rest_capacities)) / np.arange(1, len(bins) + 1)) - np.square(rest_capacities)\n    scores[1:] -= np.abs(np.diff(bins))\n    scores -= np.sqrt(rest_capacities) / (np.arange(1, len(bins) + 1) ** 2)\n    return scores",
+          "objective": 0.04095,
+          "other_inf": null
+     }
+]

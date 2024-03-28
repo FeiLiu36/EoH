@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "Algorithm: Modified Exponential Score Function Algorithm\n\nThis new algorithm, named \"Modified Exponential Score Function Algorithm\", assigns a score to each bin by considering four factors: an exponential decay term, a ratio term, a capacity term, and a penalty term. The exponential decay term is calculated using an exponential decay function with a decay parameter, the ratio term is the inverse of the ratio of the difference between the item and the bin size to the square of the capacity plus 1, the capacity term remains the same as before, and the penalty term is calculated based on the difference between the item and the bin size. The scores are then sorted in descending order.\n\nPython implementation of the Modified Exponential Score Function Algorithm:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    \n    difference = item - bins\n    \n    # Exponential decay term\n    decay_param = 0.5 # Adjust this parameter for different decay rates\n    decay_term = np.exp(-decay_param * (difference / max_capacity)**2)\n    \n    # Ratio term\n    ratio_term = 1 / (difference / (bins**2 + 1))\n    \n    # Capacity term\n    capacity_term = 1 - bins / max_capacity\n    \n    # Penalty term\n    penalty_term = np.maximum(0, difference) / max_capacity\n    \n    # Calculate scores\n    scores = decay_term + ratio_term + capacity_term - penalty_term\n    \n    # Sort scores in descending order\n    sorted_scores = np.sort(scores)[::-1]\n    \n    return scores",
+          "objective": 0.01308,
+          "other_inf": null
+     }
+]

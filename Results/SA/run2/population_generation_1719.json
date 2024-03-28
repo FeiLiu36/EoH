@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm description: The new algorithm calculates the scores for the bins based on the exponential of the negative normalized difference between the bin capacity and the item size, where the normalization is done by dividing the difference by the maximum difference, multiplied by a constant factor, squared, and then normalizes them by dividing them by the sum of all scores.\n\nNew code:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the maximum difference\n    max_diff = np.max(bins - item)\n    \n    # Calculate the scores for the bins\n    diff = bins - item\n    normalized_diff = diff / max_diff\n    squared_diff = normalized_diff ** 2\n    scores = np.exp(-squared_diff * 0.1)\n    normalized_scores = scores / np.sum(scores)\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

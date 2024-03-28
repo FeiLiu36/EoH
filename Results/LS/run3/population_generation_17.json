@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm aims to prioritize bins with the lowest remaining capacity while taking into account the size of the item. It assigns scores to each bin based on a combination of their remaining capacity and the item size, with a higher weight given to bins with lower remaining capacity. The algorithm then returns the scores as a Numpy array.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    min_capacity = np.min(bins)\n    scores = (min_capacity - bins + item) / bins\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

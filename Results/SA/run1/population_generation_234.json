@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "\nAlgorithm Description: \n\nThe new algorithm calculates the score for each bin by taking the ratio of the item size to the rest capacity of the bin, raising it to a power computed from the logarithm of the maximum rest capacity plus one divided by the logarithm of the rest capacity of the bin plus one, and multiplying it by a weight factor that prioritizes certain bins. Additionally, a penalty factor is applied to bins with rest capacity equal to or close to the maximum rest capacity.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the maximum rest capacity\n    max_capacity = np.max(bins)\n    \n    # Calculate the ratio of item size to rest capacity of each bin\n    ratios = item / bins\n    \n    # Compute the logarithm of maximum rest capacity plus one and logarithm of each rest capacity plus one\n    log_max_capacity = np.log(max_capacity + 1)\n    log_rest_capacity = np.log(bins + 1)\n    \n    # Compute the power factor using the logarithm values\n    factor = log_max_capacity / log_rest_capacity\n    \n    # Calculate the score for each bin as the product of ratios raised to the power of the factor\n    scores = ratios ** factor\n    \n    # Set a weight factor for specific bins\n    bin_weights = np.where(np.isclose(bins, max_capacity), 1.1, 1)\n    \n    # Apply the weight factor to the scores\n    scores *= bin_weights\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

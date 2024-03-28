@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "\n  The new algorithm calculates the inverse of the item size, then multiplies it by the sum of the bin rest capacities divided by the item size, the product of the bin rest capacities, and the logarithm of the item size divided by the sum of the item size and bin rest capacities. It then calculates the scores for the bins based on a modified formula that incorporates these values, while also considering the cube of the bin rest capacities and the square root of the item size.\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    inverse_item_size = 1 / item\n    sum_bin_capacities = np.sum(bins) / item\n    product_bin_capacities = np.prod(bins)\n    log_term = np.log(item) / (np.sum(item) + np.sum(bins))\n    scores = inverse_item_size * sum_bin_capacities * product_bin_capacities * log_term * (np.sum(bins) ** 3) * np.sqrt(item)\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

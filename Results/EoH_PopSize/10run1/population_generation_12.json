@@ -1,0 +1,62 @@
+[
+     {
+          "algorithm": "My new algorithm calculates the score for each bin by taking the difference between the remaining capacity and the item size, multiplied by the hyperbolic tangent function of the natural logarithm of the remaining capacity and the square of the item size for bins where the remaining capacity is not equal to the maximum capacity, and assigns a score of zero for bins with the maximum capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    remaining_capacity = bins - item\n\n    mask = (bins < bins.max())\n    scores[mask] = (remaining_capacity[mask] - item) * np.tanh(np.log(remaining_capacity[mask]) * item**2)\n\n    return scores",
+          "objective": 0.00704,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm calculates the score for each bin by taking the difference between the remaining capacity and the item size, multiplied by the squared root of the remaining capacity and divided by the item size for bins where the remaining capacity is not equal to the maximum capacity, and assigns a score of zero for bins with the maximum capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    remaining_capacity = bins - item\n\n    mask = (bins < bins.max())\n    scores[mask] = (remaining_capacity[mask] - item) * np.sqrt(remaining_capacity[mask]) / item\n\n    return scores",
+          "objective": 0.01238,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores based on the product of remaining capacity, inverse of item size, and the difference between remaining capacity and item size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    remaining_capacity = bins - item\n\n    mask = (bins < bins.max())\n    scores[mask] = (remaining_capacity[mask] - item) * remaining_capacity[mask] / item\n\n    return scores",
+          "objective": 0.01288,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the score for each bin based on the inverse of the remaining capacity and the item size, and incorporates the square root and logarithm of the remaining capacity and item size, respectively.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    remaining_capacity = bins - item\n    item_inverse = 1 / item\n\n    mask = (bins < bins.max())\n    scores[mask] = (remaining_capacity[mask]**0.5) * np.log2(item) * (remaining_capacity[mask] - item) * item_inverse\n\n    return scores",
+          "objective": 0.01328,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew Algorithm Description: My new algorithm calculates the score for each bin by taking the product of the remaining capacity and the logarithm base 2 of the item size, multiplied by the difference between the remaining capacity and the item size for bins where the remaining capacity is not equal to the maximum capacity, and assigns a score of zero for bins with the maximum capacity.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    remaining_capacity = bins - item\n\n    mask = (bins < bins.max())\n    scores[mask] = remaining_capacity[mask] * np.log2(item) * (remaining_capacity[mask] - item)\n\n    return scores",
+          "objective": 0.01499,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm calculates the score for each bin by taking the difference between the remaining capacity and the item size, multiplied by the square root of the remaining capacity and the inverse of the item size for bins where the remaining capacity is not equal to the maximum capacity, and assigns a score of zero for bins with the maximum capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    remaining_capacity = bins - item\n\n    mask = (bins < bins.max())\n    scores[mask] = (remaining_capacity[mask] - item) * remaining_capacity[mask]\n\n    return scores",
+          "objective": 0.01509,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the score for each bin by taking the square root of the product of the remaining capacity and the inverse of the item size, multiplied by the difference between the remaining capacity and the item size, only for bins where the remaining capacity is not equal to the maximum capacity, and assigns a score of zero for bins with the maximum capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    remaining_capacity = bins - item\n\n    mask = (bins < bins.max())\n    scores[mask] = np.sqrt(remaining_capacity[mask] * (1/item)) * (remaining_capacity[mask] - item)\n\n    return scores",
+          "objective": 0.01539,
+          "other_inf": null
+     },
+     {
+          "algorithm": "scores[mask] = np.sin(remaining_capacity[mask] * (1/item)) * (remaining_capacity[mask] - item)",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    remaining_capacity = bins - item\n\n    mask = (bins < bins.max())\n    scores[mask] = np.sin(remaining_capacity[mask] * (1/item)) * (remaining_capacity[mask] - item)\n\n    return scores",
+          "objective": 0.01841,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm calculates the score for each bin by summing the square of the item size and the product of the remaining capacity and the logarithm base 2 of the item size, multiplied by the difference between the remaining capacity and the item size for bins where the remaining capacity is not equal to the maximum capacity, and assigns a score of zero for bins with the maximum capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    remaining_capacity = bins - item\n\n    mask = (bins < bins.max())\n    scores[mask] = item**2 + remaining_capacity[mask] * np.log2(item) * (remaining_capacity[mask] - item)\n\n    return scores",
+          "objective": 0.03028,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm calculates the score for each bin by taking the difference between the remaining capacity and the item size, multiplied by the natural logarithm of the remaining capacity and the inverse of the item size for bins where the remaining capacity is not equal to the maximum capacity, and assigns a score of zero for bins with the maximum capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    remaining_capacity = bins - item\n\n    mask = (bins < bins.max())\n    scores[mask] = (remaining_capacity[mask] - item) * np.log(remaining_capacity[mask]) * (1/item)\n\n    return scores",
+          "objective": 0.03159,
+          "other_inf": null
+     }
+]

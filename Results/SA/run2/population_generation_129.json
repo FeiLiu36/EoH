@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "Algorithm description: The new algorithm calculates the score for each bin based on the remaining capacity divided by the maximum capacity, a penalty term that accounts for the difference between the maximum capacity and the remaining capacity, and a bonus term that is inversely proportional to the ratio of the maximum capacity to the current item's size.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    max_capacity = np.max(bins)\n    capacity_ratio = remaining_capacity / max_capacity\n    penalty_term = max_capacity - remaining_capacity\n    bonus_term = 1 / (item / max_capacity)\n    scores = capacity_ratio + penalty_term + bonus_term\n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

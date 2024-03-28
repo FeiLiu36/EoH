@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The modified algorithm calculates the scores for each bin based on the following steps:\n1. Subtract the item size from the rest capacities of bins.\n2. Take the maximum value between the subtracted values and zero.\n3. Take the reciprocal of the maximum values.\n4. Square the reciprocal values.\n5. Multiply the squared values by a fixed factor.\n6. Return the calculated scores for each bin.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    subtracted_values = bins - item # Step 1\n    max_values = np.maximum(subtracted_values, 0) # Step 2\n    reciprocals = np.reciprocal(max_values) # Step 3\n    squared_reciprocals = np.square(reciprocals) # Step 4\n    scores = squared_reciprocals * 5 # Step 5\n    \n    return scores",
+          "objective": 0.04457,
+          "other_inf": null
+     }
+]

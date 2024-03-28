@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm description: The new algorithm calculates the scores for bin assignment by taking the square root of the item size, dividing it by the square root of the bin capacities, then raising it to the power of the logarithm of the sum of the bin capacities. Finally, the scores are sorted in descending order.\n\nNew code:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    bin_capacities = bins.astype(float)\n\n    # Calculate the square root of the item size\n    sqrt_item = np.sqrt(item)\n\n    # Calculate the square root of the bin capacities\n    sqrt_bin_capacities = np.sqrt(bin_capacities)\n\n    # Divide sqrt_item by sqrt_bin_capacities\n    divisions = np.divide(sqrt_item, sqrt_bin_capacities)\n\n    # Calculate the logarithm of the sum of the bin capacities\n    log_sum = np.log(np.sum(bin_capacities))\n\n    # Raise divisions to the power of log_sum\n    scores = np.power(divisions, log_sum)\n\n    # Sort the scores in descending order\n    sorted_scores = np.sort(scores)[::-1]\n\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

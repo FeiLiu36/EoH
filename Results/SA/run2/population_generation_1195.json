@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the score for each bin by taking the product of the reciprocal of the remaining capacity divided by the maximum capacity, the logarithm of the item size divided by the maximum capacity, and the square root of the minimum remaining capacity divided by the maximum capacity, then subtracting the natural logarithm of the item size divided by the square root of the maximum capacity, finally divided by the logarithm of the maximum capacity divided by the square root of the item size.\n\nHere's the modified version of the score function in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    log_item = np.log(item)\n    sqrt_max_cap = np.sqrt(max_capacity)\n    sqrt_min_cap = np.sqrt(np.min(bins))\n\n    scores = (1 / (bins / max_capacity)) * (log_item / max_capacity) * (np.sqrt(sqrt_min_cap / max_capacity)) - log_item / (sqrt_max_cap / np.sqrt(item))\n\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

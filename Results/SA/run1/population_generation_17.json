@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "My new algorithm calculates the scores for each bin based on the remaining capacity of the bins and the size of the item. It penalizes bins with smaller remaining capacity and adjusts the penalty based on the item size. The scores are calculated using a modified logarithmic function that takes into account both the remaining capacity and item size. The algorithm is implemented using vectorized operations in Numpy to promote performance.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    remaining_capacity = max_capacity - bins\n    \n    # Calculate the penalties based on remaining capacity and item size\n    capacity_penalty = np.exp(-(remaining_capacity-1)/max_capacity)\n    item_penalty = np.exp(-(item-1)/max_capacity)\n    \n    # Calculate the scores for each bin\n    scores = np.log(remaining_capacity+1) - capacity_penalty - item_penalty\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

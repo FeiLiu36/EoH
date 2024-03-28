@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm description: The new algorithm assigns a score to each bin based on its remaining capacity, penalizing bins with a higher capacity, while also considering the item size and its ratio to the remaining capacity. The main steps are as follows:\n\n1. Calculate the priority factor for each bin by dividing the remaining capacity by the item size.\n2. Initialize an array of scores with zeros.\n3. For each bin:\n   a. If the remaining capacity is less than the item size:\n      - Set the score for that bin to -inf to indicate that it cannot accommodate the item.\n   b. If the bin can accommodate the item:\n      - Calculate the score by multiplying the priority factor by the ratio of item size to remaining capacity, and subtracting the square root of the remaining capacity.\n4. Return the resulting scores array.\n\nCode:\n\n```",
+          "code": "import numpy as np\nimport math\n\ndef score(item, bins):\n    priority_factor = bins / item\n\n    low_capacity_bins = bins < item\n\n    scores = np.zeros(len(bins), dtype=np.float64)\n    scores[low_capacity_bins] = -np.inf\n    scores[~low_capacity_bins] = priority_factor[~low_capacity_bins] * (item / bins[~low_capacity_bins]) - np.sqrt(bins[~low_capacity_bins])\n\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

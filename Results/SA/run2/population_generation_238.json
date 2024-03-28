@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the square of the cumulative sum of the remaining capacity for each bin (after deducting the item size) and assigns it to a variable called 'cumulative_squared'. \n\nNext, it calculates the inverse of the normalized remaining capacity of each bin by dividing the maximum capacity of the bins by the remaining capacity and assigns it to a variable called 'normalized_inverse'. \n\nThen, it calculates the scores for each bin by multiplying the cumulative squared capacity by the normalized inverse capacity. \n\nThe scores are then sorted in descending order and returned. \n\nFinally, a check is performed to ensure that no bin with a remaining capacity equal to the maximum capacity is used.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    remaining_capacity = bins - item\n\n    cumulative_squared = np.cumsum(remaining_capacity)**2\n    normalized_inverse = max_capacity / remaining_capacity\n\n    scores = cumulative_squared * normalized_inverse\n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n\n    if remaining_capacity[int(sorted_indices[0])] == max_capacity:\n        scores[0] = 0\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

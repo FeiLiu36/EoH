@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "\nThe new algorithm calculates the score for each bin by dividing the remaining capacity of the bins by the item size, then takes the square of the reciprocal of the absolute value, and finally multiplies it by 10. The scores are calculated for all bins simultaneously using numpy arrays.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    scores = remaining_capacity / item\n    scores = np.reciprocal(scores)\n    scores = np.abs(scores)\n    scores = np.square(scores)\n    scores = scores * 10\n    scores = np.where(remaining_capacity >= item, np.full_like(scores, np.inf), scores)\n    return scores",
+          "objective": 0.0157,
+          "other_inf": null
+     }
+]

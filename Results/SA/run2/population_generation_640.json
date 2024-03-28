@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New Algorithm Description: The new algorithm assigns initial scores to the bins based on the logarithm of their rest capacities plus a penalty factor, and adjusts the scores based on a discounting factor. It then normalizes the scores to ensure self-consistency, and assigns additional bonus scores to the bins based on the inverse of their rest capacities squared minus a discount factor.\n\nNew Algorithm Code:\n\n``` ",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    penalty_factor = 0.25\n    discount_factor = 0.1\n\n    # Calculate the logarithm of the rest capacities plus a penalty factor\n    log_rest_capacities = np.log(bins) + penalty_factor\n\n    # Adjust the scores by subtracting the discount factor\n    adjusted_scores = log_rest_capacities - discount_factor\n\n    # Scale the adjusted scores to ensure self-consistency\n    scaled_scores = adjusted_scores / np.sum(adjusted_scores)\n\n    # Assign bonus scores based on the inverse of the squared rest capacities minus the discount factor\n    bonus_scores = 1 / ((bins ** 2) - discount_factor)\n\n    # Normalize the bonus scores to ensure self-consistency\n    normalized_bonus_scores = bonus_scores / np.sum(bonus_scores)\n\n    # Combine the scaled scores and normalized bonus scores\n    scores = scaled_scores + normalized_bonus_scores\n\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

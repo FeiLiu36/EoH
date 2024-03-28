@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm updates the scoring formula to be the product of three components: (1) the ratio between the remaining capacity of the bin and the maximum remaining capacity across all bins, (2) the difference between the mean remaining capacity of all bins and the remaining capacity of the bin, and (3) the inverse of the index of the bin starting from 1 and going up to the number of bins. The bins are then sorted in descending order based on their scores, and the scores are returned as the output.\n\nHere is the implementation of the new algorithm:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    mean_remaining_capacity = np.mean(bins)\n    max_remaining_capacity = np.max(bins)\n    bin_indices = np.arange(1, len(bins) + 1)\n\n    scores = (\n        (remaining_capacity / max_remaining_capacity)\n        * (mean_remaining_capacity - remaining_capacity)\n        * (1 / bin_indices)\n    )\n\n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

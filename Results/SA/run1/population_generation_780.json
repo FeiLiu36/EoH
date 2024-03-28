@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "My new algorithm calculates the scores for the bins by taking the square root of the inverse tangent function applied to the sum of the bin capacities divided by the item size, multiplied by the logarithm of the item size, divided by the sum of the bin capacities, then multiplied by the sum of the bin capacities divided by the absolute difference between the maximum bin capacity and the item size, and subtracting the natural logarithm of the sum of the bin capacities.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (np.sqrt(np.arctan(np.sum(bins)/item)) * np.log(item) / np.sum(bins)) * (np.sum(bins) / np.abs(np.max(bins) - item)) - np.log(np.sum(bins))\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

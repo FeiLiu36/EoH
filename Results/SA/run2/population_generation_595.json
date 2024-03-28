@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New Algorithm Description: \n\nIn the new algorithm, the scoring function assigns scores to bins based on their remaining capacity divided by the square root of the item size. Each bin's score is then multiplied by a weight, which is determined by the bin's remaining capacity. Bins with remaining capacity closer to the item size will receive higher scores, while bins with larger or smaller remaining capacities will receive lower scores. The final scores for the bins are normalized to ensure they sum up to 1.\n\nNew Algorithm Implementation:\n\n``` ",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    num_bins = len(bins)\n    \n    # Calculate differences between remaining capacity and item size\n    diff = np.abs(bins - item)\n    \n    # Calculate scores based on the inverse of differences divided by the square root of the item size\n    inv_diff = 1 / diff\n    \n    # Calculate weights based on remaining capacity\n    weights = np.sqrt(bins)\n    \n    # Multiply scores with weights\n    scores = inv_diff * weights\n    \n    # Adjust scores to ensure they sum up to 1\n    scores = scores / np.sum(scores)\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

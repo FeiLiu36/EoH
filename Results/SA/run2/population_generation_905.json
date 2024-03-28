@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New Algorithm Description: My modified algorithm, named \"Weighted Exponential Algorithm,\" assigns scores to the bins by calculating the exponential of the ratio between the remaining bin capacity and the maximum bin capacity, giving more weight to bins with smaller remaining capacity and aiming to minimize the number of used bins by assigning the item to the bin with the maximum score.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the ratio between remaining bin capacity and maximum bin capacity\n    ratios = bins / np.max(bins)\n    \n    # Calculate the scores using the exponential function with weights\n    weights = np.exp(-10 * ratios) # You can modify the weight factor '10' based on your requirements\n    scores = weights\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

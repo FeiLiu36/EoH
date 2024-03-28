@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the score for each bin as the product of two terms: the difference between the maximum capacity and the rest capacity of the bin, and the square root of the item size plus the rest capacity of the bin, all squared. This score is then normalized to maintain self-consistency.\n\nHere is the implementation of the new algorithm in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    rest_capacity = max_capacity - bins\n    sqrt_term = np.sqrt(item + bins)\n    scores = (rest_capacity * sqrt_term) ** 2\n    scores /= np.sum(scores)\n    return scores",
+          "objective": 0.06751,
+          "other_inf": null
+     }
+]

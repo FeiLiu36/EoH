@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm is a modified version of the original algorithm, with the main steps as follows:\n\n1. Calculate the absolute difference between the bin rest capacity and the item size.\n2. Take the reciprocal of the values obtained in step 1.\n3. Raise the reciprocal values obtained in step 2 to the power of 2.\n4. Normalize the values obtained in step 3 to be between 0 and 1.\n5. Multiply the normalized values obtained in step 4 by the bin rest capacity.\n6. Apply a logarithm transformation to the product values obtained in step 5.\n7. Return the calculated scores for each bin.\n\nHere is the implementation of the new algorithm in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    difference = np.abs(bins - item) # Step 1\n    reciprocal_difference = 1 / difference # Step 2\n    powered_reciprocal = reciprocal_difference ** 2 # Step 3\n    normalized_values = (powered_reciprocal - np.min(powered_reciprocal)) / (np.max(powered_reciprocal) - np.min(powered_reciprocal)) # Step 4\n    product_values = normalized_values * bins # Step 5\n    logarithm_values = np.log(product_values) # Step 6\n    scores = logarithm_values # Step 7\n\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

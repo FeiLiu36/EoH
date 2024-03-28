@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm description: The \"Exponential Decay Algorithm\" assigns scores to the bins based on an exponential decay function, where the scores decrease exponentially as the remaining bin capacity increases. The scores are further adjusted based on the number of used bins so far, aiming to minimize the number of used bins. Bins with exactly the maximum capacity are also considered for assignment.\n\nCode:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the exponential decay scores based on the remaining bin capacity\n    decay_scores = np.exp(-np.divide(bins, np.max(bins)))\n\n    # Add a small constant to bins with maximum capacity to include them for assignment\n    bins_with_max_capacity = np.where(bins == np.max(bins))\n    decay_scores[bins_with_max_capacity] += 0.001\n\n    # Adjust scores based on the number of used bins so far\n    num_used_bins = np.count_nonzero(bins < np.max(bins))\n    adjusted_scores = decay_scores + 0.1*num_used_bins\n    scores = np.maximum(adjusted_scores, 0)\n\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

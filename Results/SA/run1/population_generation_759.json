@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "\nThe new algorithm first scales the item size and bin capacities by dividing them by the maximum bin capacity, then takes the element-wise multiplication of the item size and the inverse of the bin capacities. Finally, it subtracts the minimum score from the resulting array and returns it as the scores for the bins.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_bin_capacity = np.max(bins)\n    scaled_item = item / max_bin_capacity\n    scaled_bins = bins / max_bin_capacity\n    \n    scores = scaled_item * (1 / scaled_bins)\n    scores -= np.min(scores)\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

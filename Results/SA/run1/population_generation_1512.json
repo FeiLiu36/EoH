@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm description: Modified algorithm that assigns scores to bins based on a combination of their remaining capacities and the difference between their capacities and the item size, promoting the utilization of bins with capacities close to the item size.\n\nNew code:\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    alpha = 0.1\n    n = 5\n    threshold = 0.3 * max_capacity\n\n    sorted_bins = np.sort(bins)\n\n    quadratic_term = np.zeros_like(bins)\n    quadratic_term[:n] = alpha * (bins[:n] ** 2)  # Quadratic term\n\n    ratio_term = (bins ** 2 + 1) / ((item - bins) + 1)  # Ratio term\n\n    capacity_term = np.exp(-(bins - item) / (0.5 * item))  # Capacity term\n\n    difference_term = np.abs(bins - item)  # Difference term\n\n    penalty_term = np.exp((threshold - bins) / threshold)  # Penalty term\n\n    scores = (\n        quadratic_term + ratio_term + capacity_term + difference_term - penalty_term\n    )\n\n    sorted_scores = np.sort(scores)[::-1]\n\n    return scores",
+          "objective": 0.01137,
+          "other_inf": null
+     }
+]

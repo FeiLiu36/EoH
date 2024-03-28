@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm: \n\n1. Calculate the ratio between the remaining capacity and the item size, raised to the power of 2 and multiplied by a factor of 100.\n2. Calculate the absolute difference between the logarithms of the remaining capacity divided by the item size and a constant value (5).\n3. Square the absolute difference and multiply it by a factor of 50.\n4. Generate the scores for each bin by comparing the remaining capacity with the item size. If the remaining capacity is greater than or equal to the item size, assign a very high score (1e9), otherwise assign the sum of the ratio and the squared absolute difference.\n5. Return the scores for the bins.\n\nCode:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    ratio = 100 * (remaining_capacity / item)**2\n    logarithm_difference = np.abs(np.log(remaining_capacity / item) - 5)\n    squared_difference = 50 * np.square(logarithm_difference)\n    scores = np.where(remaining_capacity >= item, np.full_like(remaining_capacity, 1e9), ratio + squared_difference)\n    return scores",
+          "objective": 0.01358,
+          "other_inf": null
+     }
+]

@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the score for each bin by taking the reciprocal of the sum of the absolute differences between the remaining capacity of the bin and the item size, then raising it to the power of the natural logarithm of the item size, and finally multiplying it by the normalized sum of the remaining capacity of the bin divided by the total capacity of all feasible bins.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    absolute_diff = np.abs(bins - item)\n    sum_diff = np.sum(absolute_diff)\n    scores = (1 / sum_diff) ** np.log(item)\n    total_capacity = np.sum(bins)\n    remaining_capacity = bins - item\n    normalized_sum_remaining_capacity = np.sum(remaining_capacity) / total_capacity\n    scores = scores * normalized_sum_remaining_capacity\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

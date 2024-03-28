@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "\nNew Algorithm: The new algorithm calculates the score for each bin by taking the sum of the logarithm of the bin's remaining capacity and the logarithm of one plus the bin's index position, and then returns the scores sorted in descending order.\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    \n    scores = np.log(remaining_capacity) + np.log(1 + np.arange(len(bins)))\n    \n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

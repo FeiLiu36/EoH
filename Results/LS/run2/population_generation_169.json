@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "My new algorithm\\",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = (1 / (bins / item)) * ((bins // item)).astype(float) * (max_capacity / item)\n    return scores",
+          "objective": 0.01801,
+          "other_inf": null
+     }
+]

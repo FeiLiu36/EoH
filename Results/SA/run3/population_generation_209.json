@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on a combination of trigonometric and logarithmic functions, which assign higher scores to bins with less remaining capacity and larger item sizes while penalizing bins with more remaining capacity and smaller item sizes. The algorithm also introduces a new term that penalizes bins with extreme differences between the remaining capacity and item size. In addition, the new algorithm further penalizes bins with extremely low remaining capacity or extremely large item sizes.\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    \n    capacity_ratio = np.tan(np.sinh(np.arcsinh(np.exp(-(remaining_capacity / item)**2))))\n    capacity_log_difference = 3 * np.abs(np.log(remaining_capacity / item) + np.exp(-np.log(remaining_capacity / item)**2))\n    capacity_difference_penalty = np.maximum(((remaining_capacity - item) / item)**2, 0)\n    \n    size_ratio = np.tan(np.sinh(np.arcsinh(np.exp(-(item / remaining_capacity)**2))))\n    size_log_difference = np.abs(np.log(item / remaining_capacity) + np.exp(-np.log(item / remaining_capacity)**2))\n    size_difference_penalty = np.maximum(((item - remaining_capacity) / remaining_capacity)**2, 0)\n    \n    scores = np.where(remaining_capacity >= item, np.full_like(remaining_capacity, 1e9), \n                     np.maximum(capacity_ratio, capacity_log_difference) + capacity_difference_penalty +\n                     np.maximum(size_ratio, size_log_difference) + size_difference_penalty)\n    \n    scores = np.round(scores)\n    \n    return scores",
+          "objective": 0.01358,
+          "other_inf": null
+     }
+]

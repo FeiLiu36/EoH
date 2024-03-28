@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm is based on the following steps: The scores for each bin are computed based on the logarithm of the absolute difference between the rest capacity of each bin and the item size, the square root of the sum of the rest capacities of all the bins, and the inverse of the square of the difference between the rest capacity of each bin and the maximum capacity among all bins. The scores are then modified by taking the maximum value among the logarithm, square root, and inverse squared values. The modified scores are adjusted by emphasizing the assignment of items to bins with higher modified scores and penalizing bins with high rest capacities. Finally, the scores are normalized by dividing them by the sum of the modified scores plus the total number of bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    log_diff = np.log(np.abs(bins - item))  \n    sqrt_sum_rest_capacities = np.sqrt(np.sum(bins))  \n    inverse_square_diff = 1 / np.square(bins - np.max(bins))  \n    modified_scores = np.maximum(log_diff, sqrt_sum_rest_capacities, inverse_square_diff)  \n    modified_scores = np.power(modified_scores, 2)  \n    adjusted_scores = modified_scores / (1 + np.exp(bins - np.mean(bins)))  \n    sum_modified_scores = np.sum(adjusted_scores)  \n    scores = adjusted_scores / (sum_modified_scores + len(bins)) \n    \n    # Your new algorithm starts here:\n    modified_scores = np.power(modified_scores, 3)  \n    adjusted_scores = modified_scores / (1 + np.exp(bins - np.mean(bins)))  \n    scores = adjusted_scores / (np.sum(adjusted_scores) + len(bins))\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

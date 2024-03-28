@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm description: The new algorithm calculates the scores for bin assignment by first calculating the ratio between the sum of the bin capacities and the maximum bin capacity, then taking the exponential of this ratio. The algorithm then multiplies this exponential by the inverse of the item size and the square root of the bin capacities. Finally, the scores are sorted in descending order.\n\nNew code:\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    bin_capacities = bins.astype(float)\n\n    # Calculate the ratio of the sum of the bin capacities to the maximum bin capacity and take the exponential\n    sum_ratio_exp = np.exp(np.sum(bin_capacities) / max_capacity)\n\n    # Calculate the inverse of the item size and the square root of the bin capacities\n    inv_sqrt_product = 1.0 / (item * np.sqrt(bin_capacities))\n\n    # Multiply the exponential ratio by the inv_sqrt_product\n    scores = sum_ratio_exp * inv_sqrt_product\n\n    # Sort the scores in descending order\n    sorted_scores = np.sort(scores)[::-1]\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

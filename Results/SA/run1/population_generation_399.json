@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm: The new algorithm calculates the score for each bin by taking the square root of the item size to the maximum capacity ratio and the cube root of the ratio of the maximum capacity to the rest capacity of each bin, and then applies a sigmoid transformation to the result to map it to a value between 0 and 1. Finally, it normalizes the scores so that the sum of the scores is equal to the number of bins used.\n\nPython implementation:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the maximum capacity of the bins\n    max_capacity = np.max(bins)\n    \n    # Calculate the item size to maximum capacity ratio\n    item_ratio = item / max_capacity\n    \n    # Calculate the ratio of maximum capacity to rest capacity of each bin\n    capacity_ratio = max_capacity / bins\n    \n    # Calculate the score for each bin\n    scores = np.sqrt(item_ratio) * np.cbrt(capacity_ratio)\n    \n    # Apply sigmoid transformation to the scores\n    scores = 1 / (1 + np.exp(-scores))\n    \n    # Normalize the scores\n    scores /= np.sum(scores)\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

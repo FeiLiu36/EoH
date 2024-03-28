@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the product of the bin capacities divided by the item size, then multiplies it by the logarithm of the sum of the bin capacities divided by the item size, the square root of the logarithm of the item size plus 1, and the cube root of the sum of the bin capacities minus the maximum bin capacity. It then calculates the scores for the bins based on a modified formula that incorporates these values.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    bin_capacities = bins / item\n    product_term = np.prod(bin_capacities)\n    log_term = np.log(np.sum(bin_capacities) / item)\n    sqrt_log_item_size = np.sqrt(np.log(item+1))\n    cubic_term = np.cbrt(np.sum(bins) - np.max(bins))\n    scores = product_term * log_term * sqrt_log_item_size * cubic_term\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

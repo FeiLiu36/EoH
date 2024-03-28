@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the scores for the bins by dividing the sum of the ratio between the remaining capacity of each bin and the maximum capacity by the square root of the item size, multiplies the maximum value across all bins with the scores, subtracts the minimum value across all bins from the obtained scores, then normalizes the scores by dividing them by the sum of all scores.\n\nCode:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    \"\"\"The new modified algorithm calculates the scores for the bins by dividing the sum of the ratio between the remaining capacity\n    of each bin and the maximum capacity by the square root of the item size, multiplies the maximum value across all bins with the\n    scores, subtracts the minimum value across all bins from the obtained scores, then normalizes the scores by dividing them by the\n    sum of all scores.\"\"\"\n    \n    # Calculate the sum of the ratio between the remaining capacity of each bin and the maximum capacity\n    ratio_sum = np.sum(bins / np.max(bins))\n    \n    # Divide the ratio sum by the square root of the item size\n    scores = ratio_sum / np.sqrt(item)\n    \n    # Multiply the maximum value across all bins with the scores\n    scores *= np.max(scores)\n    \n    # Subtract the minimum value across all bins from the scores\n    scores -= np.min(scores)\n    \n    # Normalize the scores by dividing them by the sum of all scores\n    scores /= np.sum(scores)\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

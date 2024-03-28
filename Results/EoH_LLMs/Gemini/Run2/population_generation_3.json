@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "My new algorithm reduces the strength of the logarithmic component with the power of the times the bin is used.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = bins / (bins - item) + np.log(bins) ** (np.arange(len(bins)) ** 1)\n    return scores",
+          "objective": 0.01167,
+          "other_inf": null
+     },
+     {
+          "algorithm": "{Bins with higher score means that there is a higher probability of being assigned to the item.}",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacities = bins - item\n    partially_used_bins = np.where(np.logical_and(bins >= item, bins < max_capacity))[0]\n    num_partially_used_bins = len(partially_used_bins)\n    scores = 1.0 / ((bins / item) - np.floor(bins / item)) * (bins / item) ** 2 / (1.0 + np.exp(-(remaining_capacities / item)))\n    return scores",
+          "objective": 0.01439,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Prioritize bins that have the largest remaining capacity, while penalizing bins that have been partially used, based on a normalized difference between the bin's current capacity and the item's size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    average_remaining_capacity = np.mean(bins)\n    scores = 1.0 / ((bins / item) - np.floor(bins / item)) * (bins / item) ** 2\n    return scores",
+          "objective": 0.01479,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm adds a randomization step to the previous algorithm to enhance its robustness and efficiency.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacities = bins - item\n    partially_used_bins = np.where(np.logical_and(bins >= item, bins < max_capacity))[0]\n    num_partially_used_bins = len(partially_used_bins)\n    scores = (bins - item) * 0.5 / ((bins / item) - np.floor(bins / item)) * (1.0 + np.square(np.exp(-(remaining_capacities / item)))) / (1.0 + np.sqrt(1))\n    return scores",
+          "objective": 0.01539,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm adds a randomization step to the previous algorithm to enhance its robustness and efficiency.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = (bins - item) * 0.5 / ((bins / item) - np.floor(bins / item)) * (1.0 + np.square(np.exp(-(bins / item))))\n    return scores",
+          "objective": 0.01549,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm adds a randomization step to the previous algorithm to enhance its robustness and efficiency.",
+          "code": "import numpy as np\nimport random\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacities = bins - item\n    partially_used_bins = np.where(np.logical_and(bins >= item, bins < max_capacity))[0]\n    num_partially_used_bins = len(partially_used_bins)\n    random_numbers = np.random.rand(len(bins))\n    scores = (bins - item) * 0.5 / ((bins / item) - np.floor(bins / item)) * (1.0 + np.square(np.exp(-(remaining_capacities / item)))) / (1.0 + np.sqrt(num_partially_used_bins)) * random_numbers\n    return scores",
+          "objective": 0.0162,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Prioritize bins based on a weighted combination of 1. the inverse of the ratio of the bin's remaining capacity to the item's size, 2. the square root of the remaining capacity of the bin, and 3. the inverse of the number of items that can fit into the bin.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacities = bins - item\n    scores = 1.0 / ((bins / item) - np.floor(bins / item)) + np.sqrt(remaining_capacities) + 1.0 / (remaining_capacities / item + 1)\n    scores[bins < item] = -np.inf\n    return scores",
+          "objective": 0.01751,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Score bins based on the bin's remaining capacity and the inverse of the number of partially used bins, weighted by the difference between the bin's capacity and the item's size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacities = bins - item\n    partially_used_bins = np.where(np.logical_and(bins >= item, bins < max_capacity))[0]\n    num_partially_used_bins = len(partially_used_bins)\n    scores = (bins - item) * 1.0 / ((bins / item) - np.floor(bins / item)) * (1.0 + np.exp(-(remaining_capacities / item))) / (num_partially_used_bins + 1)\n    return scores",
+          "objective": 0.01761,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Prioritize bins based on a weighted combination of the ratio of the bin's current capacity to the item's size and the inverse of the number of partially used bins, considering the variance in the available bin capacities.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacities = bins - item\n    partially_used_bins = np.where(np.logical_and(bins >= item, bins < max_capacity))[0]\n    num_partially_used_bins = len(partially_used_bins)\n    bin_capacity_variance = np.var(bins)\n    scores = (bins / item) * 1.0 / ((bins / item) - np.floor(bins / item)) * (num_partially_used_bins + 1) / (bin_capacity_variance + 1)\n    return scores",
+          "objective": 0.01811,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The proposed algorithm uses a weighted score that combines the bin's remaining capacity, the weighted inverse of the number of items in the bin, and the item's size, with the weights adjusted based on the score from the original algorithm.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacities = bins - item\n    partially_used_bins = np.where(np.logical_and(bins >= item, bins < max_capacity))[0]\n    num_partially_used_bins = len(partially_used_bins)\n    base_scores = (bins - item) * 1.0 / ((bins / item) - np.floor(bins / item)) * (1.0 + np.exp(-(remaining_capacities / item))) / (num_partially_used_bins + 1)\n    num_items_in_bin = np.floor(bins / item)\n    weights = 1.0 + np.log(num_items_in_bin + 1)\n    scores = base_scores * weights\n    return scores",
+          "objective": 0.01821,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Prioritize bins based on a weighted combination of 1. the inverse of the ratio of the bin's remaining capacity to the item's size, 2. the inverse of the number of partially used bins, and 3. the inverse of the square of the difference between the bin's remaining capacity and the item's size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacities = bins - item\n    partially_used = remaining_capacities > 0\n    num_partially_used = partially_used.sum()\n    scores = 1.0 / ((bins / item) - np.floor(bins / item)) + 1.0 / (np.where(bins == max_capacity, 1, num_partially_used + 1)) + 1.0 / ((bins - item) ** 2 + 1)\n    scores[bins < item] = -np.inf\n    return scores",
+          "objective": 0.02958,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Prioritize bins based on a weighted combination of 1. the inverse of the ratio of the bin's remaining capacity to the item's size, 2. the inverse of the number of partially used bins, and 3. the inverse of the square of the difference between the bin's remaining capacity and the item's size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacities = bins - item\n    partially_used_bins = np.where(np.logical_and(bins >= item, bins < max_capacity))[0]\n    num_partially_used_bins = len(partially_used_bins)\n    scores = 1.0 / ((bins / item) - np.floor(bins / item)) + 1.0 / (np.where(bins == max_capacity, 1, num_partially_used_bins + 1)) + 1.0 / ((bins - item) ** 2 + 1)\n    scores[bins < item] = -np.inf\n    return scores",
+          "objective": 0.03169,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Score bins based on a weighted combination of the inverse of the ratio of the bin's remaining capacity to the item's size and the inverse of the number of partially used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacities = bins - item\n    partially_used_bins = np.where(np.logical_and(bins >= item, bins < max_capacity))[0]\n    num_partially_used_bins = len(partially_used_bins)\n    scores = 1.0 / ((bins / item) - np.floor(bins / item)) + 1.0 / (np.where(bins == max_capacity, 1, num_partially_used_bins + 1))\n    scores[bins < item] = -np.inf\n    return scores",
+          "objective": 0.032,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign items to the bin with the highest score calculated by a function of the ratio of the bin's remaining capacity to the item's size, with a bonus for bins where the remaining capacity after assignment is less than a threshold.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = np.where(bins == max_capacity, 0.0, 1.0 / ((bins / item) - np.floor(bins / item))) + (bins > max_capacity / 2)\n    scores[bins < item] = -np.inf\n    return scores",
+          "objective": 0.03592,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Prioritize bins with more remaining capacity by giving them higher scores. If a bin's capacity is less than twice the item's size, assign a score of 0 to it.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    capacities = bins - item\n    scores = np.zeros_like(bins)\n    scores[(capacities > 0) & (capacities < 2 * item)] = 1 / capacities[(capacities > 0) & (capacities < 2 * item)]\n    scores[capacities >= 2 * item] = 1\n    return scores",
+          "objective": 0.03632,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Score bins based on a weighted combination of the inverse of the ratio of the bin's remaining capacity to the item's size and the inverse of the number of partially used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins, threshold=1.0):\n    remaining_capacities = bins - item\n    scores = 1.0 / ((bins / item) - np.floor(bins / item)) + 1.0 / (1 + 1)\n    scores[bins < item] = -np.inf\n    return scores",
+          "objective": 0.03642,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Score bins based on a weighted combination of the inverse of the remaining capacity and the inverse of the difference between the bin's capacity and the item's size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacities = bins - item\n    scores = 1.0 / remaining_capacities + 1.0 / ((bins / item) - np.floor(bins / item))\n    return scores",
+          "objective": 0.03682,
+          "other_inf": null
+     },
+     {
+          "algorithm": " Prioritize bins based on a non-linear combination of 1. the inverse of the ratio of the bin's remaining capacity to the item's size, 2. the square root of the number of partially used bins, and 3. the exponential of the difference between the bin's remaining capacity and the item's size. ",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacities = bins - item\n    partially_used_bins = np.where(np.logical_and(bins >= item, bins < max_capacity))[0]\n    scores = 1.0 / ((bins / item) - np.floor(bins / item)) + np.exp(-(bins - item))\n    scores[bins < item] = -np.inf\n    return scores",
+          "objective": 0.03693,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Score bins based on the inverse of the ratio of the bin's remaining capacity to the item's size, with a penalty factor for partially used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = np.where(bins == max_capacity, 0.0, 1.0 / ((bins / item) - np.floor(bins / item)))\n    scores[bins < item] = -np.inf\n    return scores",
+          "objective": 0.03703,
+          "other_inf": null
+     },
+     {
+          "algorithm": " Prioritize bins based on a non-linear combination of 1. the inverse of the ratio of the bin's remaining capacity to the item's size, 2. the square root of the number of partially used bins, and 3. the exponential of the difference between the bin's remaining capacity and the item's size. ",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacities = bins - item\n    partially_used_bins = np.where(np.logical_and(bins >= item, bins < max_capacity))[0]\n    num_partially_used_bins = len(partially_used_bins)\n    scores = 1.0 / ((bins / item) - np.floor(bins / item)) + np.sqrt(np.where(bins == max_capacity, 1, num_partially_used_bins + 1)) + np.exp(-(bins - item))\n    scores[bins < item] = -np.inf\n    return scores",
+          "objective": 0.03723,
+          "other_inf": null
+     }
+]

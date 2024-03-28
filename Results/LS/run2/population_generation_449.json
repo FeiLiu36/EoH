@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "\nThe new algorithm calculates the scores for assigning an item to each bin based on the ratio of the remaining capacity of each bin to the square root of the size of the item, using Numpy's vectorized operations to optimize performance. In this modified version, instead of using the mean remaining capacity of all bins to scale the remaining capacity, we will use the standard deviation of the remaining capacities among all bins for scaling, and then apply the same score calculation as before.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    scaled_capacity = remaining_capacity / np.std(remaining_capacity)\n    scores = (1 / scaled_capacity.astype(float)) * np.where(remaining_capacity >= item, remaining_capacity.astype(float) / np.sqrt(item), 0)\n    return scores",
+          "objective": 0.01187,
+          "other_inf": null
+     }
+]

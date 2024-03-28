@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "Algorithm description: My new algorithm is a modified version of the previous algorithm where instead of directly computing the scores, I first calculate the remaining capacity of each bin after assigning the item to it, and then use that information to generate the scores.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    max_capacity = np.max(bins)\n    scores = (1 / (remaining_capacity / item)) * ((remaining_capacity // item)).astype(float) * (max_capacity / item)\n    return scores",
+          "objective": 0.01771,
+          "other_inf": null
+     }
+]

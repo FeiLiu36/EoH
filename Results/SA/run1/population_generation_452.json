@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "Algorithm description: The new algorithm calculates the score for each bin by dividing the squared ratio between the item size and the rest capacity of each bin by a penalty factor, which is a function of the difference between the sum of the rest capacities of all the bins and the maximum capacity, and the sum of the assigned items. Finally, the scores are obtained by dividing the ratio and penalty factor by the maximum ratio, and then normalizing them.\n\nCode:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the ratio between item size and rest capacity of each bin\n    ratio = item / bins\n    \n    # Calculate the penalty factor\n    sum_rest_capacities = np.sum(bins)\n    sum_assigned_items = sum_rest_capacities - np.sum(bins)\n    max_capacity = np.max(bins)\n    penalty_factor = (sum_rest_capacities - max_capacity) / sum_assigned_items\n    \n    # Calculate the scores\n    scores = (ratio ** 2) / penalty_factor\n    scores /= np.max(scores)\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

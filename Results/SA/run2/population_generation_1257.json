@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New Algorithm Description: The new algorithm calculates the scores for each bin based on the following steps:\n1. Calculate the squared value of the bin rest capacity.\n2. Calculate the absolute difference between the squared value obtained in step 1 and the product of the bin rest capacity and the item size.\n3. Calculate the reciprocal of the absolute differences obtained in step 2.\n4. Add a constant value to avoid any potential division by zero errors to the reciprocal values obtained in step 3.\n5. Take the square root of the reciprocal values obtained in step 4.\n6. Return the calculated scores for each bin.\n\nCode:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    squared_values = bins ** 2 # Step 1\n    differences = np.abs(squared_values - bins * item) # Step 2\n    reciprocal_values = 1 / (differences + 1e-10) # Step 3 (with added constant)\n    square_root_outputs = np.sqrt(reciprocal_values) # Step 4\n    scores = square_root_outputs # Step 5\n\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

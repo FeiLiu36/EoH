@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the score for each bin by multiplying three factors:\n1. The inverse of the ratio between the remaining capacity and the bin size, raised to the power of 0.5, to promote higher scores for bins with larger remaining capacity and larger bin sizes.\n2. The inverse of the logarithm of the item size, to promote higher scores for smaller items.\n3. The inverse of a scaled value of the remaining capacity with a scaling factor of 1,000, to further consider the remaining capacity in the scoring process.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    \n    # Calculate the inverse of the ratio between remaining capacity and bin size\n    capacity_ratio_inverse = 1 / (remaining_capacity / bins)\n    \n    # Raise the capacity ratio inverse to the power of 0.5\n    capacity_ratio_inverse_sqrt = np.power(capacity_ratio_inverse, 0.5)\n    \n    # Calculate the inverse of the logarithm of the item size\n    item_size_inverse = 1 / np.log(item)\n    \n    # Calculate the inverse of the scaled remaining capacity\n    scaled_remaining_capacity_inverse = 1 / (remaining_capacity/1000)\n    \n    # Calculate the product of the three factors\n    weighted_product = capacity_ratio_inverse_sqrt * item_size_inverse * scaled_remaining_capacity_inverse\n    \n    # Calculate the final scores\n    scores = np.where(remaining_capacity >= item, 1e9, weighted_product)\n    \n    return scores",
+          "objective": 0.01358,
+          "other_inf": null
+     }
+]

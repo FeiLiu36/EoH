@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm: The modified algorithm calculates the score for each bin by taking the ratio between the item size and the remaining capacity, then raising it to the power of e, where e is Euler's number, dividing it by the maximum capacity, finally multiplying the score by the ratio between the square root of the remaining capacity and the square root of the maximum capacity.\n\nCode:\n",
+          "code": "import numpy as np\nimport math\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n\n    # Calculate the score for each bin\n    ratio = item / remaining_capacity\n    ratio_e = np.exp(ratio)\n    ratio2 = np.sqrt(remaining_capacity) / np.sqrt(np.max(bins))\n    scores = (ratio_e / np.max(bins)) * ratio2\n\n    # Assign maximum scores for bins with remaining capacity >= item size\n    scores = np.where(remaining_capacity >= item, np.inf, scores)\n\n    return scores",
+          "objective": 0.01358,
+          "other_inf": null
+     }
+]

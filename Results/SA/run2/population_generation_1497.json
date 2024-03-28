@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on the following steps: \n1. Calculate the sum of the rest capacities of the bins.\n2. Divide the result of step 1 by the rest capacities of each bin.\n3. Take the square root of the item size.\n4. Multiply the square root calculated in step 3 with the inverse of the rest capacities of the bins.\n5. Take the square root of the product of the rest capacities of the bins.\n6. Divide the result of step 4 by the product calculated in step 5.\n7. Return the calculated scores.\n\nHere's the implementation of the new score function in Python:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    sum_rest_capacities = np.sum(bins)\n    scores = (sum_rest_capacities / bins) * np.sqrt(item) * (1 / np.sqrt(np.prod(bins)))\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

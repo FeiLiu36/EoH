@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the score for each bin by taking into account the ratio between the item size and the rest capacity of the bin, and then multiplies it by a factor obtained by dividing the maximum bin capacity by the rest capacity of the bin. This score is then rounded up to the nearest integer and returned as the scores for the bins for assignment.\n\nCode:\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    ratios = item / bins\n    factors = max_capacity / bins\n    scores = np.ceil(ratios * factors)\n    return scores",
+          "objective": 0.03904,
+          "other_inf": null
+     }
+]

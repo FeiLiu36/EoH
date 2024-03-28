@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm, named Modified Score Algorithm, calculates the scores for the bins as the sum of the ratio of the item size to the remaining capacity of each bin, multiplied by a factor that is the square of the difference between the maximum capacity and the remaining capacity of each bin, then subtracted by a constant value.\n\nHere is the implementation of the Modified Score Algorithm in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"The Modified Score Algorithm calculates the scores for the bins as the sum of the ratio of the item size\n    to the remaining capacity of each bin, multiplied by a factor that is the square of the difference between the\n    maximum capacity and the remaining capacity of each bin, then subtracted by a constant value.\"\"\"\n    \n    # Calculate the ratio of the item size to the remaining capacity of each bin\n    ratios = item / bins\n    \n    # Calculate the factor as the square of the difference between the maximum capacity and the remaining capacity of each bin\n    max_capacity = np.max(bins)\n    factor = np.square(max_capacity - bins)\n    \n    # Calculate the scores as the sum of the ratio multiplied by the factor, then subtracted by a constant value\n    scores = np.sum(ratios * factor) - 1\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

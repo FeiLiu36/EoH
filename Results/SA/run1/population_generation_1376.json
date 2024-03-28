@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "Algorithm Description: Piecewise Exponential Score Function Algorithm",
+          "code": "import numpy as np\nimport math\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    weight = 0.5\n    alpha_1 = 0.1\n    alpha_2 = 0.2\n    m = 5\n\n    # Ratio term\n    ratio_term = weight * (1 / ((item - bins) / (bins**2 + 1)))\n\n    # Capacity term\n    capacity_term = weight * ((max_capacity - bins) / max_capacity)\n\n    # Penalty term\n    penalty_term = weight * ((bins - max_capacity) / max_capacity) ** 2\n\n    # Proximity term\n    proximity_term = weight * (bins / max_capacity) ** 2\n\n    # Exponential term\n    sorted_bins = np.sort(bins)[::-1]\n    positions = np.arange(1, len(bins) + 1)\n\n    exponential_term = np.zeros_like(bins)\n    exponential_term[:m] = np.exp(-alpha_1 * positions[:m])\n    exponential_term[m:] = np.exp(-alpha_2 * positions[m:])\n\n    # Calculate scores\n    scores = ratio_term + capacity_term - penalty_term - proximity_term + exponential_term\n\n    # Sort scores in descending order\n    sorted_scores = np.sort(scores)[::-1]\n\n    return scores",
+          "objective": 0.01439,
+          "other_inf": null
+     }
+]

@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New Algorithm: The new algorithm calculates the score for each bin based on the remaining capacity and a modified version of the logarithm of the remaining capacity divided by the maximum remaining capacity. It uses a scoring formula that includes a combination of exponential, logarithmic, and power terms, with additional modification where the power term is raised to the power of the square root of the modified logarithmic ratio. The scores are sorted in descending order and returned.\n\nCode:\n\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    max_remaining_capacity = np.max(bins)\n    ratio = remaining_capacity / max_remaining_capacity\n    \n    # Constants for adjusting importance of each term in the scoring formula\n    exponential_factor = 0.4\n    logarithmic_factor = 0.6\n    power_factor = 0.8\n    \n    modified_ratio = np.log(remaining_capacity) / np.log(max_remaining_capacity)\n    \n    scores = (\n        exponential_factor * np.exp(power_factor * np.power(modified_ratio, np.sqrt(logarithmic_factor)))\n    )\n    \n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

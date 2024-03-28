@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on a function that takes into account the remaining capacity of each bin and the item size. The scores are determined by dividing the remaining capacity by the item size and then subtracting it from the maximum possible score. The scores are then sorted in descending order before returning them. Additionally, if the remaining capacity of a bin equals the maximum capacity, it will not be used.\n\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the remaining capacity after assigning the item to each bin\n    remaining_capacity = bins - item\n    \n    # Create a mask to identify bins with maximum capacity\n    mask = remaining_capacity < np.max(bins)\n    \n    # Calculate the maximum possible score based on the remaining capacity\n    max_score = np.max(remaining_capacity / item)\n    \n    # Initialize the scores array with all zeros\n    scores = np.zeros_like(remaining_capacity)\n    \n    # Calculate the scores for bins with non-maximum capacity\n    scores[mask] = max_score - (remaining_capacity[mask] / item)\n    \n    # Sort the scores in descending order\n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

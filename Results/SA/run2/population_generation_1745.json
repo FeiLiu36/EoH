@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm: The new algorithm assigns higher scores to the bins with smaller differences between the bin capacity and the item size, while also considering the remaining capacity of the bin after assigning the item, and lower scores to the bins with larger differences and less remaining capacity.\n\nPython Implementation:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the differences between the bin capacity and the item size\n    differences = bins - item\n    \n    # Calculate the remaining capacities of the bins after assigning the item\n    remaining_capacity = bins - np.minimum(differences, 0)\n    \n    # Calculate the reciprocal of the differences\n    reciprocal = 1 / differences\n    \n    # Calculate the modified scores for the bins\n    scores = reciprocal * np.sqrt(item) / remaining_capacity\n    \n    # Replace NaN values with a large negative value to avoid errors in assignment\n    scores[np.isnan(scores)] = -np.inf\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

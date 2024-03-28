@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm description: \nMy new algorithm calculates the scores for the bins by taking the sum of the inverse of the remaining capacities of the bins and subtracting the minimum value across all bins from the obtained sum, then normalizes the scores by dividing them by the sum, and finally multiplies the scores by a factor based on the item size.\n\nHere's the implementation of the new algorithm in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    \"\"\"Create a new algorithm that calculates the scores for the bins\n    by taking the sum of the inverse of the remaining capacities of the bins,\n    subtracts the minimum value across all bins from the obtained sum,\n    normalizes the scores by dividing them by the sum,\n    and finally multiplies the scores by a factor based on the item size.\"\"\"\n\n    # Calculate the inverse of the remaining capacities of the bins\n    inv_capacity = 1.0 / bins\n\n    # Calculate the sum of the inverse capacities and subtract the minimum value across all bins\n    sum_inv_capacity = np.sum(inv_capacity) - np.min(inv_capacity)\n\n    # Normalize the scores by dividing them by the sum\n    scores = inv_capacity / sum_inv_capacity\n\n    # Multiply the scores by a factor based on the item size\n    scores *= item\n\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

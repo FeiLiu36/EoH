@@ -1,0 +1,32 @@
+[
+     {
+          "algorithm": "The new algorithm assigns items to bins by calculating a score for each bin based on its remaining capacity, the item size, and an additional factor that penalizes bins with small remaining capacity. The algorithm then adjusts the scores based on the index of the bin to prioritize assigning items to bins with higher indices before lower indices. Finally, the algorithm incorporates a factor that amplifies the scores based on the difference between the maximum remaining capacity and the current bin's capacity, adding more weight to bins that are closer to being full.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = item - bins\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: \n\nThe new algorithm assigns items to bins by calculating a score for each bin based on its remaining capacity, the item size, and a penalty factor for bins that cannot accommodate the item. It also considers an additional factor based on the index of the bin to prioritize assigning items to bins with lower indices before higher indices.\n\nImplementation:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (np.max(item) - bins) - 0.1 * np.arange(len(bins))\n\n    return scores",
+          "objective": 0.03994,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: The new algorithm assigns items to bins by calculating a score for each bin based on its remaining capacity, the item size, and an additional factor that penalizes small remaining capacities. It also incorporates a factor that amplifies the scores based on the difference between the maximum remaining capacity and the current bin's capacity, adding more weight to bins that are closer to being empty. The algorithm further adjusts the scores based on the index of the bin to prioritize assigning items to bins with higher indices before lower indices. Finally, it applies a power transformation to the scores to further enhance the differentiation between bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = (max_capacity - bins)**1.5 * (1 - bins/max_capacity) + item / (np.arange(len(bins)) + 1)**1.5\n\n    return scores",
+          "objective": 0.04004,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns items to bins by calculating a score for each bin based on its remaining capacity, the item size, and an additional factor that penalizes bins with small remaining capacity. The algorithm then adjusts the scores based on the index of the bin to prioritize assigning items to bins with higher indices before lower indices. Finally, the algorithm incorporates a factor that amplifies the scores based on the difference between the maximum remaining capacity and the current bin's capacity, adding more weight to bins that are closer to being full.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (-bins) - item - np.arange(len(bins)) + 1.5 * (-bins)\n    \n    return scores",
+          "objective": 0.04014,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns items to bins by calculating a score for each bin based on its remaining capacity, the item size, and a penalty factor for bins that cannot accommodate the item, while also considering an additional factor based on the index of the bin to prioritize assigning items to bins with higher indices before lower indices.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = (max_capacity - bins) - item - 0.5 * np.arange(len(bins))\n    \n    return scores",
+          "objective": 0.04035,
+          "other_inf": null
+     }
+]

@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on a combination of logarithmic and quadratic functions, assigning higher scores to bins with less remaining capacity and larger item sizes while penalizing bins with more remaining capacity and smaller item sizes. The algorithm further penalizes bins with extremely low remaining capacity or extremely large item sizes, as well as bins with extreme differences between the remaining capacity and item size.\n\nHere's the implementation of the new algorithm in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n\n    capacity_score = np.log(1 + remaining_capacity / item)\n    capacity_quadratic_difference = np.maximum(((remaining_capacity - item) / item)**2, 0)\n\n    size_score = np.log(1 + item / remaining_capacity)\n    size_quadratic_difference = np.maximum(((item - remaining_capacity) / remaining_capacity)**2, 0)\n\n    scores = np.where(remaining_capacity >= item, np.full_like(remaining_capacity, 1e9),\n                     capacity_score + capacity_quadratic_difference +\n                     size_score + size_quadratic_difference)\n\n    return scores",
+          "objective": 0.01358,
+          "other_inf": null
+     }
+]

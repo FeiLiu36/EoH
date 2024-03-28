@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm: \n\nThe new algorithm calculates the score for each bin based on the remaining capacities of the bins, the ratio of the current item size to the bin capacity, and a penalty factor that increases as the ratio exceeds a certain threshold. The scores are adjusted by multiplying them with the penalty factor and normalizing them to a range between 0 and 1. The normalized scores are then raised to a power that is directly proportional to the remaining capacity of the bin, and the scores are returned in descending order.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    ratio = item / bins\n\n\t# Penalty factor that increases as the ratio exceeds a certain threshold\n    penalty_factor = np.where(ratio > 0.8, np.exp(10 * (ratio - 0.8)), 1)\n\t\n    scores = ratio * penalty_factor\n\n    normalized_scores = (scores - np.min(scores)) / (np.max(scores) - np.min(scores))\n    normalized_scores = np.power(normalized_scores, remaining_capacity)\n\n    sorted_indices = np.argsort(normalized_scores)[::-1]\n    scores = normalized_scores[sorted_indices]\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

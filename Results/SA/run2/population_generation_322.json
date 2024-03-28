@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm description: The new algorithm calculates the score for each bin based on the remaining capacities and the ratio between the current item size and the bin capacity. The score is then adjusted based on a logarithmic transformation of the ratio and a power transformation of the remaining capacities, and the scores are returned in descending order.\n\nCode: \n\n```\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    ratio = item / bins\n    \n    # Constants for adjusting importance of each term in the scoring formula\n    logarithmic_factor = 0.3\n    power_factor = 0.7\n    \n    logarithmic_term = logarithmic_factor * np.log(ratio + 1)\n    power_term = power_factor * np.power(remaining_capacity, 3)\n    \n    scores = logarithmic_term + power_term\n    \n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

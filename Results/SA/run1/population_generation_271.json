@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "New algorithm: The new algorithm calculates the score for each bin based on the ratio of the item size to the rest capacity of the bin, with the scores weighted by a multiplier that increases as the bin's rest capacity approaches its maximum capacity up to a certain threshold, aiming to minimize the number of used bins. The threshold is determined based on the average rest capacity of the bins.\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the average rest capacity of the bins\n    avg_rest_capacity = np.mean(bins)\n    \n    # Calculate the ratio of the item size to the rest capacity of each bin\n    ratios = item / bins\n    \n    # Calculate the weight multiplier for bins close to their maximum rest capacity up to the average rest capacity\n    weight_multiplier = np.where(bins >= avg_rest_capacity, 1 - bins / bins.max(), 1)\n    \n    # Calculate the weighted score for each bin by combining the ratio and weight multiplier\n    scores = ratios * weight_multiplier\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     }
+]

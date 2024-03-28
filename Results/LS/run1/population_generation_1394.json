@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the score for each bin based on the remaining capacity of the bin divided by the sum of the remaining capacity of all bins plus the squared sum of the capacities of the current item and all the other items already assigned to the bin, and returns the scores as a Numpy array.\n\nHere is the implementation of the new algorithm:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = np.sum(bins) + item - bins\n    item_weighted_sum = np.sum(bins * item)\n    squared_sum = np.sum((bins + item) ** 2)\n    scores = remaining_capacity / (np.sum(remaining_capacity) + squared_sum)\n    return scores",
+          "objective": 0.02616,
+          "other_inf": null
+     }
+]

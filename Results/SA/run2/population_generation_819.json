@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "Algorithm: The new algorithm assigns scores to each bin based on the sum of the rest capacities of each bin, the reciprocal of the square root of the item size, the difference between the maximum capacity and the item size, and the logarithmic value that is proportional to the sum of the rest capacities and the number of bins.\n\nCode:\n\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    num_bins = len(bins)\n    \n    # Calculate the sum of the rest capacities of each bin\n    sum_rest_capacities = np.sum(bins)\n    \n    # Calculate the reciprocal of the square root of the item size\n    reciprocal_sqrt_item = 1 / np.sqrt(item)\n    \n    # Calculate the difference between the maximum capacity and the item size\n    diff_max_item = np.max(bins) - item\n    \n    # Calculate the logarithmic value proportional to the sum of the rest capacities and the number of bins\n    log_value = np.log(sum_rest_capacities * num_bins)\n    \n    # Calculate the scores based on the modified formula\n    scores = sum_rest_capacities + reciprocal_sqrt_item + diff_max_item + log_value\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

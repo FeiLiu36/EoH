@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm, named Modified Score Algorithm X, calculates the scores for the bins by dividing the remaining capacity of each bin by the square root of the product of the item size and a weighted sum of the bin capacities, then adding a decreasing sequence of integers.\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"The Modified Score Algorithm X calculates the scores for the bins by dividing the remaining capacity of each bin by \n    the square root of the product of the item size and a weighted sum of the bin capacities, then adding a decreasing sequence of integers.\"\"\"\n    \n    # Calculate the weighted sum of the bin capacities\n    weighted_sum = np.sum(bins * np.arange(1, len(bins) + 1))\n    \n    # Calculate the remaining capacity of each bin\n    remaining_capacity = bins - item\n    \n    # Calculate the division of the remaining capacity by the square root of the product of the item size and the weighted sum\n    division = remaining_capacity / np.sqrt(item * weighted_sum)\n    \n    # Calculate the scores as the division added by a decreasing sequence of integers\n    scores = division + np.arange(len(bins), 0, -1)\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

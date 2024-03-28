@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm is called the \"Modified Exponential Score Function\" and it assigns items to bins while minimizing the number of used bins by using a modified exponential scoring technique.\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    average_capacity = np.mean(bins)\n    \n    # Additional variables\n    weight = 0.5\n    exponent = 0.5\n    \n    # Scoring terms\n    quadratic_term = np.zeros_like(bins)\n    quadratic_term[:7] = (bins[:7] ** 2) / 4\n    \n    ratio_term = np.power(bins / (item - bins), 2)\n    \n    capacity_term = np.exp(-(bins - item)**2 / (2 * max_capacity**2))\n    \n    difference_term = np.exp(-np.abs(bins - item) / (2 * max_capacity**2))\n    \n    penalty_term = np.exp(-bins / (2 * max_capacity**2))\n    \n    deviation_term = np.exp(-np.abs(bins - average_capacity) / (2 * max_capacity**2))\n    \n    optimization_term = np.exp(-bins / (2 * max_capacity**2))\n    \n    balance_term = np.exp(-np.abs(bins - average_capacity) / (2 * max_capacity**2))\n    \n    # Calculate scores with the modified exponential algorithm\n    scores = (\n        weight * (capacity_term ** exponent) + quadratic_term + ratio_term - difference_term - penalty_term +\n        (1 - weight) * (deviation_term + optimization_term - balance_term)\n    ) / (\n        np.max(\n            weight * (capacity_term ** exponent) + quadratic_term + ratio_term - difference_term - penalty_term +\n            (1 - weight) * (deviation_term + optimization_term - balance_term)\n        )\n    )\n    \n    return scores",
+          "objective": 0.00714,
+          "other_inf": null
+     }
+]

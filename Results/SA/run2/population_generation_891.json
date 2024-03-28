@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "My new algorithm, called the \"Modified Combined Score Algorithm,\" calculates scores for the bins based on a combination of three factors: a penalty factor, a capacity factor, and a bonus factor. The penalty factor penalizes bins that cannot accommodate the item, the capacity factor considers the remaining capacity of each bin, and the bonus factor rewards bins with a higher remaining capacity. The formula ensures self-consistency and aims to minimize the number of used bins by assigning the item to the bin with the maximum score.",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Define the weight for each factor\n    penalty_weight = 0.5\n    capacity_weight = 0.3\n    bonus_weight = 0.2\n    \n    # Calculate the penalty factor\n    penalty_factor = np.where(bins < item, np.inf, item / bins)\n    \n    # Calculate the capacity factor\n    capacity_factor = bins / np.max(bins)\n    \n    # Calculate the bonus factor\n    bonus_factor = np.exp(-capacity_factor)\n    \n    # Calculate the combined scores\n    scores = penalty_weight * penalty_factor + capacity_weight * capacity_factor + bonus_weight * bonus_factor\n    \n    return scores",
+          "objective": 0.03954,
+          "other_inf": null
+     }
+]

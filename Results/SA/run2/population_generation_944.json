@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "Algorithm Description:\n\nThe \"Modified Score Algorithm 4.0\" assigns scores to the bins based on a modified formula that takes into account the remaining bin capacity, capacity utilization, and the number of items already present in the bin. This algorithm aims to optimize the bin selection process by prioritizing bins with higher capacity utilization and fewer items already present.\n\nCode:\n\n",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the ratio between the remaining bin capacity and the item size\n    remaining_capacity_ratio = bins / item\n    \n    # Calculate the weighted scores based on the remaining capacity ratio and the number of items already present in the bin\n    weighted_scores = remaining_capacity_ratio * (bins.size - np.count_nonzero(bins)) / bins.size\n\n    # Adjust the scores based on the number of used bins so far\n    num_used_bins = np.count_nonzero(bins < np.max(bins))\n    adjusted_scores = weighted_scores * (0.1 ** num_used_bins)\n    \n    scores = np.maximum(adjusted_scores, 0)\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

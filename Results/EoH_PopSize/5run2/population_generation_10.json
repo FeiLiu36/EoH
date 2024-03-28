@@ -1,0 +1,32 @@
+[
+     {
+          "algorithm": "The new algorithm assigns scores to bins based on a combination of the logarithm of the remaining capacity divided by the item size and the reciprocal of the logarithm of the item size, giving higher scores to bins with larger remaining capacity and smaller item sizes:\n\n```",
+          "code": "import numpy as np\nimport math\n\ndef score(item, bins):\n    scores = np.empty_like(bins)\n\n    remaining_bins = np.where(bins > item)[0]\n    remaining_capacity = bins[remaining_bins] - item\n    reciprocal_log_item_size = np.reciprocal(np.log(item))\n\n    scores[remaining_bins] = np.log(remaining_capacity) * reciprocal_log_item_size\n\n    return scores",
+          "objective": 0.03089,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Description of new algorithm:\nThe new algorithm assigns scores to bins based on a combination of the square root of the remaining capacity divided by the item size and the reciprocal of the square root of the item size, giving higher scores to bins with larger remaining capacity and smaller item sizes.\n\nImplementation in Python:\n```",
+          "code": "import numpy as np\nimport math\n\ndef score(item, bins):\n    scores = np.empty_like(bins)\n\n    remaining_bins = np.where(bins > item)[0]\n    remaining_capacity = bins[remaining_bins] - item\n    reciprocal_item_size = np.reciprocal(np.sqrt(item))\n\n    scores[remaining_bins] = np.sqrt(remaining_capacity) * reciprocal_item_size\n\n    return scores",
+          "objective": 0.03964,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The common backbone idea in the provided algorithms is to assign scores to bins based on the remaining capacity divided by the item size and the logarithm of the reciprocal of the item size, giving higher scores to bins with larger remaining capacity and smaller item sizes.\n\nNew algorithm description: The new algorithm assigns scores to bins based on the product of the remaining capacity divided by the item size, the logarithm of the reciprocal of the item size, and the square root of the item size.\n\nCode:\n```",
+          "code": "import numpy as np\nimport math\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n\n    remaining_bins = np.where(bins > item)[0]\n    scores[remaining_bins] = (bins[remaining_bins] / item) * np.log(1 / item) * np.sqrt(item)\n\n    return scores",
+          "objective": 0.03974,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to bins based on the product of the ratio of the remaining capacity to the item size and the logarithm of the item size, giving higher scores to bins with larger remaining capacity and smaller item sizes.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = item / bins\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description:\nThe new algorithm assigns scores to bins based on a combination of the square root of the remaining capacity divided by the item size and the logarithm of the reciprocal of the item size, giving higher scores to bins with larger remaining capacity and smaller item sizes.\nCode:\n\n```\n",
+          "code": "import numpy as np\nimport math\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n\n    remaining_bins = np.where(bins > item)[0]\n    scores[remaining_bins] = (np.sqrt(bins[remaining_bins] / item)) * np.log(1 / item)\n\n    return scores",
+          "objective": 0.03994,
+          "other_inf": null
+     }
+]

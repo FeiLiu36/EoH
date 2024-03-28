@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin by taking the square root of the ratio between the item size and the remaining capacity, multiplied by a constant factor of 1000. It then adds an additional penalty score to each bin based on the absolute difference between the item size and the remaining capacity, multiplied by a constant factor of 100. Finally, it sets the scores of bins that cannot accommodate the item to a very high value (10^9).",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    ratios = np.sqrt(item / remaining_capacity) * 1000\n    penalty_scores = (np.abs(item - remaining_capacity) * 100)\n    scores = ratios + penalty_scores\n    scores = np.where(remaining_capacity >= item, np.full_like(scores, 1e9), scores)\n    return scores",
+          "objective": 0.01358,
+          "other_inf": null
+     }
+]

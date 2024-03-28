@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "\nThis algorithm calculates a score for a given item based on its comparison with a list of bins by first determining the maximum capacity of the bins, then computing a score using a formula involving the bins and the item, adjusting the scores for bins greater than the item, updating the scores based on differences between consecutive elements, and finally returning the resulting scores.\n",
+          "code": "import numpy as np\ndef score(item, bins):\n    max_bin_cap = max(bins)\n    score = (bins - max_bin_cap)**2 / item + bins**2 / (item**2)\n    score += bins**2 / item**3\n    score[bins > item] = -score[bins > item]\n    score[1:] -= score[:-1]\n    return score",
+          "objective": 0.0068,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm will calculate the scores for each bin based on the ratio of each bin's rest capacity to the item size, the inverse of the indices, and a penalty factor for bins with maximum capacity, while also considering the cumulative sum of the rest capacities and applying an exponential decay factor to promote performance.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    epsilon = 1e-6  # Small value to avoid division by zero\n\n    ratios = bins / (item + epsilon)\n    inverse_indices = 1 / (np.arange(len(bins)) + 1)\n    penalty_factor = 0.9\n    cumulative_sum = np.cumsum(bins)\n    decay_factor = 0.9\n    \n    scores = ratios + inverse_indices\n    scores -= penalty_factor * (bins == bins.max())\n    scores *= decay_factor ** (cumulative_sum / bins.max())\n\n    return scores",
+          "objective": 0.03803,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The score function will calculate the scores for each bin based on the ratio of each bin's rest capacity to the item size, with additional penalties for bins with maximum capacity, bins with lower indices, and bins that have not been utilized as frequently as others, by subtracting a weighted value from the scores, multiplying by a decay factor, and adjusting the scores based on the cumulative sum of the rest capacities.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    ratios = bins / item\n    weights = np.arange(len(bins))\n    counter = np.arange(1, len(bins) + 1)\n\n    scores = ratios - weights - 1 / counter\n    scores *= (0.9 ** (bins / bins.max()))\n    scores *= np.cumsum(bins)\n\n    return scores",
+          "objective": 0.03823,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The common backbone idea in the provided algorithms is to calculate scores for each bin based on various factors such as rest capacity, index, ratio of rest capacity to item size, and penalty for maximum capacity.\n\nNew algorithm: The score function will calculate the scores for each bin based on the combination of the rest capacity, the index of the bin, the square of the bin's rest capacity divided by the item size, and a penalty for maximum capacity to minimize the number of used bins and promote utilization of bins with lower rest capacities, while avoiding the random component and maintaining self-consistency.\n\nHere's the implementation in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    indices = np.arange(len(bins))\n    ratios = bins / item\n    penalties = (bins == max_capacity) * item\n    \n    scores = bins + indices - (bins**2/item) + penalties\n    return scores",
+          "objective": 0.03964,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: \n1. Calculate the ratio of item size to each bin's rest capacity.\n2. Calculate the score for each bin based on the ratio and the condition of the rest capacity.\n3. Return the scores for the bins for assignment. \n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = item / bins\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: The score function will calculate the scores for each bin based on the ratio of each bin's rest capacity to the item size, the index of the bin, and a decay factor. Bins with a higher rest capacity and a lower index will be given higher scores, and the scores will decay for bins with larger capacities.\n\nCode:\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    ratios = bins / item\n    weights = np.arange(len(bins), 0, -1)\n    decay_factor = 0.8\n\n    scores = ratios + weights\n    scores *= decay_factor ** (bins / bins.max())\n\n    return scores",
+          "objective": 0.03994,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on a combination of the rest capacity, the bin's index, and the cube of the bin's rest capacity divided by the square of the item size. Higher scores are assigned to bins with higher rest capacity, lower index, and larger cube values.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = bins + np.arange(len(bins)) - (bins**3/(item**2))\n    return scores",
+          "objective": 0.04004,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: The score function will calculate the scores for each bin based on a combination of the ratio of each bin's rest capacity to the item size and the index of the bin. Bins with a higher rest capacity and a lower index will be given higher scores, while bins with maximum capacity will be penalized to promote utilization of bins with lower rest capacities.\n\nCode:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    ratios = bins / item\n    weights = np.arange(len(bins), 0, -1)\n    decay_factor = 0.9\n    \n    scores = ratios + weights\n    scores *= decay_factor ** (bins / bins.max())\n\n    return scores",
+          "objective": 0.04014,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm is based on the original algorithm, but with some modifications. The main steps are as follows:\n\n1. Normalize the rest capacities of the bins by dividing each bin's capacity by the maximum capacity.\n2. Calculate the ratios of the normalized capacities to the item size and store them in the variable \"ratios\".\n3. Create a weight array using the formula 2 * (n - index), where n is the total number of bins and index is the index of each bin.\n4. Calculate the scores by adding the ratios to the weights.\n5. Multiply the scores by a decay factor raised to the power of the normalized capacities, to penalize bins with larger capacities.\n6. Return the scores as a Numpy array.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    n = len(bins)\n    normalized_capacities = bins / np.max(bins)\n    ratios = normalized_capacities / item\n    weight = 2 * (n - np.arange(n))\n    decay_factor = 0.95\n    \n    scores = ratios + weight\n    scores *= decay_factor ** normalized_capacities\n\n    return scores",
+          "objective": 0.04025,
+          "other_inf": null
+     },
+     {
+          "algorithm": "description = \"The new algorithm will calculate the scores for each bin based on the ratio of each bin's rest capacity to the item size, the index of the bin, and a penalty factor for bins with maximum capacity to promote utilization of bins with lower rest capacities, where the penalty factor will be adjusted to 0.8.\"\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    ratios = bins / item\n    weights = np.arange(len(bins), 0, -1)\n    penalty_factor = 0.8\n    \n    scores = ratios + weights\n    scores -= penalty_factor * (bins == bins.max())\n\n    return scores",
+          "objective": 0.04045,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The score function will calculate the scores for each bin based on a combination of the rest capacity, the index of the bin, and the square of the bin's rest capacity divided by the item size. Higher scores are assigned to bins with higher rest capacity, lower index, and larger square values.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = bins + np.arange(len(bins)) - (bins**2/item)\n    return scores",
+          "objective": 0.04065,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm will calculate the scores for each bin based on the ratio of each bin's rest capacity to the item size, the index of the bin, and a penalty factor for bins with maximum capacity to promote utilization of bins with lower rest capacities.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    ratios = bins / item\n    weights = np.arange(len(bins), 0, -1)\n    penalty_factor = 0.9\n    \n    scores = ratios + weights\n    scores -= penalty_factor * (bins == bins.max())\n\n    return scores",
+          "objective": 0.04085,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The score function will calculate scores for each bin based on a combination of the ratio of each bin's rest capacity to the item size, the index of the bin, and a penalty factor. The penalty factor will penalize bins with larger capacities to promote utilization of bins with lower rest capacities.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    ratios = bins / item\n    weights = np.arange(len(bins), 0, -1)\n    penalty_factor = 0.7\n    \n    scores = ratios + weights - penalty_factor * bins\n\n    return scores",
+          "objective": 0.04095,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The score function will calculate the scores for each bin based on the remaining capacity, with a penalty for bins with maximum capacity to minimize the number of used bins.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = (max_capacity - bins) + (bins == max_capacity) * item\n    return scores",
+          "objective": 0.04105,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common Backbone Idea: All of the provided algorithms calculate scores for each bin based on the rest capacity of the bin compared to the size of the current item.\n\nNew Algorithm: The score function will calculate the scores for each bin based on the ratio of each bin's rest capacity to the item size, with a penalty for bins with maximum capacity and a reward for bins with lower indices, by subtracting a weighted value from the scores and adding a weighted value based on the inverse of the indices, while also considering the cumulative sum of the rest capacities and applying an exponential decay factor to promote performance.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    ratios = bins / item\n    weights = np.arange(len(bins))\n    inverse_indices = 1 / (weights + 1)\n    decay_factor = 0.9\n    \n    scores = ratios - weights + inverse_indices\n    scores *= decay_factor ** (bins == bins.max())\n\n    return scores",
+          "objective": 0.04115,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: The score function will calculate the scores for each bin based on the ratio of each bin's rest capacity to the item size. Bins with a higher rest capacity and a higher index will be prioritized by adding a weighted value to the scores. The final scores will be multiplied by a decay factor raised to the power of the ratio of each bin's rest capacity to the maximum capacity, to penalize bins with maximum capacity and promote utilization of bins with lower rest capacities, then the scores will be divided by the index of the bins added to the maximum capacity to further penalize bins with higher indices.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    epsilon = 1e-6  # Small value to avoid division by zero\n\n    ratios = bins / (item + epsilon)\n    weights = -1 * np.arange(len(bins))\n    \n    scores = ratios + weights\n    scores /= (np.arange(len(bins)) + 1)\n\n    return scores",
+          "objective": 0.04125,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: The score function will calculate the scores for each bin based on the ratio of each bin's rest capacity to the item size, but prioritize bins with a higher rest capacity and a lower index, by subtracting a weighted value from the scores. The final scores will be multiplied by an exponential decay factor to penalize bins with maximum capacity.\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    ratios = bins / item\n    weights = 2 * np.arange(len(bins))\n    decay_factor = 0.9\n    \n    scores = ratios - weights\n    scores *= decay_factor ** (bins == bins.max())\n\n    return scores",
+          "objective": 0.04155,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm calculates the scores for each bin based on the following steps:\n1. Normalize the rest capacities of the bins by dividing each bin's capacity by the maximum capacity.\n2. Calculate the ratios of the normalized capacities to the item size and store them in a variable called \"ratios\".\n3. Create a weight array using the formula 2 * (n - 1 - index), where n is the total number of bins and index is the index of each bin.\n4. Calculate the scores by adding the ratios to the weights.\n5. Multiply the scores by a decay factor raised to the power of the normalized capacities, to penalize bins with larger capacities.\n6. Return the scores as a Numpy array.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    n = len(bins)\n    normalized_capacities = bins / np.max(bins)\n    ratios = normalized_capacities / item\n    weight = 2\n    decay_factor = 0.95\n    \n    scores = ratios + weight\n    scores *= decay_factor ** normalized_capacities\n\n    return scores",
+          "objective": 0.04165,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: The score function will calculate the scores for each bin based on the ratio of each bin's rest capacity to the item size. Bins with a higher rest capacity and a lower index will be prioritized by subtracting a weighted value from the scores. The final scores will be multiplied by a decay factor raised to the power of the ratio of each bin's rest capacity to the maximum capacity, to penalize bins with maximum capacity and promote utilization of bins with lower rest capacities.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    ratios = bins / item\n    weights = 2 * np.arange(len(bins))\n    decay_factor = 0.9\n    \n    scores = ratios - weights\n    scores *= decay_factor ** (bins / bins.max())\n\n    return scores",
+          "objective": 0.04175,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: The score function will calculate the scores for each bin based on the ratio of each bin's rest capacity to the item size. Bins with a higher rest capacity and a lower index will be prioritized by subtracting a weighted value from the scores. The final scores will be multiplied by a decay factor raised to the power of the ratio of each bin's rest capacity to the maximum capacity, to penalize bins with maximum capacity and promote utilization of bins with lower rest capacities.\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    ratios = bins / item\n    decay_factor = 0.85\n    \n    scores = ratios - 2 * np.arange(len(bins))\n    scores *= decay_factor ** (ratios / np.max(bins))\n\n    return scores",
+          "objective": 0.04186,
+          "other_inf": null
+     }
+]

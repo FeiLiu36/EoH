@@ -1,0 +1,8 @@
+[
+     {
+          "algorithm": "The new algorithm assigns the item to the bin with the maximum ratio of (item size minus current bin capacity) to the maximum capacity and calculates the scores for the other bins based on the following modified scoring formula: the current bin capacity divided by the maximum capacity plus one, multiplied by the square root of the item size divided by the maximum capacity, multiplied by the square root of the current bin capacity divided by the maximum capacity. The scores are then multiplied together with the ratios and the exponential of the sum of bin capacities divided by the maximum capacity plus one.\n\nHere is the implementation of the new algorithm:\n\n```",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_ratio_bin = np.argmax((item - bins) / (np.max(bins) + 1))\n    \n    ratios = bins / (np.max(bins) + 1)\n    max_ratio_score = ratios * np.sqrt(item / np.max(bins)) * np.sqrt(bins / np.max(bins))\n    sum_exponential = np.exp(np.sum(bins) / (np.max(bins) + 1))\n\n    scores = max_ratio_score * sum_exponential\n\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]
