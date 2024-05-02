@@ -136,7 +136,8 @@ cd examples/tsp_construct
 python runEoH.py
 ```
 
-###### Example 2: Online Bin Packing (**<span style="color: red;">Generate new best heuristic and Beat Funsearch in 30 minutes on your personal computer !</span>**  i7-10700 2.9Ghz, 32 GB)
+###### Example 2: Online Bin Packing 
+(**<span style="color: red;">Generate new best heuristic and Beat Funsearch in 30 minutes on your personal computer !</span>**  i7-10700 2.9Ghz, 32 GB)
 
 ```bash
 cd examples/bp_online
