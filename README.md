@@ -4,9 +4,9 @@
 <h1 align="center">
 EoH: Evolution of Heuristics 
 </h1>
-<h5 align="center">
+<h3 align="center">
 A Platform of Evolutionary Computation (EC) + Large Language Model (LLM) for efficient automatic algorithm design 
-</h5>
+</h3>
 
 [Chinese Version 中文版本](./README_CN.md)
 
