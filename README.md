@@ -37,7 +37,7 @@ A Platform of Evolutionary Computation (EC) + Large Language Model (LLM) for eff
 
 A Platform for **Evolutionary Computation** + **Large Language Model** for automatic algorithm design.
 
-<img src="./docs/figures/eoh.jpg" alt="eoh" width="600" height="280">
+<img src="./docs/figures/eoh.JPG" alt="eoh" width="600" height="280">
 
 ## Introduction
 
