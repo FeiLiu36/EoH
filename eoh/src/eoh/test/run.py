@@ -18,8 +18,8 @@ paras = Paras()
 # Set parameters #
 paras.set_paras(method = "ael",    # ['ael','funsearch','reevo']
                 problem = "bp_online", #['tsp_construct','bp_online','tsp_gls','fssp_gls']
-                llm_api_endpoint = "api.chatanywhere.tech",
-                llm_api_key = "sk-poiXyXBUmQQqWxGOHiy09XYLwFB6pHehJQhbV8DVA9HETdRt",   # set your key
+                llm_api_endpoint = "XXX",
+                llm_api_key = "XXX",   # set your key
                 llm_model = "gpt-3.5-turbo-1106",
                 ec_pop_size = 4,
                 ec_n_pop = 2,
