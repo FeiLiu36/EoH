@@ -5,7 +5,7 @@
 EoH: Evolution of Heuristics 
 </h1>
 <h3 align="center">
-A Platform of Evolutionary Computation (EC) + Large Language Model (LLM) for efficient automatic algorithm design 
+A Platform of Evolutionary Computation (EC) + Large Language Model (LLM) for Efficient Automatic Algorithm Design 
 </h3>
 
 [Chinese Version 中文版本](./README_CN.md)
