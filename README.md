@@ -158,14 +158,14 @@ python runEoH.py
 
 #### Combinatorial Optimization
 
-- Online Bin Packing, greedy heuristic, [code](./ael/examples/online_bin_packing), [paper]
-- TSP, construct heuristic, [code](./ael/examples/greedy_tsp), [paper]
+- Online Bin Packing, greedy heuristic, [code](https://github.com/FeiLiu36/EoH/tree/main/examples/bp_online), [paper]
+- TSP, construct heuristic, [code](https://github.com/FeiLiu36/EoH/tree/main/examples/tsp_construct), [paper]
 - TSP, guided local search, [code], [paper]
 - Flow Shop Scheduling Problem (FSSP), guided local search, [code], [paper]
 
 #### Machine Learning
 
-- Attack, [code](./ael/examples/L_AutoDA), [paper](https://arxiv.org/abs/2401.15335)
+- Attack, [code], [paper](https://arxiv.org/abs/2401.15335)
 
 #### Bayesian Optimization
 
@@ -208,11 +208,7 @@ A Step-by-step guide is provided in [here](./docs/QuickGuide.md) (coming soon)
 
 
 
-## Other Related Papers
-
-1. **AEL (preliminary version of EoH)**:  "Fei Liu, Xialiang Tong, Mingxuan Yuan, and Qingfu Zhang, Algorithm Evolution Using Large Language Model. arXiv preprint arXiv:2311.15249. 2023."  https://arxiv.org/abs/2311.15249
-2. **Guided Local Search:** "Fei Liu, Xialiang Tong, Mingxuan Yuan, Xi Lin, Fu Luo, Zhenkun Wang, Zhichao Lu, and Qingfu Zhang, [An Example of Evolutionary Computation+ Large Language Model Beating Human: Design of Efficient Guided Local Search](https://arxiv.org/abs/2401.02051)" https://arxiv.org/abs/2401.02051
-3. **Adversarial Attacks:** Pin Guo, Fei Liu, Xi Lin, Qingchuan Zhao, and Qingfu Zhang,  L-AutoDA: Leveraging Large Language Models for Automated Decision-based Adversarial Attacks. *arXiv preprint arXiv:2401.15335*. 2024.
+## Related Works on LLM4Opt
 
 
 
