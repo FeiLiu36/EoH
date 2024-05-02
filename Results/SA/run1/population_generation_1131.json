@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm Description: The new algorithm calculates the scores for each bin based on the rest capacities of the bins and the size of the current item. It introduces a penalty term that increases with the difference between the item size and the bin capacities, and also includes a reward term that encourages the selection of bins with similar capacities as the current item. Additionally, the algorithm incorporates a scaling factor that adjusts the impact of the penalty and reward terms. The algorithm then returns the scores for the bins for assignment.\n\nCode:\n\n```\n",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    scaling_factor = 0.5  # Adjust the impact of penalty and reward terms\n    \n    max_capacity = np.max(bins)\n    difference = item - bins\n    divided_sizes = difference / (bins * bins)\n    penalty = np.maximum(0, difference) * scaling_factor\n    reward = np.exp(-np.abs(bins - item)) * np.exp(-np.abs(bins - max_capacity)) * scaling_factor\n    scores = np.reciprocal(divided_sizes) + penalty + reward\n    sorted_scores = np.sort(scores)[::-1]\n    return scores",
-          "objective": 0.0156,
-          "other_inf": null
-     }
-]

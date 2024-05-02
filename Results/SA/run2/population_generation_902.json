@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm, named \"Modified Exponential Algorithm,\" assigns scores to the bins by calculating the exponential of the difference between the maximum bin capacity and the remaining bin capacity, aiming to prioritize bins with smaller remaining capacity and minimize the number of used bins by assigning the item to the bin with the maximum score.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the difference between maximum bin capacity and remaining bin capacity\n    differences = np.max(bins) - bins\n    \n    # Calculate the scores using the exponential function\n    scores = np.exp(differences)\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

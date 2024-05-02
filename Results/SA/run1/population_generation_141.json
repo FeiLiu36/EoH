@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description:\n\nIn the new algorithm, the score for each bin is calculated as the product of three components: a proximity component, a capacity component, and a penalty component. The proximity component measures the closeness of the bin's capacity to the item size, with higher scores given to bins with capacities closer to the item size. The capacity component rewards larger bin capacities by assigning higher scores to bins with larger capacities. The penalty component penalizes bins that are significantly larger than the item size, with higher penalties for larger differences in capacity. The final scores are computed by multiplying these three components together and then normalizing the scores to maintain self-consistency.\n\nNew algorithm implementation:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    proximity_component = 1 / np.abs(item - bins)\n    capacity_component = bins\n    penalty_component = np.clip(1 - item / bins, 0, np.inf)\n    \n    scores = (proximity_component * capacity_component * penalty_component) / np.sum(proximity_component * capacity_component * penalty_component)\n    \n    return scores",
-          "objective": 0.04165,
-          "other_inf": null
-     }
-]

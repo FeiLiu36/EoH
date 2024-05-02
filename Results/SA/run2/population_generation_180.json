@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "\\algorithm The new algorithm calculates the score for each bin by taking the sum of the square root of the ratio between the remaining capacity and the maximum capacity, the reciprocal of the square root of the ratio between the remaining capacity and the maximum capacity, and the ratio between the remaining capacity and the maximum capacity raised to the power of 0.5, then subtracting the natural logarithm of the ratio between the remaining capacity and the maximum capacity from the previous result. The scores are then sorted in descending order.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    max_capacity = np.max(bins)\n    ratio = remaining_capacity / max_capacity\n    scores = np.sqrt(ratio) + 1 / np.sqrt(ratio) + ratio ** 0.5 - np.log(ratio)\n\n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n\n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

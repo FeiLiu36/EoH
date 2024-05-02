@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm Description: In the new algorithm, named \"Modified Weighted Power Algorithm,\" scores are assigned to the bins based on a modification of the inverse ratio between the remaining bin capacity and the maximum bin capacity, giving more weight to bins with larger remaining capacity and aiming to minimize the number of used bins. Unlike the previous algorithm, bins with exactly the maximum capacity will also be considered for assignment to encourage better utilization of bin space.\n\nCode:\n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the ratio between remaining bin capacity and maximum bin capacity\n    ratios = bins / np.max(bins)\n    \n    # Calculate the scores using the power function with weights\n    weights = 1 / np.power(ratios, 2) # You can modify the power factor '2' based on your requirements\n    \n    # Add a small constant to bins with maximum capacity to include them for assignment\n    bins_with_max_capacity = np.where(bins == np.max(bins))\n    weights[bins_with_max_capacity] += 0.001\n    \n    scores = weights\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

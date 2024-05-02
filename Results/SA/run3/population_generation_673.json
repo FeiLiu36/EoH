@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin by taking the square root of the sum of the squared log of the remaining capacity divided by the item size, and multiplies it by the square root of the reciprocal of the remaining capacity. The scaling factor is determined by the square root of the item size.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n\n    # Calculate the log term incorporating the remaining capacity divided by item size\n    log_term = np.log(remaining_capacity) / item\n\n    # Calculate the sum of squared log term and reciprocal capacity\n    sum_term = log_term ** 2 + (1 / remaining_capacity)\n\n    # Take the square root of the sum term\n    sqrt_term = np.sqrt(sum_term)\n\n    # Multiply with the reciprocal squared of item size\n    score_step4 = sqrt_term * np.sqrt(1/item)\n\n    # Assign maximum scores for bins with remaining capacity >= item size\n    scores = np.where(remaining_capacity >= item, np.inf, score_step4)\n\n    return scores",
-          "objective": 0.0157,
-          "other_inf": null
-     }
-]

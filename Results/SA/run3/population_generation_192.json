@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm: Modified algorithm 2 with additional step\n\n1. Calculate the ratio between the remaining capacity and the item size, raised to the power of 3 and multiplied by a factor of 100.\n2. Calculate the absolute difference between the logarithms of the remaining capacity divided by the item size and a constant value (5).\n3. Cube the absolute difference and multiply it by a factor of 75.\n4. Generate the scores for each bin by comparing the remaining capacity with the item size. If the remaining capacity is greater than or equal to the item size, assign a very high score (1e9), otherwise assign the maximum value between the sum of the ratio and the cubed absolute difference, and the sum of the ratio and the logarithm difference, and multiply it by a factor of 15.\n5. Multiply the scores by a factor of 0.9, raise it to the power of the inverse of the item size, and round it to the nearest integer.\n6. Return the scores for the bins.\n\nCode:\n\n```",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    ratio = 100 * (remaining_capacity / item)**3\n    logarithm_difference = np.abs(np.log(remaining_capacity / item) - 5)\n    cubed_difference = 75 * np.power(logarithm_difference, 3)\n    scores = np.where(remaining_capacity >= item, np.full_like(remaining_capacity, 1e9), 15 * np.maximum(ratio + cubed_difference, ratio + logarithm_difference))\n    scores = np.round(scores * 0.9**(1/item))\n    return scores",
-          "objective": 0.01358,
-          "other_inf": null
-     }
-]

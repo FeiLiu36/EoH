@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the scores for the bins by dividing each value by the cumulative sum of the item size and all the rest capacities of bins, subtracting the minimum value from the resulting array, and then calculating the reciprocal of each value multiplied by the item size divided by the maximum capacity.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    cumulative_sum = np.cumsum(np.concatenate(([item], bins)))\n    scores = (bins / cumulative_sum[1:]) - np.min(bins / cumulative_sum[1:])\n    scores = (1 / scores) * (item / np.max(bins))\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

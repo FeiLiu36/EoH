@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the scores for the bins by taking the exponential of the negative differences between each value and the item size, summing up all the exponential differences, and dividing the scores by the maximum capacity.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    exponent_diff = np.exp(-1 * (bins - item))\n    sum_exponent_diff = np.sum(exponent_diff)\n    scores = sum_exponent_diff / np.max(bins)\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

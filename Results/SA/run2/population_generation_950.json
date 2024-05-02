@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The \"Improved Modified Score Algorithm\" assigns scores to the bins based on a new formula that takes into account both the remaining capacities of the bins and the number of items already present in each bin, aiming to prioritize the bins with larger remaining capacities and minimize the number of used bins. Furthermore, the algorithm introduces a penalization factor for bins that are close to reaching their maximum capacity to encourage the usage of bins with larger remaining capacities.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the remaining capacities of the bins\n    remaining_capacity = bins - item\n\n    # Calculate the score based on the remaining capacity and the number of items already present in the bin\n    scores = remaining_capacity * (1 - np.count_nonzero(bins) / bins.size)\n\n    # Minimize the score of bins with remaining capacity equal to the maximum capacity\n    max_capacity = np.max(bins)\n    scores[bins == max_capacity] = -np.inf\n\n    # Calculate a penalization factor for bins close to reaching their maximum capacity\n    penalization_factor = 1 - np.abs((max_capacity - bins) / max_capacity)\n\n    # Apply the penalization factor to the scores\n    scores *= penalization_factor\n\n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm Description: The new algorithm calculates a score for each bin based on three factors: a decay term, a ratio term, and a capacity term. The decay term is calculated using a polynomial decay function, the ratio term is the inverse of the ratio of the difference between the item and the bin size to the square of the capacity plus 1, and the capacity term remains the same as before. The scores are then sorted in descending order.\n\nPython implementation of the new algorithm:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    \n    difference = item - bins\n    \n    # Decay term (weighted by a factor of 0.5)\n    decay_term = 0.5 * (1 - (difference / max_capacity)**2)\n    \n    # Ratio term (weighted by a factor of 0.2)\n    ratio_term = 0.2 / (difference / (bins**2 + 1))\n    \n    # Capacity term (weighted by a factor of 0.3)\n    capacity_term = 0.3 * (1 - bins / max_capacity)\n    \n    # Calculate scores\n    scores = decay_term + ratio_term + capacity_term\n    \n    # Sort scores in descending order\n    sorted_scores = np.sort(scores)[::-1]\n    \n    return scores",
-          "objective": 0.01318,
-          "other_inf": null
-     }
-]

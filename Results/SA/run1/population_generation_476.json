@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm is as follows:\n- Sort the bins array in ascending order.\n- Calculate the weights for each bin by dividing the item size by the rest capacity.\n- Normalize the weights by dividing them by the maximum weight.\n- Calculate the scores as the cumulative sum of the normalized weights.\n\nHere's the implementation of the new algorithm in Python:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Sort the bins array in ascending order\n    bins_sorted = np.sort(bins)\n    \n    # Calculate the weights for each bin\n    weights = item / bins_sorted\n    \n    # Normalize the weights by dividing them by the maximum weight\n    weights /= np.max(weights)\n    \n    # Calculate the scores as the cumulative sum of the normalized weights\n    scores = np.cumsum(weights)\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

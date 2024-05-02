@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "My new algorithm assigns scores to each bin based on the ratio between the rest capacity of the bin and the size of the current item, the difference between the maximum capacity and the current bin capacity, the average capacity across all bins, and the variance of the rest capacities of the feasible bins. The algorithm scales these terms using scaling and discount factors and returns the scores for the bins for assignment.\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    scaling_factor = 0.5  # Adjust the impact of penalty and reward terms\n    discount_factor = 0.9  # Adjust the impact of discounting over time\n    \n    max_capacity = np.max(bins)\n    difference = item - bins\n    \n    ratio = bins / item\n    \n    penalty = scaling_factor * np.exp(-np.abs(difference)) / (max_capacity * max_capacity + 1) / (ratio * ratio + 1)\n    \n    reward = scaling_factor * np.exp(-np.abs(item - bins)) / (max_capacity * max_capacity + 1)\n    \n    average_capacity = np.mean(bins)\n    \n    variance_capacity = np.var(bins)\n    \n    balanced_term = scaling_factor * (1 / (difference / (bins * bins + 1))) - scaling_factor * (1 / (average_capacity * average_capacity + 1)) + scaling_factor * (1 / (variance_capacity + 1))\n    \n    scores = penalty + reward + balanced_term\n    \n    sorted_scores = np.sort(scores)[::-1]\n    \n    discounted_scores = sorted_scores * (discount_factor ** np.arange(len(sorted_scores)))\n    \n    return scores",
-          "objective": 0.0156,
-          "other_inf": null
-     }
-]

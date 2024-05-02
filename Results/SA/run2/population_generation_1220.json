@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "\nAlgorithm description:\nIn the new algorithm, the score function calculates the scores for each bin based on the following steps:\n1. Calculate the sum of the squared differences between the rest capacities of bins and the maximum capacity.\n2. Calculate the natural logarithm of the square root of the item size.\n3. Perform element-wise division of the squared differences with the logarithm of the square root of the item size.\n4. Multiply the result with the inverse of the maximum capacity.\n5. Return the calculated scores for each bin.\n\nCode:\nimport numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    squared_diffs = np.square(bins - max_capacity)\n    log_item_size = np.log(np.sqrt(item))\n    \n    scores = squared_diffs / log_item_size / max_capacity\n    \n    return scores\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    squared_diffs = np.square(bins - max_capacity)\n    log_item_size = np.log(np.sqrt(item))\n    \n    scores = squared_diffs / log_item_size / max_capacity\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

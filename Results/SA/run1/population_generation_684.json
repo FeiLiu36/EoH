@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    \"\"\"Create a new algorithm that calculates the scores for the bins\n    by taking the logarithm of the remaining capacities of the bins divided by the item size,\n    adds a penalty factor to each score based on the bin's remaining capacity,\n    subtracts the maximum value across all bins from the obtained scores,\n    normalizes the scores by dividing them by the sum of all scores,\n    and finally amplifies the scores by multiplying them with a factor based on the item size.\"\"\"\n\n    # Calculate the logarithm of the remaining capacities of the bins divided by the item size\n    log_capacity = np.log(bins.astype(float) / item)\n\n    # Define the penalty factor based on the remaining capacity\n    penalty_factor = 0.3 * (1 - bins / np.max(bins))\n\n    # Add the penalty factor to each score\n    scores = log_capacity + penalty_factor\n\n    # Subtract the maximum value across all bins from the scores\n    scores -= np.max(scores)\n\n    # Normalize the scores by dividing them by the sum of all scores\n    scores /= np.sum(scores)\n\n    # Amplify the scores by multiplying them with a factor based on the item size\n    scores *= item\n\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

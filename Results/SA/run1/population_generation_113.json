@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm assigns the item to the bin with the minimum ratio of the current bin capacity to the item size as the primary bin, and calculates the scores for the other bins based on the following modified scoring formula: the sum of the current bin capacities divided by the primary bin capacity multiplied by the item size, multiplied by the logarithm of the primary bin capacity divided by the current bin capacity plus one. The scores are then multiplied together with the ratios and the exponential of the primary bin capacity minus the sum of bin capacities squared.\n\nHere's the implementation of the new algorithm in Python:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    primary_bin_capacity = bins - item\n    min_ratio_bin = np.argmin(primary_bin_capacity / item)\n    primary_bin_capacity[min_ratio_bin] = bins[min_ratio_bin] - item\n    \n    sum_score = (np.sum(bins) / primary_bin_capacity) * item\n    logarithm_score = np.log((primary_bin_capacity / bins) + 1)\n    primary_exponential = np.exp(primary_bin_capacity - np.sum(bins)**2)\n\n    scores = sum_score * logarithm_score * primary_exponential\n\n    return scores",
-          "objective": 0.04095,
-          "other_inf": null
-     }
-]

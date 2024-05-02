@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description: The improved algorithm sorts the bins in descending order, calculates the inverse weights for each bin by dividing the item size by the rest capacity, inverts the inverse weights by subtracting them from 1, normalizes the weights by dividing by the sum of weights, and finally calculates the scores as the cumulative sum of the normalized weights.\n\nHere's the implementation of the improved algorithm in Python:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Sort the bins array in descending order\n    bins_sorted = np.sort(bins)[::-1]\n    \n    # Calculate the inverse weights for each bin\n    weights_inv = item / bins_sorted\n    \n    # Invert the inverse weights\n    weights = 1 - weights_inv\n    \n    # Normalize the weights by dividing by the sum of weights\n    weights /= np.sum(weights)\n    \n    # Calculate the scores as the cumulative sum of the normalized weights\n    scores = np.cumsum(weights)\n    \n    return scores",
-          "objective": 0.05232,
-          "other_inf": null
-     }
-]

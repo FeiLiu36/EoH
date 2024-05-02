@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm: Exponential Score Algorithm\n\nThe Exponential Score Algorithm calculates the scores as an exponential function of the ratio between the item size and the rest capacity, where the exponent is based on the average capacity of the bins. The scores are further adjusted by taking into account the position of the bin in the sorted rest capacities array.\n\nCode:\n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"The exponential score algorithm calculates the scores as an exponential function of the ratio between the item size and the rest capacity,\n    where the exponent is based on the average capacity of the bins. The scores are further adjusted by taking into account the position of the bin in the sorted rest capacities array.\"\"\"\n\n    avg_capacity = np.mean(bins)\n    \n    # Sort the rest capacities in ascending order\n    sorted_bins = np.sort(bins)\n    \n    # Assign higher scores to bins with higher capacity by calculating the position-adjusted exponent\n    exponent = np.arange(1, len(bins) + 1)\n    \n    # Calculate the scores as exponential function of the ratio between item size and rest capacity\n    scores = np.exp(item / sorted_bins / avg_capacity) ** exponent\n    \n    # Normalize the scores by dividing them by the sum of all scores\n    scores /= np.sum(scores)\n    \n    return scores",
-          "objective": 0.04407,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm, named Modified Score Algorithm 2, calculates the scores for the bins as the sum of the product of the item size and the logarithm of the remaining capacity of each bin, multiplied by a factor that is the square of the difference between the maximum capacity and the remaining capacity of each bin, then subtracted by a constant value and an increasing sequence of integers.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"The Modified Score Algorithm 2 calculates the scores for the bins as the sum of the product of the item size\n    and the logarithm of the remaining capacity of each bin, multiplied by a factor that is the square of the difference between the\n    maximum capacity and the remaining capacity of each bin, then subtracted by a constant value and an increasing sequence of integers.\"\"\"\n    \n    # Calculate the product of the item size and the logarithm of the remaining capacity of each bin\n    capacities = bins.astype(float)\n    capacities[capacities == 0] = 1  # Avoid division by zero\n    log_capacities = np.log(capacities)\n    product = item * log_capacities\n    \n    # Calculate the factor as the square of the difference between the maximum capacity and the remaining capacity of each bin\n    max_capacity = np.max(bins)\n    factor = np.square(max_capacity - bins)\n    \n    # Calculate the scores as the sum of the product multiplied by the factor, then subtracted by a constant value and an increasing sequence of integers\n    scores = np.sum(product * factor) - 1 - np.arange(len(bins))\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

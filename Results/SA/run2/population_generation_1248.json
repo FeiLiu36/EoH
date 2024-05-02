@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm Description: The new algorithm calculates the scores for each bin based on a modified version of the provided steps:\n\n1. Calculate the square root of the exponentiated difference of the item size and each bin's rest capacity, and the maximum capacity of the bins.\n2. Take the reciprocal of the square root values calculated in step 1.\n3. Take the logarithm of the reciprocal values obtained in step 2 and add a constant value to avoid any potential division by zero errors.\n4. Multiply the logarithmic outputs with a variable value.\n5. Return the calculated scores for each bin.\n\nCode:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_cap = np.max(bins)\n    difference_values = np.exp(np.sqrt(np.abs(item - bins) - max_cap)) # Step 1\n    reciprocal_values = 1 / difference_values # Step 2\n    logarithmic_outputs = np.log(reciprocal_values + 1e-10) # Step 3 (with added constant)\n    adjusted_outputs = 3.2 * logarithmic_outputs # Step 4 (with variable value)\n    scores = adjusted_outputs # There is no multiplication in Step 5\n\n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

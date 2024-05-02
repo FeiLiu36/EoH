@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the difference between item size and bin capacities\n    difference = item - bins\n\n    # Divide the difference by the square of bin capacities\n    divided_sizes = difference / (bins ** 2)\n\n    # Calculate the scores as the reciprocal of divided_sizes\n    scores = np.reciprocal(divided_sizes)\n\n    # Sort the scores in descending order\n    sorted_scores = np.sort(scores)[::-1]\n\n    return scores",
-          "objective": 0.0156,
-          "other_inf": null
-     }
-]

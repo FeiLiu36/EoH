@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the scores for assigning an item to each bin based on the remaining capacity of each bin, the size of the item, a penalty factor, and a modified version of the cumulative sum of the remaining capacities among all bins. The modified version involves adding a constant value to the cumulative sum to avoid division by zero and improve performance. Additionally, the penalty factor takes into account the difference between the remaining capacity and a target capacity.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    cumsum_capacity = np.cumsum(remaining_capacity)\n    scaled_capacity = remaining_capacity / (cumsum_capacity + 1e-12)  # Adding a small constant value to avoid division by zero\n    target_capacity = np.mean(bins) / np.sqrt(item)\n    penalty_factor = np.where(remaining_capacity > target_capacity, 1, 0)\n    scores = penalty_factor / scaled_capacity * np.where(remaining_capacity >= item, remaining_capacity / np.sqrt(item), 0)\n    return scores",
-          "objective": 0.00966,
-          "other_inf": null
-     }
-]

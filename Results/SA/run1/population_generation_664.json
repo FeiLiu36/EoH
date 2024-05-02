@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the scores for the bins by taking the inverse of the ratio between the remaining capacity of each bin and the maximum capacity, multiplies the result by the square root of the item size, subtracts the minimum value across all bins from the obtained scores, then normalizes the scores by dividing them by the sum of all scores.\n\nCode:\n",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    \"\"\"The new modified algorithm calculates the scores for the bins by taking the inverse of the ratio between the remaining capacity of each bin and the maximum capacity, multiplies the result by the square root of the item size, subtracts the minimum value across all bins from the obtained scores, then normalizes the scores by dividing them by the sum of all scores.\"\"\"\n\n    # Take the inverse of the ratio between the remaining capacity of each bin and the maximum capacity\n    ratio_inverse = 1 / (bins / np.max(bins))\n\n    # Multiply the inverse ratio by the square root of the item size\n    scores = ratio_inverse * np.sqrt(item)\n\n    # Subtract the minimum value across all bins from the scores\n    scores -= np.min(scores)\n\n    # Normalize the scores by dividing them by the sum of all scores\n    scores /= np.sum(scores)\n\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

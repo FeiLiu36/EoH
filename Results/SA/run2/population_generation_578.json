@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm description: In the new algorithm, we modify the scoring function by introducing a penalty for bins that have lower remaining capacity and a bonus for bins with a larger average remaining capacity. We also adjust the penalties and bonuses to have a greater impact on the final scores. The final scores for the bins are calculated by combining the base scores, remaining capacity penalty, and average remaining capacity bonus. For performance optimization, we vectorize the calculations using numpy.\n\nCode:\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    num_bins = len(bins)\n    \n    # Calculate base scores\n    base_scores = 1 - bins / item\n    \n    # Calculate penalty for bins with lower remaining capacity\n    remaining_capacity_penalty = np.maximum(0, (item - bins) / np.max(bins))\n    \n    # Calculate bonus for bins with a larger average remaining capacity\n    average_remaining_capacity = (np.sum(bins) - bins) / (num_bins - 1)\n    larger_average_bonus = np.maximum(0, (bins - average_remaining_capacity) / average_remaining_capacity)\n    \n    # Calculate final scores by combining base scores, penalties, and bonuses\n    scores = base_scores - 0.5 * remaining_capacity_penalty + 0.2 * larger_average_bonus\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "This is the implementation of the modified algorithm in Python:\n\n```\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the remaining capacity of the bins\n    remaining_capacity = bins - item\n    \n    # Calculate the penalty factor for bins with larger remaining capacity\n    penalty_factor = 1 - (remaining_capacity / np.max(remaining_capacity))\n    \n    # Calculate the adjustment factor based on the ratio of item size to remaining capacity\n    adjustment_factor = 1 + (item / remaining_capacity)\n    \n    # Calculate the adjusted scores by combining the penalty factor and adjustment factor\n    adjusted_scores = penalty_factor * adjustment_factor\n    \n    # Normalize the scores to fall within the range [0, 1]\n    min_score = np.min(adjusted_scores)\n    max_score = np.max(adjusted_scores)\n    scores = (adjusted_scores - min_score) / (max_score - min_score)\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

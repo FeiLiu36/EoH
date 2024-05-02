@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description: The new algorithm assigns a score to each bin based on its remaining capacity and the item size, penalizing bins with a higher remaining capacity and favoring bins closer in size to the item.\n\nThe main steps are as follows:\n\n1. Calculate the ratio of the item size to the maximum remaining capacity across all bins.\n2. Initialize an array of scores with zeros.\n3. For each bin:\n   a. Calculate the score by multiplying the ratio by the bin's remaining capacity divided by the item size.\n   b. Subtract the square root of the remaining capacity.\n4. Return the resulting scores array.\n\nCode:\n\n```\nCode:\n",
-          "code": "import numpy as np\nimport math\n\ndef score(item, bins):\n    max_remaining_capacity = np.max(bins)\n    ratio = item / max_remaining_capacity\n\n    scores = np.zeros(len(bins), dtype=np.float64)\n    scores = ratio * (bins / item) - np.sqrt(bins)\n\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm: Modified Polynomial Score Function Algorithm\n\nThis modified algorithm assigns a score to each bin by considering three factors: a polynomial decay term, a ratio term, and a capacity term. The polynomial decay term is calculated using a polynomial decay function with a decay parameter and a power parameter, the ratio term is the inverse of the ratio of the difference between the item and the bin size to the square of the capacity plus 1, and the capacity term remains the same as before. The scores are then sorted in descending order.\n\nPython implementation of the Modified Polynomial Score Function Algorithm:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    \n    difference = item - bins\n    \n    # Polynomial decay term\n    decay_param = 0.5 # Adjust this parameter for different decay rates\n    power_param = 2 # Adjust this parameter for different polynomial powers\n    decay_term = (1 - (difference / max_capacity)**power_param) ** decay_param\n    \n    # Ratio term\n    ratio_term = 1 / (difference / (bins**2 + 1))\n    \n    # Capacity term\n    capacity_term = 1 - bins / max_capacity\n    \n    # Calculate scores\n    scores = decay_term + ratio_term + capacity_term\n    \n    # Sort scores in descending order\n    sorted_scores = np.sort(scores)[::-1]\n    \n    return scores",
-          "objective": 0.01348,
-          "other_inf": null
-     }
-]

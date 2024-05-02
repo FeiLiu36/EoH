@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm: Adaptive Weighted Average Score Algorithm\n\n1. The new algorithm calculates the scores as the weighted average of two components: the item ratio and the adaptive weight.\n2. The item ratio component is calculated as the ratio between the item size and the rest capacity of the bins.\n3. The adaptive weight component is calculated as the inverse of the rest capacity of the bins, with a higher weight assigned to bins with lower rest capacities.\n4. The scores are calculated as the weighted average of the item ratio and the adaptive weight, with the adaptive weight being the weight for the adaptive weight component.\n\nCode:\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"The Adaptive Weighted Average Score Algorithm calculates the scores as the weighted average of the item ratio and the adaptive weight.\"\"\"\n\n    # Calculate the inverse of the rest capacity of the bins as the adaptive weight\n    adaptive_weight = 1 / bins\n    \n    # Calculate the ratio between the item size and the rest capacity of the bins\n    item_ratio = item / bins\n    \n    # Calculate the scores as the weighted average of the item ratio and the adaptive weight\n    scores = (item_ratio + adaptive_weight) / 2\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

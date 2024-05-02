@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm will calculate the scores for bin assignment by taking the reciprocal of the item size squared, adding it to the exponential of the negative differences between the bin capacities and the item size squared, and finally dividing it by the sum of the maximum bin capacity and the item size squared, while also adding the product of the reciprocal of the item size and a constant factor squared.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    neg_diff = -np.abs(bins - item)\n    scores = (1 / item) ** 2 + np.exp(neg_diff) ** 2 / (max_capacity + item) ** 2 + (1 / item * 0.2) ** 2 + (1 / item) ** 2 * 0.5\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

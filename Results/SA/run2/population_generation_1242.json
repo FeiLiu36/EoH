@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the scores for each bin based on the following steps:\n1. Divide the item size by the rest capacities of bins.\n2. Apply the sigmoid function to the divided values.\n3. Add a constant value to the sigmoid outputs.\n4. Multiply the sigmoid outputs by a fixed factor.\n5. Return the calculated scores for each bin.",
-          "code": "import numpy as np\n\ndef sigmoid(x):\n    return 1 / (1 + np.exp(-x))\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    divided_values = item / bins # Step 1\n    sigmoid_outputs = sigmoid(divided_values) # Step 2\n    adjusted_outputs = sigmoid_outputs + 0.5 # Step 3\n    scores = adjusted_outputs * 10 # Step 4\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

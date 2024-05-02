@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm assigns the item to the bin with the maximum score calculated using a different scoring formula based on the inverse square root of the item size divided by the maximum capacity, multiplied by the inverse of the current bin capacity divided by the maximum capacity, multiplied by the difference between the item size and the bin capacity, multiplied by the exponential of the sum of bin capacities divided by the maximum capacity plus one.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_score_bin = np.argmax(\n        np.sqrt(item / np.max(bins))\n        * (1 / (bins / np.max(bins)))\n        * (item - bins)\n        * np.exp(np.sum(bins) / (np.max(bins) + 1))\n    )\n    \n    scores = (\n        np.sqrt(item / np.max(bins))\n        * (1 / (bins / np.max(bins)))\n        * (item - bins)\n        * np.exp(np.sum(bins) / (np.max(bins) + 1))\n    )\n\n    scores[max_score_bin] = np.Inf # Assign the maximum score bin with infinity to ensure it is selected\n    \n    return scores",
-          "objective": 0.04105,
-          "other_inf": null
-     }
-]

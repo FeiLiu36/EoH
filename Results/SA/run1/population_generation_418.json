@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "My new algorithm calculates the score for each bin by taking the square of the item size multiplied by the maximum capacity of the bins, and then subtracts the square root of the item size multiplied by the rest capacity of each bin.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the maximum capacity of the bins\n    max_capacity = np.max(bins)\n    \n    # Calculate the square of the item size multiplied by the maximum capacity of the bins\n    square_max = np.square(item * max_capacity)\n    \n    # Calculate the square root of the item size multiplied by the rest capacity of each bin\n    sqrt_ratio = np.sqrt(item * bins)\n    \n    # Calculate the score for each bin\n    scores = square_max - sqrt_ratio\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

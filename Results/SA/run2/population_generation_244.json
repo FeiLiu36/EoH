@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm description: The new algorithm calculates the exponential of the absolute differences between the remaining capacity and the maximum capacity for each bin (after deducting the item size), squares it, and assigns it to a variable called 'exp_squared_diff'. Next, it calculates the sum of the exponential squared differences between the remaining capacity and the maximum capacity for each bin (after deducting the item size), squares it, and assigns it to a variable called 'sum_exp_squared_diff'. Then, it calculates the scores for each bin by multiplying the 'exp_squared_diff' array by the 'sum_exp_squared_diff' array. The scores are then sorted in descending order and returned. Finally, a check is performed to ensure that no bin with a remaining capacity equal to the maximum capacity is used.\n\nCode:\n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    remaining_capacity = bins - item\n    \n    exp_diff = np.exp(np.abs(remaining_capacity - max_capacity))\n    exp_squared_diff = exp_diff ** 2\n\n    sum_exp_squared_diff = np.sum(exp_squared_diff) ** 2\n\n    scores = exp_squared_diff * sum_exp_squared_diff\n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n\n    if remaining_capacity[int(sorted_indices[0])] == max_capacity:\n        scores[0] = 0\n\n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "\nThe new algorithm calculates the scores for each bin based on the following steps:\n1. Calculate the ratio between the rest capacities of bins and the item size.\n2. Take the reciprocal of the ratios.\n3. Square the reciprocal values.\n4. Multiply the squared values by a fixed factor.\n5. Subtract the item size from the multiplied values.\n6. Return the calculated scores for each bin.\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    ratios = np.divide(bins, item) # Step 1\n    reciprocals = np.reciprocal(ratios) # Step 2\n    squared_reciprocals = np.square(reciprocals) # Step 3\n    scores = squared_reciprocals * 5 - item # Step 4 and 5\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

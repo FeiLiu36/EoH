@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm assigns the item to the bin with the maximum score, calculated using a modified scoring formula that takes into account the ratio of the item size to the bin capacities, the logarithm of the inverse of the absolute difference between the item size and the bin capacity, the square root of the rest capacity of the bins divided by the maximum capacity plus one, and a penalty factor that penalizes bins with less remaining capacity when the item cannot fit perfectly.\n\nCode:\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_score_bin = np.argmax(\n        (item / bins)\n        * (1 / np.log(np.abs(item - bins)))\n        * ((bins ** 0.5) / ((np.max(bins) + 1) ** 0.5))\n        * (np.clip((1 - item / bins), 0, np.inf) / (np.max(bins) + 1))\n    )\n    \n    scores = (\n        (item / bins)\n        * (1 / np.log(np.abs(item - bins)))\n        * ((bins ** 0.5) / ((np.max(bins) + 1) ** 0.5))\n        * (np.clip((1 - item / bins), 0, np.inf) / (np.max(bins) + 1))\n    )\n\n    scores[max_score_bin] = np.Inf \n    \n    return scores",
-          "objective": 0.03008,
-          "other_inf": null
-     }
-]

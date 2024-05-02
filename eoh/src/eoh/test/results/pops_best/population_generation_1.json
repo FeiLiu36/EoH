@@ -1,0 +1,6 @@
+{
+     "algorithm": "\nNew novel algorithm: The score function takes an item size and a set of rest capacities of feasible bins as input, and assigns a score to each bin based on a novel scoring function that prioritizes the bins with the least remaining capacity to minimize the number of used bins, then returns the scores for each bin.\n",
+     "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    remaining_capacity = bins - item\n    sorted_indices = np.argsort(remaining_capacity)\n    \n    num_bins = len(bins)\n    for i in range(num_bins):\n        scores[sorted_indices[i]] = num_bins - i\n\n    return scores",
+     "objective": 0.03984,
+     "other_inf": null
+}

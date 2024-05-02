@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm Description: The new algorithm scores the bins based on the sum of the inverse of the rest capacity and the square of the item-size ratio, adjusts the scores to ensure self-consistency, and assigns additional bonus scores based on the logarithm of the rest capacity of each bin.\n\nNew Algorithm Code:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    scaling_factor = 0.5\n    \n    # Calculate the inverse of the rest capacity\n    inverse_capacity = np.reciprocal(bins)\n\n    # Calculate the square of the item-size ratio\n    item_ratio_squared = np.square(item / bins)\n\n    # Calculate the sum of the inverse capacity and item ratio squared\n    combined_scores = inverse_capacity + item_ratio_squared\n\n    # Normalize the combined scores to ensure self-consistency\n    normalized_scores = combined_scores / np.sum(combined_scores)\n\n    # Calculate the logarithm of the rest capacity of each bin and assign bonus scores\n    bonus_scores = np.log(bins)\n\n    # Normalize the bonus scores to ensure self-consistency\n    normalized_bonus_scores = bonus_scores / np.sum(bonus_scores)\n\n    # Combine the normalized scores and normalized bonus scores\n    scores = normalized_scores + normalized_bonus_scores\n\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "In the new algorithm, the scores for each bin will be calculated based on the inverse difference between the rest capacity of each bin and the item size, the exponential function of the sum of the rest capacities of all the bins, and the square root of the difference between the rest capacity of each bin and the maximum capacity among all bins. These scores will be adjusted with weighted components by dividing each score by the exponential function of the sum of the rest capacities of all the bins. Finally, the adjusted scores will be normalized by dividing each score by the sum of all adjusted scores plus the number of bins.\n\nHere's the implementation of the new score function in Python:\n\n```",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    inverse_diff = 1 / (bins - item)\n    exp_sum_rest_capacities = np.exp(np.sum(bins))\n    sqrt_diff = np.sqrt(bins - np.max(bins))\n  \n    modified_scores = inverse_diff * 0.2 + exp_sum_rest_capacities * 0.5 + sqrt_diff * 0.3\n    weights = [np.sum(modified_scores) for _ in range(3)]\n    weights = np.divide(weights, np.sum(modified_scores))\n    \n    # Adjusted scores with weighted components\n    adjusted_scores = (\n        weights[0] * np.divide(inverse_diff, np.exp(np.sum(bins))) +\n        weights[1] * np.divide(exp_sum_rest_capacities, np.exp(np.sum(bins))) +\n        weights[2] * np.divide(sqrt_diff, np.exp(np.sum(bins)))\n    )\n  \n    sum_modified_scores = np.sum(adjusted_scores)\n    scores = adjusted_scores / (sum_modified_scores + len(bins))\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description: The Modified Score Algorithm calculates the scores as the reciprocal of the ratio between the rest capacity of the bins and the item size, multiplied by a constant factor of 100 and rounded to the nearest integer.\n\nNew algorithm implementation:\n\n```\nCode:\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"The Modified Score Algorithm calculates the scores as the reciprocal of the ratio between \n    the rest capacity of the bins and the item size, multiplied by a constant factor of 100 and \n    rounded to the nearest integer.\"\"\"\n\n    # Calculate the ratio of rest capacity of the bins to the item size\n    ratio = bins / item\n\n    # Calculate the scores as the reciprocal of the ratio multiplied by a constant factor of 100 and \n    # rounded to the nearest integer\n    scores = np.round(1 / ratio * 100)\n\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

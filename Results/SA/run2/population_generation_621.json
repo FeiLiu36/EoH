@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm Description: The new algorithm assigns scores to the bins based on a combination of their current rest capacities, the item size, and a penalty factor for bins that are close to their maximum capacity. It then applies a scaling factor to adjust the weight of these factors and normalizes the scores to ensure self-consistency.\n\nNew Algorithm Code:\n\n``` ",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    num_bins = len(bins)\n    weight = 0.5  # Set weight value\n    penalty_factor = 0.1  # Set penalty factor value\n    scaling_factor = 2.0  # Set scaling factor value\n    \n    # Calculate the difference between the rest capacities of the bins and the item size\n    capacity_difference = bins - item\n    \n    # Apply the weight parameter to the capacity difference\n    weighted_capacity_difference = weight * np.exp(-capacity_difference)  # Apply exponential decay to the weighted capacity difference\n    \n    # Compute the penalty factors for bins that are close to their maximum capacity\n    penalty_capacity = np.maximum(bins, 1) / np.maximum(capacity_difference, 1)  # Used np.maximum to avoid division by zero\n    weighted_penalty_capacity = penalty_factor * penalty_capacity\n    \n    # Calculate the modified scores based on the weighted capacity difference, penalty factors, and scaling factor\n    raw_scores = (weighted_capacity_difference - weighted_penalty_capacity) * scaling_factor\n    \n    # Normalize the scores to ensure self-consistency\n    scores = raw_scores / np.sum(raw_scores)\n\n    return scores",
-          "objective": 0.04306,
-          "other_inf": null
-     }
-]

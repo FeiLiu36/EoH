@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description: The new algorithm calculates the scores for the bins by taking the ratio between the item size and the remaining capacities, raising the differences between each value and the minimum capacity to the power of 2, summing up all the powered differences, dividing the scores by the minimum capacity minus a factor based on the square root of the item size, and finally applying a modified hyperbolic tangent function to adjust the scores to a range between -1 and 1.\n\nCode:\n",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacities = np.asarray(bins)\n    ratios = item / remaining_capacities\n    powered_diff = np.power(ratios - np.min(bins), 2)\n    sum_powered_diff = np.sum(powered_diff)\n    scores = sum_powered_diff / (np.min(bins) - np.sqrt(item))\n    \n    tanh_scores = np.tanh(scores)\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

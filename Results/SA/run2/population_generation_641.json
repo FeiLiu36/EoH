@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm Description: The new algorithm assigns scores to the bins based on a combination of their rest capacities and the ratio between their rest capacities and the item size, and adjusts the scores based on a scaling factor. It then normalizes the scores to ensure self-consistency, and assigns additional bonus scores to the bins based on the inverse of their rest capacities squared minus a discount factor.\n\nNew Algorithm Code:\n\n```\nCode:\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    scaling_factor = 0.5\n    discount_factor = 0.2\n\n    # Calculate the combination of rest capacities and the item-size ratio\n    size_ratio = bins / item\n    capacities_ratio = bins / np.sum(bins)\n    combined_scores = size_ratio * capacities_ratio\n\n    # Adjust the scores by multiplying with the scaling factor\n    adjusted_scores = combined_scores * scaling_factor\n\n    # Scale the adjusted scores to ensure self-consistency\n    scaled_scores = adjusted_scores / np.sum(adjusted_scores)\n\n    # Assign bonus scores based on the inverse of the squared rest capacities minus the discount factor\n    bonus_scores = 1 / ((bins ** 2) - discount_factor)\n\n    # Normalize the bonus scores to ensure self-consistency\n    normalized_bonus_scores = bonus_scores / np.sum(bonus_scores)\n\n    # Combine the scaled scores and normalized bonus scores\n    scores = scaled_scores + normalized_bonus_scores\n\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

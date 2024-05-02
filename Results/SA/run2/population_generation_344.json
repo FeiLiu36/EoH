@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "\nAlgorithm description: The new algorithm calculates the score for each bin based on the remaining capacities of the bins using a modified formula that considers an exponential function of the inverse of the remaining capacity divided by the item size, as well as a product of the remaining capacity and the logarithm of the remaining capacity divided by the item size squared. The scores are then normalized to a range between 0 and 1.\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    \n    inverse_ratio = 1 / (remaining_capacity / item)\n    product_ratio = np.product(remaining_capacity * np.log((remaining_capacity / item) ** 2))\n    \n    scores = np.exp(-inverse_ratio * product_ratio)\n    \n    normalized_scores = (scores - np.min(scores)) / (np.max(scores) - np.min(scores))\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

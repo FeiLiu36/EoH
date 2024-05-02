@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm: Power Score Algorithm\r\n\r\n",
-          "code": "import numpy as np\r\n\r\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\r\n    \"\"\"The power score algorithm calculates the scores as a power function of the ratio between item size and rest capacity,\r\n    where the power exponent is based on the average capacity of bins.\"\"\"\r\n    \r\n    avg_capacity = np.mean(bins)\r\n    \r\n    # Get the power exponent\r\n    power_exponent = avg_capacity\r\n    \r\n    # Calculate the power scores as a function of the ratio between item size and rest capacity\r\n    scores = (item / bins / power_exponent) ** power_exponent\r\n    \r\n    # Normalize the scores by dividing them by the sum of all scores\r\n    scores /= np.sum(scores)\r\n    \r\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

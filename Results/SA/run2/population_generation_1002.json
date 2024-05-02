@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm assigns scores to bins based on the ratio of remaining capacity to the maximum capacity, and then adjusts the scores using a penalty score based on the difference between the remaining capacity and the average capacity. Finally, it applies a weighting factor based on the maximum capacity and the priority score, as well as a scaling factor based on the maximum capacity and the average capacity.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    max_capacity = np.max(bins)\n    avg_capacity = np.mean(bins)\n    \n    ratio_score = remaining_capacity / max_capacity  # Calculate ratio score based on the ratio of remaining capacity to maximum capacity\n\n    penalty_score = np.maximum(0, remaining_capacity - avg_capacity)  # Calculate penalty score based on the difference between remaining capacity and average capacity\n\n    priority_score = max_capacity / (bins + 1)  # Calculate priority score based on the maximum capacity of each bin with a small offset to avoid division by zero\n\n    scaling_factor = max_capacity / (np.max(bins) + avg_capacity)  # Scaling factor based on the maximum capacity and average capacity\n    \n    scores = penalty_score * ratio_score * priority_score * scaling_factor\n    \n    return scores",
-          "objective": 0.04276,
-          "other_inf": null
-     }
-]

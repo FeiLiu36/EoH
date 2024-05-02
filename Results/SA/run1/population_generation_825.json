@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm: The new algorithm calculates the scores for bin assignment by taking the reciprocal of the bin capacity and adding it to the square root of the difference between the maximum bin capacity and the item size squared divided by the sum of the maximum bin capacity and the item size squared, multiplied by a scaling factor that is the square root of the maximum bin capacity divided by the item size.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    reciprocal_bin_capacity = 1 / bins\n    item_squared = item ** 2\n    diff_squared = (max_capacity - item) ** 2\n    sum_squared = (max_capacity + item) ** 2\n    scaling_factor = np.sqrt(max_capacity) / np.sqrt(item)\n    \n    scores = (reciprocal_bin_capacity + (np.sqrt(diff_squared / sum_squared) * scaling_factor))\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

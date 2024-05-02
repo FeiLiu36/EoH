@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "```\n",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.exp(-np.abs(bins - item)) * np.sqrt(np.sum(bins)) / (1 + np.exp(np.sum(bins)))\n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

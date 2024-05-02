@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm:\n\nThe new algorithm assigns a score to each bin based on a weighted combination of the ratio of the remaining capacity to the item size, the difference between the remaining capacity and the average capacity, and the difference between the remaining capacity and the maximum capacity. The weights for each component can be adjusted to prioritize different criteria. The algorithm then sorts the bins based on their scores, and the item is assigned to the bin with the maximum score.\n\nCode:\n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    max_capacity = np.max(bins)\n    avg_capacity = np.mean(bins)\n    \n    ratio_weight = 1.0\n    difference_weight = 0.5\n    max_score = (max_capacity - avg_capacity) * ratio_weight * difference_weight\n    \n    ratio_score = (remaining_capacity / item) * ratio_weight * max_score\n    difference_score = (np.abs(remaining_capacity - avg_capacity) + np.abs(remaining_capacity - max_capacity)) * difference_weight * max_score\n    \n    scores = ratio_score + difference_score\n    \n    sorted_indices = np.argsort(scores)[::-1]\n    sorted_bins = bins[sorted_indices]\n    \n    assigned_bins = np.where(sorted_bins >= item, sorted_bins, max_capacity)\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

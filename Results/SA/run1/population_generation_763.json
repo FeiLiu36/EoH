@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "\nThe new algorithm calculates the scores for the bins by taking the square root of the bin capacities, then dividing the item size by this square root and returning it as the scores for the bins.\n",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.sqrt(bins)\n    scores = item / scores\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

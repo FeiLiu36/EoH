@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm: \n\nThe new algorithm assigns scores to the bins based on the product of the ratio between the rest capacity and the maximum capacity of each bin and the log of the item size, and subtracts the square root of the sum of the remaining capacities of all the bins.\n\n```",
-          "code": "import numpy as np\nimport math\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    rest_capacity = max_capacity - bins\n    rest_capacity_sum = np.sum(rest_capacity)\n    scores = (rest_capacity / max_capacity) * np.log(item) - np.sqrt(np.sum(rest_capacity))\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

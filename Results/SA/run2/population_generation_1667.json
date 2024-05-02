@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description: The new algorithm calculates the scores for each bin by dividing the item size by the absolute difference between the bin capacities and the item size, taking the logarithm of the result, and then subtracting the result from the reciprocal of the maximum absolute difference between the bin capacities and the item size before normalizing the scores by dividing them by the maximum score across all bins.\n\nCode:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the scores for the bins\n    abs_diff = np.abs(item - bins)\n    scores = item / abs_diff  # Calculate the scores by dividing the item size by the absolute difference between the bin capacities and the item size\n    \n    # Apply logarithmic transformation and normalization to the scores\n    max_abs_diff = np.max(abs_diff)\n    scores = np.log(scores) - (1 / max_abs_diff)  # Take the logarithm of the scores and subtract them from the reciprocal of the maximum absolute difference\n    \n    max_score = np.max(scores)\n    scores = scores / max_score  # Normalize the scores by dividing by the maximum score\n    \n    return scores",
-          "objective": 0.03894,
-          "other_inf": null
-     }
-]

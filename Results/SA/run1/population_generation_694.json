@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description: \nMy new algorithm calculates the scores for the bins by taking the ratios of the remaining capacities of the bins to the item size, subtracting the maximum ratio across all bins from the obtained ratios, normalizes the scores by dividing them by the sum of ratios, and finally multiplies the scores by a factor based on the item size.\n\nImplementation in Python:\n\n```",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    \"\"\"Create a new algorithm that calculates the scores for the bins\n    by taking the ratios of the remaining capacities of the bins to the item size,\n    subtracts the maximum ratio across all bins from the obtained ratios,\n    normalizes the scores by dividing them by the sum of ratios,\n    and finally multiplies the scores by a factor based on the item size.\"\"\"\n    \n    # Calculate the ratios of the remaining capacities of the bins to the item size\n    ratios = bins / item\n\n    # Subtract the maximum ratio across all bins from the obtained ratios\n    subtracted_ratios = ratios - np.max(ratios)\n\n    # Normalize the scores by dividing them by the sum of ratios\n    normalized_scores = subtracted_ratios / np.sum(subtracted_ratios)\n\n    # Multiply the scores by a factor based on the item size\n    scores = normalized_scores * item\n\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

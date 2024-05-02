@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm Description: The new algorithm assigns scores to the bins based on the exponential of the inverse of the absolute difference between the bin capacity and the item size, divided by the sum of the squared differences between the bin capacities and the item sizes multiplied by a factor 'a'.\n\n\nPython Implementation:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the differences between the bin capacity and the item size\n    differences = bins - item\n    \n    # Calculate the sum of squared differences between the bin capacities and the item sizes\n    sum_squared_differences = np.sum(differences ** 2)\n    \n    # Calculate the inverse of the absolute difference between the bin capacity and the item size\n    inv_abs_difference = 1 / np.abs(differences)\n    \n    # Define a factor 'a' (can be adjusted for performance)\n    a = 0.5\n    \n    # Calculate the modified scores for the bins\n    scores = np.exp(a * inv_abs_difference) / (sum_squared_differences * a)\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

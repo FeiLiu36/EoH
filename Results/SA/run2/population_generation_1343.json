@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm: The new algorithm calculates the score for each bin by taking the harmonic mean of the ratios between the item size and the rest capacity of all bins, multiplied by the reciprocal of the sum of the rest capacities of all bins, multiplied by the logarithm of the minimum rest capacity of all bins, divided by the maximum rest capacity of all bins.\n\nImplementation:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    min_rest_capacity = bins.min()\n    max_rest_capacity = bins.max()\n    sum_rest_capacity = bins.sum()\n    \n    ratios = item / bins\n    harmonic_mean = len(ratios) / np.sum(1 / ratios)\n    scores = harmonic_mean * (1 / sum_rest_capacity) * np.log(min_rest_capacity) / max_rest_capacity\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

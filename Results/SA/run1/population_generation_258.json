@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description: The new algorithm calculates the score for each bin based on the inverse of the ratio of the rest capacity of the bin to the item size, penalizes bins close to their maximum capacity by multiplying them with a penalty factor, and takes into account the ratio of the total rest capacity of the bins to the maximum capacity of the bins while avoiding the use of additional penalty terms for bins exceeding their maximum capacity.\n\nNew code:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the inverse ratio of the rest capacity of each bin to the item size\n    ratios = bins / item\n    \n    # Calculate the penalty factor for bins close to their maximum rest capacity\n    penalty_factor = np.where(bins >= 0.9 * bins.max(), 0.1, 1)\n    \n    # Calculate the ratio of the sum of the rest capacities to the maximum capacity of the bins\n    capacity_ratio = np.sum(bins) / (bins.size * bins.max())\n    \n    # Calculate the score for each bin by combining the ratio, penalty factor, and capacity ratio\n    scores = 1 / ratios * penalty_factor + capacity_ratio\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

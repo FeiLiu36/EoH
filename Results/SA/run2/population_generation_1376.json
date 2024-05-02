@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm description: \n\nIn the new algorithm, the score for each bin is calculated by dividing the rest capacity of each bin by the maximum capacity and then multiplying each score by a factor that is inversely proportional to the bin capacity. The scores are then further modified by a function that penalizes bins with larger rest capacities, promoting the assignment of items to bins with lower rest capacities. Finally, the scores are normalized by dividing them by the sum of the modified scores.\n\nCode:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    rest_capacity = max_capacity - bins\n    \n    scores = rest_capacity / max_capacity  # Calculating initial scores by dividing rest capacity by max capacity\n    \n    factors = 1 / bins  # Computing factors as inversely proportional to bin capacity\n    scores *= factors  # Multiplying scores by the factors\n    \n    modified_scores = scores * (1 - np.exp(-rest_capacity))  # Modifying scores using a penalizing function\n    \n    sum_modified_scores = np.sum(modified_scores)  # Sum of the modified scores\n    scores /= sum_modified_scores  # Normalizing scores by dividing by the sum of modified scores\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

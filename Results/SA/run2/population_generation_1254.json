@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Description: The new algorithm calculates the scores for each bin based on the following steps:\n1. Calculate the product of the bin rest capacity and the item size.\n2. Take the absolute difference between the product calculated in step 1 and the bin rest capacity.\n3. Calculate the reciprocal of the absolute differences obtained in step 2.\n4. Add a constant value to avoid any potential division by zero errors to the reciprocal values obtained in step 3.\n5. Cube the reciprocal values obtained in step 4.\n6. Return the calculated scores for each bin.\n\nCode:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    product = bins * item # Step 1\n    differences = np.abs(product - bins) # Step 2\n    reciprocal_values = 1 / (differences + 1e-10) # Step 3 (with added constant)\n    cubed_outputs = reciprocal_values ** 3 # Step 4\n    scores = cubed_outputs # Step 5\n\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

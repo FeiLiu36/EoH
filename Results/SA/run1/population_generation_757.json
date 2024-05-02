@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm first calculates the reciprocal of each bin's rest capacity divided by the sum of the rest capacities, then multiplies it by the item size divided by the maximum bin capacity. Finally, it subtracts the minimum score from the resulting array and returns it as the scores for the bins.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    reciprocal = 1 / (bins / np.sum(bins))\n    scores = reciprocal * (item / np.max(bins))\n    scores -= np.min(scores)\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

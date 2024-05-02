@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm Description: The new algorithm scores the bins based on the difference between the maximum capacity and the rest capacity, adjusts the scores to ensure self-consistency, and then assigns bonus scores based on the item-size ratio.\n\nNew Algorithm Code:\n\n``` ",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    scaling_factor = 0.5\n    \n    # Calculate the difference between the maximum capacity and the rest capacity\n    difference_capacities = np.max(bins) - bins\n\n    # Calculate the adjusted scores based on the difference capacities and the item-size ratio\n    adjusted_scores = difference_capacities / bins * (item / bins) ** scaling_factor\n\n    # Normalize the adjusted scores to ensure self-consistency\n    normalized_scores = adjusted_scores / np.sum(adjusted_scores)\n\n    # Calculate the number of items that can fit into each bin\n    num_items_fit = np.floor(bins / item)\n\n    # Assign bonus scores based on the item-size ratio\n    bonus_scores = (item / bins) ** scaling_factor\n\n    # Normalize the bonus scores to ensure self-consistency\n    normalized_bonus_scores = bonus_scores / np.sum(bonus_scores)\n\n    # Combine the normalized scores and normalized bonus scores\n    scores = normalized_scores + normalized_bonus_scores\n\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

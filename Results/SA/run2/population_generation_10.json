@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm will calculate the score for each bin based on the remaining capacity and the size of the item, and then return the scores as a Numpy array. If the remaining capacity of a bin is greater than or equal to the maximum capacity minus the item size, the score will be set to -np.inf. Otherwise, the score will be (remaining_capacity + 1) / (item - remaining_capacity) if remaining_capacity is greater than or equal to item, or 1 / (item - remaining_capacity) otherwise. The algorithm will prioritize assigning the item to bins with smaller remaining capacities and larger remaining capacity to item ratios.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = np.zeros_like(bins, dtype=float)\n    \n    for i, remaining_capacity in enumerate(bins):\n        if remaining_capacity >= (max_capacity - item):\n            scores[i] = -np.inf\n        elif remaining_capacity >= item:\n            scores[i] = (remaining_capacity + 1) / (item - remaining_capacity)\n        else:\n            scores[i] = 1 / (item - remaining_capacity)\n    \n    return scores",
-          "objective": 0.03874,
-          "other_inf": null
-     }
-]

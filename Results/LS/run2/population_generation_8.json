@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm will calculate the score for each bin based on the remaining capacity and the size of the item, and then return the scores as a Numpy array. However, instead of using the maximum capacity of the bins, it will use the average capacity of the bins. The scores will be calculated as the ratio of the remaining capacity to the item size, and bins with no remaining capacity will be assigned a score of -infinity.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    avg_capacity = np.mean(bins)\n    scores = (avg_capacity - bins) / item\n    scores[bins == 0] = -np.inf\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

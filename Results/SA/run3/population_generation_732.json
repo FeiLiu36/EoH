@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin by multiplying the item size by a constant factor and dividing it by the remaining capacity raised to the power of another constant factor. The constant factors are chosen to optimize the scoring function.\n\nHere is the modified Python implementation of the new score function:\n\n```\n",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n\n    # Define constant factors\n    constant_factor1 = 0.5\n    constant_factor2 = 1.5\n\n    # Calculate the score for each bin\n    scores = (item * constant_factor1) / (remaining_capacity ** constant_factor2)\n\n    # Assign maximum scores for bins with remaining capacity >= item size\n    scores = np.where(remaining_capacity >= item, np.inf, scores)\n\n    return scores",
-          "objective": 0.0157,
-          "other_inf": null
-     }
-]

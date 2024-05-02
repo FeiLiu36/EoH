@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm assigns scores to each bin based on the ratio of the item size to the remaining capacity of the bin, with a higher weight given to bins with lower remaining capacity. The algorithm calculates the scores by dividing the item size by the remaining capacity of each bin, and then returns the scores as a Numpy array.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = item / bins\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin based on the ratio of the item size to the rest capacity of the bin, with the scores adjusted by a modifier that penalizes bins with rest capacity below a certain threshold, aiming to minimize the number of used bins. In this modified version, the modifier is an exponential decay function of the difference between the bin's rest capacity and the average rest capacity of all the bins, rather than just the difference between the rest capacity and the item size.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the average rest capacity of all the bins\n    avg_rest_capacity = np.mean(bins)\n    \n    # Calculate the ratio of the item size to the rest capacity of each bin\n    ratios = item / bins\n    \n    # Calculate the modifier for bins based on the difference between the rest capacity and the average rest capacity of all the bins\n    modifier = np.where(bins < item, np.exp(-1*(bins - avg_rest_capacity)), 1)\n    \n    # Calculate the adjusted score for each bin by combining the ratio and modifier\n    scores = ratios * modifier\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description: The new algorithm assigns scores to the bins based on the ratio of the item size to the bin capacity, where the ratio is raised to a power of three and then divided by the sum of all ratios.\n\nNew code:\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the ratios of item size to bin capacities\n    ratios = item / bins\n    \n    # Calculate the scores for the bins\n    scores = (ratios ** 3) / np.sum((ratios ** 3))\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

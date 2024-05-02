@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    max_capacity = np.max(bins)\n    avg_capacity = np.mean(bins)\n    std_capacity = np.std(bins)\n    diff_capacity = remaining_capacity - avg_capacity\n    \n    weights = np.exp(-diff_capacity)\n    capacity_ratio = remaining_capacity / max_capacity\n    bin_efficiency = remaining_capacity / bins\n    assigned_items = np.sum(bins) - np.sum(remaining_capacity)\n    \n    distance_score = np.abs(remaining_capacity - avg_capacity)\n    weighted_distance_score = distance_score * weights\n    weights_ratio = np.mean(weights) / weights\n    priority_scores = np.array([0.5, 0.3, 0.2])  # Example priority scores for bins, can be customized\n    \n    priority_based_scores = (weights_ratio * priority_scores[:, np.newaxis])\n    \n    scores = ((np.exp(-((diff_capacity / max_capacity) + 0.5) / (1 - capacity_ratio))\n               * priority_based_scores * weighted_distance_score) \n              - (0.5 * (diff_capacity / max_capacity))\n              - (0.2 * bin_efficiency)\n              - (0.1 * assigned_items))\n    \n    median_score = np.median(scores)\n    scaled_scores = scores / median_score\n    penalty_term = np.abs(bins - np.median(bins))\n    scaled_scores -= penalty_term / np.max(penalty_term)\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

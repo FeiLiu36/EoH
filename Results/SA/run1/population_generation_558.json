@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm Description (New Algorithm):\nThe new algorithm, named Modified Score Algorithm 4, calculates the scores for the bins as the sum of the product of the item size and the exponential decay of the remaining capacity of each bin, then multiplied by a factor that is the reciprocal of the logarithm of the maximum capacity, and finally subtracted by a decreasing sequence of integers.\n\nCode:\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"The Modified Score Algorithm 4 calculates the scores for the bins as the sum of the product of the item size \n    and the exponential decay of the remaining capacity of each bin, then multiplied by a factor that is the reciprocal\n    of the logarithm of the maximum capacity, and finally subtracted by a decreasing sequence of integers.\"\"\"\n    \n    # Calculate the exponential decay of the remaining capacity of each bin\n    capacities = bins.astype(float)\n    capacities[capacities == 0] = 1  # Avoid division by zero\n    decay_capacities = np.exp(-capacities)\n    \n    # Calculate the product of the item size and the decay of the capacities\n    product = item * decay_capacities\n    \n    # Calculate the factor as the reciprocal of the logarithm of the maximum capacity\n    max_capacity = np.max(bins)\n    factor = 1 / np.log(max_capacity)\n    \n    # Calculate the scores as the sum of the product multiplied by the factor, then subtracted by a decreasing sequence of integers\n    scores = np.sum(product) * factor - np.arange(len(bins), 0, -1)\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

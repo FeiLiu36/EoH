@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description:\nThe new algorithm calculates the score for each bin based on a modified combination of factors, including the square root of the remaining capacity of the bins, the logarithm of the reciprocal of the item size, and the scaled sum of the remaining capacities of the bins divided by the total capacity of all feasible bins.\n\nNew algorithm implementation:\n\n``` \nCode:\n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    sqrt_scores = np.sqrt(remaining_capacity)\n    logarithmic_scores = np.log(1 / item)\n    scaled_sum = np.sum(remaining_capacity) / np.sum(bins)\n    scores = (sqrt_scores * logarithmic_scores) * scaled_sum\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

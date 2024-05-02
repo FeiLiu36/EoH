@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description: \nThe new algorithm calculates the score for each bin based on a modified exponential function that incorporates additional factors including the cube root of the remaining capacity of the bins and the inverse of the item size, then multiplies it by the normalized sum of the remaining capacities of the bins divided by the total capacity of all feasible bins, and finally adds a penalty term that depends on the maximum rest capacity among all feasible bins.\n\nNew algorithm implementation:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    exp_scores = np.exp(-(np.abs(remaining_capacity) ** (1/3) + 1/item))\n    total_capacity = np.sum(bins)\n    normalized_sum_remaining_capacity = np.sum(remaining_capacity) / total_capacity\n    max_rest_capacity = np.max(remaining_capacity)\n    penalty_term = 1 / (max_rest_capacity + 1)\n    scores = exp_scores * normalized_sum_remaining_capacity + penalty_term\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

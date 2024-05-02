@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm description: In the modified algorithm, we will calculate the score for each bin by dividing the rest capacity of each bin by the maximum capacity of the bins, and then multiplying it by the inverse of the difference between the item size and the rest capacity of the bin, with a weight determined by the exponential of the ratio of the rest capacity to the maximum capacity.\n\nSteps:\n1. Calculate the maximum capacity of the bins.\n2. Calculate the ratio of the rest capacity of each bin to the maximum capacity.\n3. Calculate the inverse of the difference between the item size and the rest capacity of each bin.\n4. Calculate the weights based on the exponential of the ratio of the rest capacity to the maximum capacity.\n5. Calculate the scores for each bin by multiplying the ratios, inverses, and weights.\n6. Return the scores.\n\nCode:\n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the maximum capacity of the bins\n    max_capacity = np.max(bins)\n    \n    # Calculate the ratio of the rest capacity of each bin to the maximum capacity\n    ratios = bins / max_capacity\n    \n    # Calculate the inverse of the difference between the item size and the rest capacity of each bin\n    inverses = 1 / (item - bins)\n    \n    # Calculate the weights based on the exponential of the ratio of the rest capacity to the maximum capacity\n    weights = np.exp(ratios)\n    \n    # Calculate the scores for each bin by multiplying the ratios, inverses, and weights\n    scores = ratios * inverses * weights\n    \n    return scores",
-          "objective": 0.01942,
-          "other_inf": null
-     }
-]

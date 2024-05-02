@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm Description: The new algorithm will calculate the scores for each bin based on a weighted value derived from the remaining capacity, using a combination of trigonometric and exponential functions.\n\nPython implementation:\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the remaining capacity after assigning the item to each bin\n    remaining_capacity = bins - item\n    \n    # Calculate the absolute value of the remaining capacity\n    abs_capacity = np.abs(remaining_capacity)\n    \n    # Calculate the weighted value based on the remaining capacity using a trigonometric function\n    weights = np.sin(np.pi * abs_capacity / np.max(bins))\n    \n    # Adjust the weighted values using an exponential function\n    weights = np.exp(weights)\n    \n    # Calculate the scores for each bin using the weighted value\n    scores = remaining_capacity * weights\n    \n    # Sort the indices of bins in descending order based on the scores\n    sorted_indices = np.argsort(scores)[::-1]\n    \n    # Reorder the scores based on the sorted indices\n    scores = scores[sorted_indices]\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

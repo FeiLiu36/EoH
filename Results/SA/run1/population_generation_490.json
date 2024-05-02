@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm: Enhanced Modified Ratio Score Algorithm",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the scores as the modified ratio of item size to rest capacity\n    scores = (np.power(item, 2) / bins) * 1000\n\n    # Normalize the scores by dividing them by the maximum score\n    scores /= np.max(scores)\n\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

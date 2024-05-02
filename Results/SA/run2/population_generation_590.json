@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description: \n\nIn the new algorithm, we modify the scoring function by considering the square of the difference between the remaining capacity of a bin and the item size. Bins with remaining capacity closer to the item size will receive higher scores, while bins with larger or smaller remaining capacities will receive lower scores. The final scores for the bins are calculated by multiplying the base scores and the square-based scores.\n\nNew algorithm implementation:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    num_bins = len(bins)\n    \n    # Calculate base scores\n    base_scores = 1 - bins / item\n    \n    # Calculate square-based scores\n    square_scores = np.square(bins - item)\n    \n    # Calculate final scores by multiplying base scores and square-based scores\n    scores = base_scores * square_scores\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

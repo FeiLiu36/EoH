@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm description: The new algorithm calculates the score for each bin by subtracting the bin's rest capacity from the cubic root of the bin's rest capacity plus the item size, dividing it by the square root of the bin's rest capacity plus the item size, and multiplying it by the item size.\n\nCode:\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    sum_capacity = bins + item  # Step 1\n    cubic_root = np.cbrt(sum_capacity)  # Step 2\n    sqrt_sum = np.sqrt(sum_capacity)  # Step 3\n    score_diff = cubic_root - bins  # Step 4\n    scores = score_diff / sqrt_sum * item  # Step 5\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the remaining capacity\n    remaining_capacity = bins - item\n    \n    # Calculate the weight for the remaining capacity\n    remaining_weight = np.exp(-remaining_capacity / np.max(bins))\n    \n    # Calculate the weight for the ratio of remaining capacity to item size\n    ratio_weight = 1 - (bins / np.max(bins))**2\n    \n    # Calculate the scores for each bin\n    scores = np.multiply(remaining_weight, ratio_weight)\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

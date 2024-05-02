@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm: Modified Weighted Score Algorithm\n\nThe Modified Weighted Score Algorithm calculates the scores as a modified weighted sum of two components: the ratio between the item size and the rest capacity, and the ratio between the item size and the average capacity of the bins. The scores are further adjusted by taking into account the position of the bin in the sorted rest capacities array.\n\nCode:\n\n```\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"The modified weighted score algorithm calculates the scores as a modified weighted sum of two components: the ratio between the item size and the rest capacity,\n    and the ratio between the item size and the average capacity of the bins. The scores are further adjusted by taking into account the position of the bin in the sorted rest capacities array.\"\"\"\n\n    # Sort the rest capacities in descending order\n    sorted_bins = np.sort(bins)[::-1]\n    \n    # Calculate the modified weighted sum of two components\n    component1 = item / sorted_bins\n    component2 = item / np.mean(bins)\n    \n    # Assign higher weights to component2 by multiplying with the position-adjusted exponent\n    weights = np.exp(np.arange(1, len(bins) + 1))\n    \n    # Calculate the scores as a modified weighted sum of the two components\n    scores = 2 * component1 + 3 * component2\n    scores *= weights\n    \n    # Normalize the scores by dividing them by the sum of all scores\n    scores /= np.sum(scores)\n    \n    return scores",
-          "objective": 0.04477,
-          "other_inf": null
-     }
-]

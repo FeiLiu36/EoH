@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the sum of the differences between the remaining capacity and the maximum capacity for each bin (after deducting the item size), squares it, and assigns it to a variable called 'sum_squared_differences'. Next, it calculates the product of the log of the remaining capacity divided by the maximum capacity, and the squared differences between the remaining capacity and the maximum capacity for each bin (after deducting the item size), and assigns it to a variable called 'product_log_squared_differences'. Then, it calculates the scores for each bin by multiplying the 'sum_squared_differences' array by the 'product_log_squared_differences' array. The scores are then sorted in descending order and returned. Finally, a check is performed to ensure that no bin with a remaining capacity equal to the maximum capacity is used.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    remaining_capacity = bins - item\n\n    squared_differences = (remaining_capacity - max_capacity) ** 2\n    sum_squared_differences = np.sum(squared_differences)\n    product_log_squared_differences = np.log(remaining_capacity / max_capacity) * squared_differences\n\n    scores = sum_squared_differences * product_log_squared_differences\n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n\n    if remaining_capacity[int(sorted_indices[0])] == max_capacity:\n        scores[0] = 0\n\n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

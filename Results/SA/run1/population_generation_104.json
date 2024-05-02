@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm selects the bin with the minimum remaining capacity after the item is assigned as the primary bin, and calculates the scores for the other bins based on the bin capacities divided by the primary bin capacity, the logarithm of the sum of the bin capacities divided by the primary bin capacity multiplied by the item size plus 1, and the logarithm of the sum of the bin capacities minus the primary bin capacity divided by the primary bin capacity plus 1. The scores are then multiplied together with the product term and the logarithm of the primary bin capacity minus the sum of bin capacities.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    min_remaining_capacity = np.min(bins) - item\n    primary_bin_capacity = bins - item\n\n    scores = np.log(np.sum(bins) / primary_bin_capacity)\n    scores *= np.log((np.sum(bins) / primary_bin_capacity) * (item + 1))\n    scores *= np.log((np.sum(bins) - primary_bin_capacity) / (primary_bin_capacity + 1))\n    scores *= np.prod(bins / primary_bin_capacity)\n    scores *= np.log(primary_bin_capacity - np.sum(bins))\n\n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

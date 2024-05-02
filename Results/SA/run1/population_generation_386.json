@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm description: The new algorithm calculates the score for each bin by taking the ratio of the item size to the rest capacity of the bin, subtracting a logarithmic factor which is proportional to the ratio of the item size to the maximum capacity, and multiplying it by a penalty factor that is proportional to the difference between the maximum capacity and the rest capacity of each bin. Finally, it applies a sigmoid function to the result to map it to a value between 0 and 1.\n\nCode:\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the maximum capacity of the bins\n    max_capacity = np.max(bins)\n\n    # Calculate the ratio of the item size to the rest capacity of each bin\n    ratios = item / bins\n\n    # Calculate the ratio of the item size to the maximum capacity\n    item_ratio = item / max_capacity\n\n    # Calculate the logarithmic factor\n    log_factor = np.log(item_ratio)\n\n    # Calculate the penalty factor\n    penalty_factor = max_capacity - bins\n\n    # Calculate the scores for each bin\n    scores = 1 / (1 + np.exp(- (ratios - log_factor) * penalty_factor))\n\n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

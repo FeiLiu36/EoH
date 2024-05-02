@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the maximum capacity\n    max_capacity = np.max(bins)\n    \n    # Calculate the remaining capacity after assigning the item to each bin\n    remaining_capacity = bins - item\n    \n    # Calculate the ratio of remaining capacity to maximum capacity\n    ratio = remaining_capacity / max_capacity\n    \n    # Calculate the scores for each bin using a modified formula\n    scores = (ratio ** 2) + (1 / (ratio ** 3)) + (np.sqrt(ratio) ** 0.5) - np.log1p(ratio) + np.exp(np.cos(ratio))\n    \n    # Sort the indices of bins in descending order based on the scores\n    sorted_indices = np.argsort(scores)[::-1]\n    \n    # Reorder the scores based on the sorted indices\n    scores = scores[sorted_indices]\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

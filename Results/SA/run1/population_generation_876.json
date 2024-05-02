@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm:\nThe new algorithm assigns scores to the bins by first calculating the reciprocal of the item size and raising it to the power of the bin capacities divided by the item size. Finally, the scores are sorted in descending order.\n\nNew code:\n```",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    bin_capacities = bins.astype(float)\n\n    # Calculate the reciprocal of the item size\n    reciprocal_item = 1 / item\n\n    # Divide bin capacities by item size\n    divided_capacities = bin_capacities / item\n\n    # Calculate reciprocal_item raised to the power of divided_capacities\n    powers = np.power(reciprocal_item, divided_capacities)\n\n    # Multiply reciprocal_item with powers\n    scores = reciprocal_item * powers\n\n    # Sort the scores in descending order\n    sorted_scores = np.sort(scores)[::-1]\n\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

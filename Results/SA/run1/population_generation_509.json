@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm: Position Weighted Score Algorithm\n\nThe Position Weighted Score Algorithm calculates the scores as a weighted sum of two components: the ratio between the item size and the rest capacity, and the ratio between the item size and the average capacity of the bins. The scores are further adjusted by considering the position of the bin in the sorted rest capacities array.\n\nCode:\n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"The Position Weighted Score Algorithm calculates the scores as a weighted sum of two components: the ratio between the item size and the rest capacity,\n    and the ratio between the item size and the average capacity of the bins. The scores are further adjusted by considering the position of the bin in the sorted rest capacities array.\"\"\"\n\n    # Sort the rest capacities in descending order\n    sorted_bins = np.sort(bins)[::-1]\n    \n    # Calculate the weighted sum of two components with weights corresponding to the position of the bin\n    weights = np.exp(np.arange(1, len(bins) + 1))\n    weighted_sum = item / sorted_bins + item / np.mean(bins)\n    \n    # Calculate the scores as a weighted sum of the two components\n    scores = weighted_sum * weights\n    \n    # Normalize the scores by dividing them by the sum of all scores\n    scores /= np.sum(scores)\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

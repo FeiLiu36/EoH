@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm scores the bins for assignment by taking the square of the item size divided by the bin capacity, subtracting the square root of the ratio between the maximum bin capacity and the item size, and then multiplying it by the inverse of the bin capacity, with an additional scaling factor that is equal to the square root of the maximum bin capacity divided by the item size. The scores are then sorted in descending order.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    ratio = (item ** 2) / bins\n    square_root_ratio = np.sqrt(max_capacity / item)\n    inverse_bin_capacity = 1 / bins\n    scaling_factor = np.sqrt(max_capacity) / np.sqrt(item)\n    \n    scores = (ratio - square_root_ratio) * inverse_bin_capacity * scaling_factor\n    sorted_scores = np.sort(scores)[::-1]\n    return scores",
-          "objective": 0.03994,
-          "other_inf": null
-     }
-]

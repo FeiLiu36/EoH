@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm Description: The new algorithm assigns scores to each bin based on the inverse of the remaining capacity, with a higher weight given to bins with lower remaining capacity. The algorithm calculates the scores by dividing 1 by the remaining capacity of each bin, and then returns the scores as a Numpy array.\n\nCode:\n\n",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = 1.0 / bins\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

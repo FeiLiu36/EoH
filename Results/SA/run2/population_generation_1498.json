@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the scores for each bin based on the following steps:\n1. Take the logarithm of the item size.\n2. Calculate the sum of the inverse of the rest capacities of the bins.\n3. Multiply the logarithm calculated in step 1 with the sum calculated in step 2.\n4. Take the square root of the result from step 3.\n5. Divide the square root calculated in step 4 by the rest capacities of the bins.\n6. Return the calculated scores.\n",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    log_item_size = np.log(item)\n    sum_inverse_rest_capacities = np.sum(1 / bins)\n    scores = np.sqrt((log_item_size * sum_inverse_rest_capacities) / bins)\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

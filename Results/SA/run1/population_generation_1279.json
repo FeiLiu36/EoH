@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates scores for the bins based on a combination of a weighted decay term, a balanced term that considers the ratio of the difference to the bin capacity, and a logarithmic term. The scores are then sorted in descending order and returned as the final output.\n\nImplementation of the new algorithm in Python:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    \n    difference = item - bins\n    \n    # Decay term (weighted by a factor of 0.5)\n    decay_term = 0.5 * np.exp(-np.abs(difference))\n    \n    # Balanced term based on ratio (weighted by a factor of 0.3)\n    ratio_term = 0.3 / (difference / (bins**2 + 1))\n    \n    # Logarithmic term (weighted by a factor of 0.2)\n    log_term = 0.2 * np.log(np.abs(bins)) / (np.log(max_capacity) + 1)\n    \n    # Calculate scores\n    scores = decay_term + ratio_term + log_term\n    \n    # Sort scores in descending order\n    sorted_scores = np.sort(scores)[::-1]\n    \n    return scores",
-          "objective": 0.0156,
-          "other_inf": null
-     }
-]

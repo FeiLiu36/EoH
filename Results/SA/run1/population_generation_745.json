@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the scores for the bins by taking the ratio between the item size and the remaining capacities, raising the differences between each value and the maximum capacity to the power of 5, summing up all the powered differences, and finally dividing the scores by the maximum capacity multiplied by a factor based on the square root of the item size.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacities = np.asarray(bins)\n    ratios = item / remaining_capacities\n    powered_diff = np.power(ratios - np.max(bins), 5)\n    sum_powered_diff = np.sum(powered_diff)\n    scores = sum_powered_diff / (np.max(bins) * np.sqrt(item))\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

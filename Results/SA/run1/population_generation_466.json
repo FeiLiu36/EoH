@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm assigns a weight to each bin based on the ratio between the rest capacity of the bin and the item size, and then calculates the score as the sum of the weights of all the bins except the one with the maximum weight, normalized by dividing by the maximum value.\n\nCode:\n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the weights for each bin\n    weights = (bins - item) / item\n    \n    # Set the weight of the bin with maximum rest capacity as 0\n    weights[np.argmax(bins)] = 0\n    \n    # Calculate the score as the sum of all weights except the maximum weight, normalized by dividing by the maximum value\n    scores = np.sum(weights) / np.max(weights)\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

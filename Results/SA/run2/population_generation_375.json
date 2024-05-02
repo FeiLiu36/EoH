@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm Description: \n\nCreate a modified version of the algorithm that assigns a score to each bin based on the remaining capacities of the bins, the difference between the maximum capacity and the remaining capacity, the logarithm of the remaining capacities, and the sum of the remaining capacities of the bins multiplied by a constant factor. The score for each bin is then multiplied by a weighting factor based on the ratio of the item size to the maximum capacity of the bins, and the logarithm of the maximum capacity. The scores are then normalized to a range between 0 and 1. Finally, the scores are sorted in descending order, but with the modification that bins with a remaining capacity equal to the maximum capacity are excluded from the sorting process. \n\nCode: \n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    max_capacity = np.max(bins)\n    diff_capacity = max_capacity - remaining_capacity\n    remaining_capacity_log = np.log(remaining_capacity)\n    \n    weighting_factor = item / (max_capacity * np.log(max_capacity))\n    scores = (remaining_capacity * diff_capacity * weighting_factor * remaining_capacity_log) + (np.sum(remaining_capacity) * 0.5)\n    \n    normalized_scores = (scores - np.min(scores)) / (np.max(scores) - np.min(scores))\n\n    # Exclude bins with remaining capacity equal to the maximum capacity\n    normalized_scores[remaining_capacity == max_capacity] = 0\n    \n    sorted_scores = np.sort(normalized_scores)[::-1]\n    return scores",
-          "objective": 0.03612,
-          "other_inf": null
-     }
-]

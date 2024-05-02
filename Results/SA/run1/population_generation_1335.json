@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm, named Enhanced Score Function Algorithm, assigns a score to each bin by considering four factors: a ratio term, a capacity term, a penalty term, and a bonus term. The ratio term is the inverse of the ratio of the difference between the item and the bin size to the square of the capacity plus 1. The capacity term remains the same as before. The penalty term penalizes bins that are close to maximum capacity. The bonus term rewards bins that have capacities significantly larger than the item. The scores are then sorted in descending order.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    min_capacity = np.min(bins)\n    \n    difference = item - bins\n    \n    # Ratio term\n    ratio_term = 1 / (difference / (bins**2 + 1))\n    \n    # Capacity term\n    capacity_term = 1 - bins / max_capacity\n    \n    # Penalty term\n    penalty_term = ((bins - max_capacity) / max_capacity) ** 2\n    \n    # Bonus term\n    bonus_term = ((max_capacity - bins) / (max_capacity - min_capacity)) ** 2\n    \n    # Calculate scores\n    scores = ratio_term + capacity_term - penalty_term + bonus_term\n    \n    # Sort scores in descending order\n    sorted_scores = np.sort(scores)[::-1]\n    \n    return scores",
-          "objective": 0.01499,
-          "other_inf": null
-     }
-]

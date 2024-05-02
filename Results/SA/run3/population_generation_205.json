@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the scores for each bin based on a combination of polynomial and exponential functions, which assign higher scores to bins with more capacity and lower item sizes while penalizing bins with less remaining capacity and larger item sizes. The algorithm also introduces a new term that penalizes bins with extreme differences between the remaining capacity and item size.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    ratio = np.polyval([200, 0], np.exp(-(remaining_capacity / item)**2))\n    logarithm_difference = np.abs(np.polyval([3, 0], np.log(remaining_capacity / item)))\n    difference_penalty = np.maximum(((remaining_capacity - item) / item)**2, 0)\n    scores = np.where(remaining_capacity >= item, np.full_like(remaining_capacity, 1e9), np.maximum(ratio, logarithm_difference) + difference_penalty)\n    scores = np.round(scores)\n    return scores",
-          "objective": 0.01368,
-          "other_inf": null
-     }
-]

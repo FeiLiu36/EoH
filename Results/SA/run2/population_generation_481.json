@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin based on a combination of factors, including the remaining capacity of the bins, the logarithm of the reciprocal of the item size, and the number of bins already used. The weights of the factors are determined based on the remaining capacity of each bin, with higher weights assigned to bins with lower remaining capacity. The new algorithm also introduces a penalty term for the bins that have the maximum capacity, to encourage assigning items to bins that are not at full capacity.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    log_scores = np.log(1 / item)\n    \n    num_bins_used = np.count_nonzero(remaining_capacity < np.max(bins))\n    \n    weights = 1 / remaining_capacity\n    normalized_weights = weights / np.sum(weights) # Normalize weights to maintain self-consistency\n    \n    max_capacity_penalty = (remaining_capacity == np.max(bins)) * np.max(bins)\n    \n    scores = normalized_weights * (log_scores + num_bins_used) + max_capacity_penalty\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

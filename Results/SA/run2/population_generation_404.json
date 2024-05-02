@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm assigns a score to each bin based on the remaining capacity divided by the item size, and then adds a penalty depending on the difference between the item size and the remaining capacity. The scores are then sorted in descending order. \n\nHere is the implementation of the new algorithm in Python:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    difference_capacity = item - remaining_capacity\n    scores = remaining_capacity/item + difference_capacity\n    \n    sorted_scores = np.sort(scores)[::-1]\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

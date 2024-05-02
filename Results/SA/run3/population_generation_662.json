@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin based on a modified formula by adding an additional term that accounts for the logarithm of the item size divided by the remaining capacity to the original algorithm. \n\nHere's the implementation in Python:\n\n```",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n\n    # Calculate the reciprocal of the fourth-degree polynomial of the remaining capacity\n    fourth_degree = 1 / ((remaining_capacity ** 4) + 1)\n\n    # Calculate the square root of the remaining capacity\n    sqrt_capacity = np.sqrt(remaining_capacity)\n\n    # Calculate the natural logarithm of the remaining capacity\n    log_capacity = np.log(remaining_capacity)\n\n    # Multiply the fourth-degree, square root, and logarithmic terms\n    score_step4 = fourth_degree * sqrt_capacity * log_capacity\n\n    # Calculate the logarithmic term incorporating the item size\n    log_term = np.log(item) / remaining_capacity\n\n    # Add the logarithmic term to the previous scores\n    scores_step5 = score_step4 + log_term\n\n    # Assign maximum scores for bins with remaining capacity >= item size\n    scores_step6 = np.where(remaining_capacity >= item, np.inf, scores_step5)\n\n    # Multiply scores with mask to make scores of unused bins equal to 0\n    scores = scores_step6 * (1 - np.where(remaining_capacity == bins, 1, 0))\n\n    return scores",
-          "objective": 0.01358,
-          "other_inf": null
-     }
-]

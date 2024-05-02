@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm description: \nThe new algorithm assigns scores to each bin based on the ratio of the item size to the rest capacity of the bin, multiplied by the square of the logarithm of the item size divided by the maximum rest capacity among all bins.\n\nCode:\n",
-          "code": "import numpy as np\nimport math\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Find the bin with the maximum rest capacity\n    max_rest_capacity = np.max(bins)\n    \n    # Calculate the scores for the bins\n    scores = (item / bins) * (np.log(item) / np.log(max_rest_capacity)) ** 2\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

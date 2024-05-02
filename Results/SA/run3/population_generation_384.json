@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin by taking the exponential of the reciprocal of the ratio between the remaining capacity and the bin size, multiplied by the square root of the item size, to promote higher scores for bins with larger remaining capacity and larger bin sizes.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    \n    # Calculate the reciprocal of the remaining capacity ratio and take the exponential\n    exponential = np.exp(1 / (remaining_capacity / bins))\n    \n    # Calculate the square root of the item size\n    square_root = np.sqrt(item)\n    \n    # Calculate the product of the exponential and the square root\n    weighted_product = exponential * square_root\n    \n    # Calculate the final scores\n    scores = np.where(remaining_capacity >= item, 1e9, weighted_product)\n    \n    return scores",
-          "objective": 0.01207,
-          "other_inf": null
-     }
-]

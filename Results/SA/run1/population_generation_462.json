@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin by subtracting the rest capacity of each bin from the maximum capacity, taking the absolute value of the result, and then dividing it by the maximum capacity.\n\nCode:\n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the difference between the maximum capacity and the rest capacity of each bin\n    diff = np.abs(np.max(bins) - bins)\n    \n    # Divide the difference by the maximum capacity\n    scores = diff / np.max(bins)\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

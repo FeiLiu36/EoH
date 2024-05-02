@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin based on the remaining capacity and a penalty factor that depends on the ratio of the remaining capacity to the item size, prioritizing bins with larger ratios. If the remaining capacity of a bin is greater than or equal to the item size, the score is set to negative infinity. Otherwise, the score is calculated as follows: the ratio of remaining capacity to item size divided by the penalty factor. The penalty factor is determined by finding the maximum item size in the list of bins and dividing it by the maximum remaining capacity.\n\n",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    max_item_size = max(item, np.max(bins))\n    max_remaining_capacity = np.max(bins)\n    penalty_factor = max_item_size / max_remaining_capacity\n    \n    scores = np.zeros_like(bins, dtype=float)\n    \n    for i, remaining_capacity in enumerate(bins):\n        if remaining_capacity >= item:\n            scores[i] = -np.inf\n        else:\n            scores[i] = (remaining_capacity / item) / penalty_factor\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

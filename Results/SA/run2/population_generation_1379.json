@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description: In the new algorithm, the score for each bin is calculated by taking the product of the rest capacity of each bin and the reciprocal of the absolute difference between the rest capacity and the current item size. The scores are then modified by a function that promotes the assignment of items to bins with higher modified scores. Finally, the scores are normalized by dividing them by the sum of the modified scores.\n\nNew code:\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    differences = np.abs(bins - item)  # Computing the absolute differences between rest capacity and item size\n    modified_scores = bins * (1 / differences)  # Modifying scores using the reciprocal of the absolute differences\n\n    modified_scores = np.power(modified_scores, 2)  # Promoting assignment to bins with higher modified scores\n    sum_modified_scores = np.sum(modified_scores)  # Sum of the modified scores\n    scores = modified_scores / sum_modified_scores  # Normalizing scores by dividing by the sum of modified scores\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

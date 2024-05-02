@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin by taking the square root of the product of the item size and the remaining capacity of the bin, dividing it by the sum of the item size and the remaining capacity of the bin, multiplying it by the square root of the remaining capacity of the bin, and finally sorting the scores in descending order.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins\n    scores = np.sqrt(item * remaining_capacity) / (item + remaining_capacity) * np.sqrt(remaining_capacity)\n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n\n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

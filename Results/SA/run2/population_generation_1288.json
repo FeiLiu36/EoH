@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm description: In the new algorithm, the score for each bin is calculated by dividing the item size by the bin rest capacity and then subtracting the absolute difference between this ratio and 1. \n\nCode:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    ratios = item / bins  # Step 1\n    absolute_difference = np.abs(ratios - 1)  # Step 2\n    scores = ratios - absolute_difference  # Step 3\n\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

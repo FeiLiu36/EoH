@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "\nThe new algorithm calculates the score for each bin by taking the product of the reciprocal of the sum of the rest capacities of each bin and the maximum capacity minus the item size, multiplied by the square root of the product of the difference between the current item's size and the minimum capacity among the bins and a constant value that is a function of the item size and the number of bins.\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    num_bins = len(bins)\n    \n    # Calculate the sum of the rest capacities of each bin\n    sum_rest_capacities = np.sum(bins)\n    \n    # Calculate the product of the reciprocal of the sum of the rest capacities and the difference between the maximum capacity and the item size\n    product_reciprocal_sum = 1 / sum_rest_capacities * (np.max(bins) - item)\n    \n    # Calculate the product of the difference between the current item's size and the minimum capacity among the bins and the constant value\n    product_diff_constant = (item - np.min(bins)) * np.exp(-item / num_bins)\n    \n    # Calculate the square root of the product of the difference and constant value\n    sqrt_product_diff_constant = np.sqrt(product_diff_constant)\n    \n    # Calculate the scores based on the modified formula\n    scores = product_reciprocal_sum * sqrt_product_diff_constant\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

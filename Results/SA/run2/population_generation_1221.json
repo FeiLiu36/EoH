@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm description: \n\nIn the new algorithm, the score function calculates the scores for each bin based on the following steps:\n1. Get the maximum capacity of all the bins.\n2. Calculate the absolute differences between the rest capacities of bins and the maximum capacity.\n3. Calculate the exponential of the absolute differences.\n4. Calculate the square root of the item size.\n5. Perform element-wise division of the exponential of the absolute differences with the square root of the item size.\n6. Multiply the result with the inverse of the maximum capacity.\n7. Return the calculated scores for each bin.\n\nCode:\n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    abs_diffs = np.abs(bins - max_capacity)\n    exp_abs_diffs = np.exp(abs_diffs)\n    sqrt_item_size = np.sqrt(item)\n    \n    scores = exp_abs_diffs / sqrt_item_size / max_capacity\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

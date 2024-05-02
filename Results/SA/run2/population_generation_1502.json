@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm uses the reciprocal of the element-wise maximum of the logarithm of the item size and the inverse of the rest capacities of the bins, multiplied by the item size itself, and returns the calculated scores.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    log_item = np.log(item)\n    inv_rest_cap = 1 / bins\n    max_log_inv = np.maximum(log_item, inv_rest_cap)\n    scores = item / max_log_inv\n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

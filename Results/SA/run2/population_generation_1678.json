@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description: The new algorithm assigns scores to the bins by taking the product of the logarithm of the inverse of the difference between the bin capacity and the item size and a penalty term that is inversely proportional to the square root of the capacity of the bin. The penalty term is calculated by dividing the square root of the capacity of the bin by the sum of the square root of all bin capacities, subtracting it from 1, and adding a small constant value for numerical stability. The scores are then normalized by dividing them by the sum of all scores across all bins.\n\nCode:\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the penalty term\n    penalty_term = (1 - np.sqrt(bins) / np.sum(np.sqrt(bins))) + 1e-5\n    \n    # Calculate the scores for the bins\n    difference = bins - item\n    scores = np.log(1 / difference) * penalty_term\n    normalized_scores = scores / np.sum(scores) # Sum of all scores across all bins\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

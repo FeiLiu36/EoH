@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin by taking the reciprocal of the remaining capacity divided by the item size, raises it to the power of the difference between the reciprocal of the remaining capacity and the reciprocal of the item size, and multiplies it by the square root of the item size divided by the remaining capacity.\n\nHere is the Python implementation of the new algorithm:\n\n```",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n\n    # Calculate the reciprocal of the remaining capacity divided by item size\n    reciprocal_term = 1 / (remaining_capacity / item)\n\n    # Calculate the power term as the difference between the reciprocal of the remaining capacity and the reciprocal of the item size\n    pow_term = (1 / remaining_capacity) - (1 / item)\n\n    # Raise the reciprocal_term to the power term\n    score_step3 = reciprocal_term ** pow_term\n\n    # Multiply the score_step3 by the square root of the item size divided by the remaining capacity\n    score_step4 = score_step3 * np.sqrt(item / remaining_capacity)\n\n    # Assign maximum scores for bins with remaining capacity >= item size\n    scores = np.where(remaining_capacity >= item, np.inf, score_step4)\n\n    return scores",
-          "objective": 0.0157,
-          "other_inf": null
-     }
-]

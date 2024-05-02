@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin based on the remaining capacities and the ratio of the current item size to the bin capacity. The score is then adjusted based on a square root transformation of the ratio and a logarithmic transformation of the remaining capacities, followed by a multiplication with a factor that decreases as the bin index increases. The scores are returned in descending order.\n\nHere's the implementation of the new algorithm:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    ratio = item / bins\n    \n    # Constants for adjusting importance of each term in the scoring formula\n    square_root_factor = 0.5\n    logarithmic_factor = 0.2\n    \n    square_root_term = square_root_factor * np.sqrt(ratio)\n    logarithmic_term = logarithmic_factor * np.log(remaining_capacity + 1)\n    \n    scores = (square_root_term + logarithmic_term) * (1 - np.arange(len(bins))/(len(bins)-1))\n    \n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

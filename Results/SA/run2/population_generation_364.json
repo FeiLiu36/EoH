@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm Description: \nCreate a modified version of the algorithm that assigns a score to each bin based on the remaining capacities of the bins, the difference between the maximum capacity and the remaining capacity, the square root of the item size to the remaining capacity ratio, the logarithm of the maximum capacity, and the sum of the remaining capacities of the bins multiplied by a constant factor. The score for each bin is then multiplied by a weighting factor based on the ratio of the item size to the maximum capacity of the bins, and the logarithm of the maximum capacity. The scores are then normalized to a range between 0 and 1.\n\nCode:\n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    max_capacity = np.max(bins)\n    diff_capacity = max_capacity - remaining_capacity\n    ratio = np.sqrt(item / remaining_capacity)\n    max_capacity_log = np.log(max_capacity)\n    \n    weighting_factor = item / (max_capacity * max_capacity_log)\n    scores = (remaining_capacity * diff_capacity * ratio * weighting_factor * max_capacity_log) + (np.sum(remaining_capacity) * 0.5)\n    \n    normalized_scores = (scores - np.min(scores)) / (np.max(scores) - np.min(scores))\n    return scores",
-          "objective": 0.01982,
-          "other_inf": null
-     }
-]

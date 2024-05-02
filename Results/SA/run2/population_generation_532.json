@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the scores for the bins based on a combination of features such as the difference between the remaining capacity and the item size, a penalty for bins with higher items assigned, and a bonus for bins with a large remaining capacity. It also takes into account the proportion of remaining capacity to the maximum capacity of each bin.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate base scores by subtracting remaining capacity from item size\n    base_scores = item - bins\n    \n    # Calculate penalty for bins that already have higher items assigned\n    higher_item_penalty = np.where(bins < item, 0.3 * item, 0)\n    \n    # Calculate bonus for bins with a large remaining capacity\n    large_capacity_bonus = np.where(bins > (1.2 * item), 0.2 * item, 0)\n    \n    # Calculate proportion of remaining capacity to maximum capacity\n    proportions = bins / np.max(bins)\n    \n    # Calculate penalty for bins with remaining capacity close to their maximum capacity\n    near_max_capacity_penalty = np.where(proportions >= 0.8, 0.1 * item, 0)\n    \n    # Calculate final scores by combining base scores, higher item penalty, large capacity bonus, and near-maximum capacity penalty\n    scores = base_scores - higher_item_penalty + large_capacity_bonus - near_max_capacity_penalty\n    \n    return scores",
-          "objective": 0.04065,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm Description: The new algorithm assigns scores to the bins based on a combination of the inverse of the rest capacities of the bins and a penalty factor for bins that are close to their maximum capacity. It then applies a scaling factor and a power factor to adjust the weight and spread of these factors, normalizes the scores to ensure self-consistency, and finally adds a bias factor based on the item size.\n\nNew Algorithm Code:\n\n``` \nCode:\n\nCode:\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    num_bins = len(bins)\n    weight = 0.5\n    penalty_factor = 0.1\n    scaling_factor = 2.0\n    power_factor = 1.5\n    bias_factor = 0.05\n\n    # Calculate the inverse of the rest capacities of the bins\n    inverse_rest_capacities = 1 / np.maximum(bins, 1)\n\n    # Multiply the inverse rest capacities by the penalty factor\n    weighted_inverse_rest_capacities = penalty_factor * inverse_rest_capacities\n\n    # Raise the weighted inverse rest capacities to the power factor\n    powered_inverse_rest_capacities = weighted_inverse_rest_capacities ** power_factor\n\n    # Calculate the modified scores based on the powered inverse rest capacities and scaling factor\n    raw_scores = powered_inverse_rest_capacities * scaling_factor\n\n    # Normalize the scores to ensure self-consistency\n    scores = raw_scores / np.sum(raw_scores)\n\n    # Add a bias factor based on the item size\n    bias_scores = scores + (bias_factor * item)\n\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm assigns scores to each bin based on the bin capacity divided by the square of the logarithm of the absolute difference between the bin capacity and the item size, multiplied by the logarithm of the item size.",
-          "code": "import numpy as np\nimport math\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the scores for the bins\n    scores = (bins / ((np.abs(bins - item)) ** 2)) * (np.log(item))\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm is a modified version of the provided algorithm that calculates the score for each bin based on the remaining capacity of the bin and the size of the item, while penalizing bins that are close to reaching maximum capacity. It also incorporates some additional penalties based on the item size.\n\n```\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    remaining_capacity = max_capacity - bins\n    \n    # Calculate the penalties\n    penalty = np.exp(-bins/max_capacity) - 1\n    \n    # Add a penalty term based on the item size\n    item_penalty = np.exp(-item/max_capacity) - 1\n    penalty += item_penalty\n    \n    # Calculate the scores for each bin\n    # Modify the score calculation by taking logarithm of remaining_capacity\n    scores = np.log(remaining_capacity+1) - penalty\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

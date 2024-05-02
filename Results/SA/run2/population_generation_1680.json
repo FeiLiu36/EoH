@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description: The new algorithm assigns scores to the bins by taking the exponential of the ratio between the square root of the item size and the difference between the bin capacity and the item size, and then normalizing the scores.\n\nCode:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the scores for the bins\n    difference = bins - item\n    scores = np.exp(np.sqrt(item) / difference)\n    normalized_scores = scores / np.sum(scores)\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

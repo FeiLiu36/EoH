@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the scores for assigning an item to each bin based on the ratio of the remaining capacity of each bin to the logarithm of the size of the item, using Numpy's vectorized operations to optimize performance. However, in this modified version, instead of calculating the scores directly using the remaining capacity, we first scale the remaining capacity of each bin by the mean remaining capacity of all bins, and then apply the same score calculation as before.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    scaled_capacity = remaining_capacity / np.mean(remaining_capacity)\n    scores = (1 / scaled_capacity.astype(float)) * np.where(remaining_capacity >= item, remaining_capacity.astype(float) / np.log(item), 0)\n    return scores",
-          "objective": 0.01268,
-          "other_inf": null
-     }
-]

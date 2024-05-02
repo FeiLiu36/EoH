@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description: The \"Dynamic Score Algorithm\" assigns scores to the bins based on a modified formula that dynamically adjusts the weights based on the number of items already present in each bin, aiming to prioritize bins with fewer items and minimize the number of used bins.\n\nNew algorithm code:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the remaining capacities of the bins\n    remaining_capacity = bins - item\n\n    # Calculate the ratio between the item size and the remaining capacities of the bins\n    capacity_ratio = item / remaining_capacity\n\n    # Calculate the weighted scores based on the capacity ratio and the number of items already present in the bin\n    weighted_scores = capacity_ratio * (1 - np.count_nonzero(bins) / bins.size)\n\n    # Calculate the dynamic adjustment factor based on the number of used bins so far\n    num_used_bins = np.count_nonzero(bins < np.max(bins))\n    adjustment_factor = (1 - num_used_bins / bins.size) ** 2\n\n    # Adjust the scores based on the dynamic adjustment factor\n    adjusted_scores = weighted_scores * adjustment_factor\n\n    scores = np.maximum(adjusted_scores, 0)\n\n    return scores",
-          "objective": 0.04095,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm involves dividing the remaining capacity of each bin by the maximum remaining capacity, multiplying it by a weight factor based on the ratio between the item size and the bin capacity, and subtracting a penalty term from the score that penalizes bins with large remaining capacities. The penalty term is based on the difference between the remaining capacity and the maximum remaining capacity, divided by the penalty factor.\n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the remaining capacity\n    remaining_capacity = bins - item\n\n    # Get the maximum remaining capacity\n    max_remaining_capacity = np.max(remaining_capacity)\n\n    # Calculate the scores for each bin with the penalty term\n    penalty_factor = 0.5\n    scores = (remaining_capacity / max_remaining_capacity) * (item / bins) - (remaining_capacity - max_remaining_capacity) / penalty_factor\n\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

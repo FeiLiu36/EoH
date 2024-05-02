@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin by summing the absolute differences between the remaining capacity of the bin and the item size, then taking the reciprocal of this sum, raising it to a power equal to the item size, and finally normalizing the scores to ensure consistency and comparability across different bins.\n\nPython implementation:\n```\nCode:\n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    \n    absolute_diff = np.abs(remaining_capacity - item)\n    \n    sum_diff = np.sum(absolute_diff)\n    \n    scores = (1 / sum_diff) ** item\n    \n    normalized_scores = (scores - np.min(scores)) / (np.max(scores) - np.min(scores))\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

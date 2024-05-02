@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm description: \nThe new algorithm calculates the score for each bin by taking the ratio of the rest capacity of the bin to the maximum rest capacity, and then multiplying it by a factor computed from the logarithm of the item size divided by the sum of logarithm values of all ratios of bins. The scores are then multiplied by a constant factor W.\n\nCode:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    rest_capacity = max_capacity - bins\n    \n    # Calculate the ratio of rest capacity to maximum rest capacity\n    ratios = rest_capacity / max_capacity\n    \n    # Compute the sum of logarithm values of all ratios\n    log_sum = np.sum(np.log(ratios))\n    \n    # Calculate the factor using the logarithm of the item size divided by log_sum\n    factor = np.log(item) / log_sum\n    \n    # Calculate the score for each bin\n    scores = ratios * factor\n    \n    # Multiply scores by a constant factor\n    W = 1.5\n    scores *= W\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

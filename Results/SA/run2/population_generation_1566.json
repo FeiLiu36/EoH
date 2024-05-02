@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin by taking the element-wise product of the rest capacity of the bin and the logarithm of the item size, then multiplying it by the inverse of the maximum bin capacity, and finally subtracting the logarithm of the sum of the rest capacities of all the bins.\n\n```\n",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    rest_capacity = max_capacity - bins\n    rest_capacity_sum = np.sum(rest_capacity)\n    scores = (rest_capacity * np.log(item)) * (1 / max_capacity) - np.log(rest_capacity_sum)\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm description (new algorithm):\n\nThe new algorithm calculates the score for each bin by dividing the ratio of the item size to the remaining capacity by the square root of the remaining capacity, multiplied by a constant factor of 1000, and subtracting the remaining capacity multiplied by another constant factor of 1000. It then subtracts the minimum value from all scores, adds 1 to each score, and sets the scores of bins that cannot accommodate the item to infinity.\n\nCode:\n\n",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    scores = (item / np.sqrt(remaining_capacity)) * 1000 - remaining_capacity * 1000\n    min_score = np.min(scores)\n    scores = (scores - min_score) + 1\n    scores = np.where(remaining_capacity >= item, np.full_like(scores, np.inf), scores)\n    return scores",
-          "objective": 0.0157,
-          "other_inf": null
-     }
-]

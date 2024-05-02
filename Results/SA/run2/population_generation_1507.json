@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the scores for each bin based on the ratio of the item size to the difference between each bin's capacity and the item size, to minimize the number of used bins.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = item / (bins - item)\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

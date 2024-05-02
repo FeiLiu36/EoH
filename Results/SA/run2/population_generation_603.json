@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm Description: The scoring function assigns scores to bins based on the remaining capacities of each bin and a weight that is a function of both the remaining capacity and the item size. Bins with remaining capacity closer to the item size and less than the item size will receive higher scores, while bins with larger remaining capacities will receive lower scores. The final scores for the bins are normalized to ensure they sum up to 1.\n\nNew Algorithm Implementation:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    num_bins = len(bins)\n\n    # Calculate differences between remaining capacity and the item size\n    diff = bins - item\n\n    # Assign higher scores to bins with remaining capacity closer to the item size\n    scores = np.exp(-np.abs(diff))\n\n    # Adjust scores to ensure they sum up to 1\n    scores = scores / np.sum(scores)\n\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

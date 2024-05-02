@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description: The \"Weighted Capacity Algorithm\" assigns scores to the bins based on a weighted sum of the remaining bin capacity and the number of items already present in the bin.\n\n```\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the weighted scores based on the remaining bin capacity and the number of items already present\n    weighted_scores = bins / (bins.size - np.count_nonzero(bins))\n    \n    # Adjust scores based on the number of used bins so far\n    num_used_bins = np.count_nonzero(bins < np.max(bins))\n    adjusted_scores = weighted_scores + 0.1 * num_used_bins\n    \n    scores = np.maximum(adjusted_scores, 0)\n\n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

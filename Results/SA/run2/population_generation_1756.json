@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm assigns scores to the bins based on their remaining capacities after assigning the item using a mathematical function that includes exponential decay and division, and it penalizes the bins with larger remaining capacities by proportionally reducing the scores.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the remaining capacities of the bins after assigning the item\n    remaining_capacity = bins - item\n    \n    # Calculate the penalty factor for bins that are not used\n    penalty = np.where(remaining_capacity >= bins, 1/np.log(remaining_capacity), 1)\n    \n    # Calculate the modified scores for the bins\n    scores = (np.exp(-remaining_capacity) + np.log10(penalty)) / np.log1p(bins)\n    \n    # Replace NaN values with a large negative value to avoid errors in assignment\n    scores[np.isnan(scores)] = -np.inf\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

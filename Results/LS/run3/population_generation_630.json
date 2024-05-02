@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm Description: The new algorithm assigns scores to each bin based on a weighted combination of the remaining capacity and the ratio of the remaining capacity to the size of the item, with a higher weight given to bins with both lower remaining capacity and a larger ratio.\n\nCode:\n",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    ratio = remaining_capacity / item\n    scores = (1 / remaining_capacity) * ratio\n    return scores",
-          "objective": 0.03884,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "My new algorithm calculates the scores for each bin based on the following steps:\n1. Calculate the difference between the rest capacities of bins and the maximum capacity.\n2. Multiply the differences by a fixed factor.\n3. Subtract the item size from the multiplied values.\n4. Return the calculated scores for each bin.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins) # Step 1\n    diffs = max_capacity - bins # Step 1\n    scores = (diffs * 5) - item # Step 2 and 3\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

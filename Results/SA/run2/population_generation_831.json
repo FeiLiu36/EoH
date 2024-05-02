@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm Description: The new algorithm aims to assign higher scores to bins that have a higher ratio between the remaining capacity and the item size, encouraging the use of bins that can accommodate the item more efficiently. The algorithm calculates the scores based on the inverse of the square root of the ratio between the remaining capacities and the item size.\n\nCode:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    num_bins = len(bins)\n    \n    # Calculate the ratio between the remaining capacities and the item size\n    capacity_ratio = bins / item\n    \n    # Calculate the inverse of the square root of the ratio\n    inv_sqrt_ratio = 1 / np.sqrt(capacity_ratio)\n    \n    # Calculate the scores based on the modified formula\n    scores = inv_sqrt_ratio\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

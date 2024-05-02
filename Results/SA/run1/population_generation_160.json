@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin as the ratio between twice the rest capacity of the bin and the square root of the item size plus the bin's rest capacity, raised to the power of the natural logarithm of the bin's rest capacity, and multiplied by the inverse of the bin's rest capacity. The scores are then normalized to maintain self-consistency.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    scores = (2 * bins) / (np.sqrt(item) + bins) ** (np.log(bins)) * (1 / bins)\n    scores /= np.sum(scores)\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

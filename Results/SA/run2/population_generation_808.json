@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description: The new algorithm assigns scores to the bins based on the sum of the rest capacities of each bin divided by their maximum capacity, multiplied by the square root of the maximum capacity of any bin divided by the item size, and then adds a constant value to each score.\n\nCode:\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the sum of the rest capacities of each bin\n    sum_capacity = np.sum(bins)\n    \n    # Calculate the division between the sum of capacities and the maximum capacity of any bin\n    ratio_capacity = sum_capacity / (len(bins) * np.max(bins))\n    \n    # Calculate the ratio between the maximum capacity of any bin and the item size\n    ratio_item = np.max(bins) / item\n    \n    # Calculate the scores based on the modified formula and add a constant value\n    scores = (ratio_capacity * np.sqrt(ratio_item)) + 2.0\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

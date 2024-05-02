@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the weighted remaining capacity for each bin by multiplying the remaining capacity by a weight coefficient, which is determined based on the ratio of the item size to the maximum capacity, then takes the square root of the weighted remaining capacity multiplied by the bin index raised to the power of the item size, and assigns maximum scores for bins with remaining capacity equal to or greater than the item size, while also adjusting the scores based on the item size, the weighted remaining capacity ratio, and the logarithm of the weighted remaining capacity, to promote performance and minimize the number of used bins. Finally, the scores are multiplied by the bin index.\n\nCode:\n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    max_capacity = np.max(bins)\n    item_ratio = item / max_capacity\n    \n    # Calculate the score for each bin\n    weight_coefficient = (1 + item_ratio) / np.sqrt(item_ratio)\n    weighted_capacity = remaining_capacity * weight_coefficient\n    scores = (np.sqrt(weighted_capacity) * np.arange(len(bins), 0, -1) ** item)\n    \n    # Adjust the scores based on the item size, weighted remaining capacity ratio, and logarithm of the weighted remaining capacity\n    scores -= scores * item_ratio * np.log(weighted_capacity)\n    \n    # Assign maximum scores for bins with remaining capacity >= item size\n    scores = np.where(remaining_capacity >= item, np.inf, scores)\n    \n    # Multiply scores by bin index\n    scores *= np.arange(len(bins))\n    \n    return scores",
-          "objective": 0.01157,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm description: The new algorithm calculates the scores for each bin by taking the product of the exponential function of the negative difference between the bin capacity and the item size, then normalizing the scores by dividing them by the sum of all scores across all bins.\n\nCode:\n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the scores for the bins\n    exponent = np.exp(-1 * (bins - item))\n    scores = exponent / np.sum(exponent) # Sum of all scores across all bins\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

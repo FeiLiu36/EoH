@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm: Capacity Ratio and Inverse Log Score Algorithm\n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"The Capacity Ratio and Inverse Log Score Algorithm calculates the scores as the capacity ratio between the item size and the rest capacity of the bins, \n    further adjusted by the inverse logarithms of the rest capacities.\"\"\"\n\n    # Calculate the capacity ratio between the item size and the rest capacity of the bins\n    capacity_ratio = item / bins\n    \n    # Adjust the capacity ratio by taking the inverse logarithms of the rest capacities\n    inverse_log_scores = 1 / np.log(1 + bins)\n    \n    # Calculate the scores as the product of the capacity ratio and the inverse log scores\n    scores = capacity_ratio * inverse_log_scores\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm assigns scores to the bins based on a modified formula that considers the remaining capacity, the maximum capacity, and the item size. The main steps of the algorithm are as follows:}\n\n1. {Calculate the maximum capacity of the bins by finding the maximum value in the 'bins' array.}\n2. {Calculate the remaining capacity of each bin by subtracting the 'bins' array from the maximum capacity.}\n3. {Calculate the scores for each bin based on the remaining capacity, maximum capacity, and item size using a modified formula.}\n4. {Multiply the scores by a weight that is determined by the difference between the remaining capacity and the maximum capacity of each bin, giving more weight to bins that are closer to their maximum capacity.}\n5. {Adjust the scores by multiplying them with a factor determined by the item size, decreasing the score for bins that have a larger item size.}\n6. {Normalize the scores by dividing them by the maximum score, ensuring they are in the range [0, 1].}\n7. {Return the scores as a numpy array.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    remaining_capacity = max_capacity - bins\n\n    scores = (remaining_capacity**2 / max_capacity**2) * (1 - (item / max_capacity))\n    scores *= 1 + (remaining_capacity - max_capacity) / max_capacity\n\n    scores *= 1 - item / np.max(bins)\n\n    scores /= np.max(scores)\n\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

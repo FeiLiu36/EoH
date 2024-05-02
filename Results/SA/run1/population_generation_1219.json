@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description: My new algorithm computes the score for each bin based on a combination of the difference between the rest capacity of a bin and the size of the current item, the standard deviation of the rest capacities across all bins, the logarithm of the rest capacity of the bin, and a term that promotes using bins with larger rest capacities. It also introduces a penalty term that penalizes large differences between rest capacity and item size, and a reward term that rewards smaller differences. The scoring function is adjusted by a scaling factor to control the impact of the penalty and reward terms. Additionally, the algorithm uses bitwise operations to optimize performance.\n\nNew algorithm implementation:\n\n```\nCode:\n\nCode:\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    scaling_factor = 0.7\n\n    max_capacity = np.max(bins)\n\n    difference = item - bins\n    abs_difference = np.abs(difference)\n\n    penalty = scaling_factor * np.exp(-abs_difference) / (max_capacity * max_capacity + 1)\n\n    reward = scaling_factor * np.exp(-abs_difference) / (max_capacity * max_capacity + 1)\n\n    std_deviation = np.std(bins)\n\n    balanced_term1 = scaling_factor * (1 / (difference / (bins * bins + 1))) - scaling_factor * (1 / (std_deviation * std_deviation + 1))\n\n    log_term = scaling_factor * np.log(np.abs(bins)) / (np.log(max_capacity) + 1)\n\n    promotion_term = scaling_factor * (std_deviation / max_capacity)\n\n    scores = penalty + reward + balanced_term1 + log_term + promotion_term\n\n    sorted_scores = np.sort(scores)[::-1]\n\n    return scores",
-          "objective": 0.0163,
-          "other_inf": null
-     }
-]

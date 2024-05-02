@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin based on a modified version of the previous algorithm. It first calculates the ratio of the item size to the rest capacity of each bin, and then calculates a modifier using a quadratic function of the difference between the bin's rest capacity and the average rest capacity of all the bins, with the weights determined by the cube root of the ratio of the rest capacity to the maximum capacity. The adjusted score for each bin is then calculated by combining the ratio, modifier, and weights.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the average rest capacity of all the bins\n    avg_rest_capacity = np.mean(bins)\n    \n    # Calculate the maximum capacity of the bins\n    max_capacity = np.max(bins)\n    \n    # Calculate the ratio of the item size to the rest capacity of each bin\n    ratios = item / bins\n    \n    # Calculate the modifier for bins based on the quadratic function of the difference between the rest capacity and the average rest capacity of all the bins\n    modifier = ((bins - avg_rest_capacity) ** 2) / bins\n    \n    # Calculate the weights based on the cube root of the ratio of the rest capacity to the maximum capacity\n    weights = np.cbrt(bins / max_capacity)\n    \n    # Calculate the adjusted score for each bin by combining the ratio, modifier, and weights\n    scores = ratios * modifier * weights\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm Description: In the new algorithm, the scores for the bins will be calculated by multiplying the logarithm of the bin capacity and the reciprocal of the difference between the bin capacity and the item size, then normalizing the scores by dividing them by the maximum score and multiplying them by the logarithm of their original values.\n\nCode:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the scores for the bins\n    difference = bins - item\n    scores = np.log(bins) * (1 / difference)\n    normalized_scores = (scores / np.max(scores)) * np.log(scores)\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin as the product of the item size and the reciprocal of the difference between the item size and the bin's rest capacity, with the numerator being raised to a power of 2 and the denominator being raised to a power of 3. The scores are then normalized to maintain self-consistency.\n\nHere's the implementation of the new algorithm in Python:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    scores = (item ** 2) / (item - bins) ** 3\n    scores /= np.sum(scores)\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

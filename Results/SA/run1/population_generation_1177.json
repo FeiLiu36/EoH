@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm: The new algorithm assigns scores to each bin based on the rest capacities of the bins, the size of the current item, and the difference between the maximum capacity and the current bin capacity, penalizing bins with capacities larger than the item size and rewarding bins with capacities greater than the current item. Additionally, the algorithm includes a scaling factor and a discount factor to adjust the impact of penalty and reward terms over time. Finally, the algorithm returns the scores for the bins for assignment, considering the rest capacities of the bins, the item size, and the scaling and discount factors.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    scaling_factor = 0.5  # Adjust the impact of penalty and reward terms\n    discount_factor = 0.9  # Adjust the impact of discounting over time\n    \n    max_capacity = np.max(bins)\n    difference = item - bins\n    \n    penalty = np.where(difference >= 0, scaling_factor * (1 / (max_capacity * max_capacity + 1)) * np.exp(-np.abs(difference)), 0)\n    \n    reward = np.where(bins > item, scaling_factor * (1 / (max_capacity * max_capacity + 1)) * np.exp(-np.abs(bins - item)), 0)\n    \n    scores = scaling_factor * (1 / (difference / (bins * bins + 1))) + penalty + reward\n\n    sorted_scores = np.sort(scores)[::-1]\n    \n    discounted_scores = sorted_scores * (discount_factor ** np.arange(len(sorted_scores)))\n    \n    return scores",
-          "objective": 0.0156,
-          "other_inf": null
-     }
-]

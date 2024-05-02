@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the scores for the bins based on the inverse of their remaining capacity divided by the item size, subtracts the minimum value across all bins from the obtained scores, and finally normalizes the scores by dividing them by the sum of all scores.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    \"\"\"Create a new algorithm that calculates the scores for the bins\n    based on the inverse of their remaining capacity divided by the item size,\n    subtracts the minimum value across all bins from the obtained scores,\n    and finally normalizes the scores by dividing them by the sum of all scores.\"\"\"\n\n    # Calculate the inverse of the remaining capacity divided by the item size\n    inv_capacity = 1 / (bins.astype(float)/item)\n\n    # Subtract the minimum value across all bins from the scores\n    scores = inv_capacity - np.min(inv_capacity)\n\n    # Normalize the scores by dividing them by the sum of all scores\n    scores /= np.sum(scores)\n\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

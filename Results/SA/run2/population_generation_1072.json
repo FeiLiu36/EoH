@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm Description: \n\nMy new algorithm calculates a score for each bin based on the bin's remaining capacity relative to the item size and the bin's maximum capacity. The algorithm then assigns the item to the bin with the maximum score. If multiple bins have the same maximum score, the bin with the minimum remaining capacity is chosen. However, if a bin's remaining capacity is exactly equal to the maximum capacity, it will not be considered for assignment and will be given a score of -1. The modified algorithm uses a more efficient approach for calculating the scores and for selecting the bin to assign the item to.\n\nCode:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    max_capacity = np.max(bins)\n\n    remaining_capacity[max_capacity == bins] = -1\n    \n    scores = np.zeros_like(bins)\n    nonzero_indices = remaining_capacity > 0\n    scores[nonzero_indices] = 1 / remaining_capacity[nonzero_indices]\n\n    max_score = np.max(scores)\n    max_score_indices = np.where(scores == max_score)[0]\n    min_remaining_capacity = np.min(remaining_capacity[max_score_indices])\n\n    scores[remaining_capacity == -1] = 0\n    scores[remaining_capacity != min_remaining_capacity] = 0\n    \n    return scores",
-          "objective": 0.04457,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm:\n1. First, calculate the ratios between the item size and the remaining capacity, squared.\n2. Next, calculate the logarithm (base 2) of the ratios.\n3. Then, multiply the logarithm values by a constant factor of 1000.\n4. Add an additional penalty score to each bin based on the absolute difference between the item size and the remaining capacity, divided by the item size and multiplied by a constant factor of 200.\n5. If the remaining capacity equals the maximum capacity, set the scores of bins to a very high value of 10^9.\n6. Finally, return the scores for assignment.\n\nCode:\n\n```",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    ratios = (item / remaining_capacity) ** 2\n    logarithms = np.log2(ratios)\n    logarithms *= 1000\n    penalty_scores = (np.abs(item - remaining_capacity) / item * 200)\n    scores = logarithms + penalty_scores\n    scores = np.where(remaining_capacity >= item, np.full_like(scores, 1e9), scores)\n    return scores",
-          "objective": 0.01358,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the scores for each bin based on the product of the square root of the item size and the inverse of the rest capacities of the bins, to minimize the number of used bins.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    sqrt_item = np.sqrt(item)\n    inv_rest_cap = 1 / bins\n    scores = sqrt_item * inv_rest_cap\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

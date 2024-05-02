@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm:\nThe new algorithm will calculate the scores for each bin based on the difference between the remaining capacity and the item size, using a combination of logarithmic and power functions, scaled by a factor of 1000. The algorithm will penalize bins with very low remaining capacity and assign higher scores to bins with larger remaining capacity.\n\nNew algorithm implementation:\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the remaining capacity after assigning the item to each bin\n    remaining_capacity = bins - item\n    \n    # Calculate the difference between remaining capacity and item size\n    difference = remaining_capacity - item\n    \n    # Calculate the scores for each bin using a combination of logarithmic and power functions (scaled by 1000)\n    scores = 1000 * np.log(difference) + 0.001 * np.power(remaining_capacity, 2)\n    \n    # Sort the indices of bins in descending order based on the scores\n    sorted_indices = np.argsort(scores)[::-1]\n    \n    # Reorder the scores based on the sorted indices\n    scores = scores[sorted_indices]\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

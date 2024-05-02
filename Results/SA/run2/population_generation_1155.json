@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm involves calculating a score for each bin by multiplying the remaining capacity of the bin by the ratio of the item size to the remaining capacity of the bin, subtracting the item size squared from the remaining capacity of each bin squared, and then subtracting the sum from the maximum capacity of the bins squared.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the maximum remaining capacity among all the bins\n    max_remaining_capacity = np.max(bins)\n    \n    # Calculate the scores for each bin\n    scores = (bins * (item/bins))**2 - item**2\n    scores = np.subtract(max_remaining_capacity**2, scores) / max_remaining_capacity**2\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

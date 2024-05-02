@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm description: The new algorithm, named Modified Exponential Score Function Algorithm, aims to improve the scoring system by introducing a modified exponential score function. In addition to the polynomial term and penalty term from the previous algorithm, the modified algorithm incorporates a new exponential term that penalizes bins with capacities significantly larger than the item size.\n\nCode:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    alpha = 0.1\n    m = 5\n\n    sorted_bins = np.sort(bins)\n    \n    polynomial_term = bins ** alpha  # Polynomial term\n\n    quadratic_term2 = np.zeros_like(bins)\n    quadratic_term2[:m] = alpha * (bins[:m] ** 2)  # Quadratic term\n\n    ratio_term = (bins ** 2 + 1) / ((item - bins) + 1)  # Ratio term\n\n    capacity_term = bins / max_capacity  # Capacity term\n\n    penalty_term = np.exp((bins - max_capacity) / max_capacity)  # Penalty term\n\n    exponential_term = np.exp(-(bins - item) / item)  # Exponential term\n\n    scores = (\n        ratio_term + quadratic_term2 + capacity_term - penalty_term\n        + polynomial_term - exponential_term\n    )\n\n    sorted_scores = np.sort(scores)[::-1]\n    \n    return scores",
-          "objective": 0.01137,
-          "other_inf": null
-     }
-]

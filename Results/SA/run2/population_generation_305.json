@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm description: The new algorithm calculates the score for each bin based on the remaining capacity and the difference between the remaining capacity and the maximum remaining capacity multiplied by a constant factor. It uses a modified formula that includes a quadratic term and an exponential term. The scores are sorted in descending order and returned.\n\nCode:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    max_remaining_capacity = np.max(bins)\n    \n    score_factor = 0.5  # Constant factor to adjust the importance of the difference in remaining capacities\n    \n    scores = (\n        (remaining_capacity ** 2) * np.exp((remaining_capacity - max_remaining_capacity) * score_factor)\n    )\n    \n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n\n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description: \nStart by calculating the inverse of the difference between the capacity and the maximum capacity, multiplied by a factor proportional to the item size. Next, calculate the proximity factor based on the difference between the capacity and the maximum capacity. Calculate a penalty factor for bins nearing their maximum capacity, considering a threshold of 0.9. Finally, calculate the scores based on the modified formula that combines the inverse capacity difference, proximity factor, and penalty factor, with an additional factor proportional to the item size.\n\nCode:\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    num_bins = len(bins)\n    \n    # Calculate the inverse of the difference between the capacity and the maximum capacity, multiplied by a factor proportional to the item size\n    capacity_diff = bins - item\n    capacity_inv = 1 / (capacity_diff + 1e-9) * item\n    \n    # Calculate the proximity factor based on the difference between the capacity and the maximum capacity\n    max_capacity = np.max(bins)\n    proximity_factor = (max_capacity - bins) / max_capacity\n    \n    # Calculate the penalty factor for bins nearing their maximum capacity\n    penalty_factor = np.where(proximity_factor >= 0.9, -np.inf, 1)\n    \n    # Calculate the scores based on the modified formula\n    scores = capacity_inv + proximity_factor + penalty_factor\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

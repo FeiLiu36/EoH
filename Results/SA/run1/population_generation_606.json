@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"The new algorithm calculates the scores for the bins by taking the product of \n    the inverse of the item size, the reciprocal of the remaining capacity, and \n    the exponential of the ratio between the remaining capacity and the maximum \n    remaining capacity, then adds the maximum score across all bins.\"\"\"\n\n    # Calculate the remaining capacity of each bin\n    remaining_capacity = bins - item\n    \n    # Calculate the maximum remaining capacity\n    max_remaining_capacity = np.max(remaining_capacity)\n    \n    # Calculate the inverse of the item size\n    inverse_item_size = 1 / item\n    \n    # Calculate the reciprocal of the remaining capacity\n    reciprocal_capacity = 1 / remaining_capacity\n    \n    # Calculate the exponential of the ratio between the remaining capacity and the maximum remaining capacity\n    exp_ratio = np.exp(remaining_capacity / max_remaining_capacity)\n    \n    # Calculate the product of the inverse of the item size, the reciprocal of the remaining capacity,\n    # and the exponential of the capacity ratio\n    product = inverse_item_size * reciprocal_capacity * exp_ratio\n    \n    # Take the maximum score across all bins\n    max_score = np.max(product)\n    \n    # Calculate the scores for the bins\n    scores = np.sum(product, axis=0) + max_score\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

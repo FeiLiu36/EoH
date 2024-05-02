@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin based on the remaining capacity, the ratio of the remaining capacity to twice the item size, and the square root of the item size minus the remaining capacity, with a higher weight given to bins with both lower remaining capacity and a larger ratio. The equation to calculate the score is as follows:\nscores = (1 / remaining_capacity) * (remaining_capacity / (2 * item)) * np.sqrt(item - remaining_capacity)\n\nThe implementation of this algorithm in Python is as follows:\n\n```",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    scores = (1 / remaining_capacity) * (remaining_capacity / (2 * item)) * np.sqrt(item - remaining_capacity)\n    return scores",
-          "objective": 0.01157,
-          "other_inf": null
-     }
-]

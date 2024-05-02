@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Description: The new algorithm calculates the score for each bin by multiplying the bin's remaining capacity by the inverse of the bin's index position, and then takes the cumulative sum of these scores. The scores are then sorted in descending order and returned.\n\nCode:\n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    \n    scores = remaining_capacity * (1 / (np.arange(len(bins)) + 1))\n    scores = np.cumsum(scores)\n    \n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

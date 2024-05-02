@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin based on a combination of the remaining capacity and a priority factor. It prioritizes bins with smaller remaining capacities and larger priority factors. The score is calculated as the product of the remaining capacity and the priority factor, divided by the square root of the item size plus a small positive value to handle divisions by zero. The score is adjusted based on the square root of the priority factor, and bins with remaining capacity greater than or equal to the item size are assigned a large negative value.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    max_item_size = np.max(item)\n    max_remaining_capacity = np.max(bins)\n    priority_factor = max_remaining_capacity / max_item_size\n    \n    scores = np.zeros(len(bins), dtype=np.float64)\n    scores[bins >= item] = -np.inf\n    \n    remaining_capacity = bins[bins < item]\n    scores[bins < item] = (remaining_capacity * priority_factor) / (np.sqrt(item) + 1e-8)\n    scores[bins < item] = np.sqrt(scores[bins < item]) * np.sqrt(priority_factor)\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

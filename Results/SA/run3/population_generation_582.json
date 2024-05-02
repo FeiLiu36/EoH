@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm Description: The new algorithm calculates the score for each bin based on a modified formula by adding a logarithmic term and a polynomial term to the original algorithm: score = (1 / (log(remaining_capacity) * remaining_capacity)) * ((remaining_capacity / item) + 1) * (remaining_capacity / item) * (remaining_capacity / (np.exp(item) + 1)) + ((remaining_capacity**3) / item)\n\nCode:\n",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n\n    # Calculate the reciprocal of the natural logarithm of the remaining capacity multiplied by the remaining capacity\n    log_ratio = 1 / (np.log(remaining_capacity) * remaining_capacity)\n\n    # Calculate the sum of remaining capacity divided by item size and 1\n    sum_ratio = (remaining_capacity / item) + 1\n\n    # Calculate the product of remaining capacity divided by item size, remaining capacity divided by (exp(item) + 1), and the sum ratio\n    weighted_product = log_ratio * sum_ratio * (remaining_capacity / item) * (remaining_capacity / (np.exp(item) + 1))\n\n    # Add polynomial term to the scores\n    scores_step4 = weighted_product + ((remaining_capacity**3) / item)\n\n    # Assign maximum scores for bins with remaining capacity >= item size\n    scores_step5 = np.where(remaining_capacity >= item, np.inf, scores_step4)\n\n    # Multiply scores with mask to make scores of unused bins equal to 0\n    scores = scores_step5 * (1 - np.where(remaining_capacity == bins, 1, 0))\n\n    return scores",
-          "objective": 0.01157,
-          "other_inf": null
-     }
-]

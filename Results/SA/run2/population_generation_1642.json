@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm assigns scores to each bin based on the product of the square root of the item size and the cube root of the bin capacity divided by the absolute difference between the bin capacity and the item size, then adds the standard deviation of the scores to each bin score to adjust the range of scores. The scores of each bin are then normalized by dividing them by the maximum score across all bins.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the scores for the bins\n    scores = np.sqrt(item) * (bins**(1/3)) / np.abs(bins - item)\n\n    # Adjust the range of scores by adding the standard deviation of scores\n    std_score = np.std(scores)\n    scores = scores + std_score\n    \n    # Normalize the scores by dividing by the maximum score\n    max_score = np.max(scores)\n    scores = scores / max_score\n    \n    return scores",
-          "objective": 0.04165,
-          "other_inf": null
-     }
-]

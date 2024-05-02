@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm: Weighted Exponential Decay and Capacity Ratio Score Algorithm\n\nThe new algorithm calculates the scores as the weighted sum of the exponential decay of the rest capacity of the bins and the ratio between the item size and the rest capacity. The weights are assigned based on the inverse of the capacity ratio, ensuring that bins with higher capacity ratios are penalized.\n\nCode:\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"The Weighted Exponential Decay and Capacity Ratio Score Algorithm calculates the scores as the weighted sum of the exponential decay of the rest capacity of the bins and the ratio between the item size and the rest capacity.\"\"\"\n\n    # Calculate the exponential decay of the rest capacities with a decay factor of 0.5\n    exponential_decay_scores = np.exp(-0.5 * bins)\n    \n    # Calculate the capacity ratio between the item size and the rest capacity of the bins\n    capacity_ratio = item / bins\n    \n    # Calculate the weights as the inverse of the capacity ratio\n    weights = 1 / capacity_ratio\n    \n    # Calculate the scores as the weighted sum of the exponential decay scores and the capacity ratio\n    scores = weights * exponential_decay_scores\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

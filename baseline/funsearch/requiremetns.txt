@@ -1,0 +1,15 @@
+# Rui Zhang 01/09/2024
+# funsearch requires the following requirements
+# Python version MUST be larger or equal than Python 3.9 !!!
+
+transformers
+bitsandbytes
+torch
+absl-py
+scipy
+flask
+flask-cors
+numba
+tensorboard
+tensorboardX
+

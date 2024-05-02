@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "\nNew algorithm: The new algorithm calculates the scores for the bins based on a penalty factor, a capacity factor, and a bonus factor. The penalty factor penalizes bins that cannot accommodate the item, the capacity factor considers the remaining capacity of each bin, and the bonus factor rewards bins with a higher remaining capacity. The scores are calculated using a modified formula, which incorporates the three factors and ensures self-consistency.\n\nSteps:\n1. Define the penalty factor as the inverse of the ratio between the item size and the capacity of each bin: penalty_factor = item / bins\n2. Set the penalty factor to infinity for bins that cannot accommodate the item: penalty_factor = np.where(bins < item, np.inf, penalty_factor)\n3. Calculate the capacity factor as the ratio between the remaining capacity of each bin and the maximum capacity among all bins: capacity_factor = bins / np.max(bins)\n4. Calculate the bonus factor as the inverse of the capacity factor: bonus_factor = 1 / capacity_factor\n5. Calculate the scores as the product of the penalty factor, the capacity factor, and the bonus factor: scores = penalty_factor * capacity_factor * bonus_factor\n6. Return the scores as a Numpy array.\n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    penalty_factor = item / bins\n    penalty_factor = np.where(bins < item, np.inf, penalty_factor)\n    \n    capacity_factor = bins / np.max(bins)\n    \n    bonus_factor = 1 / capacity_factor\n    \n    scores = penalty_factor * capacity_factor * bonus_factor\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

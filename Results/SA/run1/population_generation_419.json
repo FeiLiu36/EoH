@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "My new algorithm calculates the score for each bin by taking the logarithm of the item size multiplied by the maximum capacity of the bins and then subtracting the logarithm of the item size multiplied by the rest capacity of each bin.\n\nHere's the implementation in Python:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the maximum capacity of the bins\n    max_capacity = np.max(bins)\n    \n    # Calculate the logarithm of the item size multiplied by the maximum capacity of the bins\n    log_max = np.log(item * max_capacity)\n    \n    # Calculate the logarithm of the item size multiplied by the rest capacity of each bin\n    log_ratio = np.log(item * bins)\n    \n    # Calculate the score for each bin\n    scores = log_max - log_ratio\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

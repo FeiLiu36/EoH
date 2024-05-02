@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "'The new algorithm scores each bin based on the maximum number of items that can fit within the remaining capacity, while also considering the size of the item relative to the remaining capacity of the bin. The scores are calculated as the reciprocal of the remaining capacity divided by the size of the item, multiplied by the integer division of the remaining capacity divided by the size of the item, and then multiplied by the reciprocal of the size of the item to promote performance.'",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = ((1 / (bins / item)) * ((bins // item))).astype(float) * (1 / item)\n    return scores",
-          "objective": 0.01821,
-          "other_inf": null
-     }
-]

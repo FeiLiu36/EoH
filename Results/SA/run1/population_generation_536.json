@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description: The Improved Score Algorithm calculates the scores as the square root of the ratio between the item size and the rest capacity of the bins, multiplied by a constant factor of 100 and rounded to the nearest integer.\n\nNew algorithm implementation:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"The Improved Score Algorithm calculates the scores as the square root of the ratio between \n    the item size and the rest capacity of the bins, multiplied by a constant factor of 100 and \n    rounded to the nearest integer.\"\"\"\n\n    # Calculate the ratio of item size and rest capacity of the bins\n    ratio = np.sqrt(item / bins)\n\n    # Calculate the scores as the ratio multiplied by a constant factor of 100 and rounded to the \n    # nearest integer\n    scores = np.round(ratio * 100)\n\n    return scores",
-          "objective": 0.03954,
-          "other_inf": null
-     }
-]

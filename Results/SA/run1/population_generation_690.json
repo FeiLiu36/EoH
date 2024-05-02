@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the scores for the bins by taking the sigmoid function of the inverse of the product of the remaining capacities of the bins and the item size, then subtracts the minimum value across all bins from the obtained scores, normalizes the scores by dividing them by the sum of all scores, and finally amplifies the scores by multiplying them with a factor based on the item size.\n\nCode:\n``` ",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    \"\"\"Create a new algorithm that calculates the scores for the bins\n    by taking the sigmoid function of the inverse of the product of the remaining capacities of the bins and the item size,\n    subtracts the minimum value across all bins from the obtained scores,\n    normalizes the scores by dividing them by the sum of all scores,\n    and finally amplifies the scores by multiplying them with a factor based on the item size.\"\"\"\n\n    # Calculate the sigmoid function of the inverse of the product of the remaining capacities of the bins and the item size\n    inv_capacity = 1 / (bins.astype(float) * item)\n    sigmoid_inv_capacity = 1 / (1 + np.exp(-inv_capacity))\n\n    # Subtract the minimum value across all bins from the scores\n    scores = sigmoid_inv_capacity - np.min(sigmoid_inv_capacity)\n\n    # Normalize the scores by dividing them by the sum of all scores\n    scores /= np.sum(scores)\n\n    # Amplify the scores by multiplying them with a factor based on the item size\n    scores *= item\n\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin by dividing the logarithm of the item size by the sum of the rest capacities of all bins plus a constant value, then taking the reciprocal of this value. Finally, it subtracts the minimum score from all the scores and adds a small constant value to ensure non-zero scores.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    sum_rest_capacity = np.sum(bins)\n    log_item_size = np.log(item)\n    constant_value = 2    # Change the constant value as desired\n    \n    scores = (log_item_size / (sum_rest_capacity + constant_value)) ** -1\n    min_score = np.min(scores)\n    small_constant = 1e-10   # Small constant value\n    \n    scores = (scores - min_score) + small_constant\n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

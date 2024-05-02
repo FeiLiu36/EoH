@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm: Logarithmic Decay and Capacity Difference Score Algorithm\n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"The Logarithmic Decay and Capacity Difference Score Algorithm calculates the scores as the logarithmic decay of the rest capacity of the bins, \n    further adjusted by the absolute difference between the item size and the rest capacity.\"\"\"\n\n    # Calculate the logarithmic decay of the rest capacities with a decay factor of 0.5\n    logarithmic_decay_scores = -np.log10(bins) / 0.5\n    \n    # Calculate the capacity difference between the item size and the rest capacity of the bins\n    capacity_difference = np.abs(item - bins)\n    \n    # Calculate the scores as the product of the logarithmic decay scores and the capacity difference\n    scores = logarithmic_decay_scores * capacity_difference\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

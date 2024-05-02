@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "My new algorithm calculates the scores for the bins by taking the cube root of the hyperbolic sine function applied to the product of the bin capacities, multiplied by the natural logarithm of the item size, divided by the sum of the bin capacities, then multiplied by the sum of the absolute differences between the bin capacities and the item size, divided by the sum of the bin capacities. The scores are assigned to the bins based on their capacity to minimize the number of used bins.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (np.cbrt(np.sinh(np.prod(bins)))* np.log(item)/ np.sum(bins)) * np.sum(np.abs(bins - item)) / np.sum(bins)\n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

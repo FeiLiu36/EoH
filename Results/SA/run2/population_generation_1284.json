@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm description: The new algorithm is a modified version of the original algorithm, with the main steps as follows: \n\n1. Raise the logarithm values obtained in the original algorithm to the power of 2.\n2. Calculate the square root of the sum of the logarithm values and the absolute difference between the bin rest capacity and the item size.\n3. Take the reciprocal of the square root values.\n4. Scale the reciprocal values to be between the minimum and maximum values of the logarithm values obtained in step 1.\n5. Multiply the logarithm values obtained in step 1 with the scaled values obtained in step 4.\n6. Return the calculated scores for each bin.\n\nCode:\n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    logarithm_values = np.log(bins) ** 2  # Step 1\n    absolute_difference = np.sqrt(logarithm_values + np.abs(bins - item))  # Step 2\n    reciprocal_difference = 1 / absolute_difference  # Step 3\n    scaled_values = (reciprocal_difference - np.min(reciprocal_difference)) / (np.max(reciprocal_difference) - np.min(reciprocal_difference)) * (np.max(logarithm_values) - np.min(logarithm_values)) + np.min(logarithm_values)  # Step 4\n    scores = logarithm_values * scaled_values  # Step 5\n\n    return scores",
-          "objective": 0.04004,
-          "other_inf": null
-     }
-]

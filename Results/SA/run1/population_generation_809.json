@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm description: The new algorithm calculates the scores for the bins by taking the product of the item size and the exponential of the negative absolute differences between the bin capacities and the item size, subtracting the natural logarithm of the product of the bin capacities and the item size, and multiplying it by the reciprocal of the difference between the item size and the maximum bin capacity squared. Then it adds the element-wise product of the square root of the item size divided by the bin capacities and the square of the difference between the item size and the maximum bin capacity multiplied by a constant factor.\n\nCode:\n",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    exp_neg_diff = np.exp(-np.abs(bins - item))\n    scores = (item * exp_neg_diff) - (np.log(bins * item) * (1 / (item - max_capacity))**2)\n    scores = scores + np.sqrt(item / bins) * (item - max_capacity)**2 * 0.1\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

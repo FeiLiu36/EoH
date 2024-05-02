@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm: The new algorithm calculates the score for each bin by taking the exponential of the sum of the item size multiplied by the rest capacity of each bin, and then subtracts the square root of the item size multiplied by the maximum capacity of the bins divided by the rest capacity of each bin.\n\nCode:\n``` ",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the maximum capacity of the bins\n    max_capacity = np.max(bins)\n    \n    # Calculate the sum of item size multiplied by the rest capacity of each bin\n    size_capacity_sum = np.sum(item * bins)\n    \n    # Calculate the exponential of the sum\n    exp_sum = np.exp(size_capacity_sum)\n    \n    # Calculate the square root of the item size multiplied by the maximum capacity divided by the rest capacity of each bin\n    sqrt_ratio = np.sqrt((item * max_capacity) / bins)\n    \n    # Calculate the score for each bin\n    scores = exp_sum - sqrt_ratio\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

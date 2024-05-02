@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm selects the bin with the minimum remaining capacity after the item is assigned as the primary bin, and calculates the scores for the other bins based on the bin capacities divided by the squared primary bin capacity, the exponential of the sum of the bin capacities divided by the primary bin capacity, the item size squared plus 1, and the square root of the exponential of the sum of the bin capacities minus the primary bin capacity multiplied by the cube root of the item size plus 1. The scores are then multiplied together with the product term and the exponential of the primary bin capacity minus the sum of bin capacities.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    primary_bin_capacity = np.min(bins) - item\n    bin_capacities = bins / np.square(primary_bin_capacity)\n    product_term = np.prod(bin_capacities)\n    exp_term = np.exp(np.sum(bin_capacities) / primary_bin_capacity)\n    item_squared = np.square(item) + 1\n    cube_root_item_plus_one = np.cbrt(item + 1)\n    sqrt_exp_sum = np.sqrt(np.exp(np.sum(bins) - primary_bin_capacity) * cube_root_item_plus_one)\n    scores = product_term * exp_term * item_squared * sqrt_exp_sum * np.exp(primary_bin_capacity - np.sum(bins))\n\n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

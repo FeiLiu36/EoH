@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin based on a weighted sum of the remaining capacity and the ratio of remaining capacity to item size. The weight for the remaining capacity is determined by a function that decreases as the remaining capacity increases, and the weight for the ratio is determined by a function that increases as the ratio decreases.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the remaining capacity\n    remaining_capacity = bins - item\n    \n    # Calculate the weight for the remaining capacity\n    remaining_weight = np.exp(-remaining_capacity / np.max(bins))\n    \n    # Calculate the weight for the ratio of remaining capacity to item size\n    ratio_weight = 1 - bins / np.max(bins)\n    \n    # Calculate the scores for each bin\n    scores = np.multiply(remaining_weight, ratio_weight)\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin by taking the product of the inverse of the ratio of the item size to the rest capacity of the bin and the inverse of the ratio of the rest capacity of the bin to the maximum capacity, and adds a constant factor to the score which is inversely proportional to the ratio of the item size to the maximum capacity.\n\nHere is the implementation of the modified score function:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the maximum capacity of the bins\n    max_capacity = np.max(bins)\n\n    # Calculate the inverse ratio of the item size to the rest capacity of each bin\n    inverse_ratios = item / bins\n\n    # Calculate the inverse ratio of the rest capacity of each bin to the maximum capacity\n    inverse_max_ratios = bins / max_capacity\n\n    # Calculate the product of the inverse ratio of the item size to the rest capacity\n    # of each bin and the inverse ratio of the rest capacity of each bin to the maximum capacity\n    scores = inverse_ratios * inverse_max_ratios\n\n    # Calculate the ratio of the item size to the maximum capacity\n    item_ratio = item / max_capacity\n\n    # Add a constant factor to the scores which is inversely proportional to the ratio of the item size to the maximum capacity\n    scores += 1 / item_ratio\n\n    return scores",
-          "objective": 0.04236,
-          "other_inf": null
-     }
-]

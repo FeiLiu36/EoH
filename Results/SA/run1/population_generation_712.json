@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the scores for the bins by taking the logarithm of the sum of the item size and remaining capacities of the bins, multiplying the logarithms by the difference between the maximum capacity and the sum, raising the multiplied logarithms to the power of the logarithm of the item size divided by the maximum capacity, normalizing the scores by dividing them by the sum of the raised logarithms, and finally multiplying the normalized scores by a factor based on the logarithm of the maximum capacity squared.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    sum_capacity = np.sum(bins) + item\n    logarithms = np.log(sum_capacity)\n    multiplied_logarithms = logarithms * (max_capacity - sum_capacity)\n    raised_logarithms = multiplied_logarithms ** (np.log(item) / np.log(max_capacity))\n    normalized_scores = raised_logarithms / np.sum(raised_logarithms)\n    scores = normalized_scores * np.log(max_capacity ** 2)\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

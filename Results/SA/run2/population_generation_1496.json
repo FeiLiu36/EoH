@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the scores for each bin based on the following steps: \n1. Calculate the difference between the rest capacities of the bins and the size of the current item.\n2. Take the square of the absolute value of the difference calculated in step 1.\n3. Multiply the squared absolute difference calculated in step 2 with the inverse of the rest capacities of the bins.\n4. Take the cube root of the product of the rest capacities of the bins.\n5. Divide the result of step 3 by the exponential of the product of the rest capacities of the bins.\n6. Return the calculated scores.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.square(np.abs(bins - item)) * (1 / bins) * np.cbrt(np.prod(bins)) / np.exp(np.prod(bins))\n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

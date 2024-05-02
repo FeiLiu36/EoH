@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description: The new algorithm calculates the scores for bin assignment by first calculating the product of the item size and the inverse of the bin capacities, then raising this product to the power of the sum of the bin capacities. Finally, the scores are sorted in descending order.\n\nNew code:\n\n```",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    bin_capacities = bins.astype(float)\n\n    # Calculate the product of the item size and the inverse of the bin capacities\n    inv_pow_product = item * (1.0 / bin_capacities)\n\n    # Raise the inv_pow_product to the power of the sum of the bin capacities\n    scores = inv_pow_product ** np.sum(bin_capacities)\n\n    # Sort the scores in descending order\n    sorted_scores = np.sort(scores)[::-1]\n\n    return scores",
-          "objective": 0.04095,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm Description: \n\nIn the new algorithm, named \"Weighted Power Algorithm,\" scores are assigned to the bins based on the inverse of the ratio between the remaining bin capacity and the maximum bin capacity, giving more weight to bins with larger remaining capacity and aiming to minimize the number of used bins. \n\nCode:\n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the ratio between remaining bin capacity and maximum bin capacity\n    ratios = bins / np.max(bins)\n    \n    # Calculate the scores using the power function with weights\n    weights = 1 / np.power(ratios, 2) # You can modify the power factor '2' based on your requirements\n    scores = weights\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

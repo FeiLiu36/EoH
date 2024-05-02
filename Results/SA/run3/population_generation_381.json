@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin by taking the square of the reciprocal of the ratio between the remaining capacity and the bin size, multiplied by the logarithm of the item size plus 1, to promote higher scores for bins with larger remaining capacity and larger bin sizes.",
-          "code": "import numpy as np\r\nimport math\r\n\r\ndef score(item, bins):\r\n    remaining_capacity = bins - item\r\n    \r\n    # Calculate the reciprocal of the remaining capacity ratio and square it\r\n    reciprocal_squared = (1 / (remaining_capacity / bins)) ** 2\r\n    \r\n    # Calculate the logarithm of the item size plus 1\r\n    logarithm = np.log(item + 1)\r\n    \r\n    # Calculate the product of the reciprocal squared and the logarithm\r\n    weighted_product = reciprocal_squared * logarithm\r\n    \r\n    # Calculate the final scores\r\n    scores = np.where(remaining_capacity >= item, 1e9, weighted_product)\r\n    \r\n    return scores",
-          "objective": 0.01358,
-          "other_inf": null
-     }
-]

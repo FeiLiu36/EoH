@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the scores for the bins by taking the sum of the element-wise product of the item size and the reciprocal of the absolute differences between the bin capacities and the item size, subtracts the logarithm of the item size divided by the sum of the bin capacities, squared, multiplied by the item size, and finally adds the sum of the logarithm of the item size divided by the bin capacities.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    reciprocal_diff = 1 / np.abs(bins - item)\n    scores = np.sum(item * reciprocal_diff) - (np.log(item) / np.sum(bins)**2 * item) + np.sum(np.log(item) / bins)\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

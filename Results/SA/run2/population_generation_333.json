@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin based on the remaining capacities of the bins and the ratio of the current item size to the bin capacity. The scores are further adjusted by a modified formula that takes into account the logarithmic sum of all remaining capacities, ensuring that bins with larger remaining capacities are penalized more. The scores are then scaled and normalized to a range between 0 and 1.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    ratio = item / bins\n\n    scores = np.power(ratio, remaining_capacity)\n\n    log_sum_remaining = np.log(np.sum(remaining_capacity))\n    adjusted_scores = scores * (1 / log_sum_remaining)\n    normalized_scores = (adjusted_scores - np.min(adjusted_scores)) / (np.max(adjusted_scores) - np.min(adjusted_scores))\n\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

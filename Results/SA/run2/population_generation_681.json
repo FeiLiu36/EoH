@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm adjusts the scores for the bins based on their rest capacity and the item size, penalizes bins with rest capacities less than a fraction of the item size, and gives a bonus score to bins with rest capacities greater than a certain threshold value. The final scores are then normalized to ensure self-consistency.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    scaling_factor = 0.5\n    penalty_fraction = 0.8\n    bonus_threshold = 10\n    \n    # Calculate the difference between the rest capacity and the penalty fraction of the item size\n    capacity_diff = bins - penalty_fraction * item\n    \n    # Penalize bins with rest capacities less than a fraction of the item size by reducing their scores to zero\n    capacity_diff[capacity_diff <= 0] = 0\n    \n    # Adjust the scores using the capacity difference\n    adjusted_scores = scaling_factor * capacity_diff\n    \n    # Normalize the adjusted scores to ensure self-consistency\n    normalized_scores = adjusted_scores / np.sum(adjusted_scores)\n    \n    # Assign bonus scores based on the rest capacity of each bin\n    bonus_scores = np.where(bins > bonus_threshold, 1 / bins, 0)\n    \n    # Normalize the bonus scores to ensure self-consistency\n    normalized_bonus_scores = bonus_scores / np.sum(bonus_scores)\n    \n    # Combine the adjusted scores and normalized bonus scores\n    scores = normalized_scores + normalized_bonus_scores\n    \n    # Normalize the final scores to ensure self-consistency\n    scores /= np.sum(scores)\n    \n    return scores",
-          "objective": 0.03924,
-          "other_inf": null
-     }
-]

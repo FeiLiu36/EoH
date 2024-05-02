@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "\n  The new algorithm scores each bin based on the product of the remaining capacity and the square of the difference between the remaining capacity and the item size, divided by the sum of the remaining capacity and the item size. If the remaining capacity is greater than or equal to the item size, the score is set to the remaining capacity multiplied by the square of the difference between the item size and the remaining capacity. If the item size is greater than the remaining capacity, the score is set to the remaining capacity multiplied by the square of the difference between the remaining capacity and the item size. Finally, the scores are returned as a Numpy array.\n",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacity = max_capacity - bins\n    scores = (remaining_capacity * (remaining_capacity - item)**2) / (remaining_capacity + item)\n    scores = np.where(remaining_capacity >= item, remaining_capacity * (item - remaining_capacity)**2, scores)\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

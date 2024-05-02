@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm: \n1. Calculate the logarithm of the remaining capacity divided by the item size.\n2. Square the logarithm and multiply it by a factor of 100.\n3. Calculate the reciprocal of the absolute differences between the remaining capacity and the item size.\n4. Multiply the reciprocal by a factor of 1000.\n5. Calculate the penalized differences by adding the squared logarithm, multiplied reciprocal, and a large constant value (1e6) multiplied by the absolute differences.\n6. Generate the scores for each bin by comparing the remaining capacity with the item size. If the remaining capacity is greater than or equal to the item size, assign a very high score (1e9), otherwise assign the penalized differences.\n7. Return the scores for the bins.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    logarithm_capacity = np.log(remaining_capacity / item)\n    squared_logarithm = 100 * np.square(logarithm_capacity)\n    reciprocal_differences = 1000 / np.abs(remaining_capacity - item)\n    penalized_differences = squared_logarithm + reciprocal_differences + 1e6 * np.abs(remaining_capacity - item)\n    scores = np.where(remaining_capacity >= item, np.full_like(penalized_differences, 1e9), penalized_differences)\n    return scores",
-          "objective": 0.01358,
-          "other_inf": null
-     }
-]

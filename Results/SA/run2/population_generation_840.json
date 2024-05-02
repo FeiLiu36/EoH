@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm description: The new algorithm aims to assign higher scores to bins that have a higher ratio between their remaining capacity and the item size, while penalizing bins that have a remaining capacity equal to the maximum capacity by assigning them a lower score. The algorithm calculates the scores based on a modified formula that includes the ratio between the remaining capacities and the item size, the difference between the remaining capacities and the item size, and a penalty factor for bins with maximum capacity. \n\nCode:\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    num_bins = len(bins)\n    \n    # Calculate the ratio between the remaining capacities and the item size\n    capacity_ratio = bins / item\n    \n    # Calculate the difference between the remaining capacities and the item size\n    capacity_diff = bins - item\n    \n    # Calculate the inverse of the difference\n    inv_diff = 1 / (capacity_diff + 1e-9) # Add small constant to avoid division by zero\n    \n    # Calculate additional factors\n    max_capacity = np.max(bins)\n    penalty_factor = np.where(bins == max_capacity, -np.inf, 1)\n    \n    # Calculate the scores based on the modified formula\n    scores = (inv_diff ** 2) * capacity_ratio + penalty_factor\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the scores for the bins by dividing the remaining capacity of each bin by the item size, subtracts the maximum value across all bins from the obtained scores, adds the minimum value across all bins to the scores, and finally normalizes the scores by dividing them by the maximum score.\n\nHere is the implementation of the new score function:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"The new algorithm calculates the scores for the bins by dividing the remaining capacity of each bin by the item size, subtracts the maximum value across all bins from the obtained scores, adds the minimum value across all bins to the scores, and finally normalizes the scores by dividing them by the maximum score.\"\"\"\n    \n    # Calculate the remaining capacity of each bin\n    remaining_capacity = bins - item\n    \n    # Divide the remaining capacity by the item size\n    scores = remaining_capacity / item\n    \n    # Subtract the maximum value across all bins from the scores\n    scores -= np.max(scores)\n    \n    # Add the minimum value across all bins to the scores\n    scores += np.min(scores)\n    \n    # Normalize the scores by dividing them by the maximum score\n    scores /= np.max(scores)\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

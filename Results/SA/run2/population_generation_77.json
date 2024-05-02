@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "\nThe new algorithm assigns a score to each bin based on the remaining capacity ratio, penalizing bins with a high deviation from the average remaining capacity and favoring bins with a lower remaining capacity, with a modified formulation.\n",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity_ratio = bins / item\n    average_remaining_capacity = np.mean(bins)\n    deviation = np.abs(bins - average_remaining_capacity)\n    deviation_penalty = deviation * item\n    \n    scores = (remaining_capacity_ratio - 1) * (item / average_remaining_capacity) - deviation_penalty\n    scores = np.maximum(scores, 0)\n    \n    return scores",
-          "objective": 0.04155,
-          "other_inf": null
-     }
-]

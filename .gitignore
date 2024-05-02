@@ -1,0 +1,8 @@
+**/__pycache__
+**/build/
+*.egg-info/
+*.egg
+*.pyc
+.DS_Store
+.vscode/
+output.log

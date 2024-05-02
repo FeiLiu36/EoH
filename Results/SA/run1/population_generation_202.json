@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin by taking the product of the inverse of the rest capacity of the bin and the exponential of the negative difference between the maximum capacity of the bin and the rest capacity of the bin, divided by a scaling factor. It then subtracts a penalty term from the scores for bins that will reach their maximum capacity after the assignment of the item. Finally, it normalizes the scores to ensure they sum up to 1.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    rest_capacity = max_capacity - bins\n    \n    # Calculate the score for each bin\n    scaling_factor = 0.1  # Adjust this value based on your needs\n    inverse_rest_capacity = 1 / rest_capacity\n    scores = inverse_rest_capacity * np.exp(-(max_capacity - rest_capacity) / scaling_factor)\n    \n    # Subtract penalty term for bins that will reach maximum capacity\n    penalty = np.zeros_like(bins)\n    bins_capacity_after_assignment = bins - item\n    penalty[bins_capacity_after_assignment == max_capacity] = 1\n    \n    scores -= penalty\n    scores /= np.sum(scores)\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

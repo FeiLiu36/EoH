@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm description: The new algorithm calculates the score for each bin based on a modified logarithmic function that incorporates additional factors including the reciprocal of the remaining capacity of the bins, the logarithm of the item size, and the square root of the normalized sum of the remaining capacities of the bins divided by the total capacity of all feasible bins. \n\nNew algorithm implementation:\n\n``` ",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    remaining_capacity = bins - item\n    logarithmic_scores = np.log(1 / remaining_capacity) * np.log(item + 1) * np.sqrt(np.sum(remaining_capacity) / np.sum(bins))\n    scores = logarithmic_scores\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm assigns scores to the bins based on the product of the logarithm of the sum of the item size and bin rest capacities, divided by the product of the logarithm of the item size and the sum of the bin rest capacities.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    sum_rest_capacities = np.sum(bins)\n    scores = (np.log(item + sum_rest_capacities) / np.log(item) * sum_rest_capacities) / (np.log(item) * (sum_rest_capacities + bins))\n\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

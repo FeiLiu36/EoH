@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "\nThe new algorithm calculates the score for each bin as the reciprocal of the difference between the rest capacity and the maximum capacity of the bin, divided by the sum of the reciprocals. Then, it normalizes the scores to ensure they sum up to 1.\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    rest_capacity = max_capacity - bins\n    scores = 1 / (rest_capacity - max_capacity)\n    scores /= np.sum(scores)\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

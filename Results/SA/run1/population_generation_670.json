@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    \"\"\"Create a new algorithm that calculates the scores for the bins\n    based on the difference between the remaining capacity of each bin \n    and the item size, multiplied by the logarithm of the remaining \n    capacity, then subtracts the maximum value across all bins from \n    the obtained scores, finally normalizes the scores by dividing \n    them by the sum of all scores.\"\"\"\n\n    # Calculate the differences between the remaining capacity of each bin and the item size\n    differences = bins - item\n\n    # Multiply the differences by the logarithm of the remaining capacity\n    scores = differences * np.log(bins)\n\n    # Subtract the maximum value across all bins from the scores\n    scores -= np.max(scores)\n\n    # Normalize the scores by dividing them by the sum of all scores\n    scores /= np.sum(scores)\n\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

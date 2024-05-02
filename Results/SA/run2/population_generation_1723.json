@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm assigns scores to the bins based on the sum of the inverse of the product of the bin capacity and the item size, where each ratio is squared and then normalized by dividing it by the sum of all squared ratios.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the ratios of inverse of bin capacity to item size\n    ratios = (1 / (bins * item))\n    \n    # Calculate the scores for the bins\n    scores = (ratios ** 2) / np.sum((ratios ** 2))\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

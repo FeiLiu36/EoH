@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm: \n\n1. Calculate the absolute differences between the item size and the remaining capacity of each bin.\n2. Square the resulting absolute differences.\n3. Divide the squared values by the remaining capacity.\n4. Take the square root of the resulting values.\n5. Multiply the square root values by a constant factor of 1000.\n6. If the remaining capacity equals the maximum capacity, set the scores of bins to a very high value of 10^9.\n\nCode:\n``` \n",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    absolute_differences = np.abs(item - remaining_capacity)\n    squared_differences = absolute_differences ** 2\n    scores = squared_differences / remaining_capacity\n    scores = np.sqrt(scores)\n    scores *= 1000\n    scores = np.where(remaining_capacity >= item, np.full_like(scores, 1e9), scores)\n    return scores",
-          "objective": 0.01358,
-          "other_inf": null
-     }
-]

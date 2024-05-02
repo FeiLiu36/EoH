@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin by computing the product of the reciprocal of the ratio between the item size and the rest capacity of each bin, and the reciprocal of the maximum capacity of the bins. It then adds a small constant value to ensure non-zero scores, multiplies each score by a weight that is inversely proportional to the bin capacity, and finally normalizes the scores by dividing them by the sum of the rest capacities of all the bins to achieve a more equitable distribution of scores and assign items to bins more effectively.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    rest_capacity = max_capacity - bins\n    constant_value = 0.001    # Change the constant value as desired\n    \n    scores = (1 / (item / rest_capacity)) * (1 / max_capacity)    # Calculating the initial scores\n    scores += constant_value    # Adding constant value to ensure non-zero scores\n    \n    weights = 1 / bins    # Computing weights inversely proportional to bin capacity\n    scores *= weights    # Multiplying scores by the weights\n    \n    sum_rest_capacities = np.sum(rest_capacity)   # Sum of the rest capacities of all bins\n    scores /= sum_rest_capacities    # Normalizing scores by dividing by the sum of rest capacities\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

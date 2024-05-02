@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description: The Enhanced Score Algorithm calculates the scores as the product of the inverse of the ratio between the remaining capacities of the bins and the item size, and a factor that is inversely proportional to the rank of the bin's remaining capacity among the remaining capacities.\n\nNew algorithm implementation:\n\n```\nCode:\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"The Enhanced Score Algorithm calculates the scores as the product of the inverse of the ratio between\n    the remaining capacities of the bins and the item size, and a factor that is inversely proportional to \n    the rank of the bin's remaining capacity among the remaining capacities.\"\"\"\n\n    # Calculate the ratio of remaining capacities of the bins to the item size\n    ratio = bins / item\n\n    # Calculate the ranks of the remaining capacities\n    ranks = np.argsort(np.argsort(bins))\n\n    # Calculate the inverse of the ranks plus one to avoid division by zero\n    rank_factor = 1 / (ranks + 1)\n\n    # Calculate the scores as the product of the inverse of the ratio and the rank factor\n    scores = np.ceil(1 / ratio * rank_factor)\n\n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

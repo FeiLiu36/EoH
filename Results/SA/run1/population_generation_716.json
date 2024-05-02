@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the scores for the bins by taking the exponential of the sum of the item size and remaining capacities of the bins, subtracting the exponential of the maximum capacity, raising the subtracted exponential to the power of the maximum capacity divided by the item size, normalizing the scores by dividing them by the sum of the raised exponentials, and finally multiplying the normalized scores by a factor based on the maximum capacity divided by the logarithm of the maximum capacity.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    sum_capacity = np.sum(bins) + item\n    exp_sum = np.exp(sum_capacity)\n    exp_diff = np.exp(max_capacity) - exp_sum\n    raised_exp = exp_diff ** (max_capacity / item)\n    normalized_scores = raised_exp / np.sum(raised_exp)\n    scores = normalized_scores * (max_capacity / np.log(max_capacity))\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

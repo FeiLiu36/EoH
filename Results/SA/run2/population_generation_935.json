@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description: The \"Inverse Proportional Algorithm\" assigns scores to the bins based on the inverse of the remaining bin capacity, where the scores increase proportionally as the remaining bin capacity decreases. The scores are further adjusted based on the number of used bins so far, aiming to minimize the number of used bins. Bins with exactly the maximum capacity are also considered for assignment.\n\nCode:\n\n```\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the inverse proportional scores based on the remaining bin capacity\n    inverse_scores = np.divide(1, bins)\n\n    # Add a small constant to bins with maximum capacity to include them for assignment\n    bins_with_max_capacity = np.where(bins == np.max(bins))\n    inverse_scores[bins_with_max_capacity] += 0.001\n\n    # Adjust scores based on the number of used bins so far\n    num_used_bins = np.count_nonzero(bins < np.max(bins))\n    adjusted_scores = inverse_scores + 0.1*num_used_bins\n    scores = np.maximum(adjusted_scores, 0)\n\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

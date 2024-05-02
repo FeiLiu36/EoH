@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm Description: The new algorithm calculates the score for each bin based on the remaining capacity and item size, as well as the proximity to the maximum capacity and the sum of remaining capacities. The algorithm aims to optimize the assignment of items to bins while minimizing the number of used bins.\n\nCode:\n\n",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n\n    # Calculate the penalty for bins with remaining capacity close to the maximum capacity\n    capacity_penalty = np.exp(-(remaining_capacity - bins) / item) * np.logical_not(remaining_capacity == bins)\n\n    # Calculate the score for capacity\n    capacity_score = np.exp(-remaining_capacity / item) + capacity_penalty\n\n    # Calculate the reward for bins with item size close to the remaining capacity\n    size_reward = np.exp((item - remaining_capacity) / bins) * np.logical_not(item == remaining_capacity)\n\n    # Calculate the score for size\n    size_score = np.exp(item / remaining_capacity) + size_reward\n\n    # Calculate the sum of remaining capacities\n    sum_remaining_capacity = np.sum(remaining_capacity)\n\n    # Calculate the penalty for bins with low sum of remaining capacities\n    sum_penalty = np.exp(-(sum_remaining_capacity))\n\n    # Calculate the final scores\n    scores = np.where(remaining_capacity >= item, np.full_like(remaining_capacity, 1e9),\n                     capacity_score + size_score + sum_penalty)\n\n    return scores",
-          "objective": 0.01197,
-          "other_inf": null
-     }
-]

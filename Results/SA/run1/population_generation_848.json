@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the scores for bin assignment by multiplying the inverse of the rest capacity of each bin by the inverse of the ratio of the item size to the maximum bin capacity, and adding the inverse of the maximum bin capacity minus the item size. The scores are then calculated as the reciprocal of the result, and the final scores are sorted in descending order.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    ratio = item / max_capacity\n    inverse_rest_capacity = np.reciprocal(bins)\n    inverse_ratio = np.reciprocal(ratio)\n    inverse_max_capacity_minus_item = np.reciprocal(max_capacity - item)\n    \n    scores = np.reciprocal(inverse_rest_capacity * inverse_ratio + inverse_max_capacity_minus_item)\n    sorted_scores = np.sort(scores)[::-1]\n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

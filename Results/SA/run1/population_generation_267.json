@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm: The new algorithm calculates the score for each bin based on the ratio of the item size to the rest capacity of the bin, modified by a penalty factor that increases as the bin's rest capacity approaches its maximum capacity, and also considers the average utilization ratio of all bins.\n\nNew code:\n``` \nCode:\n\nCode:\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the ratio of the item size to the rest capacity of each bin\n    ratios = item / bins\n    \n    # Calculate the penalty factor for bins close to their maximum rest capacity\n    penalty_factor = (1 - bins / bins.max()) ** (bins.size * np.log(bins.size))\n    \n    # Calculate the average utilization ratio of all bins\n    utilization_ratio = np.mean(bins / bins.max())\n    \n    # Calculate the score for each bin by combining the ratio, penalty factor, and average utilization ratio\n    scores = ratios * penalty_factor * utilization_ratio\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

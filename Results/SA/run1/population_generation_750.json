@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "My new algorithm calculates the scores for the bins by raising the differences between each value and the item size to the power of 2, summing up all the powered differences, and dividing the scores by the average capacity multiplied by the square root of the item size.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    powered_diff = np.power(bins - item, 2)\n    sum_powered_diff = np.sum(powered_diff)\n    scores = sum_powered_diff / (np.mean(bins) * np.sqrt(item))\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

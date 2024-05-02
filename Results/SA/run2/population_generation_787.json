@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm assigns scores to the bins based on the logarithm of the ratio between the rest capacity of each bin and the item size, multiplied by the difference between the rest capacity and the item size, and then adding a constant value equal to the maximum capacity divided by the item size. The scores are then raised to the power of 0.5 and normalized to ensure self-consistency.\n\nHere is the implementation of the new score function in Python:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the ratio between the rest capacity of each bin and the item size\n    ratio_capacity = bins / item\n    \n    # Calculate the difference between the rest capacity and the item size\n    difference_capacity = bins - item\n    \n    # Calculate the scores based on the logarithm of the ratio_capacity multiplied by the difference_capacity\n    scores = np.log(ratio_capacity) * difference_capacity\n    \n    # Add a constant value equal to the maximum capacity divided by the item size\n    constant_value = np.max(bins) / item\n    scores += constant_value\n    \n    # Raise the scores to the power of 0.5\n    scores = np.power(scores, 0.5)\n    \n    # Adjust the scores to ensure self-consistency by dividing them by the maximum value\n    scores = scores / np.max(scores)\n    \n    # Sort the scores in descending order\n    scores = np.sort(scores)[::-1]\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the scores for the bins based on a modified weight calculation. \nFirst, create a copy of the 'bins' array and sort it in descending order. \nNext, calculate the weights for each bin by taking the difference between the maximum rest capacity (first element in the sorted array) and the rest capacity of each bin, divided by the item size. \nThen, set the weight of the bin with the maximum rest capacity as 0. \nFinally, calculate the scores as the sum of all weights except the maximum weight. Normalize the scores by dividing by the maximum value of the weights.\n\nHere's the implementation of the new algorithm in Python:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Create a copy and sort the bins array in descending order\n    bins_sorted = np.sort(bins)[::-1]\n    \n    # Calculate the weights for each bin\n    weights = (bins_sorted[0] - bins) / item\n    \n    # Set the weight of the bin with maximum rest capacity as 0\n    weights[np.argmax(bins)] = 0\n    \n    # Calculate the scores as the sum of all weights except the maximum weight\n    scores = np.sum(weights)\n    \n    # Normalize the scores by dividing by the maximum value of the weights\n    scores /= np.max(weights)\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the scores for each bin based on the following steps:\n1. Create a variable that represents the maximum ratio between the item size and the capacity of the bins.\n2. Calculate the absolute difference between the maximum ratio and the ratio between the item size and each bin's rest capacity.\n3. Take the reciprocal of the differences calculated in step 2 and add a constant value to avoid any potential division by zero errors.\n4. Square the reciprocal values obtained in step 3 and multiply them by a constant value.\n5. Return the calculated scores for each bin.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_ratio = np.max(item / bins) # Step 1\n    differences = np.abs(max_ratio - (item / bins)) # Step 2\n    reciprocal_values = 1 / (differences + 1e-10) # Step 3 (with added constant)\n    squared_outputs = reciprocal_values ** 2 # Step 4\n    scores = 3.5 * squared_outputs # Step 5 (with variable value)\n\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

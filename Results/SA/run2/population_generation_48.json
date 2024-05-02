@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "```",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    max_remaining_capacity = np.max(bins)\n    priority_factor = max_remaining_capacity / item\n\n    low_capacity_bins = bins < item\n\n    scores = np.zeros(len(bins), dtype=np.float64)\n    scores[low_capacity_bins] = -np.inf\n    scores[~low_capacity_bins] = bins[~low_capacity_bins] * priority_factor - np.power(item, 2)\n\n    scores = scores * (1 - low_capacity_bins) + low_capacity_bins * np.inf\n\n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

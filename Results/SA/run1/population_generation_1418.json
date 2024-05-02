@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm: Enhanced Logarithmic Score Function Algorithm\n\nDescription:\n\nThe new algorithm aims to improve the scoring system by incorporating an enhanced logarithmic function to assign scores to the bins. It takes into account the logarithmic term to reward bins with larger capacities and penalizes bins with smaller capacities.\n\nCode:\n\n```\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    max_capacity = np.max(bins)\n    alpha = 0.1\n    m = 5\n\n    sorted_bins = np.sort(bins)\n    logarithmic_term = np.log(bins + 1)\n\n    quadratic_term2 = np.zeros_like(bins)\n    quadratic_term2[:m] = alpha * (bins[:m] ** 2)\n\n    ratio_term = (bins ** 2 + 1) / ((item - bins) + 1)\n    capacity_term = (bins / max_capacity)\n    penalty_term = ((bins - max_capacity) / max_capacity) ** 2\n\n    scores = (\n        ratio_term + quadratic_term2 + capacity_term - penalty_term\n        + logarithmic_term\n    )\n\n    sorted_scores = np.sort(scores)[::-1]\n\n    return scores",
-          "objective": 0.01117,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm description: The new algorithm assigns a score of 10 to bins with the same capacity as the item, assigns a score based on the ratio of the item size to the remaining capacity of the bins, and sets the scores of bins that are not used to zero. Additionally, it penalizes bins with a larger remaining capacity by multiplying the scores with a factor inversely proportional to the square root of the remaining capacity.\n\nCode:\n```\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the remaining capacity of the bins\n    remaining_capacity = bins - item\n    \n    # Calculate the penalty factor for bins with larger remaining capacity\n    penalty_factor = 1 / np.sqrt(remaining_capacity)\n    \n    # Create an array 'scores' with the size of 'bins' and initialize it with zeros\n    scores = np.zeros_like(bins)\n    \n    # Assign a score of 10 to bins that have the same capacity as the item\n    scores[remaining_capacity == 0] = 10\n    \n    # Assign a score based on the ratio of the item size to the remaining capacity of the bins,\n    # multiplied by the penalty factor for bins with larger remaining capacity\n    scores[remaining_capacity > 0] = item / remaining_capacity[remaining_capacity > 0] * penalty_factor[remaining_capacity > 0]\n    \n    return scores",
-          "objective": 0.04145,
-          "other_inf": null
-     }
-]

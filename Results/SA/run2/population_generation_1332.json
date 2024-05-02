@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin by taking the product of the bin's rest capacity divided by the item size plus one, subtracting the bin's rest capacity divided by the item size, and multiplying it by the sum of the bin's rest capacity divided by the item size plus one.",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    score_diff = (bins / (item + 1)) - (bins / item)  # Step 1\n    scores = score_diff * ((bins / item) + 1)  # Step 2\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm involves dividing the remaining capacity of each bin by a modified maximum remaining capacity, multiplying it by a weight factor incorporating the ratio between the item size and the bin capacity, adding a penalty term to the score that penalizes bins with large remaining capacities, and finally applying a non-linear transformation to the scores to encourage better discrimination between bins with similar scores.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the remaining capacity\n    remaining_capacity = bins - item\n\n    # Get the maximum remaining capacity\n    max_remaining_capacity = np.max(remaining_capacity)\n\n    # Calculate the scores for each bin with the penalty term\n    penalty_factor = 0.5\n    scores = (remaining_capacity / (max_remaining_capacity + 1)) * (item / bins) + (max_remaining_capacity - remaining_capacity) / penalty_factor\n    \n    # Apply a non-linear transformation to the scores\n    scores = np.log1p(scores) / np.log(2)\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

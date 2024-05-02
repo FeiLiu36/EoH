@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description: The modified algorithm calculates the scores for the bins by taking the sum of the remaining capacities of the bins after assigning the item, dividing it by the item size, multiplying it by a weight factor, and subtracting a penalty value based on the square root scaling of the capacities.\n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \n    # Calculate the remaining capacities of the bins after assigning the item\n    remaining_capacity = bins - item\n    \n    # Calculate the scores for the bins based on the ratio of sum of remaining capacities to item size\n    scores = (np.sum(remaining_capacity) / item) * 0.1 - np.sqrt(remaining_capacity)\n    \n    # Set the scores of bins that are not used to a large negative value\n    scores[remaining_capacity >= bins] = -np.inf\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

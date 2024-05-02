@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm Description: \n\nThe new algorithm aims to assign higher scores to bins that have a higher capacity remaining after the item is assigned, encouraging the use of bins with more available space. The algorithm calculates the scores based on the reciprocal of the squared differences between the bin capacities and the item size, and also takes into account the sum of the squares of the remaining capacities.\n\nCode:\n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    num_bins = len(bins)\n    \n    # Calculate the squared difference between the bin capacities and the item size\n    diff_sqr_capacity_item = np.square(bins - item)\n    \n    # Calculate the reciprocal of the squared differences\n    reciprocal_sqr_diff_capacity_item = 1 / diff_sqr_capacity_item\n    \n    # Calculate the sum of the squares of the remaining capacities\n    sum_sqr_rest_capacities = np.sum(np.square(bins))\n    \n    # Calculate the scores based on the modified formula\n    scores = reciprocal_sqr_diff_capacity_item + sum_sqr_rest_capacities\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

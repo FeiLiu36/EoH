@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm is a modified version of the original algorithm. It calculates the score for each bin by dividing the remaining capacity by the maximum capacity and then multiplying it by a penalty factor that increases as the remaining capacity decreases. The penalty factor is calculated using a power function. The algorithm also penalizes bins with large remaining capacities by subtracting a penalty term, which is determined by the difference between the remaining capacity and the minimum remaining capacity.\n\nHere's the implementation of the new algorithm in Python:\n\n```",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the remaining capacity\n    remaining_capacity = bins - item\n\n    # Calculate the penalty factor using a power function\n    penalty_factor = remaining_capacity ** 2 / np.max(bins) ** 2\n\n    # Calculate the penalty term to penalize bins with large remaining capacities\n    penalty_term = (remaining_capacity - np.min(remaining_capacity)) / np.ptp(remaining_capacity)\n\n    # Initialize an array to store the scores\n    scores = np.zeros_like(bins)\n\n    # Calculate the scores for each bin\n    scores[bins >= item] = remaining_capacity[bins >= item] / np.max(bins) * penalty_factor[bins >= item] - penalty_term[bins >= item]\n\n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

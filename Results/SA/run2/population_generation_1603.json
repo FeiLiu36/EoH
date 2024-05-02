@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New algorithm description: The new algorithm assigns scores to each bin based on the square root of the ratio between the bin capacity and the item size, multiplied by the logarithm of the bin capacity, squared, divided by the absolute difference between the bin capacity and the item size.\n\nCode:\n\n```\n",
-          "code": "import numpy as np\nimport math\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the scores for the bins\n    scores = np.sqrt(bins / item) * (np.log(bins) ** 2) / np.abs(bins - item)\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

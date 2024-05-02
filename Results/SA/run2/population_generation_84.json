@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "\nNew algorithm description: In the modified algorithm, I am assigning a score to each bin based on a combination of factors such as the ratio of remaining capacity to item size, the distance of the remaining capacity from the average remaining capacity, and the maximum capacity of each bin. The algorithm also includes a step to sort the bins based on their scores in descending order before returning the scores.\n\nPython implementation:\n",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity_ratio = bins / item\n    average_remaining_capacity = np.mean(bins)\n    deviation = np.abs(bins - average_remaining_capacity)\n    deviation_penalty = deviation / average_remaining_capacity\n    maximum_capacity_penalty = np.where(bins == np.max(bins), 1, 0)\n    scores = remaining_capacity_ratio - deviation_penalty - maximum_capacity_penalty\n    \n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

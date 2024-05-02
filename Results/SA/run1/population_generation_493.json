@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm: Polynomial Score Algorithm",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"\n    The new algorithm calculates the scores as a polynomial function of item size / rest capacity,\n    where the polynomial degree is based on the maximum capacity of bins.\n    \"\"\"\n    \n    # Determine the maximum capacity of bins\n    max_capacity = np.amax(bins)\n\n    # Calculate the scores as a polynomial function of item size / rest capacity\n    scores = np.power((item / bins), max_capacity)\n\n    # Normalize the scores by dividing them by the sum of all scores\n    scores /= np.sum(scores)\n\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm assigns a score to each bin based on three factors: the ratio of remaining capacity to the item size, the difference between the remaining capacity and the maximum capacity, and the square root of the average remaining capacity. The bins are then sorted based on their scores in descending order before returning the scores.\n\nHere is the Python implementation of the new algorithm:\n\n```",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity_ratio = bins / item\n    maximum_capacity_distance = np.abs(bins - np.max(bins))\n    average_remaining_capacity = np.mean(bins)\n    \n    scores = remaining_capacity_ratio - maximum_capacity_distance + np.sqrt(average_remaining_capacity)\n    \n    sorted_indices = np.argsort(scores)[::-1]\n    scores = scores[sorted_indices]\n    \n    return scores",
-          "objective": 0.04226,
-          "other_inf": null
-     }
-]

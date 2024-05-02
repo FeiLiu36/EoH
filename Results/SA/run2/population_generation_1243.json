@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "New Algorithm Description:\n\nThe new algorithm calculates the scores for each bin based on the following steps:\n1. Multiply each bin's rest capacity by a constant factor.\n2. Divide the item size by the multiplied values.\n3. Apply the exponential function to the divided values.\n4. Subtract a constant value from the exponential outputs.\n5. Return the calculated scores for each bin.\n\nCode:\n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    multiplied_values = bins * 2 # Step 1\n    divided_values = item / multiplied_values # Step 2\n    exponential_outputs = np.exp(divided_values) # Step 3\n    adjusted_outputs = exponential_outputs - 0.2 # Step 4\n    scores = adjusted_outputs # There is no multiplication in Step 5\n    \n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

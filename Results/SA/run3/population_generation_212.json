@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the scores for each bin based on a combination of sigmoid and exponential functions, assigning higher scores to bins with less remaining capacity and larger item sizes while penalizing bins with more remaining capacity and smaller item sizes. The algorithm further penalizes bins with extremely low remaining capacity or extremely large item sizes, as well as bins with extreme differences between the remaining capacity and item size.\n\n```",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n\n    capacity_score = 1 / (1 + np.exp(-(remaining_capacity / item)))\n    capacity_exponential_difference = np.abs(np.exp(remaining_capacity / item) - np.exp(1 / (remaining_capacity / item)))\n    capacity_difference_penalty = np.maximum(((remaining_capacity - item) / item)**2, 0)\n\n    size_score = 1 / (1 + np.exp(-(item / remaining_capacity)))\n    size_exponential_difference = np.abs(np.exp(item / remaining_capacity) - np.exp(1 / (item / remaining_capacity)))\n    size_difference_penalty = np.maximum(((item - remaining_capacity) / remaining_capacity)**2, 0)\n\n    scores = np.where(remaining_capacity >= item, np.full_like(remaining_capacity, 1e9),\n                     capacity_score + capacity_exponential_difference + capacity_difference_penalty +\n                     size_score + size_exponential_difference + size_difference_penalty)\n\n    return scores",
-          "objective": 0.01268,
-          "other_inf": null
-     }
-]

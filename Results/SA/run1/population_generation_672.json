@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the scores for the bins by multiplying the inverse of their remaining capacity divided by the item size with a penalty factor, subtracts the minimum value across all bins from the obtained scores, and finally normalizes the scores by dividing them by the sum of all scores.\n\nHere is the modified implementation of the score function:\n\n```",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    \"\"\"Create a new algorithm that calculates the scores for the bins\n    by multiplying the inverse of their remaining capacity divided by the item size\n    with a penalty factor, subtracts the minimum value across all bins from the obtained scores,\n    and finally normalizes the scores by dividing them by the sum of all scores.\"\"\"\n\n    # Calculate the inverse of the remaining capacity divided by the item size\n    inv_capacity = 1 / (bins.astype(float) / item)\n\n    # Define the penalty factor\n    penalty_factor = 0.5\n\n    # Multiply the inverse capacity by the penalty factor\n    scores = inv_capacity * penalty_factor\n\n    # Subtract the minimum value across all bins from the scores\n    scores -= np.min(scores)\n\n    # Normalize the scores by dividing them by the sum of all scores\n    scores /= np.sum(scores)\n\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

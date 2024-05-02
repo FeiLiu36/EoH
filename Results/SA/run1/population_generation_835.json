@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the scores for bin assignment by taking the logarithm of the item size divided by the rest capacity of the bins, and multiplying it with a scaling factor that is equal to the logarithm of the maximum bin capacity divided by the item size. The scores are then sorted in descending order.\n\nHere is the implementation of the new score function:\n\n",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    log_ratio = np.log(item / bins)\n    scaling_factor = np.log(max_capacity) / np.log(item)\n    \n    scores = log_ratio * scaling_factor\n    sorted_scores = np.sort(scores)[::-1]\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

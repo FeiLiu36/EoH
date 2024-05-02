@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin by dividing the remaining capacity of the bin by the size of the item, adding 1 to the result, and then taking the reciprocal. The scores are returned as a Numpy array.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (1 / (bins / item + 1)).astype(float)\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]

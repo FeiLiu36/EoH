@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "Algorithm description: \"Weighted Capacity Difference Score Algorithm\" assigns scores to the bins based on a weighted version of the capacity-difference score formula that takes into account the maximum capacity among the bins, the average capacity of the bins, and the difference between the remaining capacity of each bin and the average capacity, in order to prioritize both bins with larger remaining capacities and at the same time minimize the number of used bins by penalizing bins that have a remaining capacity far below the average capacity.\n\nCode:\n\n",
-          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    # Calculate the remaining capacities of the bins\n    remaining_capacity = bins - item\n\n    # Calculate the maximum capacity among the bins\n    max_capacity = np.max(bins)\n\n    # Calculate the average capacity of the bins\n    avg_capacity = np.mean(bins)\n\n    # Calculate the difference between the remaining capacity of each bin and the average capacity\n    diff_capacity = remaining_capacity - avg_capacity\n\n    # Calculate the weight for each bin based on the difference in capacities\n    weights = np.exp(-diff_capacity)\n\n    # Calculate the score based on the weighted capacity differences and the maximum capacity\n    scores = np.exp(remaining_capacity - max_capacity) * weights\n\n    # Minimize the score of bins with remaining capacity equal to the maximum capacity\n    scores[bins == max_capacity] = -np.inf\n\n    return scores",
-          "objective": 0.0485,
-          "other_inf": null
-     }
-]

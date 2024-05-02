@@ -1,8 +1,0 @@
-[
-     {
-          "algorithm": "The new algorithm calculates the score for each bin by multiplying the item size raised to the power of 4 by the rest capacity of the bin divided by the maximum bin capacity, and multiplying it by a constant factor of 1000000. In the end, the algorithm subtracts the square of the item size from all the calculated scores to prioritize bins with higher rest capacity for assignment.",
-          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    rest_capacity = max_capacity - bins\n    scores = (item**4) * (rest_capacity / max_capacity) * 1000000\n    scores -= item**2\n    return scores",
-          "objective": 0.03984,
-          "other_inf": null
-     }
-]
