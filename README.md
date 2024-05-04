@@ -67,10 +67,11 @@ If you find EoH helpful for your research or applied projects:
 }
 ```
 
-If you are interested on LLM&Opt or EoH, you can:
+If you are interested on LLM4Opt or EoH, you can:
 
 1) Contact us through email fliu36-c@my.cityu.edu.hk.
-1) Join Wechat Group
+2) Visit [a collection of references and research papers on LLM4Opt](https://github.com/FeiLiu36/LLM4Opt)
+3) Join our Group (coming soon)
 
 If you encounter any difficulty using the code, you can contact us through the above or submit an [issue] 
 
@@ -210,7 +211,7 @@ A Step-by-step guide is provided in [here](./docs/QuickGuide.md) (coming soon)
 
 
 ## Related Works on LLM4Opt
-coming soon
+Welcome to visit [a collection of references and research papers on LLM4Opt](https://github.com/FeiLiu36/LLM4Opt)
 
 
 ## License
