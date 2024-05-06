@@ -39,6 +39,12 @@ A Platform for **Evolutionary Computation** + **Large Language Model** for autom
 
 <img src="./docs/figures/eoh.JPG" alt="eoh" width="600" height="280">
 
+---
+**< News >**
+2024.5.2 EoH (Evolution of Heuristics: Towards Efficient Automatic Algorithm Design using Large Language Model) has been accepted at the [ICML 2024]! 🎉
+
+---
+
 ## Introduction
 
 
