@@ -221,6 +221,4 @@ A Step-by-step guide is provided in [here](./docs/QuickGuide.md) (coming soon)
 Welcome to visit [a collection of references and research papers on LLM4Opt](https://github.com/FeiLiu36/LLM4Opt)
 
 
-## License
-
-MIT
+## Contributors
