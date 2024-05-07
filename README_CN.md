@@ -71,6 +71,7 @@ EOH在分钟/小时内设计出了非常有竞争力的算法/启发式方法。
     year={2024},
     url={https://arxiv.org/abs/2401.02051}
 }
+```
 
 如果您对LLM4Opt或EoH感兴趣，您可以：
 
@@ -86,76 +87,106 @@ EOH在分钟/小时内设计出了非常有竞争力的算法/启发式方法。
 + numpy
 + joblib
 
-EoH示例用法
+## EoH示例用法
 第1步：安装EoH
-我们建议在具有python>=3.10的conda环境中安装和运行EoH
+我们建议在具有python>=3.10的[conda](https://conda.io/projects/conda/en/latest/index.html)环境中安装和运行EoH
 
+```bash
 cd eoh
 
 pip install .
+```.
  
 第2步：尝试示例：
-在开始前设置您的端点和密钥以远程LLM或在启动之前设置您的本地LLM！
-
+**在开始前设置您的端点和密钥以远程LLM或在启动之前设置您的本地LLM！**
+```python
 from eoh import eoh
 from eoh.utils.getParas import Paras
 
-# 参数初始化 #
+# Parameter initilization #
 paras = Paras() 
 
-# 设置参数 #
+# Set parameters #
 paras.set_paras(method = "eoh",    # ['ael','eoh']
                 problem = "bp_online", #['tsp_construct','bp_online']
-                llm_api_endpoint = "xxx", # 设置您的LLM端点
-                llm_api_key = "xxx",   # 设置您的LLM密钥
+                llm_api_endpoint = "xxx", # set your LLM endpoint
+                llm_api_key = "xxx",   # set your LLM key
                 llm_model = "gpt-3.5-turbo-1106",
-                ec_pop_size = 5, # 每个种群中的样本数量
-                ec_n_pop = 5,  # 种群数量
-                exp_n_proc = 4,  # 多核并行
+                ec_pop_size = 5, # number of samples in each population
+                ec_n_pop = 5,  # number of populations
+                exp_n_proc = 4,  # multi-core parallel
                 exp_debug_mode = False)
 
-# 初始化
+# initilization
 evolution = eoh.EVOL(paras)
 
-# 运行
+# run 
 evolution.run()
+```
+
  
-示例1：旅行商问题的构造算法
+###### 示例1：旅行商问题的构造算法
+```bash
 cd examples/tsp_construct
 
 python runEoH.py
+```
+
  
-示例2：在线装箱问题
+###### 示例2：在线装箱问题
 （在您的个人计算机上在30分钟内生成新的最佳启发式方法并击败Funsearch！ i7-10700 2.9Ghz, 32GB）
 
+```bash
 cd examples/bp_online
 
 python runEoH.py
+```
  
-示例3：使用EoH解决您的本地问题
+###### 示例3：使用EoH解决您的本地问题
+```bash
 cd examples/local_problem
 
 python runEoH.py
+```
  
-使用EoH平台的更多示例（代码和论文）
-组合优化
-在线装箱问题，贪婪启发式方法，代码, [论文]
-旅行商问题，构造启发式方法，代码, [论文]
-旅行商问题，引导式局部搜索，[代码], [论文]
-流水车间调度问题（FSSP），引导式局部搜索，[代码], [论文]
-机器学习
-攻击，[代码], 论文
-贝叶斯优化
-有成本意识的获取函数设计，论文
-数学
-可接受集合
-物理学
-计算流体动力学
-在您的应用程序中使用EoH
+### 使用EoH平台的更多示例（代码和论文）
+#### 组合优化
++ 在线装箱问题 (BP)，贪婪启发式方法，代码, [论文]
++ 旅行商问题 (TSP)，构造启发式方法，代码, [论文]
++ 旅行商问题 (TSP)，引导式局部搜索，[代码], [论文]
++ 流水车间调度问题（FSSP），引导式局部搜索，[代码], [论文]
+#### 机器学习
++ 图像攻击，[代码], [论文](https://arxiv.org/abs/2401.15335)
+#### 贝叶斯优化
++ 获取函数自动设计，[论文](https://arxiv.org/abs/2404.16906)
+#### 数学
++ 可接受集合
+#### 物理学
++ 计算流体动力学
+
+## 在您的应用程序中使用EoH
 提供了这里的逐步指南（即将推出）
 
-LLMs
-1) 远程LLM + API（例如，GPT3.5，GPT4）（推荐！）： + OpenAI官方API。 + 其他API： + https://yukonnet.site/ + https://github.com/chatanywhere/GPT_API_free + https://www.api2d.com/ 2) 本地LLM部署 + API（例如，Llamacode，instruct Llama，gemma，deepseek等）： + 第1步：下载Huggingface模型，例如，下载gemma-2b-it（git clone https://huggingface.co/google/gemma-2b-it） + 第2步： + cd llm_server + python gemma_instruct_server.py + 第3步：将运行服务器生成的url复制到request.py（例如，将url='http://127.0.0.1:11012/completions'设置为测试您的服务器部署)。 + 第4步：将运行服务器生成的url复制到您的示例中的runAEL.py中（例如，将url='http://127.0.0.1:11012/completions'设置该项）。 + 第5步：Python runAEL.py 3) 您的实现： + 如果您想使用其他LLM或自己的GPT API或本地LLMs，请在ael/llm中添加您的接口
+## 大模型设置
+1) 远程LLM + API（例如，GPT3.5，GPT4）（推荐！）：
++ OpenAI官方API。
++ 其他API：
+  + https://yukonnet.site/ (Llama, Llamacode, Gemini Pro, 等)
+  + https://github.com/chatanywhere/GPT_API_free
+  + https://www.api2d.com/
+2) 本地LLM部署 + API（例如，Llamacode，instruct Llama，gemma，deepseek等）：
++ 第1步：下载Huggingface模型，例如，下载gemma-2b-it（git clone https://huggingface.co/google/gemma-2b-it）
++ 第2步： + cd llm_server + python gemma_instruct_server.py
++ 第3步：将运行服务器生成的url复制到request.py（例如，将url='http://127.0.0.1:11012/completions'设置为测试您的服务器部署)。
++ 第4步：将运行服务器生成的url复制到您的示例中的runAEL.py中（例如，将url='http://127.0.0.1:11012/completions'设置该项）。
++ 第5步：Python runAEL.py
+3) 自己的实现：
++ 如果您想使用其他LLM或自己的GPT API或本地LLMs，请在ael/llm中添加您的接口
 
-关于LLM4Opt的相关工作
-欢迎访问LLM4Opt上的参考文献和研究论文收藏
+## 关于LLM4Opt的相关工作
+欢迎访问[大模型与优化参考文献和研究论文收藏](https://github.com/FeiLiu36/LLM4Opt)
+
+## 贡献者
+
+
+
