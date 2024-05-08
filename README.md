@@ -66,7 +66,7 @@ If you find EoH helpful for your research or applied projects:
 
 ```bibtex
 @inproceedings{fei2024eoh,
-    title={Evolution of Heuristics: Towards Efficient Automatic Algorithm Design Using Large Language Mode},
+    title={Evolution of Heuristics: Towards Efficient Automatic Algorithm Design Using Large Language Model},
     author={Fei Liu, Xialiang Tong, Mingxuan Yuan, Xi Lin, Fu Luo, Zhenkun Wang, Zhichao Lu, Qingfu Zhang},
     booktitle={ICML},
     year={2024},
