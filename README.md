@@ -37,7 +37,7 @@ A Platform of Evolutionary Computation (EC) + Large Language Model (LLM) for Eff
 
 A Platform for **Evolutionary Computation** + **Large Language Model** for automatic algorithm design.
 
-<img src="./docs/figures/eoh.JPG" alt="eoh" width="600" height="280">
+<div align=center><img src="./docs/figures/eoh.JPG" alt="eoh" width="600" height="280">
 
 ---
 **< News >**
@@ -54,11 +54,15 @@ Heuristics are indispensable for tackling complex search and optimization proble
 
 EOH introduces a novel paradigm that leverages the synergy between Large Language Models (LLMs) and Evolutionary Computation (EC) for Automatic Heuristic Design (AHD). The coevolution of thoughts and codes within an evolutionary framework offers superior AHD performance while mitigating computational expenses. 
 
+<div align=center><img src="./docs/figures/framework.jpg" alt="eoh" width="500" height="auto">
+
+
+
 EOH design very competetive algorithm/heuristic in minuts/hours.  Notably, It surpasses FunSearch, identifying superior heuristics with significantly fewer computational budgets (i.e., queries to LLMs) on online bin packing problem.
 
 Following Figure shows the Evolution of EOH on the online bin packing problem. We outline the key **thoughts** and the corresponding **code** **snippets** that have contributed to the best results during evolution. Additionally, we mark the prompt strategies that result in improvement. Finally, we present the optimal heuristic in the final population and compare it to the heuristics designed by humans and from FunSearch.
 
-<img src="./docs/figures/evolution.jpg" alt="ael" width="1000" height="auto">
+<img src="./docs/figures/evolution.jpg" alt="eoh" width="1000" height="auto">
 
 
 
