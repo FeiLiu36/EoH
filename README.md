@@ -37,7 +37,8 @@ A Platform of Evolutionary Computation (EC) + Large Language Model (LLM) for Eff
 
 A Platform for **Evolutionary Computation** + **Large Language Model** for automatic algorithm design.
 
-<div align=center><img src="./docs/figures/eoh.JPG" alt="eoh" width="600" height="280">
+<img src="./docs/figures/eoh.JPG" alt="eoh" width="600" height="280" div align=center>
+
 
 ---
 **< News >**
@@ -54,7 +55,8 @@ Heuristics are indispensable for tackling complex search and optimization proble
 
 EOH introduces a novel paradigm that leverages the synergy between Large Language Models (LLMs) and Evolutionary Computation (EC) for Automatic Heuristic Design (AHD). The coevolution of thoughts and codes within an evolutionary framework offers superior AHD performance while mitigating computational expenses. 
 
-<div align=center><img src="./docs/figures/framework.jpg" alt="eoh" width="500" height="auto">
+<img src="./docs/figures/framework.jpg" alt="eoh" width="500" height="auto" div align=center>
+
 
 
 
