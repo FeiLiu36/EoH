@@ -207,7 +207,8 @@ A Step-by-step guide is provided in [here](./docs/QuickGuide.md) (coming soon)
 ## LLMs
 
 1) Remote LLM + API (e.g., GPT3.5, GPT4) (**Recommended !**):
-   + OpenAI official API.
+   + OpenAI API.
+   + [Deepseek API](https://platform.deepseek.com/)
    + Other APIs: 
      + https://yukonnet.site/
      + https://github.com/chatanywhere/GPT_API_free
