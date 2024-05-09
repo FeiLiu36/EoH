@@ -206,7 +206,7 @@ A Step-by-step guide is provided in [here](./docs/QuickGuide.md) (coming soon)
 
 ## LLMs
 
-1) Remote LLM + API (e.g., GPT3.5, GPT4) (**Recommended !**):
+1) Remote LLM + API (e.g., GPT3.5, Deepseek, Gemini Pro) (**Recommended !**):
    + OpenAI API.
    + [Deepseek API](https://platform.deepseek.com/)
    + Other APIs: 
