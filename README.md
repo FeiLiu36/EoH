@@ -113,7 +113,9 @@ pip install .
 
 #### Step 2: Try Example: 
 
-**<span style="color: red;">Setup your Endpoint and Key for remote LLM or Setup your local LLM before start !</span>**  
+**<span style="color: red;">Setup your Endpoint and Key for remote LLM or Setup your local LLM before start !</span>** 
+
+For example, set the llm_api_endpoint to "api.deepseek.com", set llm_api_key to "your key", and set llm_model to "deepseek-chat".
 
 ```python
 from eoh import eoh
