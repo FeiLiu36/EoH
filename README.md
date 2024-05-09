@@ -41,13 +41,13 @@ A Platform for **Evolutionary Computation** + **Large Language Model** for autom
 
 
 ---
-**< News >**
+**< News >**🔥 
 
 2024.5.2 [EoH (Evolution of Heuristics: Towards Efficient Automatic Algorithm Design using Large Language Model)](https://arxiv.org/abs/2401.02051) has been accepted at the [**ICML 2024**]! 🎉
 
 ---
 
-## Introduction
+## Introduction 📖
 
 
 
@@ -99,7 +99,7 @@ If you encounter any difficulty using the code, you can contact us through the a
 
 
 
-## EoH Example Usage
+## EoH Example Usage 💻 
 
 #### Step 1: Install EoH
 
@@ -204,7 +204,7 @@ A Step-by-step guide is provided in [here](./docs/QuickGuide.md) (coming soon)
 
 
 
-## LLMs
+## LLMs 
 
 1) Remote LLM + API (e.g., GPT3.5, Deepseek, Gemini Pro) (**Recommended !**):
    + OpenAI API.
