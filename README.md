@@ -231,5 +231,4 @@ Welcome to visit [a collection of references and research papers on LLM4Opt](htt
 
 
 ## Contributors
-<img src="https://github.com/RayZhhh.png" width="60" div align=center>
- [Rui Zhang](https://github.com/RayZhhh)
+<img src="https://github.com/RayZhhh.png" width="60" div align=center> [Rui Zhang](https://github.com/RayZhhh)
