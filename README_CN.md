@@ -102,7 +102,8 @@ pip install .
  
 第2步：尝试示例：
 **在开始前设置您的端点和密钥以远程LLM或在启动之前设置您的本地LLM！**
-例如： 把 llm_api_endpoint 设置为 "api.deepseek.com", 把 llm_api_key 设置为 "your key",把 llm_model 设置为 "deepseek-chat".
+
+**例如： 把 llm_api_endpoint 设置为 "api.deepseek.com", 把 llm_api_key 设置为 "your key",把 llm_model 设置为 "deepseek-chat".**
 ```python
 from eoh import eoh
 from eoh.utils.getParas import Paras
