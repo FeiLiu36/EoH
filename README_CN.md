@@ -173,8 +173,9 @@ python runEoH.py
 提供了这里的逐步指南（即将推出）
 
 ## 大模型设置
-1) 远程LLM + API（例如，GPT3.5，GPT4）（推荐！）：
-+ OpenAI官方API。
+1) 远程LLM + API（例如， GPT3.5, Deepseek, Gemini Pro) （推荐！）：
++ OpenAI API。
++ [Deepseek API](https://platform.deepseek.com/)
 + 其他API：
   + https://yukonnet.site/ (Llama, Llamacode, Gemini Pro, 等)
   + https://github.com/chatanywhere/GPT_API_free
