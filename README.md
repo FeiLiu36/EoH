@@ -86,7 +86,7 @@ If you are interested on LLM4Opt or EoH, you can:
 2) Visit [a collection of references and research papers on LLM4Opt](https://github.com/FeiLiu36/LLM4Opt)
 3) Join our Group (coming soon)
 
-If you encounter any difficulty using the code, you can contact us through the above or submit an [issue] 
+If you encounter any difficulty using the code, you can contact us through the above or submit an [issue](https://github.com/FeiLiu36/EoH/issues)
 
 
 
