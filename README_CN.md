@@ -40,9 +40,10 @@ EoH: Evolution of Heuristics
 <img src="./docs/figures/eoh.JPG" alt="eoh" width="600" height="280">
 
 ---
-**< 新闻 >**
+##  新闻  🔥 
 
-2024.5.2 [EoH（启发式算法的演变：利用大型语言模型实现高效自动算法设计）](https://arxiv.org/abs/2401.02051) 已被 [**ICML 2024**]录用了！🎉
++ 2024.5.5 [L-AutoDA: Leveraging Large Language Models for Automated Decision-based Adversarial Attacks](https://arxiv.org/abs/2401.15335) 已被 **GECCO 2024** 录用了! 🎉
++ 2024.5.2 [EoH (Evolution of Heuristics: Towards Efficient Automatic Algorithm Design using Large Language Model)](https://arxiv.org/abs/2401.02051) 已被 **ICML 2024** 录用了！🎉
 
 ---
 
