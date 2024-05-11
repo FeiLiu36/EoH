@@ -54,7 +54,7 @@ EoH: Evolution of Heuristics
 
 EOH引入了一种新的范式，利用大型语言模型（LLMs）和演变计算（EC）之间的协同作用进行自动启发式设计（AHD）。思维和代码在演变框架内的共同演化为卓越的AHD性能，同时降低了计算成本。
 
-<img src="./docs/figures/evolution.jpg" alt="eoh" width="1000" height="auto">
+<img src="./docs/figures/framework.jpg" alt="eoh" width="1000" height="auto">
 
 EOH在分钟/小时内设计出了非常有竞争力的算法/启发式方法。例如，在在线装箱问题上，EoH自动设计出新的最优启发式算法，优于人工设计算法和同期谷歌工作FunSearch。
 
