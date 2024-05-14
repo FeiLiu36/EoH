@@ -150,6 +150,15 @@ evolution.run()
 cd examples/tsp_construct
 
 python runEoH.py
+
+```
+**Evaluation**
+```bash
+cd examples/tsp_construct/evaluation
+
+copy your heuristic to heuristic.py (Note that the function name/input/output must align with the evaluation block!!)
+
+python runEval.py
 ```
 
 ###### Example 2: Online Bin Packing 
@@ -159,6 +168,14 @@ python runEoH.py
 cd examples/bp_online
 
 python runEoH.py
+```
+**Evaluation**
+```bash
+cd examples/bp_online/evaluation
+
+copy your heuristic to heuristic.py (Note that the function name/input/output must align with the evaluation block!!)
+
+python runEval.py
 ```
 
 ###### Example 3: Use EoH solve your local problem 
