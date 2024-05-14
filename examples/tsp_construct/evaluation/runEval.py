@@ -1,3 +1,12 @@
+# -------
+# Evaluaiton code for EoH on TSP
+#--------
+# More results may refer to 
+# Liu, Fei, Xialiang Tong, Mingxuan Yuan, and Qingfu Zhang.
+# "Algorithm evolution using large language model." 
+# arXiv preprint arXiv:2311.15249 (2023).
+
+
 from evaluation import Evaluation
 import pickle
 import time
@@ -5,7 +14,7 @@ import time
 debug_mode = False
 # problem_size = [10,20,50,100,200]
 problem_size = [20,50,100]
-n_test_ins = 100
+n_test_ins = 64
 print("Start evaluation...")
 with open("results.txt", "w") as file:
     for size in problem_size:
