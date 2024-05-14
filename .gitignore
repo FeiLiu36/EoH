@@ -1,0 +1,17 @@
+**/__pycache__
+**/build/
+*.egg-info/
+*.egg
+*.pyc
+.DS_Store
+.vscode/
+output.log
+logs/
+.idea
+mytest.py
+ignore/
+admissible_set/
+bin_packing_or/
+bin_packing_weibull/
+gls_tsp/
+mmlu_eval/
