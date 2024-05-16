@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "The new algorithm assigns an item to the bin with the maximum score, which is calculated as the logarithm of the bin's current capacity divided by the bin's capacity minus the item size, multiplied by the bin's current capacity divided by the number of times the bin has been used, and raised to the power of the square root of the bin's current capacity minus the item size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.log(bins / (bins - item)) * (bins / np.arange(1,len(bins)+1))**(np.sqrt(bins - item))\n    return scores",
+          "objective": 0.00714,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns an item to the bin with the maximum score, which is calculated as the sum of the logarithm of the bin's current capacity divided by the bin's capacity minus the item size, multiplied by the square root of the bin's current capacity divided by the number of times the bin has been used, and raised to the power of the bin's current capacity minus the item size, squared and multiplied by a weight value, which is the difference between the maximum capacity of the bins and the average capacity of the bins, squared multiplied by a factor of 5, divided by the number of items already assigned to bins.\n\n```\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_items = len(bins)\n    weight = 5 * ((bins.max() - bins.mean()) ** 2) / num_items\n    scores = np.log(bins / (bins - item)) * np.sqrt(bins / np.arange(1, num_items + 1))**(bins - item)**2 * weight\n    return scores",
+          "objective": 0.00724,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns an item to the bin with the maximum score, which is calculated as the sum of the bin's current capacity divided by the bin's capacity plus the item size, multiplied by the bin's current capacity divided by the number of times the bin has been used, and raised to the power of the square root of the bin's current capacity minus the item size, all divided by the square root of the bin's current capacity plus one.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins / (bins - item)) * (bins / np.arange(1,len(bins)+1))**(np.sqrt(bins - item)) / (np.sqrt(bins) + 1)\n    return scores",
+          "objective": 0.00755,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns an item to the bin with the maximum score, which is calculated as the product of the bin's current capacity divided by the bin's capacity minus the item size, the bin's current capacity divided by the number of times the bin has been used, raised to the power of the bin's current capacity minus the item size, and the exponential of the bin's current capacity divided by the item size, all multiplied by the sum of the square root of the bin's current capacity divided by the number of items already assigned to bins and the logarithm of the bin's capacity divided by the bin's current capacity minus the item size, all raised to the power of the bin's current capacity minus the item size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_items = len(bins)\n    scores = (bins / (bins - item)) * (bins / np.arange(1, num_items + 1))**(bins - item) * np.exp(bins / item) * ((np.sqrt(bins / num_items) + np.log(bins / (bins - item)))**(bins - item))\n    return scores",
+          "objective": 0.00775,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The common backbone idea in the provided algorithms is to calculate the score for each bin based on its current capacity, the item size, and the number of times the bin has been used.\n\nBased on this backbone idea, the new algorithm assigns an item to the bin with the maximum score, which is calculated as the product of the natural logarithm of the bin's current capacity divided by the bin's capacity plus the item size, multiplied by the bin's current capacity divided by the number of times the bin has been used, raised to the power of the square root of the bin's current capacity minus the item size, all divided by the square root of the bin's current capacity plus one.\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.log((bins / (bins - item)) + item) * ((bins / np.arange(1,len(bins)+1))**(np.sqrt(bins - item))) / (np.sqrt(bins) + 1)\n    return scores",
+          "objective": 0.00785,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns an item to the bin with the maximum score, which is calculated as the product of the bin's current capacity divided by the bin's capacity minus the item size, multiplied by the bin's current capacity divided by the number of times the bin has been used, and raised to the power of the square root of the bin's current capacity minus the item size, all divided by the square root of the bin's current capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins / (bins - item)) * (bins / np.arange(1,len(bins)+1))**(np.sqrt(bins - item)) / np.sqrt(bins)\n    return scores",
+          "objective": 0.00795,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns an item to the bin with the maximum score, which is calculated as the product of the bin's current capacity divided by the bin's capacity minus the item size, and the bin's current capacity divided by the number of times the bin has been used, raised to the power of the square root of the bin's current capacity minus the item size, added to the natural logarithm of the bin's current capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins / (bins - item)) * (bins / np.arange(1,len(bins)+1))**(np.sqrt(bins - item)) + np.log(bins)\n    return scores",
+          "objective": 0.00815,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns an item to the bin with the maximum score, which is calculated as follows: the product of the bin's current capacity divided by the bin's capacity minus the item size, the bin's current capacity divided by the number of times the bin has been used, and raised to the power of the square root of the bin's current capacity minus the item size plus two, multiplied by the square root of the bin's remaining capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins / (bins - item)) * (bins / np.arange(1, len(bins)+1))**np.sqrt(bins - item + 2) * np.sqrt(bins)\n    return scores",
+          "objective": 0.00825,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Algorithm description: The new algorithm assigns an item to the bin with the maximum score, which is calculated as the product of the bin's current capacity divided by the bin's capacity minus the item size, multiplied by the bin's current capacity divided by the number of times the bin has been used, and raised to the power of the square root of the bin's current capacity minus the item size, all divided by the square root of the bin's current capacity, with an additional factor of the item size added to the denominator of the second fraction.\n\nCode:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins / (bins - item)) * (bins / np.arange(1,len(bins)+1))**(np.sqrt(bins - item)) / (np.sqrt(bins) + item / 100)\n    return scores",
+          "objective": 0.00855,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The common backbone idea in the provided algorithms is the calculation of the bin's current capacity divided by the bin's capacity minus the item size, the bin's current capacity divided by the number of times the bin has been used, and raised to a power. \n\nBased on this backbone idea, my new algorithm assigns an item to the bin with the maximum score, which is calculated as the product of the bin's current capacity divided by the bin's capacity minus the item size, the bin's current capacity divided by the number of times the bin has been used, raised to the power of the square root of the bin's current capacity minus the item size, and added to the exponential of the bin's current capacity divided by the bin's capacity minus the item size plus one. \n\nHere is the implementation of the new algorithm in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins / (bins - item)) * (bins / np.arange(1, len(bins)+1))**(np.sqrt(bins - item)) + np.exp(bins / (bins - item + 1))\n    return scores",
+          "objective": 0.00865,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns an item to the bin with the maximum score, which is calculated as the sum of the bin's current capacity divided by the bin's capacity minus the item size, the bin's current capacity divided by the number of times the bin has been used, and raised to the power of the square root of the bin's current capacity minus the item size plus one.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins / (bins - item)) + (bins / np.arange(1,len(bins)+1))**(np.sqrt(bins - item) + 1)\n    return scores",
+          "objective": 0.00936,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns an item to the bin with the maximum score, which is calculated as the product of the bin's current capacity divided by the bin's capacity minus the item size, the bin's current capacity divided by the number of times the bin has been used, and raised to the power of the square root of the bin's current capacity minus the item size plus two.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins / (bins - item)) * (bins / np.arange(1, len(bins)+1))**np.sqrt(bins - item + 2)\n    return scores",
+          "objective": 0.00956,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm description: The new algorithm assigns an item to the bin with the maximum score, which is calculated as the product of the bin's current capacity divided by the bin's capacity minus the item size, multiplied by the bin's current capacity divided by the number of times the bin has been used, raised to the power of the square root of the bin's current capacity minus the item size, divided by the square root of the bin's current capacity, and with an additional factor of the square root of the item size subtracted from the denominator of the second fraction.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins / (bins - item)) * (bins / np.arange(1,len(bins)+1))**(np.sqrt(bins - item)) / (np.sqrt(bins) - np.sqrt(item))\n    return scores",
+          "objective": 0.00986,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns an item to the bin with the maximum score, which is calculated as the sum of the cosines of the bin's current capacity divided by the bin's capacity minus the item size, multiplied by the natural logarithm of the bin's current capacity divided by the number of times the bin has been used, and raised to the power of the bin's current capacity minus the item size, squared and added to the bin's current capacity itself.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.cos(bins / (bins - item)) + np.log(bins / np.arange(1,len(bins)+1))**(bins - item)**2 + bins\n    return scores",
+          "objective": 0.00996,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns an item to the bin with the maximum score, which is calculated as the product of the logarithm of the bin's current capacity divided by the bin's capacity minus the item size, the bin's current capacity divided by the number of times the bin has been used, and raised to the power of the square root of the bin's current capacity minus the item size plus one.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.log(bins / (bins - item)) * (bins / np.arange(1,len(bins)+1))**(np.sqrt(bins - item) + 1)\n    return scores",
+          "objective": 0.01016,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The common backbone idea in the provided algorithms is to calculate the score for each bin based on its current capacity, the item size, and the number of times the bin has been used. \n\nBased on this backbone idea, my new algorithm assigns an item to the bin with the maximum score, which is calculated as the product of the bin's current capacity divided by the bin's capacity minus the item size, the bin's current capacity divided by the number of times the bin has been used, and raised to the power of the square root of the bin's capacity minus the item size plus three. \n\nHere is the implementation of the new algorithm in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins / (bins - item)) * (bins / np.arange(1, len(bins)+1))**(np.sqrt(bins - item + 3))\n    return scores",
+          "objective": 0.01026,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns an item to the bin with the maximum score, which is calculated as the sum of the bin's current capacity multiplied by the exponential of the bin's capacity minus the item size, all raised to the power of the square root of the logarithm of the bin's capacity divided by the bin's current capacity minus the item size, and divided by the number of times the bin has been used plus one.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins * np.exp(bins - item))**np.sqrt(np.log(bins / (bins - item)) / (np.arange(1, len(bins) + 1) + 1))\n    return scores",
+          "objective": 0.01056,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns an item to the bin with the maximum score, calculated as the product of the current capacity of the bin divided by the item size, plus the square root of the number of times the bin has been used, all raised to the power of the natural logarithm of the bin's capacity divided by the difference between the item size and the bin's capacity, and then multiplied by a weight value.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.exp(np.log(bins) / (item - bins) * (np.sqrt(np.arange(1, len(bins) + 1)) + bins / item))\n    return scores",
+          "objective": 0.01067,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The common backbone idea in the provided algorithms is to calculate a score for each bin based on the bin's current capacity and other factors, such as the number of times the bin has been used and the item's size.}\n\n{My new algorithm assigns an item to the bin with the maximum score, which is calculated as the sine of the bin's current capacity divided by the bin's capacity minus the item size, multiplied by the exponential of the bin's current capacity divided by the number of times the bin has been used, and raised to the power of the bin's current capacity minus the item size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.sin(bins / (bins - item)) * np.exp(bins / np.arange(1,len(bins)+1))**(bins - item)\n    return scores",
+          "objective": 0.01077,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns an item to the bin with the maximum score, which is calculated as the product of the logarithm of the bin's current capacity divided by the bin's capacity plus the item size, and the logarithm of the exponential of the bin's current capacity divided by the number of times the bin has been used, raised to the power of the bin's current capacity minus the item size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.log(bins / (bins - item)) * np.log(np.exp(bins / np.arange(1,len(bins)+1)))**(bins - item)\n    return scores",
+          "objective": 0.01087,
+          "other_inf": null
+     }
+]

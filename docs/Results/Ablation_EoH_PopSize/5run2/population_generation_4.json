@@ -1,0 +1,32 @@
+[
+     {
+          "algorithm": "The new algorithm assigns scores to bins based on the product of the ratio of the remaining capacity to the item size and the logarithm of the item size, giving higher scores to bins with larger remaining capacity and smaller item sizes.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.log1p(item) / bins\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\n  My new algorithm assigns scores to bins based on the weighted sum of the difference between the remaining capacity and the item size, giving higher scores to bins with larger remaining capacity and smaller item sizes, while taking into account the relative difference between bin capacities and applying a logarithmic transformation to the scores for a wider range of values.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    \n    max_capacity = np.max(bins)\n    \n    zero_capacity_bins = np.where(bins == max_capacity)[0]\n    scores[zero_capacity_bins] = 0\n    \n    remaining_bins = np.where(bins != max_capacity)[0]\n    \n    weight = 1 / (np.log(bins) + 1e-10)\n    scores[remaining_bins] = weight[remaining_bins] * (max_capacity - bins[remaining_bins] - item)\n    \n    return scores",
+          "objective": 0.03994,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: The new algorithm assigns scores to bins based on a combination of the square root of the remaining capacity and the logarithm of the reciprocal of the item size, giving higher scores to bins with larger remaining capacity and smaller item sizes.\n\nCode:\n\n```",
+          "code": "import numpy as np\nimport math\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n\n    remaining_bins = np.where(bins > item)[0]\n    scores[remaining_bins] = np.sqrt(bins[remaining_bins]) * np.log(1 / item)\n\n    return scores",
+          "objective": 0.04035,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: The previous algorithms assign scores to bins based on the remaining capacity and the item size, giving higher scores to bins with either larger remaining capacity or smaller item sizes.\n\nNew algorithm description: The new algorithm assigns scores to bins based on the logarithm of the remaining capacity divided by the item size raised to the power of the natural logarithm of the item size, giving higher scores to bins with larger remaining capacity and smaller item sizes, while promoting a wider range of score values with the natural logarithm.\n\nCode:\n\n```",
+          "code": "import numpy as np\nimport math\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n\n    remaining_bins = np.where(bins > item)[0]\n    scores[remaining_bins] = np.log(bins[remaining_bins]) / (item ** np.log(item))\n\n    return scores",
+          "objective": 0.04216,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: The new algorithm assigns scores to bins based on the inverse of the remaining capacity of the bin raised to the power of the reciprocal of the item size, giving higher scores to bins with smaller remaining capacity and larger item sizes.\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.ones_like(bins)\n    \n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     }
+]

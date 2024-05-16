@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "The new algorithm utilizes a dynamic adjustment of the scoring function based on the item size and the remaining capacity of the bins to minimize the number of used bins and optimize item distribution.",
+          "code": "import numpy as np\n def score(item, bins):\n remaining_capacity = bins - item\n utilization_ratio = 1 - remaining_capacity / bins\n simulated_annealing_factor = np.exp(-np.abs(bins - item))\n dynamic_adjustment = np.where(remaining_capacity > (item * 2), (utilization_ratio * np.sqrt(bins - item + 1)) + 0.8, (utilization_ratio * np.sqrt(bins - item + 1)) + 0.6)\n scores = (bins *1.1) / (np.exp(bins - item) + 0.1)  * simulated_annealing_factor + dynamic_adjustment\n return scores",
+          "objective": 0.0073,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe new algorithm aims to optimize item distribution by incorporating the remaining capacity of the bins, and item size to minimize the number of used bins. The scoring function will be based on a combination of the utilization ratio, dynamic adjustment, and an exponentially decaying factor to assign scores to each bin, ultimately facilitating the selection of the bin with the maximum score for item assignment.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    utilization_ratio = 1 - (bins - item) / bins\n    dynamic_adjustment = np.where((bins - item) > (item * 2), (utilization_ratio * np.sqrt(bins - item + 1)) + 0.8, (utilization_ratio * np.sqrt(bins - item + 1)) + 0.6)\n    scores = (bins * 1.1) / (np.exp(bins - item) + 0.1) * np.exp(-np.abs(bins - item)) + dynamic_adjustment\n    return scores",
+          "objective": 0.00734,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: The new algorithm dynamically adjusts the scoring function based on the utilization ratio and a decaying factor to assign scores to each bin for item assignment, optimizing item distribution and minimizing the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    utilization_ratio = 1 - remaining_capacity / bins\n    decaying_factor = np.exp(-np.abs(bins - item))\n    dynamic_adjustment = np.where(remaining_capacity > (item * 2), (utilization_ratio * np.sqrt(bins - item + 1)) + 0.7, (utilization_ratio * np.sqrt(bins - item + 1)) + 0.5)\n    scores = (bins * 1.05) / (np.exp(bins - item) + 0.15) * decaying_factor + dynamic_adjustment\n    return scores",
+          "objective": 0.00745,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The new algorithm aims to optimize item distribution by incorporating the remaining capacity of the bins and item size to minimize the number of used bins. It uses a scoring function based on the utilization ratio, dynamic adjustment, and an exponentially decaying factor with different parameter settings to assign scores to each bin, ultimately facilitating the selection of the bin with the maximum score for item assignment.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    adjust = np.where((bins - item) > (item * 2), (1 - (bins - item) / bins) * np.sqrt(bins - item + 2) + 0.8, (1 - (bins - item) / bins) * np.sqrt(bins - item + 1) + 0.6)\n    scores = (bins * 1.2) / (np.exp(bins - item) + 0.2) * np.exp(-np.abs(bins - item)) + adjust\n    return scores",
+          "objective": 0.00755,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The new algorithm aims to optimize item distribution by incorporating the remaining capacity of the bins and item size to minimize the number of used bins. It uses a scoring function based on the utilization ratio, dynamic adjustment, and a modified decay factor to assign scores to each bin, ultimately facilitating the selection of the bin with the maximum score for item assignment.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    utilization_ratio = 1 - remaining_capacity / bins\n    dynamic_adjustment = np.where(remaining_capacity > (item * 2), (utilization_ratio * np.sqrt(bins - item + 1)) + 0.8, (utilization_ratio * np.sqrt(bins - item + 1)) + 0.6)\n    scores = (2 * bins) / (np.log(bins + 1) * (bins - item + 1)) * np.exp(-np.abs(bins - item)) + dynamic_adjustment\n    return scores",
+          "objective": 0.00765,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The new algorithm aims to optimize item distribution by incorporating the remaining capacity of the bins, and item size to minimize the number of used bins. It uses a modified scoring function based on the utilization ratio, dynamic adjustment, and an exponentially decaying factor with different parameter settings to assign scores to each bin, ultimately facilitating the selection of the bin with the maximum score for item assignment.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    utilization_ratio = 1 - (bins - item) / bins\n    adjust = np.where((bins - item) > (item * 2), (utilization_ratio * np.sqrt(bins - item + 2)) + 0.8, (utilization_ratio * np.sqrt(bins - item + 1)) + 0.6)\n    scores = (bins * 1.1) / (np.exp(bins - item) + 0.2) * np.exp(-np.abs(bins - item)) + adjust\n    return scores",
+          "objective": 0.00785,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The new algorithm aims to optimize item distribution by incorporating the item size, remaining capacity of the bins, and a combination of dynamic adjustment and an exponentially decaying factor to assign scores to each bin to minimize the number of used bins.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    utilization_ratio = 1 - remaining_capacity / bins\n    dynamic_adjustment = np.where(remaining_capacity > (item * 2), (utilization_ratio * np.sqrt(bins - item + 1)) + 0.6, (utilization_ratio * np.sqrt(bins - item + 1)) + 0.4)\n    scores = (bins * 1.2) / (np.exp(bins - item) + 0.1) * np.exp(-np.abs(bins - item)) + dynamic_adjustment\n    return scores",
+          "objective": 0.00805,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm utilizes non-linear dynamic adjustment and the integration of item size and remaining capacity to minimize the number of used bins and optimize item distribution.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    utilization_ratio = 1 - remaining_capacity / bins\n    non_linear_dynamic_adjustment = np.where(remaining_capacity > (item * 2), (utilization_ratio * np.sqrt(bins - item + 2)) + 0.2, (utilization_ratio * np.sqrt(bins - item + 1)) + 0.15)\n    scores = (bins * 1.1) / (np.exp(bins - item) + 0.2) * np.exp(-np.abs(bins - item)) + non_linear_dynamic_adjustment\n    return scores",
+          "objective": 0.00895,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The new algorithm utilizes a combination of the square root of the utilization ratio, the natural logarithm of the item size, and an adjusted dynamic factor to calculate the scores for each bin assignment to minimize the number of used bins and optimize item distribution.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    utilization_ratio = 1 - remaining_capacity / bins\n    dynamic_adjustment = np.where(remaining_capacity > (item * 2), (utilization_ratio * np.sqrt(bins - item + 2)) + 0.5, (utilization_ratio * np.sqrt(bins - item + 2)) + 0.3)\n    scores = (np.log(item) + bins * 1.5) / (np.exp(bins - item) + 0.3) * np.exp(-np.abs(bins - item)) + dynamic_adjustment\n    return scores",
+          "objective": 0.00906,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The new algorithm aims to optimize item distribution by incorporating the utilization ratio, dynamic adjustment, and an exponentially decaying factor while also considering the logarithm of the item size and exponential of the remaining capacity of the bins, ultimately facilitating the selection of the bin with the maximum score for item assignment by using a modified scoring function.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    utilization_ratio = 1 - remaining_capacity / bins\n    dynamic_adjustment = np.where(remaining_capacity > (item * 2), (utilization_ratio * np.sqrt(bins - item + 1)) + 0.3, (utilization_ratio * np.sqrt(bins - item + 1)) + 0.2)\n    scores = (bins * 1.2) / (np.exp(bins - item) + 0.1) * np.exp(-np.abs(bins - item)) + dynamic_adjustment\n    return scores",
+          "objective": 0.00926,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The new algorithm aims to optimize item distribution by incorporating the remaining capacity of the bins, and item size to minimize the number of used bins. It uses a modified scoring function based on the utilization ratio, dynamic adjustment, and an exponentially decaying factor to assign scores to each bin, ultimately facilitating the selection of the bin with the maximum score for item assignment.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    utilization_ratio = 1 - remaining_capacity / bins\n    dynamic_adjustment = np.where(remaining_capacity > (item * 3), (utilization_ratio * np.sqrt(bins - item + 1)) + 0.7, (utilization_ratio * np.sqrt(bins - item + 1)) + 0.5)\n    scores = (bins * 1.05) / (np.exp(bins - item) + 0.15) * np.exp(-np.abs(bins - item)) + dynamic_adjustment\n    return scores",
+          "objective": 0.00936,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The new algorithm aims to optimize item distribution by incorporating the utilization ratio, dynamic adjustment, and an exponentially decaying factor while also considering the logarithm of the item size and exponential of the remaining capacity of the bins, ultimately facilitating the selection of the bin with the maximum score for item assignment.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    utilization_ratio = 1 - remaining_capacity / bins\n    dynamic_adjustment = np.where(remaining_capacity > (item * 2), (utilization_ratio * np.sqrt(bins - item + 1)) + 0.3, (utilization_ratio * np.sqrt(bins - item + 1)) + 0.2)\n    scores = (bins * 1.15) / (np.exp(bins - item) + 0.2) * np.exp(-np.abs(bins - item)) + dynamic_adjustment\n    return scores",
+          "objective": 0.00956,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm description: The new algorithm aims to optimize item distribution by leveraging the utilization ratio, dynamic adjustment, and an exponentially decaying factor to assign scores to each bin, ultimately facilitating the selection of the bin with the maximum score for item assignment.\n\nCode:\nimport numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    utilization_ratio = 1 - remaining_capacity / bins\n    dynamic_adjustment = np.where(remaining_capacity > (item * 2), (utilization_ratio * np.sqrt(bins - item + 1)) + 0.15, (utilization_ratio * np.sqrt(bins - item + 1)) + 0.2)\n    scores = (bins * 1.1) / (np.exp(bins - item) + 0.2) * np.exp(-np.abs(bins - item)) + dynamic_adjustment\n    return scores\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    utilization_ratio = 1 - (bins - item) / bins\n    dynamic_adjustment = np.where((bins - item) > (item * 2), (utilization_ratio * np.sqrt(bins - item + 1)) + 0.15, (utilization_ratio * np.sqrt(bins - item + 1)) + 0.2)\n    scores = (bins * 1.1) / (np.exp(bins - item) + 0.2) * np.exp(-np.abs(bins - item)) + dynamic_adjustment\n    return scores",
+          "objective": 0.00966,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe new algorithm aims to optimize item distribution by incorporating the exponential of the remaining capacity of the bins and logarithm of the item size to minimize the number of used bins. It uses a modified scoring function based on the exponential of the utilization ratio, dynamic adjustment, and an exponentially decaying factor to assign scores to each bin, ultimately facilitating the selection of the bin with the maximum score for item assignment.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    utilization_ratio = 1 - remaining_capacity / bins\n    dynamic_adjustment = np.where(remaining_capacity > (item * 3), (utilization_ratio * np.sqrt(bins - item + 1)) + 0.2, (utilization_ratio * np.sqrt(bins - item + 1)) + 0.1)\n    scores = (bins * 1.05) / (np.exp(bins - item) + 0.15) * np.exp(-np.abs(bins - item)) + dynamic_adjustment\n    return scores",
+          "objective": 0.00976,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The new algorithm aims to optimize item distribution by incorporating the remaining capacity of the bins, and item size to minimize the number of used bins. It uses a modified scoring function based on the utilization ratio, dynamic adjustment, and an exponentially decaying factor to assign scores to each bin, ultimately facilitating the selection of the bin with the maximum score for item assignment.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    utilization_ratio = 1 - remaining_capacity / bins\n    dynamic_adjustment = np.where(remaining_capacity > (item * 3), (utilization_ratio * np.sqrt(bins - item + 1)) + 0.7, (utilization_ratio * np.sqrt(bins - item + 1)) + 0.5)\n    scores = (bins * 1.05) / (np.exp(bins - item) + 0.15) * np.exp(-np.abs(bins - item)) + dynamic_adjustment\n    return scores\n\n# Simplified version\nimport numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    utilization_ratio = 1 - remaining_capacity / bins\n    dynamic_adjustment = utilization_ratio * np.sqrt(bins - item + 1) + 0.6\n    scores = (bins * 1.05) / (np.exp(bins - item) + 0.15) * np.exp(-np.abs(bins - item)) + dynamic_adjustment\n    return scores",
+          "objective": 0.00986,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The score function will calculate the scores for each bin based on the logarithm of the item size to the remaining capacity of the bin, with an adjustment for the bins close to full capacity, ensuring self-consistency without introducing randomness.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    penalty = 0.3 * np.max(bins)\n    scores = np.log(item) / (bins - item) - (bins - item < penalty) * 1.5\n    return scores",
+          "objective": 0.01006,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The new algorithm aims to minimize the number of used bins and optimize item distribution by adjusting the scoring function based on the item size and the remaining capacity of the bins.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    utilization_ratio = 1 - remaining_capacity / bins\n    simulated_annealing_factor = np.exp(-np.abs(bins - item))\n    dynamic_adjustment = np.where(remaining_capacity > (item * 3), (utilization_ratio * np.sqrt(bins - item + 2)) + 0.5, (utilization_ratio * np.sqrt(bins - item + 2)) + 0.4)\n    scores = (bins * 1.2) / (np.exp(bins - item) + 0.2) * simulated_annealing_factor + dynamic_adjustment\n    return scores",
+          "objective": 0.01016,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm description: The new algorithm aims to optimize item distribution by considering the utilization ratio, dynamic adjustment, and a modified scoring function that takes into account the remaining capacity of the bins and the item size. The scores are calculated by using an adjusted formula based on the remaining capacity and item size while incorporating the utilization ratio and a dynamic adjustment factor.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    utilization_ratio = 1 - remaining_capacity / bins\n    dynamic_adjustment = np.where(remaining_capacity > (item * 2), (utilization_ratio * np.sqrt(bins - item)) + 0.1, (utilization_ratio * np.sqrt(bins - item)) + 0.2)\n    scores = (bins * 1.1) / (np.exp(bins - item) + 0.2) * np.exp(-np.abs(bins - item)) + dynamic_adjustment\n    return scores",
+          "objective": 0.01026,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm utilizes a modified approach of the scoring function by incorporating the item size, remaining bin capacity, utilization ratio, and dynamic adjustment, ultimately aiming to minimize the number of used bins while optimizing item distribution.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    utilization_ratio = 1 - remaining_capacity / bins\n    dynamic_adjustment = np.where(remaining_capacity > (item * 2), (utilization_ratio * np.sqrt(bins - item + 3)) + 0.3, (utilization_ratio * np.sqrt(bins - item + 2)) + 0.25)\n    scores = (bins * 1.3) / (np.log(bins + 1) * (bins - item + 2)) * np.exp(-np.abs(bins - item)) + dynamic_adjustment\n    return scores",
+          "objective": 0.01036,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The new algorithm improves item distribution by adjusting the scoring function based on remaining capacity, utilization ratio, and item size, using different parameter settings for the dynamic adjustment and exponentially decaying factor to assign scores to each bin, ultimately minimizing the number of used bins.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    utilization_ratio = 1 - remaining_capacity / bins\n    dynamic_adjustment = np.where(remaining_capacity > (item * 3), (utilization_ratio * np.sqrt(bins - item + 3)) + 0.8, (utilization_ratio * np.sqrt(bins - item + 2)) + 0.6)\n    scores = (bins * 1.2) / (np.exp(bins - item) + 0.5) * np.exp(-np.abs(bins - item)) + dynamic_adjustment\n    return scores",
+          "objective": 0.01077,
+          "other_inf": null
+     }
+]

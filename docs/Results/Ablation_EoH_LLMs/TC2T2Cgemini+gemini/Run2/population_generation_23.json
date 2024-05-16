@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "New algorithm: (log(bins - item) * (1 - ((bins - item) > 0.75 * item)) * (-3e6))",
+          "code": "import numpy as np\n\ndef score(item, bins):\n  scores = (np.log(bins - item) * (1 - ((bins - item) > 0.75 * item)) * (-3e6))\n  return scores",
+          "objective": 0.00895,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The backbone idea is to give high scores to bins with sufficient remaining capacity and penalize bins that are nearly full. My new algorithm: log(bins - item) / log(item) * (1 - ((bins - item) > 0.7 * item)) * (-1e6)",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.log(bins - item) / np.log(item) * (1 - ((bins - item) > 0.7 * item)) * (-1e6)\n    return scores",
+          "objective": 0.00966,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Add a penalty to the score of any bin with remaining capacity greater than two times the item size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    inf = np.inf\n    scores = (bins - item) * (1-((bins - item) > 2 * item)) * 1e6\n    scores[bins == item] = inf\n    scores[bins < item] = -inf\n    return scores",
+          "objective": 0.01006,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign a score as log(max(bins - item, 0)) * 1 / (1 + log(min(bins - item, bins / 2))) * (1 - ((bins - item) > 0.8*item)) * (1 - ((bins - item) > 1.8*item)) * (1 - (bins >= 2.2*item)) * (-1e9)",
+          "code": "import numpy as np\n\ndef score(item, bins):\n  scores = np.log(np.clip(bins - item, 0, None)) * 1 / (1 + np.log(np.clip(bins - item, 0, bins / 2))) * (1 - ((bins - item) > 0.8 * item)) * (1 - ((bins - item) > 1.8 * item)) * (1 - (bins >= 2.2 * item)) * (-1e9)\n  return scores",
+          "objective": 0.01026,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Assigns score as (bins - item)^{1/((bins - item)/item) * (1 - (bins > 1.8*item)) * (1 - (bins > 2.2*item)) * (-1e7)}",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins - item)**(1/((bins - item)/item) * (1 - (bins > 1.8*item)) * (1 - (bins > 2.2*item)) * (-1e7))\n    return scores",
+          "objective": 0.01067,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: log(bins - item) * (1 + (bins - item)/item) * (1 - ((bins - item) > 0.6 * item)) * (-1e6)",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Assigns an item to a bin with the maximum score.\n    If the rest capacity of a bin equals the maximum capacity, it will not be used.\n    The final goal is to minimize the number of used bins.\n\n    Args:\n        item (int): Size of the current item.\n        bins (np.ndarray): Rest capacities of feasible bins, which are larger than the item size.\n\n    Returns:\n        np.ndarray: Scores for the bins for assignment.\n    \"\"\"\n    bins_capacity = bins - item\n    scores = np.log(bins_capacity) * (1 + bins_capacity/item) * (1 - (bins_capacity > 0.6 * item)) * (-1e6)\n    return scores",
+          "objective": 0.01087,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: log(bins - item)/(1 + (bins - item)*0.4/item) * (1-((bins - item) > 0.6 * item)) * (-1e6)",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    availability_factor = np.log((bins - item) / (1 + (bins - item) * 0.4 / item))\n    overflow_factor = 1 - ((bins - item) > 0.6 * item)\n    scores = availability_factor * overflow_factor * (-1e6)\n    return scores",
+          "objective": 0.01107,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Assigns score as (bins - item)**((1/((bins - item)/item)) * (bins < 1.9*item)) * (-1e6)",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins - item)**((1/((bins - item)/item)) * (bins < 1.9*item)) * (-1e6)\n    return scores",
+          "objective": 0.01117,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Algorithm: Assign a score as log(1+(bins-item)**2/(bins**2-item**2)) * (1 - (bins > 2*item)) * (-1e5)",
+          "code": "def score(item, bins):\n    scores = np.log(1+(bins-item)**2/(bins**2-item**2)) * (1 - (bins > 2*item)) * (-1e5)\n    return scores",
+          "objective": 0.01127,
+          "other_inf": null
+     },
+     {
+          "algorithm": " Modified algorithm: (bins - item)**2 * (-1e6) * (1 - ((bins - item) / bins > 0.5)) ",
+          "code": "def score(item, bins):\n    scores = (bins - item)**2 * (-1e6) * (1 - ((bins - item) / bins > 0.5))\n    return scores",
+          "objective": 0.01157,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Assigns score as (bins - item)**(1/((bins - item)/item) * (1 - (bins > 1.9*item))) * (-1e6)",
+          "code": "def score(item, bins):\n  \"\"\"\n  Assigns score as (bins - item)**(1/((bins - item)/item) * (1 - (bins > 1.9*item))) * (-1e6)\n\n  Args:\n    item (int): Size of current item\n    bins (np.array): Rest capacities of feasible bins, which are larger than the item size\n\n  Returns:\n    np.array: Scores for the bins for assignment\n  \"\"\"\n\n  scores = (bins - item)**(1/((bins - item)/item) * (1 - (bins > 1.9*item))) * (-1e6)\n  return scores",
+          "objective": 0.01177,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm:  item * log(bins - item) * (1 - ((bins - item) > 0.95 * item)) * (-1e6)",
+          "code": "def score(item, bins):\n    scores = item * np.log(bins - item) * (1 - ((bins - item) > 0.95 * item)) * (-1e6)\n    return scores",
+          "objective": 0.01197,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm:  item * log(bins - item) * (1 - ((bins - item) > 0.90 * item)) * (-1e6)",
+          "code": "def score(item, bins):\n    scores = item * np.log(bins - item) * (1 - ((bins - item) > 0.90 * item)) * (-1e6)\n    return scores",
+          "objective": 0.01207,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: item * log(bins - item) * (1 - ((bins - item) > 0.95 * item)) * (-1e6) * item / bins",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.log(bins - item) * (1 - ((bins - item) > 0.95 * item)) * (-1e6) * item / bins\n    return scores",
+          "objective": 0.01217,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: log(bins - item)/(1 + (bins - item)/item) * (1-((bins - item) > 0.9 * item)) * (-1e6)",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.log(bins - item) / (1 + (bins - item) / item) * (1-((bins - item) > 0.9 * item)) * (-1e6)\n    return scores",
+          "objective": 0.01258,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Modified algorithm: Assigns score as (bins - item)^(1/((bins - item)/item) * (1 - (bins > 2*item)) * (1 - (bins > 2.5*item)) * (-1e7)",
+          "code": "def score(item, bins):\n    scores = (bins - item)**(1/((bins - item)/item)) * (1 - (bins > 2*item)) * (1 - (bins > 2.5*item)) * (-1e7)\n    return scores",
+          "objective": 0.01268,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Divide the remaining capacity of each bin by the item size to calculate a penalty, and add the penalty to the score of the bin.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    penalty = np.ceil(bins / item)\n    scores = bins - penalty * item\n    return scores",
+          "objective": 0.01298,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign score as log(bins - item)/(1 - (bins - item)/item) * (bins-item) * (1 - (bins>2*item)) * (-1e6)",
+          "code": "def score(item, bins):\n  scores = np.log(bins - item) / (1 - (bins - item) / item) * (bins-item) * (1 - (bins>2*item)) * (-1e6)\n  return scores",
+          "objective": 0.01328,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assigns score as (bins - item)^{1/((bins - item)/item) * (1 - (bins >= 2*item)) * (-1e8)}",
+          "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"Assigns score as (bins - item)^{1/((bins - item)/item) * (1 - (bins >= 2*item)) * (-1e8)}\n\n    Args:\n        item: size of current item\n        bins: rest capacities of feasible bins, which are larger than the item size\n\n    Returns:\n        scores: the scores for the bins for assignment\n    \"\"\"\n\n    scores = np.power(bins - item, 1 / ((bins - item) / item) * (1 - (bins >= 2 * item)) * (-1e8))\n    return scores",
+          "objective": 0.01348,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: (np.log(bins - item) * (1 - ((bins - item) > 0.5 * item)) * (-2e6))",
+          "code": "def score(item, bins):\n    scores = np.log(bins - item) * (1 - ((bins - item) > 0.5 * item)) * (-2e6)\n    return scores",
+          "objective": 0.01358,
+          "other_inf": null
+     }
+]

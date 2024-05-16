@@ -1,0 +1,62 @@
+[
+     {
+          "algorithm": "\nNew algorithm: Update the edge distances in the edge distance matrix based on the sum of the frequency of each edge used in the local optimal tour and the reciprocal of the edge count to guide the search towards a better solution.\n",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    edge_count = np.zeros_like(edge_n_used)\n\n    for i in range(len(local_opt_tour) - 1):\n        start = local_opt_tour[i]\n        end = local_opt_tour[i + 1]\n        edge_count[start][end] += 1\n        edge_count[end][start] += 1\n\n    for i in range(edge_distance.shape[0]):\n        for j in range(edge_distance.shape[1]):\n            if edge_count[i][j] > 0:\n                updated_edge_distance[i][j] += (edge_count[i][j] + (1 / max(edge_n_used[i][j], 1)))\n\n    return updated_edge_distance",
+          "objective": 0.04299,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe new algorithm aims to update the edge distances by taking into account the frequency of each edge used in the local optimal tour using a noise factor that depends on the squared edge count and the absolute square root of the edge count to guide the search towards a better solution in a balanced manner.\n",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    edge_count = np.zeros_like(edge_distance)\n\n    for i in range(len(local_opt_tour) - 1):\n        start = local_opt_tour[i]\n        end = local_opt_tour[i + 1]\n        edge_count[start][end] += 1\n        edge_count[end][start] += 1\n\n    for i in range(edge_distance.shape[0]):\n        for j in range(edge_distance.shape[1]):\n            if edge_count[i][j] > 0:\n                noise_factor = np.random.uniform(-0.5 / (edge_count[i][j] ** 2), 0.5 / np.sqrt(edge_count[i][j]))\n                updated_edge_distance[i][j] += noise_factor\n\n    return updated_edge_distance",
+          "objective": 0.07769,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Update the edge distances in the edge distance matrix based on the frequency of each edge used in the local optimal tour using a noise factor that depends on the reciprocal of the square root of the edge count and the edge distance to guide the search towards a better solution with a balanced bias towards lesser used edges and longer distances.",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    edge_count = np.zeros_like(edge_distance)\n\n    for i in range(len(local_opt_tour) - 1):\n        start = local_opt_tour[i]\n        end = local_opt_tour[i + 1]\n        edge_count[start][end] += 1\n        edge_count[end][start] += 1\n\n    for i in range(edge_distance.shape[0]):\n        for j in range(edge_distance.shape[1]):\n            if edge_count[i][j] > 0:\n                noise_factor = np.random.uniform(-1 / np.sqrt(edge_count[i][j]), 1 / np.sqrt(edge_count[i][j])) + (edge_distance[i][j] / np.max(edge_distance))\n                updated_edge_distance[i][j] += noise_factor\n\n    return updated_edge_distance",
+          "objective": 0.08263,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: Update the edge distances in the edge distance matrix based on the frequency of each edge used in the local optimal tour using a noise factor that depends on the edge count and the edge distance to guide the search towards a better solution with a bias towards lesser used edges and longer distances, but incorporating a decay factor to reduce the impact of noise on heavily used edges.\n",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    edge_count = np.zeros_like(edge_distance)\n\n    for i in range(len(local_opt_tour) - 1):\n        start = local_opt_tour[i]\n        end = local_opt_tour[i + 1]\n        edge_count[start][end] += 1\n        edge_count[end][start] += 1\n\n    for i in range(edge_distance.shape[0]):\n        for j in range(edge_distance.shape[1]):\n            if edge_count[i][j] > 0:\n                noise_factor = np.random.uniform(-1 / edge_count[i][j], 1 / edge_count[i][j]) + (edge_distance[i][j] / np.max(edge_distance))\n                noise_factor *= np.exp(-0.1 * edge_n_used[i][j])  # Applying decay factor\n                updated_edge_distance[i][j] += noise_factor\n\n    return updated_edge_distance",
+          "objective": 0.08494,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: The strategy is to update the edge distances in the edge distance matrix based on the frequency of each edge used in the local optimal tour using a noise factor that depends on the square root of the edge count and the logarithm of the edge count to guide the search towards a better solution in a balanced manner.",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    edge_count = np.zeros_like(edge_distance)\n\n    for i in range(len(local_opt_tour) - 1):\n        start = local_opt_tour[i]\n        end = local_opt_tour[i + 1]\n        edge_count[start][end] += 1\n        edge_count[end][start] += 1\n\n    for i in range(edge_distance.shape[0]):\n        for j in range(edge_distance.shape[1]):\n            if edge_count[i][j] > 0:\n                noise_factor = np.random.uniform(-0.5 / np.sqrt(edge_count[i][j]), 0.5 / np.log(edge_count[i][j] + 1))\n                updated_edge_distance[i][j] += noise_factor\n\n    return updated_edge_distance",
+          "objective": 0.08747,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Update the edge distances in the edge distance matrix based on the frequency of each edge used in the local optimal tour using a noise factor that depends on the edge count and the edge distance to guide the search towards a better solution with a bias towards lesser used edges and longer distances.",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    edge_count = np.zeros_like(edge_distance)\n\n    for i in range(len(local_opt_tour) - 1):\n        start = local_opt_tour[i]\n        end = local_opt_tour[i + 1]\n        edge_count[start][end] += 1\n        edge_count[end][start] += 1\n\n    for i in range(edge_distance.shape[0]):\n        for j in range(edge_distance.shape[1]):\n            if edge_count[i][j] > 0:\n                noise_factor = np.random.uniform(-1 / edge_count[i][j], 1 / edge_count[i][j]) + (edge_distance[i][j] / np.max(edge_distance))\n                updated_edge_distance[i][j] += noise_factor\n\n    return updated_edge_distance",
+          "objective": 0.0905,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: The strategy is to update the edge distances in the edge distance matrix based on the frequency of each edge used in the local optimal tour using a noise factor that depends on the square root of the edge count and the logarithm of the edge count to guide the search towards a better solution in a balanced manner.",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    edge_count = np.zeros_like(edge_distance)\n\n    for i in range(len(local_opt_tour) - 1):\n        start = local_opt_tour[i]\n        end = local_opt_tour[i + 1]\n        edge_count[start][end] += 1\n        edge_count[end][start] += 1\n\n    for i in range(edge_distance.shape[0]):\n        for j in range(edge_distance.shape[1]):\n            if edge_count[i][j] > 0:\n                noise_factor = np.random.uniform(-0.5, 0.5)\n                updated_edge_distance[i][j] += noise_factor\n\n    return updated_edge_distance",
+          "objective": 0.09058,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: Update the edge distances in the edge distance matrix by perturbing the edge distances randomly using a noise factor based on the sine function of the edge count to introduce variability and exploration in the search for a better solution.\n",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    edge_count = np.zeros_like(edge_distance)\n\n    for i in range(len(local_opt_tour) - 1):\n        start = local_opt_tour[i]\n        end = local_opt_tour[i + 1]\n        edge_count[start][end] += 1\n        edge_count[end][start] += 1\n\n    for i in range(edge_distance.shape[0]):\n        for j in range(edge_distance.shape[1]):\n            if edge_count[i][j] > 0:\n                noise_factor = np.random.uniform(-1, 1) * np.sin(edge_count[i][j])\n                updated_edge_distance[i][j] += noise_factor\n\n    return updated_edge_distance",
+          "objective": 0.09143,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Update the edge distances in the edge distance matrix based on frequency of each edge used in the local optimal tour using a modified noise factor that depends on the edge count to guide the search towards a better solution",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    edge_count = np.zeros_like(edge_distance)\n\n    for i in range(len(local_opt_tour) - 1):\n        start = local_opt_tour[i]\n        end = local_opt_tour[i + 1]\n        edge_count[start][end] += 1\n        edge_count[end][start] += 1\n\n    for i in range(edge_distance.shape[0]):\n        for j in range(edge_distance.shape[1]):\n            if edge_count[i][j] > 0:\n                noise_factor = np.random.uniform(-0.5 / edge_count[i][j], 0.5 / edge_count[i][j])\n                updated_edge_distance[i][j] += noise_factor\n\n    return updated_edge_distance",
+          "objective": 0.09253,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nImplement a new algorithm that updates the edge distances in the edge distance matrix based on the frequency of each edge used in the local optimal tour using a modified noise factor that depends on the square root of the edge count to guide the search towards a better solution.\n",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    edge_count = np.zeros_like(edge_distance)\n\n    for i in range(len(local_opt_tour) - 1):\n        start = local_opt_tour[i]\n        end = local_opt_tour[i + 1]\n        edge_count[start][end] += 1\n        edge_count[end][start] += 1\n\n    for i in range(edge_distance.shape[0]):\n        for j in range(edge_distance.shape[1]):\n            if edge_count[i][j] > 0:\n                noise_factor = np.random.uniform(-0.5 / np.sqrt(edge_count[i][j]), 0.5 / np.sqrt(edge_count[i][j]))\n                updated_edge_distance[i][j] += noise_factor\n\n    return updated_edge_distance",
+          "objective": 0.10138,
+          "other_inf": null
+     }
+]

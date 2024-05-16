@@ -1,0 +1,62 @@
+[
+     {
+          "algorithm": "\nNew algorithm: The strategy is to identify the edges in the local optimal tour that are frequently used and update their distances in the edge distance matrix to discourage using them again, thereby guiding the search towards a better solution.\n",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    edge_count = np.zeros_like(edge_distance)\n\n    for i in range(len(local_opt_tour) - 1):\n        start = local_opt_tour[i]\n        end = local_opt_tour[i + 1]\n        edge_count[start][end] += 1\n        edge_count[end][start] += 1\n\n    edge_count[edge_n_used == 0] = 1  # simplified to avoid overfitting\n\n    updated_edge_distance *= (1 + edge_count / edge_n_used)\n\n    return updated_edge_distance",
+          "objective": 0.20408,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The strategy is to identify the edges in the local optimal tour that are frequently used and update their distances in the edge distance matrix to discourage using them again, thereby guiding the search towards a better solution.\n",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    edge_count = np.zeros_like(edge_distance)\n\n    for i in range(len(local_opt_tour) - 1):\n        start = local_opt_tour[i]\n        end = local_opt_tour[i + 1]\n        edge_count[start][end] += 1\n        edge_count[end][start] += 1\n\n    for i in range(edge_distance.shape[0]):\n        for j in range(edge_distance.shape[1]):\n            if edge_count[i][j] > 0:\n                updated_edge_distance[i][j] *= (1 + edge_count[i][j] / edge_n_used[i][j])\n\n    return updated_edge_distance",
+          "objective": 0.65616,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The strategy is to identify the edges in the local optimal tour that are frequently used and update their distances in the edge distance matrix to discourage using them again, thereby guiding the search towards a better solution.\n",
+          "code": "import numpy as np\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    edge_count = np.zeros_like(edge_distance)\n    for i in range(len(local_opt_tour) - 1):\n        start = local_opt_tour[i]\n        end = local_opt_tour[i + 1]\n        edge_count[start][end] += 1\n        edge_count[end][start] += 1\n    for i in range(edge_distance.shape[0]):\n        for j in range(edge_distance.shape[1]):\n            if edge_count[i][j] > 0:\n                updated_edge_distance[i][j] *= (1 + edge_count[i][j] / (edge_n_used[i][j] + 1))\n    return updated_edge_distance",
+          "objective": 1.12469,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe new algorithm involves identifying edges that are heavily used in the local optimal tour and updating their distance in the edge distance matrix to prioritize less frequently used edges, thus promoting exploration of different routes, while scaling the update factor by the inverse square root of the edge's usage frequency.\n",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    max_used_edge = np.max(edge_n_used)\n    for i in range(len(local_opt_tour)-1):\n        start = local_opt_tour[i]\n        end = local_opt_tour[i+1]\n        updated_edge_distance[start][end] *= (1 + 1/np.sqrt(edge_n_used[start][end]+1))\n    return updated_edge_distance",
+          "objective": 1.34281,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe new algorithm involves identifying edges that are heavily used in the local optimal tour and updating their distance in the edge distance matrix to prioritize less frequently used edges, thus promoting exploration of different routes, while scaling the update factor by the inverse of the edge's usage frequency.\n",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    max_used_edge = np.max(edge_n_used)\n    for i in range(len(local_opt_tour)-1):\n        start = local_opt_tour[i]\n        end = local_opt_tour[i+1]\n        updated_edge_distance[start][end] *= (1 + 1/(edge_n_used[start][end]+1))\n    return updated_edge_distance",
+          "objective": 1.84289,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: Modify the edge distances randomly along the local optimal route to escape from the local optimum and move towards a global optimum, by perturbing the distances of the edges used in the local optimal tour.\n\nCode:\nimport numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    \n    for i in range(len(local_opt_tour) - 1):\n        start_node = local_opt_tour[i]\n        end_node = local_opt_tour[i + 1]\n        edge_index = edge_n_used[start_node][end_node]\n        perturbation_factor = np.random.uniform(0.9, 1.1)  # Randomly perturb the edge distance\n        updated_edge_distance[start_node][end_node] *= perturbation_factor\n    \n    return updated_edge_distance\n",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n\n    for i in range(len(local_opt_tour) - 1):\n        start_node = local_opt_tour[i]\n        end_node = local_opt_tour[i + 1]\n        perturbation_factor = np.random.uniform(0.9, 1.1)  # Randomly perturb the edge distance\n        updated_edge_distance[start_node][end_node] *= perturbation_factor\n\n    return updated_edge_distance",
+          "objective": 2.61658,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe new algorithm involves identifying edges that are heavily used in the local optimal tour and updating their distance in the edge distance matrix to prioritize less frequently used edges, thus promoting exploration of different routes.\n",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    max_used_edge = np.argmax(edge_n_used)\n    for i in range(len(local_opt_tour)-1):\n        start = local_opt_tour[i]\n        end = local_opt_tour[i+1]\n        updated_edge_distance[start][end] *= (1 + edge_n_used[start][end]/max_used_edge)\n    return updated_edge_distance",
+          "objective": 2.62194,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: Identify the least frequently used edges in the local optimal tour and update their distances in the edge distance matrix to encourage exploration of different routes, while also randomizing the distances of non-participating edges to promote diversification in the search for a better solution.\n",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    min_used_edge = np.argmin(edge_n_used)\n    for i in range(len(local_opt_tour)-1):\n        start = local_opt_tour[i]\n        end = local_opt_tour[i+1]\n        if edge_n_used[start][end] < np.mean(edge_n_used):  # Update distances of least frequently used edges\n            updated_edge_distance[start][end] *= (1 - edge_n_used[start][end]/min_used_edge)\n            updated_edge_distance[end][start] *= (1 - edge_n_used[end][start]/min_used_edge)\n        else:  # Randomly perturb the distances of non-participating edges\n            perturbation_factor = np.random.uniform(0.9, 1.1)\n            updated_edge_distance[start][end] *= perturbation_factor\n            updated_edge_distance[end][start] *= perturbation_factor\n    return updated_edge_distance",
+          "objective": 2.67133,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: Modify the edge distances randomly along the local optimal route to escape from the local optimum and move towards a global optimum, by perturbing the distances of the edges used in the local optimal tour.\n\nCode:\nimport numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    \n    for i in range(len(local_opt_tour) - 1):\n        start_node = local_opt_tour[i]\n        end_node = local_opt_tour[i + 1]\n        edge_index = edge_n_used[start_node][end_node]\n        perturbation_factor = np.random.uniform(0.9, 1.1)  # Randomly perturb the edge distance\n        updated_edge_distance[start_node][end_node] *= perturbation_factor\n    \n    return updated_edge_distance\n",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    \n    for i in range(len(local_opt_tour) - 1):\n        start_node = local_opt_tour[i]\n        end_node = local_opt_tour[i + 1]\n        edge_index = edge_n_used[start_node][end_node]\n        perturbation_factor = np.random.uniform(0.9, 1.1)  # Randomly perturb the edge distance\n        updated_edge_distance[start_node][end_node] *= perturbation_factor\n    \n    return updated_edge_distance",
+          "objective": 2.72499,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The strategy is to identify the edges in the local optimal tour that are frequently used and update their distances in the edge distance matrix to discourage using them again, thereby guiding the search towards a better solution.\n",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    edge_count = np.zeros_like(edge_distance)\n\n    for i in range(len(local_opt_tour) - 1):\n        start = local_opt_tour[i]\n        end = local_opt_tour[i + 1]\n        edge_count[start][end] += 0.25\n        edge_count[end][start] += 0.25\n\n    for i in range(edge_distance.shape[0]):\n        for j in range(edge_distance.shape[1]):\n            if edge_count[i][j] > 0:\n                updated_edge_distance[i][j] *= (1 + (edge_count[i][j] / (edge_n_used[i][j] + 1)) * 0.5)\n\n    return updated_edge_distance",
+          "objective": 2.73776,
+          "other_inf": null
+     }
+]

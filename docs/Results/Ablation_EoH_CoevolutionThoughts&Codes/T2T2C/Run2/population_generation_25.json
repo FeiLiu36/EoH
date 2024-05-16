@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "New algorithm: Assign scores to bins based on the difference between the item size and the bin index, multiplied by the logarithm of the rest capacity, plus the sum of the item size and the bin index, divided by the square of the rest capacity, returning the scores for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    bin_index = np.arange(len(bins))\n    rest_capacity = bins - item\n    \n    scores = (item - bin_index) * np.log(rest_capacity) + (item + bin_index) / (rest_capacity ** 2)\n    \n    return scores",
+          "objective": 0.00755,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: Assign scores to bins based on some combination or manipulation of the item size, rest capacity, and bin index.}\n\n{New algorithm: Assign scores to bins based on the cosine of the bin index divided by the sum of the logarithm of the item size and the rest capacity, multiplied by the square root of the bin index, returning the scores for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    bin_index = np.arange(1, len(bins) + 1)\n    bin_capacity = bins - item\n    scores = np.cos(bin_index / (np.log(item) + np.log(bin_capacity))) * np.sqrt(bin_index)\n    return scores",
+          "objective": 0.01992,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: Assign scores to bins based on the ratio of the bin index multiplied by the inverse of the item size to the rest capacity, subtracting the square of the item size from the scores for assignment.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    bin_indices = np.where(bins > item)[0]\n    scores = np.zeros_like(bins)\n    if len(bin_indices) == 0:\n        return scores\n    \n    bin_sizes = bins[bin_indices]\n    ratios = (bin_indices * (1/item)) / bin_sizes\n    scores[bin_indices] = ratios - np.square(item)\n    return scores",
+          "objective": 0.02133,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The common backbone idea in the provided algorithms is to calculate the score based on a combination of the item size, bin index, and rest capacity.}\n\n{New algorithm: Assign scores to bins based on the logarithm of the item size multiplied by the bin index, divided by the sum of the rest capacity and the square of the difference between the item size and the bin index, returning the scores for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.log(item) * np.arange(len(bins)) / (bins + (item - np.arange(len(bins)))**2)\n    return scores",
+          "objective": 0.02354,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Assign scores to bins based on the square root of the item size multiplied by the bin index, divided by the sum of the rest capacity and the squared difference between the item size and the bin index, returning the scores for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.sqrt(item * np.arange(len(bins))) / (bins + (item - np.arange(len(bins)))**2)\n    return scores",
+          "objective": 0.02385,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Assign scores to bins based on the logarithm of the product of the cube root of the item size multiplied by the bin index, divided by the square root of the rest capacity plus the absolute value of the difference between the item size and the bin index, returning the scores for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.log(np.cbrt(item) * np.arange(len(bins))) / (np.sqrt(bins) + np.abs(item - np.arange(len(bins))))\n    return scores",
+          "objective": 0.02596,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: Assign scores to bins based on some combination or manipulation of the item size, rest capacity, and bin index.}\n\n{New algorithm: Assign scores to bins based on the ratio between the squared difference of rest capacity and a constant alpha, and the absolute difference of the item size and a constant beta, divided by the bin index raised to the power of a constant gamma, returning the scores for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    alpha = 1.5\n    beta = 2.0\n    gamma = 0.5\n    \n    squared_diff = np.square(bins - item) - alpha\n    abs_diff = np.abs(bins - item) - beta\n    bin_index = np.arange(len(bins)) + 1\n    \n    scores = (squared_diff / abs_diff) / np.power(bin_index, gamma)\n    \n    return scores",
+          "objective": 0.03179,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Assign scores to bins based on the item size divided by the rest capacity subtracted from the bin index, returning the scores for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = item / (bins - item) - np.arange(len(bins))\n    return scores",
+          "objective": 0.03854,
+          "other_inf": null
+     },
+     {
+          "algorithm": "N",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins - item) / (bins > item)\n    scores[bins == bins.max()] = np.NINF\n    return scores",
+          "objective": 0.03874,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Assign scores to bins based on the product of the inverse of the rest capacity and a constant beta (where beta can be adjusted to control the importance of rest capacity in scoring), divided by the bin index subtracted by a constant delta (where delta can be adjusted to alter the influence of bin index in scoring), returning the scores for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    beta = 0.5  # Adjust the importance of rest capacity in scoring\n    delta = 0.1  # Adjust the influence of bin index in scoring\n\n    indices = np.arange(len(bins))\n    rest_capacity = bins - item\n\n    scores = (beta / rest_capacity) / (indices - delta)\n    scores[rest_capacity == bins] = -np.inf\n\n    return scores",
+          "objective": 0.03884,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign scores to bins based on the sum of the square of the item size divided by the rest capacity, and the bin index multiplied by a constant gamma, returning the scores for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    gamma = 10\n    scores = (item ** 2) / (bins - item) + gamma * np.arange(len(bins))\n    return scores",
+          "objective": 0.03894,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Calculate the score for each bin by considering the logarithm of the item size, weighted by the bin index and the difference between the item size and the bin index, divided by the rest capacity and the product of the difference mentioned.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.log(item) * (bins / item) * (np.log(item) / (bins - item)) * (np.arange(len(bins)) / item)\n    scores[bins == max(bins)] = 0\n    return scores",
+          "objective": 0.03904,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Assign scores to bins based on the product of the item size divided by the rest capacity raised to the power of the bin index, returning the scores for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (item / bins) ** np.arange(1, len(bins) + 1)\n    return scores",
+          "objective": 0.03914,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: Assign scores to bins based on some combination or manipulation of the item size, rest capacity, and bin index.}\n\n{New algorithm: Divide the square of the item size by the product of the rest capacity and the bin index to the power of the inverse of the item size, returning the scores for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    rest_capacity = bins.copy()\n    rest_capacity[rest_capacity == item] = 0\n    \n    bin_index = np.arange(len(bins)) + 1\n    \n    scores = (item**2) / (rest_capacity * bin_index**(1/item))\n    \n    return scores",
+          "objective": 0.03944,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Modified algorithm: Assign scores to bins based on the square root of the rest capacity multiplied by a constant alpha (where alpha can be adjusted to fine-tune the importance of rest capacity in scoring), divided by the bin index raised to the power of a constant gamma (where gamma can be adjusted to control the influence of bin index in scoring), returning the scores for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    alpha = 0.5\n    gamma = 0.2\n    scores = np.sqrt(bins) * alpha / np.power(np.arange(1, len(bins)+1), gamma)\n    scores[bins == max(bins)] = 0\n    return scores",
+          "objective": 0.03954,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Divide the item size by the sum of the rest capacity and the cube root of the bin index, returning the scores for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = item / (bins + np.cbrt(np.arange(len(bins))))\n    return scores",
+          "objective": 0.03974,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Assign scores to bins based on the division of item size by the rest capacity, returning the scores for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = item / bins\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Divide the item size by the sum of the rest capacity and the square root of the bin index, returning the scores for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = item / (bins + np.sqrt(np.arange(1, len(bins)+1)))\n    return scores",
+          "objective": 0.03994,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Assign scores to bins based on the division of the item size by the sum of the rest capacity and the square root of the bin index, returning the scores for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = item / (bins + np.sqrt(np.arange(len(bins))))\n    return scores",
+          "objective": 0.04004,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Divide the item size by the sum of the rest capacity and the logarithm of the bin index, returning the scores for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = item / (bins + np.log(np.arange(1, len(bins)+1)))\n    return scores",
+          "objective": 0.04014,
+          "other_inf": null
+     }
+]

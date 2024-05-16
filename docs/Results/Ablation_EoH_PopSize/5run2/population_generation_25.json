@@ -1,0 +1,32 @@
+[
+     {
+          "algorithm": "The new algorithm assigns scores to bins based on the sum of the hyperbolic tangent of the remaining capacity divided by the item size and the logarithm of the bin size, giving higher scores to bins with larger remaining capacity and smaller item sizes.\n```\n",
+          "code": "import numpy as np\nimport math\n\ndef score(item, bins):\n    scores = np.empty_like(bins)\n\n    remaining_bins = np.where(bins > item)[0]\n    remaining_capacity = bins[remaining_bins] - item\n    tanh_remaining_capacity = np.tanh(remaining_capacity)\n    log_bin_size = np.log(bins[remaining_bins])\n\n    scores[remaining_bins] = np.tanh(remaining_capacity) / item + log_bin_size\n\n    return scores",
+          "objective": 0.01238,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to bins based on the sum of the inverse of the remaining capacity divided by the item size and the logarithm of the bin size, giving higher scores to bins with larger remaining capacity and smaller item sizes.\n\nHere is the Python implementation of the new algorithm:\n\n```",
+          "code": "import numpy as np\nimport math\n\ndef score(item, bins):\n    scores = np.empty_like(bins)\n\n    remaining_bins = np.where(bins > item)[0]\n    remaining_capacity = bins[remaining_bins] - item\n    inv_remaining_capacity = 1.0 / remaining_capacity\n    log_bin_size = np.log(bins[remaining_bins])\n\n    scores[remaining_bins] = inv_remaining_capacity / item + log_bin_size\n\n    return scores",
+          "objective": 0.01358,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to bins based on the sum of the inverse of the remaining capacity divided by the item size and the logarithm of the bin size, giving higher scores to bins with larger remaining capacity and smaller item sizes.\n\nHere is the Python implementation of the new algorithm:\n\n```",
+          "code": "import numpy as np\nimport math\n\ndef score(item, bins):\n    scores = np.empty_like(bins)\n    log_bins = np.log(bins)  # Calculate logarithm only once\n    \n    remaining_bins = np.where(bins > item)[0]\n    remaining_capacity = bins[remaining_bins] - item\n    inv_remaining_capacity = 1.0 / remaining_capacity\n\n    scores[remaining_bins] = inv_remaining_capacity / item + log_bins[remaining_bins]\n\n    return scores",
+          "objective": 0.01368,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe new algorithm assigns scores to bins based on the sum of the square root of the remaining capacity divided by the item size and the square root of the logarithm of the item size, giving higher scores to bins with larger remaining capacity and smaller item sizes.\n",
+          "code": "import numpy as np\nimport math\n\ndef score(item, bins):\n    scores = np.empty_like(bins)\n\n    remaining_bins = np.where(bins > item)[0]\n    remaining_capacity = bins[remaining_bins] - item\n    log_item_size = np.log(item)\n\n    scores[remaining_bins] = np.sqrt(remaining_capacity) / item + np.sqrt(log_item_size)\n\n    return scores",
+          "objective": 0.01449,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe new algorithm assigns scores to bins based on the sum of the square root of the remaining capacity divided by the item size and the square root of the logarithm of the item size, giving higher scores to bins with larger remaining capacity and smaller item sizes.\n",
+          "code": "import numpy as np\nimport math\n\ndef score(item, bins):\n    scores = np.empty_like(bins)\n\n    remaining_bins = np.where(bins > item)[0]\n    remaining_capacity = bins[remaining_bins] - item\n    sqrt_remaining_capacity = np.sqrt(remaining_capacity)\n    sqrt_log_item_size = np.sqrt(np.log(item))\n\n    scores[remaining_bins] = sqrt_remaining_capacity / item + sqrt_log_item_size\n\n    return scores",
+          "objective": 0.01519,
+          "other_inf": null
+     }
+]

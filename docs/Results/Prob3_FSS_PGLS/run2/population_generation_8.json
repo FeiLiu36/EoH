@@ -1,0 +1,62 @@
+[
+     {
+          "algorithm": "\nNew algorithm description: The new algorithm selects the top jobs by random selection, perturbs them in the current sequence to update the execution time matrix by multiplying their execution time with a random factor between 0.8 and 1.2.\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    perturb_jobs = np.random.choice(n, m, replace=False)\n\n    new_matrix = time_matrix.copy()\n    for job in perturb_jobs:\n        perturbation = np.random.uniform(0.8, 1.2) * new_matrix[job]\n        new_matrix[job] = perturbation\n\n    return new_matrix, perturb_jobs",
+          "objective": 3154.6875,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe new algorithm randomly selects a subset of jobs, calculates their weighted sum of execution times on different machines, and perturbs the selected jobs in the current sequence to update the execution time matrix by adding or subtracting a random perturbation factor multiplied by their execution time.\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    job_weights = np.sum(time_matrix, axis=1)\n    perturb_jobs = np.random.choice(n, m, replace=False, p=job_weights/np.sum(job_weights))\n\n    new_matrix = time_matrix.copy()\n    for job in perturb_jobs:\n        perturbation = np.random.uniform(-0.2, 0.2) * new_matrix[job]\n        new_matrix[job] += perturbation\n\n    return new_matrix, perturb_jobs",
+          "objective": 3154.85938,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm description: The new algorithm selects the top jobs by random selection, perturbs them in the current sequence to update the execution time matrix by multiplying their execution time with a random factor between 0.8 and 1.2.\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    perturb_jobs = np.random.choice(n, m, replace=False)\n\n    perturbation_factors = np.random.uniform(0.8, 1.2, size=m).reshape(m, 1)\n    new_matrix = time_matrix.copy()\n    new_matrix[perturb_jobs] *= perturbation_factors\n\n    return new_matrix, perturb_jobs",
+          "objective": 3155.1875,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm:\nThe new algorithm selects the top jobs based on the ratio of maximum and minimum execution time on different machines, perturbs the selected jobs in the current sequence to update the execution time matrix by adding or subtracting a random perturbation factor multiplied by their execution time.\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    ratio = (np.max(time_matrix, axis=1) / np.min(time_matrix, axis=1))\n    perturb_jobs = np.argsort(ratio)[-m:]\n    new_matrix = time_matrix.copy()\n    for job in perturb_jobs:\n        new_matrix[job] += np.random.uniform(-0.2, 0.2) * new_matrix[job]\n    return new_matrix, perturb_jobs",
+          "objective": 3155.84375,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe new algorithm selects the top jobs by random selection, perturbs them in the current sequence to update the execution time matrix by adding or subtracting a random factor to their execution time.\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    perturb_jobs = np.random.choice(n, m, replace=False)\n\n    new_matrix = time_matrix.copy()\n    for job in perturb_jobs:\n        perturbation = np.random.uniform(-0.2, 0.2) * new_matrix[job]\n        new_matrix[job] += perturbation\n\n    return new_matrix, perturb_jobs",
+          "objective": 3156.07812,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe new algorithm randomly selects a subset of jobs, calculates their average execution time on different machines, and perturbs the selected jobs in the current sequence to update the execution time matrix by adding or subtracting a random perturbation factor multiplied by their execution time.\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    average_exec_time = np.mean(time_matrix, axis=1)\n    perturb_jobs = np.random.choice(n, m, replace=False, p=average_exec_time/np.sum(average_exec_time))\n\n    new_matrix = time_matrix.copy()\n    for job in perturb_jobs:\n        perturbation = np.random.uniform(-0.2, 0.2) * new_matrix[job]\n        new_matrix[job] += perturbation\n\n    return new_matrix, perturb_jobs",
+          "objective": 3156.09375,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe new algorithm randomly selects a subset of jobs, calculates their weighted sum of execution times on different machines, and perturbs the selected jobs in the current sequence to update the execution time matrix by adding or subtracting a random perturbation factor multiplied by their execution time.\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    job_weights = np.sum(time_matrix, axis=1)\n    perturb_jobs = np.random.choice(n, min(m, n), replace=False, p=job_weights/np.sum(job_weights))\n\n    new_matrix = time_matrix.copy()\n    for job in perturb_jobs:\n        perturbation = np.random.uniform(-0.2, 0.2) * new_matrix[job]\n        new_matrix[job] += perturbation\n\n    return new_matrix, perturb_jobs",
+          "objective": 3156.20312,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe new algorithm randomly selects 'm' jobs to perturb in the current sequence by adding or subtracting a random perturbation factor to their execution time, then updates the execution time matrix accordingly.\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    perturb_jobs = np.random.choice(n, m, replace=False)\n    \n    new_matrix = time_matrix.copy()\n    for job in perturb_jobs:\n        perturbation = np.random.uniform(-0.2, 0.2) * new_matrix[job]\n        new_matrix[job] += perturbation\n\n    return new_matrix, perturb_jobs",
+          "objective": 3156.35938,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe new algorithm selects the top jobs based on the absolute difference between the maximum and minimum execution time on different machines, perturbs the selected jobs in the current sequence to update the execution time matrix by applying a random perturbation factor to their execution time within the range of -0.25 to 0.25.\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    execution_time_diff = np.abs(np.max(time_matrix, axis=1) - np.min(time_matrix, axis=1))\n    perturb_jobs = np.argsort(execution_time_diff)[-m:]\n\n    new_matrix = time_matrix.copy()\n    for job in perturb_jobs:\n        perturbation = np.random.uniform(-0.25, 0.25) * new_matrix[job]\n        new_matrix[job] += perturbation\n\n    return new_matrix, perturb_jobs",
+          "objective": 3156.64062,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm description: The new algorithm selects the top jobs based on their execution time variance across all machines, perturbs the selected jobs in the current sequence to update the execution time matrix by multiplying their execution time by a random factor between 0.8 and 1.2.\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    execution_time_variance = np.var(time_matrix, axis=1)\n    perturb_jobs = np.argsort(execution_time_variance)[-m:]\n    \n    new_matrix = time_matrix.copy()\n    for job in perturb_jobs:\n        new_matrix[job] += np.random.uniform(-0.2, 0.2) * new_matrix[job]  # Perturb the execution time by adding random noise\n    \n    return new_matrix, perturb_jobs",
+          "objective": 3156.76562,
+          "other_inf": null
+     }
+]

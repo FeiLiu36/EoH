@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "Common backbone idea: Assigning scores to each bin based on a combination of the bin's capacity, the item size, the difference between the bin's capacity and the item size, and the number of times the bin has been used.\n\nNew algorithm: Assign scores to each bin based on the bin's current capacity divided by the product of the logarithm of the difference between the bin's capacity and the item size and the square root of the difference between the bin's capacity and the item size, plus the square of the number of times the bin has been used, and apply a power function to promote performance.\n\nPython code for the new algorithm:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = bins / ((np.log(bins - item) * np.sqrt(bins - item)) ** 2) + (np.arange(len(bins)) ** 2)\n    scores += np.exp(item)  # Apply a power function to promote performance\n    return scores",
+          "objective": 0.01419,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on a combination of the bin's current capacity divided by the product of the logarithm of the difference between the bin's capacity and the item size and the square root of the difference between the bin's capacity and the item size, the number of times the bin has been used squared divided by the item size, and a constant factor multiplied by the item size divided by the bin's current capacity, and applies a power function to promote performance.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins / (np.log(bins - item) * np.sqrt(bins - item))) + ((np.arange(len(bins)) ** 2) / item) + (0.1 * (item / bins))\n    scores += np.exp(item)  # Apply a power function to promote performance\n    return scores",
+          "objective": 0.01449,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: Assigning scores to each bin based on a combination of the bin's capacity, the item size, the difference between the bin's capacity and the item size, and the number of times the bin has been used.\n\nNew algorithm: Assign scores to each bin based on the bin's current capacity divided by the sum of the logarithm of the difference between the bin's capacity and the item size and the square root of the difference between the bin's capacity and the item size, plus the square of the number of times the bin has been used, the square of the item size divided by the square root of the difference between the bin's capacity and the item size, and the exponential of the item size.\n\nPython code for the new algorithm:\n\n``` \n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins / (np.log(bins - item) + np.sqrt(bins - item))) + (np.arange(len(bins)) ** 2) + ((item ** 2) / np.sqrt(bins - item)) + np.exp(item)\n    return scores",
+          "objective": 0.01489,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates scores for each bin based on a combination of the bin's capacity, the item size, and the number of times the bin has been used. It also incorporates a logarithmic function to further promote performance.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins / ((bins - item) ** 2)) * np.log(1 + np.arange(len(bins))) + (np.arange(len(bins)) ** 2)\n    scores += np.exp(item)\n    return scores",
+          "objective": 0.01519,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on a combination of their remaining capacity, the item size, and the number of times the bin has been used, while also considering a certain function that incorporates the size of the current item and promotes performance.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins + item) / (bins - item) + np.arange(len(bins)) + np.exp(item)\n    return scores",
+          "objective": 0.0164,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on a combination of the bin's capacity, the item size, and the average of the rest capacities of the feasible bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    avg_rest_capacity = np.mean(bins)\n    scores = bins / ((bins - item) ** 2) + (np.arange(len(bins)) ** 2)\n    scores += np.exp(item) * avg_rest_capacity\n    return scores",
+          "objective": 0.01731,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: The new algorithm assigns scores to each bin based on a combination of the bin's remaining capacity, the item size, the number of times the bin has been used, and a factor that takes into account the square of the difference between the bin's capacity and the item size, while also applying a logarithmic function to promote performance.\n\nCode:\n``` ",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins + item) / (bins - item) + np.arange(len(bins)) + (np.sqrt(bins - item) ** 2) + np.log10(np.exp(item))\n    return scores",
+          "objective": 0.01881,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on the combination of the bin's current capacity divided by the difference between the bin's capacity and the item size, the square root of the bin's current capacity divided by the square root of the item size, the logarithm of the bin's capacity divided by the logarithm of the item size, and the exponential of the number of times the bin has been used, while also applying a power function to promote performance.\n\nPython code for the new algorithm:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins / (bins - item)) + (np.sqrt(bins) / np.sqrt(item)) + (np.log(bins) / np.log(item)) + np.exp(item) ** np.arange(len(bins))\n    return scores",
+          "objective": 0.01902,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on the bin's current capacity divided by the sum of the square root of the difference between the bin's capacity and the item size and the square root of the difference between the bin's capacity and the item size, plus the number of times the bin has been used.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = bins / (np.sqrt((bins - item) * (bins - item)) + np.sqrt((bins - item) * (bins - item))) + np.arange(len(bins))\n    scores += np.exp(item)  # Apply a power function to promote performance\n    return scores",
+          "objective": 0.02103,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on the bin's current capacity divided by the sum of the square root of the difference between the bin's capacity and the item size and the square root of the difference between the bin's capacity and the item size plus the number of times the bin has been used, and also multiplies it by the logarithm of the item size to promote performance.\n\nCode:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = bins / (np.sqrt((bins - item) * (bins - item)) + np.sqrt((bins - item) * (bins - item))) + np.arange(len(bins)) * np.log(item)\n    scores += np.exp(item)  # Apply a power function to promote performance\n    return scores",
+          "objective": 0.02123,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: Assigning scores to each bin based on a combination of the bin's capacity, the item size, the difference between the bin's capacity and the item size, and the number of times the bin has been used.\n\nNew algorithm: Assign scores to each bin based on the bin's current capacity divided by the logarithm of the product of the difference between the bin's capacity and the item size and the difference between the bin's capacity and the item size, plus the square of the number of times the bin has been used, and apply a power function to promote performance.\n\nPython code for the new algorithm:\n\n``` ",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = bins / (np.log((bins - item) * (bins - item))) + (np.arange(len(bins)) ** 2)\n    scores += np.exp(item)  # Apply a power function to promote performance\n    return scores",
+          "objective": 0.02183,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on a combination of the bin's current capacity, the item size, the logarithm of the difference between the bin's capacity and the item size, and the square of the number of times the bin has been used. It then applies a power function to promote performance and returns the scores for the bins.\n\nPython code for the new algorithm:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins * item) / ((np.log(bins - item)) ** 2) + (np.arange(len(bins)) ** 2)\n    scores += np.exp(item)  # Apply a power function to promote performance\n    return scores",
+          "objective": 0.02203,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Backbone idea: The provided algorithms assign scores to the bins based on a combination of the bin's current capacity, the item size, the difference between the bin's capacity and the item size, the logarithm and square root of this difference, and the number of times the bin has been used.\n\nNew algorithm description: The new algorithm calculates the score for each bin as the sum of the bin's current capacity divided by the logarithm of the product of the difference between the bin's capacity and the item size and the square root of the difference between the bin's capacity and the item size, the square root of the bin's current capacity divided by the square root of the difference between the bin's capacity and the item size, the number of times the bin has been used, the exponential of the item size, an additional term incorporating the reciprocal of the item size, and a constant factor multiplied by the bin's current capacity divided by the item size.\n\nPython code for the new algorithm:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins / (np.log((bins - item) * np.sqrt(bins - item)))) + (np.sqrt(bins) / np.sqrt(bins - item)) + np.arange(len(bins)) + np.exp(item) + (1 / item) + (0.5 * (bins / item))\n    return scores",
+          "objective": 0.02324,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm and main steps: \nThe new algorithm calculates the score for each bin as the sum of the bin's current capacity divided by the logarithm of the product of the difference between the bin's capacity and the item size and the square root of the difference between the bin's capacity and the item size, the square root of the bin's current capacity divided by the square root of the difference between the bin's capacity and the item size, the number of times the bin has been used, and a function that incorporates the size of the current item and promotes performance. \n\nPython code for the new algorithm:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins / (np.log((bins - item) * np.sqrt(bins - item)))) + (np.sqrt(bins) / np.sqrt(bins - item)) + np.arange(len(bins)) + np.exp(item)\n    return scores",
+          "objective": 0.02405,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea in the provided algorithms: Assigning scores to each bin based on a combination of their remaining capacity, the item size, and the number of times the bin has been used.\n\nNew algorithm description: Assign scores to each bin based on the bin's current capacity multiplied by the item size divided by the log value of the difference between the bin's capacity and the item size, plus the number of times the bin has been used, and apply a power function to promote performance.\n\nPython code for the new algorithm:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins * item) / (np.log(bins - item) ** 2) + np.arange(len(bins))\n    scores += np.exp(item)  # Apply a power function to promote performance\n    return scores",
+          "objective": 0.02606,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign scores to each bin based on the bin's current capacity multiplied by the item size divided by the square root of the difference between the bin's capacity and the item size, plus the square of the number of times the bin has been used, and take the exponential of the result.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins * item) / (np.sqrt(bins - item)) + (np.arange(len(bins)) ** 2)\n    scores = np.exp(scores) \n    return scores",
+          "objective": 0.02676,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: Assigning scores to each bin based on the bin's capacity, the item size, the difference between the bin's capacity and the item size, and the number of times the bin has been used.\n\nNew algorithm description: The new algorithm assigns scores to each bin based on a combination of the bin's capacity divided by the logarithm of the square root of the difference between the bin's capacity and the item size, the bin's current capacity divided by the square root of the difference between the bin's capacity and the item size, the bin's current capacity divided by the difference between the bin's capacity and the item size, and the cube of the number of times the bin has been used, while also applying a power function to promote performance.\n\nPython code for the new algorithm:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins / (np.log(np.sqrt(bins - item)))) + (np.sqrt(bins) / np.sqrt(bins - item)) + (bins / (bins - item)) + (np.arange(len(bins)) ** 3)\n    scores += np.exp(item)  # Apply a power function to promote performance\n    return scores",
+          "objective": 0.02948,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on a combination of their remaining capacity, item size, the number of times the bin has been used, and a certain function that incorporates the item size and promotes performance.\n\nCode:\n\n``` ",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins / (bins - item)) + (np.sqrt(bins) / (bins - item + 1)) + np.exp(item) + np.arange(len(bins))\n    return scores",
+          "objective": 0.0324,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: Assigning scores to each bin based on the bin's capacity, the item size, the difference between the bin's capacity and the item size, and the number of times the bin has been used.\n\nNew algorithm description: The new algorithm assigns scores to each bin based on a combination of the bin's capacity divided by the logarithm of the square root of the difference between the bin's capacity and the item size, the bin's current capacity divided by the square root of the difference between the bin's capacity and the item size, the bin's current capacity divided by the difference between the bin's capacity and the item size, and the cube of the number of times the bin has been used, while also applying a power function to promote performance.\n\nPython code for the new algorithm:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins / (np.log(np.sqrt(bins - item)))) + (np.sqrt(bins) / np.sqrt(bins - item)) + (bins / (bins - item)) + (np.ones(len(bins)) * 100)\n    scores += np.exp(item)  # Apply a power function to promote performance\n    return scores",
+          "objective": 0.03521,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The common backbone idea in the provided algorithms is to assign scores to each bin based on a combination of the bin's current capacity, the item size, and the number of times the bin has been used. Additionally, various mathematical operations such as square root, logarithm, and exponential functions are applied to these values to promote performance.\n\nBased on this backbone idea, the new algorithm assigns scores to each bin by taking the square root of the bin's current capacity multiplied by the item size, and then dividing it by the logarithm of the square of the difference between the bin's capacity and the item size, all while considering the number of times the bin has been used and applying an exponential function for performance promotion.\n\nPython code for the new algorithm:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.sqrt(bins * item) / (np.log((bins - item) ** 2))\n    scores += np.arange(len(bins)) + np.exp(item)  # Apply a power function to promote performance\n    return scores",
+          "objective": 0.03542,
+          "other_inf": null
+     }
+]

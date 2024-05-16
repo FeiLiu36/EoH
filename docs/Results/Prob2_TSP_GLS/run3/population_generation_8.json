@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "The new algorithm penalizes the distances of frequently used edges in the local optimal tour using a penalty factor increased by a lower power of the difference between the maximum number of edge uses and the actual number of edge uses, with a penalty factor of 0.6 * (max_n_used - edge_n_used) instead of 0.8 * (max_n_used - edge_n_used) raised to the power of 1.5.",
+          "code": "def update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    max_n_used = np.max(edge_n_used)\n    penalty_factor = 0.6 * (max_n_used - edge_n_used)**1.2\n    \n    for i in range(len(local_opt_tour)-1):\n        edge_i = local_opt_tour[i]\n        edge_j = local_opt_tour[i+1]\n        \n        updated_edge_distance[edge_i][edge_j] += penalty_factor[edge_i][edge_j]\n        updated_edge_distance[edge_j][edge_i] = updated_edge_distance[edge_i][edge_j] # symmetrical matrix\n        \n    return updated_edge_distance",
+          "objective": 0.00712,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: The new algorithm updates the edge distance matrix by adding a penalty to the distances of edges that have been frequently used in the local optimal tour based on a linearly decreasing function of the number of times each edge has been used.\n\n```",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    max_n_used = np.max(edge_n_used)\n    \n    for i in range(len(local_opt_tour)-1):\n        edge_i = local_opt_tour[i]\n        edge_j = local_opt_tour[i+1]\n        \n        penalty = max_n_used - edge_n_used[edge_i][edge_j]\n        \n        updated_edge_distance[edge_i][edge_j] += penalty\n        updated_edge_distance[edge_j][edge_i] = updated_edge_distance[edge_i][edge_j] # symmetrical matrix\n        \n    return updated_edge_distance",
+          "objective": 0.01073,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm Description: The new algorithm updates the edge distance matrix by penalizing the distances of edges that have been frequently used in the local optimal tour, with a penalty factor increased by a higher power of the difference between the maximum number of edge uses and the actual number of edge uses. However, it uses a different penalty factor of 0.65 * (max_n_used - edge_n_used) instead of 0.75 * (max_n_used - edge_n_used) raised to the power of 1.5.\n\nCode:\n```",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    max_n_used = np.max(edge_n_used)\n    penalty_factor = 0.65 * (max_n_used - edge_n_used) ** 1.5\n    \n    for i in range(len(local_opt_tour)-1):\n        edge_i = local_opt_tour[i]\n        edge_j = local_opt_tour[i+1]\n        \n        updated_edge_distance[edge_i][edge_j] += penalty_factor[edge_i][edge_j]\n        updated_edge_distance[edge_j][edge_i] = updated_edge_distance[edge_i][edge_j] # symmetrical matrix\n        \n    return updated_edge_distance",
+          "objective": 0.01089,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm Description: The new algorithm updates the edge distance matrix by adding a penalty to the distances of edges that have been frequently used in the local optimal tour, with a penalty factor increased by a constant value of 1 multiplied by the difference between the maximum number of edge uses and the actual number of edge uses, but with a higher penalty factor of 2.\n\nCode:\n``` \n\nCode:\n",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    max_n_used = np.max(edge_n_used)\n    penalty_factor = 2 + 1 * (max_n_used - edge_n_used)\n    \n    for i in range(len(local_opt_tour)-1):\n        edge_i = local_opt_tour[i]\n        edge_j = local_opt_tour[i+1]\n        \n        updated_edge_distance[edge_i][edge_j] += penalty_factor[edge_i][edge_j]\n        updated_edge_distance[edge_j][edge_i] = updated_edge_distance[edge_i][edge_j] # symmetrical matrix\n        \n    return updated_edge_distance",
+          "objective": 0.01278,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm Description: The new algorithm updates the edge distance matrix by adding a penalty to the distances of edges that have been frequently used in the local optimal tour, with a penalty factor increased by the square root of the difference between the maximum number of edge uses and the actual number of edge uses, but with a higher penalty factor of 1.2.\n\nCode:\n\n``` ",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    max_n_used = np.max(edge_n_used)\n    penalty_factor = 1.2 * np.sqrt(max_n_used - edge_n_used)\n    \n    for i in range(len(local_opt_tour)-1):\n        edge_i = local_opt_tour[i]\n        edge_j = local_opt_tour[i+1]\n        \n        updated_edge_distance[edge_i][edge_j] += penalty_factor[edge_i][edge_j]\n        updated_edge_distance[edge_j][edge_i] = updated_edge_distance[edge_i][edge_j] # symmetrical matrix\n        \n    return updated_edge_distance",
+          "objective": 0.01384,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm Description: The new algorithm updates the edge distance matrix by penalizing the distances of edges that have been frequently used in the local optimal tour, with a penalty factor increased by a higher power of the difference between the maximum number of edge uses and the actual number of edge uses. The penalty factor is defined as (max_n_used-edge_n_used)**2, where max_n_used is the maximum number of edge uses and edge_n_used is the matrix containing the number of each edge used during permutation.\n\nCode:\n\n```",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    max_n_used = np.max(edge_n_used)\n    penalty_factor = (max_n_used-edge_n_used)**2\n    \n    for i in range(len(local_opt_tour)-1):\n        edge_i = local_opt_tour[i]\n        edge_j = local_opt_tour[i+1]\n        \n        updated_edge_distance[edge_i][edge_j] += penalty_factor[edge_i][edge_j]\n        updated_edge_distance[edge_j][edge_i] = updated_edge_distance[edge_i][edge_j] # symmetrical matrix\n        \n    return updated_edge_distance",
+          "objective": 0.01424,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm Description: The new algorithm updates the edge distance matrix by adding a penalty to the distances of edges that have been frequently used in the local optimal tour, with a penalty factor increased by a constant value of 0.5 multiplied by the difference between the maximum number of edge uses and the actual number of edge uses, but with a higher penalty factor of 1.5.\n\nCode:\n``` \n",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    max_n_used = np.max(edge_n_used)\n    penalty_factor = 1.5 + 0.5 * (max_n_used - edge_n_used)\n    \n    for i in range(len(local_opt_tour)-1):\n        edge_i = local_opt_tour[i]\n        edge_j = local_opt_tour[i+1]\n        \n        updated_edge_distance[edge_i][edge_j] += penalty_factor[edge_i][edge_j]\n        updated_edge_distance[edge_j][edge_i] = updated_edge_distance[edge_i][edge_j] # symmetrical matrix\n        \n    return updated_edge_distance",
+          "objective": 0.01559,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm: The new algorithm updates the edge distance matrix by penalizing the distances of edges that have been frequently used in the local optimal tour, with a penalty factor increased by a higher power of the difference between the maximum number of edge uses and the actual number of edge uses. The penalty factor is defined as 0.8 * (max_n_used - edge_n_used)**0.8.\n\nUpdated Code:\n```",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    max_n_used = np.max(edge_n_used)\n    penalty_factor = 0.8 * (max_n_used - edge_n_used)**0.8\n    \n    for i in range(len(local_opt_tour)-1):\n        edge_i = local_opt_tour[i]\n        edge_j = local_opt_tour[i+1]\n        \n        updated_edge_distance[edge_i][edge_j] += penalty_factor[edge_i][edge_j]\n        updated_edge_distance[edge_j][edge_i] = updated_edge_distance[edge_i][edge_j] # symmetrical matrix\n        \n    return updated_edge_distance",
+          "objective": 0.01562,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm Description: The new algorithm updates the edge distance matrix by penalizing the distances of edges that have been frequently used in the local optimal tour, with a penalty factor increased by a higher power of the difference between the maximum number of edge uses and the actual number of edge uses. The penalty factor is defined as 0.5 * (max_n_used - edge_n_used)**1.5.\n\nCode:\n```",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    max_n_used = np.max(edge_n_used)\n    penalty_factor = 0.5 * (max_n_used - edge_n_used)**1.5\n    \n    for i in range(len(local_opt_tour)-1):\n        edge_i = local_opt_tour[i]\n        edge_j = local_opt_tour[i+1]\n        \n        updated_edge_distance[edge_i][edge_j] += penalty_factor[edge_i][edge_j]\n        updated_edge_distance[edge_j][edge_i] = updated_edge_distance[edge_i][edge_j] # symmetrical matrix\n        \n    return updated_edge_distance",
+          "objective": 0.01655,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm penalizes the distances of edges that have been frequently used in the local optimal tour with a penalty factor increased by a higher power of the difference between the maximum number of edge uses and the actual number of edge uses, but with a higher penalty factor of 0.7.",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    max_n_used = np.max(edge_n_used)\n    penalty_factor = 0.7 * np.power((max_n_used - edge_n_used), 4)\n    \n    for i in range(len(local_opt_tour)-1):\n        edge_i = local_opt_tour[i]\n        edge_j = local_opt_tour[i+1]\n        \n        updated_edge_distance[edge_i][edge_j] += penalty_factor[edge_i][edge_j]\n        updated_edge_distance[edge_j][edge_i] = updated_edge_distance[edge_i][edge_j] # symmetrical matrix\n        \n    return updated_edge_distance",
+          "objective": 0.01762,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm Description: The new algorithm updates the edge distance matrix by adding a penalty to the distances of edges that have been frequently used in the local optimal tour, with a penalty factor increased by a higher power of the difference between the maximum number of edge uses and the actual number of edge uses, but with a reduced penalty factor of 0.1.\n\nCode:\n```\n",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    max_n_used = np.max(edge_n_used)\n    penalty_factor = 0.1 * np.power((max_n_used - edge_n_used), 4)\n\n    for i in range(len(local_opt_tour)-1):\n        edge_i = local_opt_tour[i]\n        edge_j = local_opt_tour[i+1]\n        \n        updated_edge_distance[edge_i][edge_j] += penalty_factor[edge_i][edge_j]\n        updated_edge_distance[edge_j][edge_i] = updated_edge_distance[edge_i][edge_j] # symmetrical matrix\n        \n    return updated_edge_distance",
+          "objective": 0.01776,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm Description: The new algorithm updates the edge distance matrix by adding a penalty to the distances of edges that have been frequently used in the local optimal tour, with a penalty factor increased by the logarithm of the difference between the maximum number of edge uses and the actual number of edge uses, but with a higher penalty factor of 0.8.\n\nCode:\n\n```",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    max_n_used = np.max(edge_n_used)\n    penalty_factor = 0.8 * np.log(max_n_used - edge_n_used + 1)\n    \n    for i in range(len(local_opt_tour)-1):\n        edge_i = local_opt_tour[i]\n        edge_j = local_opt_tour[i+1]\n        \n        updated_edge_distance[edge_i][edge_j] += penalty_factor[edge_i][edge_j]\n        updated_edge_distance[edge_j][edge_i] = updated_edge_distance[edge_i][edge_j] # symmetrical matrix\n        \n    return updated_edge_distance",
+          "objective": 0.0178,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm Description: The new algorithm penalizes the distances of edges that have been frequently used in the local optimal tour, with a penalty factor increased by a higher power of the difference between the maximum number of edge uses and the actual number of edge uses. The penalty factor is defined as the square of the difference between the maximum number of edge uses and the actual number of edge uses, multiplied by a constant factor.\n\nCode:\n\n```",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    max_n_used = np.max(edge_n_used)\n    penalty_factor = (max_n_used - edge_n_used)**2 * 1.5  # Update penalty factor with a constant factor\n    \n    for i in range(len(local_opt_tour)-1):\n        edge_i = local_opt_tour[i]\n        edge_j = local_opt_tour[i+1]\n        \n        updated_edge_distance[edge_i][edge_j] += penalty_factor[edge_i][edge_j]\n        updated_edge_distance[edge_j][edge_i] = updated_edge_distance[edge_i][edge_j]  # symmetrical matrix\n        \n    return updated_edge_distance",
+          "objective": 0.01932,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm Description: The new algorithm updates the edge distance matrix by adding a penalty to the distances of edges that have been frequently used in the local optimal tour, with a penalty factor increased by a constant value of 1 multiplied by the difference between the maximum number of edge uses and the actual number of edge uses, but with a higher penalty factor of 1.8.\n\nCode:\n``` \n\nCode:\n",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    max_n_used = np.max(edge_n_used)\n    penalty_factor = 1.8 * (max_n_used - edge_n_used)\n    \n    for i in range(len(local_opt_tour)-1):\n        edge_i = local_opt_tour[i]\n        edge_j = local_opt_tour[i+1]\n        \n        updated_edge_distance[edge_i][edge_j] += penalty_factor[edge_i][edge_j]\n        updated_edge_distance[edge_j][edge_i] = updated_edge_distance[edge_i][edge_j] # symmetrical matrix\n        \n    return updated_edge_distance",
+          "objective": 0.01943,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm Description: The new algorithm updates the edge distance matrix by penalizing the distances of edges that have been frequently used in the local optimal tour, with a penalty factor increased by a lower power of the difference between the maximum number of edge uses and the actual number of edge uses. The penalty factor is defined as 0.3 * (max_n_used - edge_n_used) raised to the power of 0.8.\n\nCode:\n\n```",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    max_n_used = np.max(edge_n_used)\n    penalty_factor = 0.3 * (max_n_used - edge_n_used)**0.8\n    \n    for i in range(len(local_opt_tour)-1):\n        edge_i = local_opt_tour[i]\n        edge_j = local_opt_tour[i+1]\n        \n        updated_edge_distance[edge_i][edge_j] += penalty_factor[edge_i][edge_j]\n        updated_edge_distance[edge_j][edge_i] = updated_edge_distance[edge_i][edge_j] # symmetrical matrix\n        \n    return updated_edge_distance",
+          "objective": 0.01988,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm Description: The new algorithm updates the edge distance matrix by multiplying the distances of edges that have been frequently used in the local optimal tour by a penalty factor calculated as the square of the difference between the maximum number of edge uses and the actual number of edge uses, but with a higher penalty factor of 0.8.\n\n```",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    max_n_used = np.max(edge_n_used)\n    penalty_factor = 0.8 * np.power((max_n_used - edge_n_used), 2)\n    \n    for i in range(len(local_opt_tour)-1):\n        edge_i = local_opt_tour[i]\n        edge_j = local_opt_tour[i+1]\n        \n        updated_edge_distance[edge_i][edge_j] *= penalty_factor[edge_i][edge_j]\n        updated_edge_distance[edge_j][edge_i] = updated_edge_distance[edge_i][edge_j] # symmetrical matrix\n        \n    return updated_edge_distance",
+          "objective": 0.01989,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm description: The new algorithm updates the edge distance matrix by penalizing the distances of edges that have been frequently used in the local optimal tour, with a penalty factor increased by a higher power of the ratio between the maximum number of edge uses and the actual number of edge uses. The penalty factor is defined as 0.5 * ((max_n_used / edge_n_used) ** 2).\n",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    max_n_used = np.max(edge_n_used)\n    penalty_factor = 0.5 * ((max_n_used / edge_n_used) ** 2)\n    \n    for i in range(len(local_opt_tour)-1):\n        edge_i = local_opt_tour[i]\n        edge_j = local_opt_tour[i+1]\n        \n        updated_edge_distance[edge_i][edge_j] += penalty_factor[edge_i][edge_j]\n        updated_edge_distance[edge_j][edge_i] = updated_edge_distance[edge_i][edge_j] # symmetrical matrix\n        \n    return updated_edge_distance",
+          "objective": 0.02,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm Description: The new algorithm penalizes the distances of edges that have been frequently used in the local optimal tour with a penalty factor increased by a higher power of the difference between the maximum number of edge uses and the actual number of edge uses, but with a higher penalty factor of 0.5.\n\nCode:\n```\n",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    max_n_used = np.max(edge_n_used)\n    penalty_factor = 0.5 * np.power((max_n_used - edge_n_used), 8)\n    \n    for i in range(len(local_opt_tour)-1):\n        edge_i = local_opt_tour[i]\n        edge_j = local_opt_tour[i+1]\n        \n        updated_edge_distance[edge_i][edge_j] += penalty_factor[edge_i][edge_j]\n        updated_edge_distance[edge_j][edge_i] = updated_edge_distance[edge_i][edge_j] # symmetrical matrix\n        \n    return updated_edge_distance",
+          "objective": 0.02049,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm Description: The new algorithm updates the edge distance matrix by penalizing the distances of edges that have been frequently used in the local optimal tour, with a penalty factor increased by a higher power of the difference between the maximum number of edge uses and the actual number of edge uses. The penalty factor is defined as max_n_used * (1 - edge_n_used/max_n_used)**2.\n\nImplementaion:\n\n```",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    max_n_used = np.max(edge_n_used)\n    penalty_factor = max_n_used * (1 - edge_n_used/max_n_used)**2\n    \n    for i in range(len(local_opt_tour)-1):\n        edge_i = local_opt_tour[i]\n        edge_j = local_opt_tour[i+1]\n        \n        updated_edge_distance[edge_i][edge_j] += penalty_factor[edge_i][edge_j]\n        updated_edge_distance[edge_j][edge_i] = updated_edge_distance[edge_i][edge_j] # symmetrical matrix\n        \n    return updated_edge_distance",
+          "objective": 0.02061,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm Description: The new algorithm updates the edge distance matrix by penalizing the distances of edges that have been frequently used in the local optimal tour, with a penalty factor increased by a lower power of the difference between the maximum number of edge uses and the actual number of edge uses. The penalty factor is defined as 0.3 * (max_n_used - edge_n_used)**1.2.\n\nCode:\n```",
+          "code": "import numpy as np\n\ndef update_edge_distance(edge_distance, local_opt_tour, edge_n_used):\n    updated_edge_distance = np.copy(edge_distance)\n    max_n_used = np.max(edge_n_used)\n    penalty_factor = 0.3 * (max_n_used - edge_n_used)**1.2\n    \n    for i in range(len(local_opt_tour)-1):\n        edge_i = local_opt_tour[i]\n        edge_j = local_opt_tour[i+1]\n        \n        updated_edge_distance[edge_i][edge_j] += penalty_factor[edge_i][edge_j]\n        updated_edge_distance[edge_j][edge_i] = updated_edge_distance[edge_i][edge_j] # symmetrical matrix\n        \n    return updated_edge_distance",
+          "objective": 0.02067,
+          "other_inf": null
+     }
+]

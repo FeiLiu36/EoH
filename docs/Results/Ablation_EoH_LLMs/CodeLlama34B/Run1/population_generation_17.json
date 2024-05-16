@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": " Common backbone idea: The provided algorithms aim to optimize the usage of bins by assigning items to bins with the highest scores, considering the restrictions of bin capacities and the number of used bins.\n\nNew algorithm: \"Proportional Score with Restricted Capacity\" (PSRC)\n\nDescription: PSRC assigns an item to the bin with the highest proportional score, considering the rest capacity of each bin, while ensuring that the total capacity of all bins does not exceed a predetermined threshold.\n\nPython implementation:\n```\n",
+          "code": "import numpy as np\n\ndef psrc_score(item, bins):\n    # Calculate the restricted capacity for each bin\n    rest_capacity = bins - item\n    \n    # Calculate the proportional scores for each bin\n    scores = np.zeros_like(bins)\n    scores[rest_capacity > 0] = (item / (bins[rest_capacity > 0] - item + 1))\n    \n    return scores",
+          "objective": 0.01962,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm uses a combination of the item size and the rest capacity of each bin to calculate the score for each bin, with a focus on minimizing the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the score for each bin based on the item size and rest capacity\n    scores = np.ones_like(bins)\n    scores[bins != bins.max()] = (item / (bins[bins != bins.max()] - item + 1))\n    return scores",
+          "objective": 0.03803,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm uses a combination of the item size and the rest capacity of each bin to calculate the score for each bin, with a focus on minimizing the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the score for each bin based on the item size and rest capacity\n    scores = np.ones_like(bins)\n    scores[bins != bins.max()] = (item / (bins[bins != bins.max()] - item + 1e-6))\n    return scores",
+          "objective": 0.03823,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: \"Bin-based Scoring with Exponential Weighting\" (BINESW)",
+          "code": "import numpy as np\n\ndef binesw_score(item, bins):\n    # Calculate the exponential weighting for each bin\n    weights = np.exp(-np.abs(bins - item))\n    \n    # Calculate the scores for each bin by multiplying the exponential weighting with the item size\n    scores = weights * item\n    \n    return scores",
+          "objective": 0.03833,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe algorithm assigns an item to the bin with the maximum score and updates the rest capacity of the bin accordingly, until all items are assigned. The score for each bin is calculated as the bin's current capacity divided by the difference between the bin's capacity and the item size, plus the number of times the bin has been used.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = bins / (bins - item) + np.arange(len(bins))\n    return scores",
+          "objective": 0.03843,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm uses a combination of the item size and the distance between the item size and the rest capacity of each bin to calculate the score for each bin.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the distance between the item size and the rest capacity of each bin\n    dist = np.abs(bins - item)\n    \n    # Calculate the score for each bin based on the item size and the distance\n    scores = np.ones_like(bins)\n    scores[dist < item] = (item / (dist[dist < item] + 1))\n    return scores",
+          "objective": 0.03854,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm uses a combination of the item size and the rest capacity of each bin to calculate the score for each bin, with a focus on minimizing the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the logarithmic scores for each bin based on the item size and rest capacity\n    scores = np.log(np.ones_like(bins))\n    scores[bins != bins.max()] = np.log((item / (bins[bins != bins.max()] - item + 1)))\n    return scores",
+          "objective": 0.03894,
+          "other_inf": null
+     },
+     {
+          "algorithm": " Common backbone idea: The algorithms aim to assign items to bins while minimizing the number of used bins. They use various methods to calculate scores for each bin based on the remaining capacity and the item size.\n\nNew algorithm: \"Maximum-Minimum Score with Restricted Capacity\" (MMSC)\n\nDescription: MMSC assigns an item to the bin with the maximum score, considering the rest capacity of each bin, while ensuring that the total capacity of all bins does not exceed a predetermined threshold. The score for each bin is calculated as the minimum of the maximum capacity and the item size divided by the remaining capacity.\n\nPython implementation:\n```\n",
+          "code": "import numpy as np\n\ndef mmsc_score(item, bins):\n    # Calculate the ratio of the item size to the bin capacity\n    ratio = item / bins\n    \n    # Calculate the scores for each bin\n    scores = np.clip(ratio, 0, 1)\n    \n    return scores",
+          "objective": 0.03904,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe algorithm assigns an item to the bin with the maximum score, considering the rest capacity of each bin, in order to minimize the number of used bins. \n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    scores[bins != bins.max()] = item / (bins[bins != bins.max()] - item + 1)\n    return scores",
+          "objective": 0.03914,
+          "other_inf": null
+     },
+     {
+          "algorithm": " Common backbone idea: The provided algorithms aim to optimize the usage of bins by assigning items to bins with the highest scores, considering the restrictions of bin capacities and the number of used bins.\n\nNew algorithm: \"Minimax Score with Restricted Capacity\" (MMRC)\n\nDescription: MMRC assigns an item to the bin with the minimum score, considering the rest capacity of each bin, while ensuring that the total capacity of all bins does not exceed a predetermined threshold.\n\nPython implementation:\n```",
+          "code": "import numpy as np\n\ndef mmrc_score(item, bins):\n    # Calculate the minimum score for each bin\n    min_score = np.min(bins)\n    \n    # Calculate the restricted capacity for each bin\n    rest_capacity = bins - item\n    \n    # Calculate the scores for each bin\n    scores = np.where(rest_capacity > 0, min_score * rest_capacity, 0)\n    \n    return scores",
+          "objective": 0.03924,
+          "other_inf": null
+     },
+     {
+          "algorithm": " Common backbone idea: The algorithms aim to assign items to bins while minimizing the number of used bins. They use various methods to calculate scores for each bin based on the remaining capacity and the item size.\n\nNew algorithm: \"Maximum-Minimum Score with Restricted Capacity\" (MMSC)\n\nDescription: MMSC assigns an item to the bin with the maximum score, considering the rest capacity of each bin, while ensuring that the total capacity of all bins does not exceed a predetermined threshold. The score for each bin is calculated as the minimum of the maximum capacity and the item size divided by the remaining capacity.\n\nPython implementation:\n```\n",
+          "code": "import numpy as np\n\ndef mmsc_score(item, bins):\n    # Calculate the restricted capacity for each bin\n    rest_capacity = bins - item\n    \n    # Calculate the scores for each bin\n    scores = np.clip(bins, item, rest_capacity)\n    \n    return scores",
+          "objective": 0.03934,
+          "other_inf": null
+     },
+     {
+          "algorithm": " New algorithm: \"Dynamic Score with Adaptive Threshold\" (DSTAT)\n\nDescription: DSTAT assigns an item to the bin with the highest dynamic score, considering the adaptive threshold of each bin, while ensuring that the total capacity of all bins does not exceed a predetermined threshold.\n\nPython implementation:\n```",
+          "code": "import numpy as np\n\ndef dstat_score(item, bins):\n    # Calculate the adaptive threshold for each bin\n    threshold = np.minimum(bins, item)\n    \n    # Calculate the dynamic scores for each bin\n    scores = np.zeros_like(bins)\n    scores[threshold > 0] = (item / (threshold[threshold > 0] + 1))\n    \n    return scores",
+          "objective": 0.03944,
+          "other_inf": null
+     },
+     {
+          "algorithm": " New algorithm: \"Maximum Score with Restricted Capacity\" (MSRC)\n\nDescription: MSRC assigns an item to the bin with the highest maximum score, considering the rest capacity of each bin, while ensuring that the total capacity of all bins does not exceed a predetermined threshold. The score for each bin is calculated as the maximum value of the item size minus the remaining capacity.\n\nPython implementation:\n```",
+          "code": "import numpy as np\n\ndef msrc_score(item, bins):\n    # Calculate the restricted capacity for each bin\n    rest_capacity = bins - item\n    \n    # Calculate the scores for each bin\n    scores = np.maximum(item - rest_capacity, 0)\n    \n    return scores",
+          "objective": 0.03954,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm uses a combination of the item size and the rest capacity of each bin to calculate the score for each bin.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    scores[bins != bins.max()] = (item * bins[bins != bins.max()]) / (bins[bins != bins.max()] - item + 1)\n    return scores",
+          "objective": 0.03964,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe algorithm assigns an item to the bin with the maximum score, considering the rest capacity of each bin, in order to minimize the number of used bins. \n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    scores[bins != bins.max()] = np.log(item / (bins[bins != bins.max()] - item + 1))\n    return scores",
+          "objective": 0.03974,
+          "other_inf": null
+     },
+     {
+          "algorithm": " New algorithm: \"Maximize the minimum bin size\"\n\nMain steps:\n\n1. Calculate the minimum bin size by subtracting the item size from the maximum bin size.\n2. Calculate the scores for each bin by dividing the minimum bin size by the rest capacity of each bin.\n3. Return the scores.\n\nPython implementation:\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = item / bins\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     },
+     {
+          "algorithm": " Common backbone idea: The algorithms aim to optimize the usage of bins by assigning items to bins with the highest scores, considering the restrictions of bin capacities and the number of used bins.\n\nNew algorithm: \"Proportional Score with Restricted Capacity\" (PSRC)\n\nDescription: PSRC assigns an item to the bin with the highest proportional score, considering the rest capacity of each bin, while ensuring that the total capacity of all bins does not exceed a predetermined threshold. The score for each bin is calculated as the ratio of the item size to the remaining capacity.\n\nPython implementation:\n```\n",
+          "code": "import numpy as np\n\ndef psrc_score(item, bins):\n    # Calculate the restricted capacity for each bin\n    rest_capacity = bins - item\n    \n    # Calculate the scores for each bin\n    scores = np.clip(rest_capacity, 0, 1) * item\n    \n    return scores",
+          "objective": 0.03994,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm assigns items to bins based on the logarithmic difference between the item size and the remaining capacity of each bin, where bins with the maximum capacity have a score of zero, and bins with smaller capacities have higher scores.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the logarithmic difference between the item size and the remaining capacity of each bin\n    diff = np.log(item) - np.log(bins - item)\n    \n    # Set the score for bins with the maximum capacity as 0\n    diff[bins == np.max(bins)] = 0\n    \n    # Calculate the scores for each bin by multiplying the logarithmic difference with an increasing factor\n    scores = diff * np.arange(1, len(bins)+1)\n    \n    return scores",
+          "objective": 0.04004,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm assigns items to bins based on the logarithmic difference between the item size and the remaining capacity of each bin, where bins with the maximum capacity have a score of zero, and bins with smaller capacities have higher scores.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the normalized logarithmic difference between the item size and the remaining capacity of each bin\n    diff = np.log(item / np.mean(item)) - np.log((bins - item) / np.mean(bins - item))\n    \n    # Calculate the scores for each bin by multiplying the normalized logarithmic difference with an increasing factor\n    scores = diff * np.arange(1, len(bins)+1)\n    \n    return scores",
+          "objective": 0.04014,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: \"Bin-based Scoring with Logarithmic Weighting\" (BINLW)",
+          "code": "import numpy as np\n\ndef binlw_score(item, bins):\n    # Calculate the logarithmic weighting for each bin\n    weights = np.log(bins / item)\n    \n    # Calculate the scores for each bin by multiplying the logarithmic weighting with the item size\n    scores = weights * item\n    \n    return scores",
+          "objective": 0.04045,
+          "other_inf": null
+     }
+]

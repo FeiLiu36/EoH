@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "Assign an item to the bin with the maximum score calculated as a weighted sum of the difference between the bin's capacity and item size in a quadratic form, the reciprocal of the bin's current capacity, the reciprocal of bin's volume, and the difference between bin's capacity and the item size to the power of 1.25 multiplied by the square root of the distance to the center.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    normalized_remaining_capacities = np.minimum((bins - item) / item, 1)\n    bin_volumes = bins * normalized_remaining_capacities\n    distances_to_the_center = np.minimum(np.abs(bins - np.mean(bins)) / np.std(bins), 1)\n    scores = (normalized_remaining_capacities ** 2) + (1 / bin_volumes) + (1 / np.sqrt(bin_volumes)) + ((bins - item) ** 1.25) * np.sqrt(distances_to_the_center)\n    return scores",
+          "objective": 0.00755,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign an item to the bin with the maximum score calculated as a weighted sum of the square of the bin's current capacity, the difference between the bin's capacity and the item size, the number of times the bin has been used, the distance to the center of bins, and the number of items that fit into the bin.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    normalized_remaining_capacities = np.minimum((bins - item) / item, 1)\n    distances_to_the_center = np.minimum(np.abs(bins - np.mean(bins)) / np.std(bins), 1)\n    scores = (normalized_remaining_capacities ** 2) / normalized_remaining_capacities.min() + np.arange(len(bins)) + np.sqrt(distances_to_the_center)\n    return scores",
+          "objective": 0.00845,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Calculate a weighted sum of the square of bin capacity, bin index, a random number, distance to the center, and number of items fit into the bin.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    normalized_remaining_capacities = np.minimum((bins - item) / item, 1)\n    distances_to_the_center = np.minimum(np.abs(bins - np.mean(bins)) / np.std(bins), 1)\n    num_fits = bins / item / np.max(bins / item)\n    scores = (normalized_remaining_capacities ** 2) / normalized_remaining_capacities.min() + np.arange(len(bins)) + np.random.uniform(0, 1, len(bins)) + np.sqrt(distances_to_the_center) + num_fits\n    return scores",
+          "objective": 0.00885,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign an item to the bin with the maximum score calculated as the square root of the sum of the weighted square of the bin's current capacity and the arctangent of the ratio of the bin's capacity to the item size, plus the number of times the bin has been used, plus the square of the bin's distance to the center of bins.",
+          "code": "import numpy as np\nfrom math import atan, sqrt\n\ndef score(item, bins):\n    weighted_capacities = np.sqrt(((bins - item) ** 2) / (bins - item).min())\n    ratios = bins / item\n    scores = weighted_capacities + np.arctan(ratios) + np.arange(len(bins)) + np.sqrt(np.abs(bins - np.mean(bins)) / np.std(bins))\n    return scores",
+          "objective": 0.00916,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign an item to the bin with the maximum score calculated as a weighted sum of the square of the bin's current capacity, the difference between the bin's capacity and the item size, the number of times the bin has been used, the distance to the center of bins, and the number of items that fit into the bin.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    normalized_remaining_capacities = np.minimum((bins - item) / item, 1)\n    distances_to_the_center = np.minimum(np.abs(bins - np.mean(bins)) / np.std(bins), 1)\n    num_fits = bins / item / np.max(bins / item)\n    scores = (normalized_remaining_capacities ** 2) / normalized_remaining_capacities.min() + np.arange(len(bins)) + np.sqrt(distances_to_the_center) + num_fits\n    return scores",
+          "objective": 0.00926,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign an item to the bin with the maximum score calculated as a weighted sum of the square of the bin's current capacity, the difference between the bin's capacity and the item size, the number of times the bin has been used, the distance to the center of bins, and the number of items that fit into the bin.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    normalized_remaining_capacities = np.minimum((bins - item) / item, 1)\n    num_fits = bins / item / np.max(bins / item)\n    scores = (normalized_remaining_capacities ** 2) / normalized_remaining_capacities.min() + np.arange(len(bins)) + num_fits\n    return scores",
+          "objective": 0.00966,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Assign an item to the bin with the highest score, calculated as a cubed sum of a weighted sum of the bin's current capacity, the difference between the bin's capacity and the item size, the number of times the bin has been used, and the distance to the center of the bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacities = np.minimum((bins - item) / item, 1)\n    scores = (remaining_capacities ** 2) / remaining_capacities.min() + (bins - item) + np.arange(len(bins)) + np.abs(bins - np.mean(bins))\n    return scores",
+          "objective": 0.00986,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign an item to the bin with the maximum score calculated as a weighted combination of the bin's remaining capacity that is penalized by the number of item that can be fit into the bin and the number of times the bin has been used.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    normalized_remaining_capacities = np.minimum((bins - item) / item, 1)\n    num_fits = bins / item / np.max(bins / item)\n    scores = (normalized_remaining_capacities - (normalized_remaining_capacities / np.sum(normalized_remaining_capacities)) * num_fits)**2 / normalized_remaining_capacities.min() + np.arange(len(bins)) + num_fits\n    return scores",
+          "objective": 0.00996,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign an item to the bin with the maximum score calculated as a weighted sum of the square of the bin's current capacity, the difference between the bin's capacity and the item size, the number of times the bin has been used, the distance to the center of bins, and the number of items that fit into the bin.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacities = np.minimum((bins - item) / item, 1)\n    scores = (remaining_capacities ** 2) / remaining_capacities.min() + np.arange(len(bins)) + 1\n    return scores",
+          "objective": 0.01006,
+          "other_inf": null
+     },
+     {
+          "algorithm": "{New algorithm: Assign an item to the bin with the maximum score calculated as a weighted sum of the square of the bin's current capacity, the difference between the bin's capacity and the item size, the number of times the bin has been used, the distance to the center of bins, the number of items that fit into the bin, and the score from the previous step.}",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacities = np.minimum((bins - item) / item, 1)\n    scores = (remaining_capacities ** 2) / remaining_capacities.min() + (bins - item) + np.arange(len(bins)) // 2 + np.arange(len(bins)) + 1\n    return scores",
+          "objective": 0.01036,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Weighted sum of the weighted score of normalized remaining capacity, the reciprocal of the remaining capacity, and the square root of the remaining capacity, and the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    weight_vector = np.array([4, 2, 1])\n    normalized_remaining_capacities = (bins - item) / (bins - item).max()\n    reciprocal_remaining_capacities = (bins - item) / (bins - item).max() * np.log(bins - item)\n    sqrt_remaining_capacities = np.sqrt((bins - item) / (bins - item).max())\n    scores = weight_vector[0] * normalized_remaining_capacities + weight_vector[1] * reciprocal_remaining_capacities + weight_vector[2] * sqrt_remaining_capacities + np.arange(len(bins))\n    return scores",
+          "objective": 0.01046,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign an item to the bin with the maximum score calculated as a weighted sum of the square of the bin's current capacity, the difference between the bin's capacity and the item size, the number of times the bin has been used, the distance to the center of bins, the number of items that fit into the bin, the square root of the bin's capacity, and the reciprocal of the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacities = np.minimum((bins - item) / item, 1)\n    scores = (remaining_capacities ** 2) / remaining_capacities.min() + (bins - item) / item + np.arange(len(bins)) // 2 + np.arange(len(bins)) + np.sqrt(bins) + 1 / (np.arange(len(bins)) + 1)\n    return scores",
+          "objective": 0.01056,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Assign the item to the bin with the maximum score defined as a weighted sum of the bin's rest capacity to the power of 3, the ratio of the bin's rest capacity to the item size, the bin's index, the bin's capacity divided by the item size, the ratio of the number of items that can fit into the bin to the number of items that can fit in the best bin, and the ratio of the square of the bin's current capacity to the square of the maximum capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    normalized_remaining_capacities = (bins - item) / item\n    normalized_capacities = bins / item\n    num_fits = bins / item / np.max(bins / item)\n    scores = (bins**3) / (bins**3).max() + normalized_remaining_capacities / normalized_remaining_capacities.min() + np.arange(len(bins)) + normalized_capacities / normalized_capacities.min() + num_fits + (bins**2) / (bins**2).max()\n    return scores",
+          "objective": 0.01067,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns a current item to the bin with the maximum score and updates the rest capacity of the bins, until all items are assigned. The score is calculated based on the bin's rest capacity, the difference between the bin's rest capacity and the item size, the number of times the bin has been used, and the square of the bin's capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    normalized_remaining_capacities = (bins - item) / item\n    normalized_capacities = bins / item\n    used_bins_scores = np.arange(len(bins))\n    scores = normalized_remaining_capacities / normalized_remaining_capacities.min() + normalized_capacities / normalized_capacities.min() + used_bins_scores + (bins**2) / (bins**2).max()\n    return scores",
+          "objective": 0.01077,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Modified weighted score of the product of inverse volume reduction and remaining capacity, and the product of volume reduction and square root of remaining capacity, and the number of used bins",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    weight_vector = np.array([3, 2, 1])\n    volume_reductions = bins - item\n    remaining_capacities = bins - item\n    scores = weight_vector[0] * 1.0 / volume_reductions * remaining_capacities + weight_vector[1] * remaining_capacities / remaining_capacities.max() * np.sqrt(remaining_capacities) + weight_vector[2] * np.arange(len(bins))\n    return scores",
+          "objective": 0.01117,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assigning the item to the bin with the maximum score defined as a weighted sum of the bin's rest capacity, the ratio of the bin's rest capacity to the item size, the bin's index, the bin's capacity divided by the item size, the ratio of the number of items that can fit into the bin to the number of items that can fit in the best bin, and the square of the bin's current capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    normalized_remaining_capacities = (bins - item) / item\n    normalized_capacities = bins / item\n    num_fits = bins / item / np.max(bins / item)\n    scores = normalized_remaining_capacities / normalized_remaining_capacities.min() + np.arange(len(bins)) + normalized_capacities / normalized_capacities.min() + num_fits + (bins**2) / (bins**2).max()\n    return scores",
+          "objective": 0.01137,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Weighted score of the product of volume reduction and reciprocal remaining capacity, and the product of volume reduction and square root of remaining capacity, and the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    weight_vector = np.array([3, 2, 1])\n    volume_reductions = bins - item\n    reciprocal_remaining_capacities = (bins - item) / (bins - item).max() * np.log(bins - item)\n    scores = weight_vector[0] * volume_reductions / volume_reductions.max() * reciprocal_remaining_capacities + weight_vector[1] * reciprocal_remaining_capacities + weight_vector[2] * np.arange(len(bins))\n    return scores",
+          "objective": 0.01147,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign an item to the bin with the maximum score calculated as a weighted combination of the bin's remaining capacity that is penalized by the average load factor of all feasible bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    normalized_remaining_capacities = np.minimum((bins - item) / item, 1)\n    avg_load = bins.mean() / bins\n    scores = (normalized_remaining_capacities - (normalized_remaining_capacities / np.sum(normalized_remaining_capacities)) * avg_load)**2 / normalized_remaining_capacities.min() + avg_load + np.arange(len(bins))\n    return scores",
+          "objective": 0.01157,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns an item to the bin with the maximum score and updates the rest capacity of the bin accordingly, until all items are assigned. The score for each bin is calculated as a weighted sum of the bin's current capacity, the difference between the bin's capacity and the item size, the number of times the bin has been used, and the bin's current capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    normalized_remaining_capacities = (bins - item) / item\n    normalized_capacities = bins / item\n    scores = normalized_remaining_capacities / normalized_remaining_capacities.min() + normalized_capacities / normalized_capacities.min() + np.arange(len(bins))\n    return scores",
+          "objective": 0.01197,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns an item to the bin with the maximum score calculated based on the weighted sum of the bin's rest capacity, the difference between the bin's rest capacity and the item size, the number of times the bin has been used, the bin's capacity, and the reciprocal of the bin's capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    normalized_remaining_capacities = (bins - item) / item\n    normalized_capacities = bins / item\n    used_bins_scores = np.arange(len(bins))\n    reciprocal_capacities = 1 / bins\n    scores = normalized_remaining_capacities / normalized_remaining_capacities.min() + normalized_capacities / normalized_capacities.min() + used_bins_scores + bins / bins.max() + reciprocal_capacities / reciprocal_capacities.max()\n    return scores",
+          "objective": 0.01248,
+          "other_inf": null
+     }
+]

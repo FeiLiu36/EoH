@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "My new algorithm assigns items to bins based on a score function that considers the logarithm of the bin's current capacity divided by the difference between the bin's capacity and the item size, multiplied by a factor of 0.7, subtracting the square root of the number of times the bin has been used from the score squared, multiplied by a factor of 0.3, then adding the product of the item size and the square of the difference between the bin's capacity and the item size, raised to the power of 0.2.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    capacities = bins.astype(float)\n    remaining_capacities = capacities - item\n    used_counts = np.arange(len(bins))\n    scores = (np.log1p(capacities) / (bins - item) * 0.7) - (used_counts * 0.3) + (item * (bins - item) ** 2)**0.2\n    return scores",
+          "objective": 0.00674,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns items to bins based on a score function that considers the logarithm of the bin's current capacity divided by the difference between the bin's capacity and the item size, multiplied by a factor of 0.7, subtracting the square root of the number of times the bin has been used from the score squared, multiplied by a factor of 0.3, then adding the product of the item size and the square of the difference between the bin's capacity and the item size, raised to the power of 0.2.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    capacities = np.mean(bins.astype(float)) # Using mean of 'bins' as representative value\n    scores = (np.log(capacities) / (bins - item) * 0.7) - (np.sqrt(np.arange(len(bins))) ** 2 * 0.3) + (item * (bins - item) ** 2) ** 0.2\n    return scores",
+          "objective": 0.00684,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns items to bins based on a score function that considers the logarithm of the bin's current capacity divided by the difference between the bin's capacity and the item size, multiplied by a factor of 0.7, subtracting the square root of the number of times the bin has been used from the score squared, multiplied by a factor of 0.3, then adding the product of the item size and the square of the difference between the bin's capacity and the item size, raised to the power of 0.2.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    capacities = bins.astype(float)\n    scores = (np.log(capacities) / (bins - item) * 0.7) - (np.sqrt(np.arange(len(bins))) ** 2 * 0.3) + (item * (bins - item) ** 2)**0.2\n    return scores",
+          "objective": 0.00694,
+          "other_inf": null
+     },
+     {
+          "algorithm": "",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    capacities = bins.astype(float)\n    remaining_capacities = capacities - item\n    used_counts = np.arange(len(bins))\n    scores = (np.log10(capacities) / (remaining_capacities) - (np.sqrt(used_counts) ** 2 * 0.3) \n              + (item * (remaining_capacities) ** 2)**0.2)\n    return scores",
+          "objective": 0.00704,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns items to bins based on a score function that considers the logarithm of the bin's current capacity divided by the difference between the bin's capacity and the item size, multiplied by a factor of 0.6, and subtracting the square root of the number of times the bin has been used from the score squared, multiplied by a factor of 0.4, then adding the product of the item size and the logarithm of the sum of the bin's capacity and the item size, multiplied by a factor of 0.5.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.log(bins) / (bins - item) * 0.6 - np.sqrt(np.arange(len(bins))) ** 2 * 0.4 + item * np.log(bins + item) * 0.5\n    return scores",
+          "objective": 0.00714,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\n\"Algorithm Description\":\nNew algorithm: My new algorithm assigns items to bins based on a score function that considers the inverse of the bin's current capacity divided by the difference between the bin's capacity and the item size, raised to the power of 1.2, then subtracting the number of times the bin has been used from the score multiplied by a factor of 0.8, and finally adding the square root of the bin's capacity raised to the power of 1.5.\n\nCode:\nimport numpy as np\n\ndef score(item, bins):\n    scores = (1/bins) / (bins - item)**1.2 - np.arange(len(bins)) * 0.8 + np.sqrt(bins)**1.5\n    return scores\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (1/bins) / (bins - item)**1.2 - np.arange(len(bins)) * 0.8 + np.sqrt(bins)**1.5\n    return scores",
+          "objective": 0.00724,
+          "other_inf": null
+     },
+     {
+          "algorithm": "",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = ((np.log(bins) / (bins - item)) ** 2 - np.sqrt(np.arange(len(bins))) ** 2) * 0.4 + item * np.log(bins + item) * 0.5\n    return scores",
+          "objective": 0.00734,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: The new algorithm assigns items to bins based on a score function that considers the inverse of the bin's current capacity divided by the difference between the bin's capacity and the item size, multiplied by a factor of 0.8, and subtracting the square root of the number of times the bin has been used from the score squared, multiplied by a factor of 0.2, then adding the product of the item size and the logarithm of the sum of the bin's capacity and the item size, multiplied by a factor of 0.3.\n\nPython implementation:\n\n```Python\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    capacities = bins.astype(float)\n    remaining_capacities = capacities - item\n    used_counts = np.arange(len(bins))\n    scores = (1 / (capacities - item)) * 0.8 - (np.sqrt(used_counts) ** 2 * 0.2) + (item * np.log(capacities + item) * 0.3)\n    return scores",
+          "objective": 0.00745,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns items to bins based on a score function that considers the cube root of the bin's current capacity divided by the difference between the bin's capacity and the item size, multiplied by a factor of 0.8, subtracting the number of times the bin has been used from the score squared, multiplied by a factor of 0.2, then adding the product of the item size and the square root of the bin's capacity, raised to the power of 0.6.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    used_counts = np.arange(len(bins))\n    scores = (np.cbrt(bins) / (bins - item) * 0.8) - (used_counts**2 * 0.2) + (item * np.sqrt(bins)**0.6)\n    return scores",
+          "objective": 0.00755,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: The existing algorithms calculate a score for each bin based on a combination of the bin's capacity and the item size, the number of times the bin has been used, and other mathematical functions.\n\nNew algorithm description: My new algorithm assigns items to bins based on a score function that considers the natural logarithm of the bin's current capacity divided by the difference between the bin's capacity and the item size, multiplied by a factor of 0.5, subtracting the square of the number of times the bin has been used from the score, multiplied by a factor of 0.3, then adding the product of the item size and the square root of the bin's capacity, multiplied by a factor of 0.4.\n\nCode:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.log(bins) / (bins - item) - np.arange(len(bins))**2 * 0.3 + item * np.sqrt(bins) * 0.4\n    return scores",
+          "objective": 0.00765,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: \n\nThe new algorithm assigns items to bins based on a score function that calculates the logarithm of the bin's current capacity divided by the square root of the difference between the bin's capacity and the item size raised to the power of 0.6, subtracts the number of times the bin has been used from the score multiplied by a factor of 0.8, and adds the product of the item size and the square root of the bin's capacity raised to the power of 0.4.\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (np.log(bins.astype(float)) / (np.sqrt(bins - item))**0.6) - (np.arange(len(bins)) * 0.8) + (item * np.sqrt(bins)**0.4)\n    return scores",
+          "objective": 0.00775,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns items to bins based on a score function that considers the square root of the inverse of the bin's current capacity divided by the difference between the bin's capacity and the item size, multiplied by a factor of 0.7, subtracting the square root of the number of times the bin has been used from the score squared, multiplied by a factor of 0.3, then adding the product of the item size and the natural logarithm of the sum of the bin's capacity and the item size, multiplied by a factor of 0.5.\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacities = bins - item\n    used_counts = np.arange(len(bins))\n    scores = (np.sqrt(1 / remaining_capacities) / np.sqrt(bins - item)) * 0.7 - (used_counts * 0.3) + (item * np.log(bins + item) * 0.5)\n    return scores",
+          "objective": 0.00785,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns items to bins based on a score function that considers the ratio between the natural logarithm of the bin's current capacity and the square root of the difference between the bin's capacity and the item size, multiplied by a factor of 0.5, subtracting the square of the number of times the bin has been used from the score, multiplied by a factor of 0.3, then adding the product of the item size and the square root of the bin's capacity, multiplied by a factor of 0.4.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    used_counts = np.arange(len(bins))\n    scores = (np.log(bins) / np.sqrt(bins - item) * 0.5) - (used_counts**2 * 0.3) + (item * np.sqrt(bins) * 0.4)\n    return scores",
+          "objective": 0.00795,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: \n\nMy new algorithm assigns items to bins based on a score function that considers the logarithm of the bin's current capacity divided by the square root of the difference between the bin's capacity and the item size raised to the power of 0.8, subtracting the number of times the bin has been used from the score multiplied by a factor of 0.6, then adding the product of the item size and the square root of the bin's capacity raised to the power of 0.5.\n\nCode:\n\n```\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.log(bins) / np.sqrt(bins - item) - np.arange(len(bins)) * 0.6 + item * np.sqrt(bins) ** 0.5\n    return scores",
+          "objective": 0.00805,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: My new algorithm assigns items to bins based on a score function that considers the square root of the bin's current capacity divided by the difference between the bin's capacity and the item size, multiplied by a factor of 0.6, subtracting the number of times the bin has been used from the score, multiplied by a factor of 0.2, then adding the product of the item size and the natural logarithm of the bin's capacity, multiplied by a factor of 0.3.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.sqrt(bins) / (bins - item) * 0.6 - np.arange(len(bins)) * 0.2 + item * np.log(bins) * 0.3\n    return scores",
+          "objective": 0.00815,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Algorithm description: The new algorithm assigns items to bins based on a score function that considers the inverse of the bin's current capacity divided by the difference between the bin's capacity and the item size, subtracting the square root of the number of times the bin has been used from the score squared, then adding the product of the item size and the natural logarithm of the sum of the bin's capacity and the item size, multiplied by a factor of 0.9, instead of 0.8. \n\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacities = bins - item\n    used_counts = np.arange(len(bins))\n    scores = (1 / remaining_capacities) / (bins - item) - np.sqrt(used_counts) ** 2 + item * np.log(bins + item) * 0.9\n    return scores",
+          "objective": 0.00825,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns items to bins based on a score function that considers the inverse of the bin's current capacity divided by the difference between the bin's capacity and the item size, multiplied by a factor of 0.6, subtracting the square root of the number of times the bin has been used from the score squared, multiplied by a factor of 0.4, then adding the product of the item size and the natural logarithm of the sum of the bin's capacity and the item size, multiplied by a factor of 0.8.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacities = bins - item\n    used_counts = np.arange(len(bins))\n    scores = (1 / remaining_capacities) / (bins - item) * 0.6 - np.sqrt(used_counts) ** 2 * 0.4 + item * np.log(bins + item) * 0.8\n    return scores",
+          "objective": 0.00835,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: \n\nMy new algorithm assigns items to bins based on a score function that considers the natural logarithm of the bin's current capacity divided by the square root of the difference between the bin's capacity and the item size, raised to the power of 0.8, then subtracting the number of times the bin has been used from the score multiplied by a factor of 0.6, and finally adding the product of the item size and the square root of the bin's capacity raised to the power of 0.5.\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.log(bins) / (bins - item)**0.8 - np.arange(len(bins)) * 0.6 + item * np.sqrt(bins)**0.5\n    return scores",
+          "objective": 0.00845,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns items to bins based on a score function that considers the logarithm of the bin's current capacity minus the item size, raised to the power of 0.8, divided by the square root of the difference between the bin's capacity and the item size, subtracting the number of times the bin has been used from the score, multiplied by a factor of 0.6, then adding the product of the item size and the square root of the bin's capacity raised to the power of 0.5.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (bins - item)**0.4 / np.sqrt(bins - item) - (np.arange(len(bins)) * 0.6) + (item * np.sqrt(bins)**0.5)\n    return scores",
+          "objective": 0.00855,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: My new algorithm assigns items to bins based on a score function that considers the square root of the bin's current capacity divided by the difference between the bin's capacity and the item size, multiplied by a factor of 0.6, subtracting the cube root of the number of times the bin has been used from the score squared, multiplied by a factor of 0.4, then adding the product of the item size and the logarithm of the difference between the bin's capacity and the item size, raised to the power of 0.2.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    capacities = bins.astype(float)\n    remaining_capacities = capacities - item\n    used_counts = np.arange(len(bins))\n    scores = (np.sqrt(capacities) / (bins - item) * 0.6) - (np.cbrt(used_counts) ** 2 * 0.4) + (item * np.log((bins - item))**0.2)\n    return scores",
+          "objective": 0.00865,
+          "other_inf": null
+     }
+]

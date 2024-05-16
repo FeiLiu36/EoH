@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "Modified Algorithm: Assign a score to each bin based on the inverse of its rest capacity multiplied by a term that increases exponentially with increasing bin index; however, the inverse of the rest capacity is raised to the power of the bin index.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse of the rest capacity for each bin\n    inv_rest_capacity = 1 / (bins - item)\n    \n    # Calculate the exponential term\n    exp_term = np.exp(np.arange(len(bins)) * np.log(inv_rest_capacity))\n    \n    # Calculate the score for each bin\n    scores = inv_rest_capacity ** exp_term\n    \n    return scores",
+          "objective": 0.00654,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign a score to each bin based on the product of the inverse of its rest capacity and a term that increases exponentially with increasing bin index, with an additional term that is proportional to the potential leftover space (item - bin) if the item is assigned to the bin.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse of the rest capacity of each bin\n    inv_rest_capacity = 1 / (bins + 1)\n    \n    # Calculate the exponential term\n    exp_term = np.exp(np.arange(len(bins)) * np.log(inv_rest_capacity))\n    \n    # Calculate the potential leftover space for each bin\n    potential_leftover = item - bins\n    \n    # Calculate the score for each bin\n    scores = inv_rest_capacity * exp_term * potential_leftover\n    \n    return scores",
+          "objective": 0.00694,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Assign an item to the bin with the maximum score of the logarithm of the reciprocal of the remaining capacity multiplied by a term that increases linearly with increasing bin index, and an additional term that is proportional to the potential leftover space if the item is assigned to the bin.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the logarithm of the reciprocal of the remaining capacity\n    log_recip_capacity = np.log(1 / (bins - item))\n    \n    # Calculate the linear term that increases with increasing bin index\n    linear_term = np.arange(len(bins)) + 1\n    \n    # Calculate the potential leftover space if the item is assigned to the bin\n    potential_leftover = bins - item\n    \n    # Calculate the final score for each bin\n    scores = log_recip_capacity * linear_term + potential_leftover\n    \n    return scores",
+          "objective": 0.00875,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Calculate the score as the sum of the square root of the inverse of the remaining capacity and the exponential of the product of the bin index and the potential leftover space.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the score for each bin\n    scores = np.sqrt(1 / (bins - item)) * np.exp(np.arange(len(bins)) * (bins - item))\n    \n    # Return the scores\n    return scores",
+          "objective": 0.00916,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Modified algorithm: Assign a score to each bin based on the sum of the inverse of its rest capacity and a term that increases exponentially with increasing bin index, with an additional term that is proportional to the reciprocal of the potential leftover space (item - bin) if the item is assigned to the bin.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse of the rest capacity of each bin\n    inv_rest_capacity = 1 / (bins - item + 1)\n    \n    # Calculate the exponential term\n    exp_term = np.exp(np.arange(len(bins)) * 0.5)\n    \n    # Calculate the reciprocal of the potential leftover space\n    reciprocal_leftover = 1 / (item - bins + 1)\n    \n    # Calculate the final score for each bin\n    scores = inv_rest_capacity * exp_term * reciprocal_leftover\n    \n    return scores",
+          "objective": 0.00996,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Prioritize bins by remaining space and penalized by distance from the item size using a Guassian distribution function.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the remaining space in each bin\n    remaining_space = bins - item\n    \n    # Penalize bins that are already full\n    penalties = np.where(remaining_space <= 0, 1e9, 0)\n    \n    # Calculate the Gaussian distribution function for each bin\n    gaussian_dist = np.exp(-((remaining_space - item) ** 2) / (2 * (item ** 2)))\n    \n    # Combine the penalties and Gaussian distribution functions\n    scores = penalties + gaussian_dist\n    \n    return scores",
+          "objective": 0.01429,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Calculate the score of each bin as the product of the exponential of its rest capacity and the inverse of the item - bin, scaled by a term that increases exponentially with increasing bin index.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the score of each bin\n    scores = np.exp(-bins) * (1 / (item - bins)) * np.exp(np.arange(len(bins)))\n    \n    # Return the scores\n    return scores",
+          "objective": 0.01479,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign an item to the bin having the highest score calculated by dividing the square root of the inverse of the remaining capacity by the exponential of the bin's capacity multiplied by the bin's index.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the scores for each bin\n    scores = np.sqrt(1 / (bins - item)) * np.exp(bins * np.arange(len(bins)))\n    \n    # Return the scores\n    return scores",
+          "objective": 0.0164,
+          "other_inf": null
+     },
+     {
+          "algorithm": "A modified version of the provided algorithm that incorporates the item size as a factor to prioritize bins with sufficient remaining capacity and assigns a constant penalty to bins that are full.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the remaining capacity of each bin\n    remaining_capacity = bins - item\n    \n    # Penalize bins that are full\n    penalties = np.where(remaining_capacity == 0, 1, 0)\n    \n    # Prioritize bins with sufficient remaining capacity\n    priorities = np.where(remaining_capacity >= item, 1, 0)\n    \n    # Combine the penalties and priorities into a single score\n    scores = penalties + priorities\n    \n    return scores",
+          "objective": 0.0171,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Assign a score to each bin based on the product of the inverse of its rest capacity and a term that increases exponentially with increasing bin index, with an additional term that is proportional to the potential leftover space (item - bin) if the item is assigned to the bin; however, the exponential term is multiplied by the bin index.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse of the rest capacity of each bin\n    inv_rest_capacity = 1 / (bins - item + 1)\n    \n    # Calculate the exponential term\n    exp_term = np.exp(np.arange(len(bins)) * np.log(inv_rest_capacity))\n    \n    # Calculate the potential leftover space if the item is assigned to each bin\n    potential_leftover = item - bins\n    \n    # Calculate the score for each bin\n    scores = inv_rest_capacity * exp_term * potential_leftover\n    \n    return scores",
+          "objective": 0.01831,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Calculate the score as the sum of the square root of the inverse of the remaining capacity and the exponential of the product of the bin index and the item.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the score for each bin\n    scores = np.sqrt(1 / (bins - item)) * np.exp(np.arange(len(bins)) * item)\n    \n    # Return the scores for the bins\n    return scores",
+          "objective": 0.01902,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Assign a score to each bin based on the product of the inverse of its rest capacity and a term that increases exponentially with increasing bin index, with an additional term that is inversely proportional to the potential leftover space (item - bin) if the item is assigned to the bin.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse of the rest capacity of each bin\n    inv_rest_capacity = 1 / (bins - item + 1)\n    \n    # Calculate the exponential term\n    exp_term = np.exp(np.arange(len(bins)) * np.log(inv_rest_capacity))\n    \n    # Calculate the inverse of the potential leftover space\n    inv_potential_leftover = 1 / (item - bins + 1)\n    \n    # Calculate the final score for each bin\n    scores = inv_rest_capacity * exp_term * inv_potential_leftover\n    \n    return scores",
+          "objective": 0.01942,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Algorithm: A modified score function that penalizes bins that are nearly full and prioritizes bins with sufficient remaining capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the remaining capacity for each bin\n    remaining_capacity = bins - item\n    \n    # Penalize bins that are nearly full (i.e., have less than 10% remaining capacity)\n    penalty = np.where(remaining_capacity < 0.1 * bins, 10, 0)\n    \n    # Prioritize bins with sufficient remaining capacity (i.e., have at least 50% remaining capacity)\n    priority = np.where(remaining_capacity >= 0.5 * bins, 1, 0)\n    \n    # Combine the penalty and priority scores\n    scores = penalty + priority\n    \n    return scores",
+          "objective": 0.02143,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign a score to each bin based on the sum of the inverse of its rest capacity and a term that decreases exponentially with the increasing bin index, with an additional term that is proportional to the reciprocal of the potential leftover space (item - bin) if the item is assigned to the bin. ",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse of the rest capacity of each bin\n    inv_rest_capacity = 1 / (bins + 1)\n    \n    # Calculate the exponential term\n    exp_term = np.exp(-np.arange(len(bins)) * 0.5)\n    \n    # Calculate the reciprocal of the potential leftover space\n    reciprocal_leftover = 1 / (item - bins)\n    \n    # Calculate the final score for each bin\n    scores = inv_rest_capacity * exp_term * reciprocal_leftover\n    \n    return scores",
+          "objective": 0.02395,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Modified algorithm: Assign a score to each bin based on the sum of the inverse of its rest capacity and a term that is proportional to the reciprocal of the potential leftover space (item - bin), multiplied by the rest capacity with an additional term that increases exponentially with increasing bin index.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse of the rest capacity of each bin\n    inv_rest_capacity = 1 / (bins + 1)\n    \n    # Calculate the reciprocal of the potential leftover space\n    reciprocal_leftover = 1 / (item - bins)\n    \n    # Calculate the exponential term\n    exp_term = np.exp(np.arange(len(bins)) * 0.5)\n    \n    # Calculate the final score for each bin\n    scores = inv_rest_capacity * reciprocal_leftover * exp_term\n    \n    return scores",
+          "objective": 0.02787,
+          "other_inf": null
+     },
+     {
+          "algorithm": " New algorithm: Assign an item to the bin with the maximum score of the logarithm of the reciprocal of the remaining capacity multiplied by a term that increases linearly with increasing bin index, and an additional term that is inversely proportional to the potential leftover space. ",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the logarithm of the reciprocal of the remaining capacity\n    log_recip_capacity = np.log(1 / (bins - item))\n    \n    # Calculate the linear term that increases with increasing bin index\n    linear_term = np.arange(len(bins)) + 1\n    \n    # Calculate the inverse of the potential leftover space\n    inv_potential_leftover = 1 / (bins - item)\n    \n    # Combine the terms to get the final score\n    scores = log_recip_capacity * linear_term * inv_potential_leftover\n    \n    return scores",
+          "objective": 0.02888,
+          "other_inf": null
+     },
+     {
+          "algorithm": " New algorithm: The new algorithm uses a score function that is the product of the inverse of the ratio between the remaining capacity of a bin and the item size multiplied by a weight that is exponentially proportional to the bin index, where the weight for the first bin is 2 and the weight of each subsequent bin is 1.3 times the weight of the previous bin. ",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the remaining capacity of each bin\n    remaining_capacity = bins - item\n    \n    # Calculate the ratio between the remaining capacity and the item size\n    ratio = remaining_capacity / item\n    \n    # Calculate the weight for each bin based on its index\n    weights = np.power(1.3, np.arange(len(bins)))\n    \n    # Calculate the score for each bin\n    scores = np.multiply(ratio, weights)\n    \n    # Return the scores\n    return scores",
+          "objective": 0.0334,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Score each bin by multiplying the reciprocal of the difference between the item size and the bin size with a term that decays as a power function of the bin index.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the reciprocal of the difference between the item size and the bin size\n    diff = 1 / (item - bins)\n    \n    # Calculate the decay term based on the bin index\n    decay = np.power(0.5, np.arange(len(bins)))\n    \n    # Multiply the two terms together to get the final score\n    scores = diff * decay\n    \n    return scores",
+          "objective": 0.03411,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign an item to the bin with the maximum score of the logarithm of the reciprocal of the remaining capacity multiplied by a term that decreases linearly with increasing bin index, and an additional term that is proportional to the potential leftover space if the item is assigned to the bin.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the maximum score for each bin\n    max_score = np.max(np.log(1 / (bins - item)))\n    \n    # Calculate the linear term that decreases with increasing bin index\n    linear_term = np.arange(len(bins)) * (max_score - 1)\n    \n    # Calculate the potential leftover space if the item is assigned to each bin\n    leftover_space = bins - item\n    \n    # Calculate the final score for each bin\n    scores = max_score + linear_term + leftover_space\n    \n    return scores",
+          "objective": 0.03481,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Assign an item to the bin with the maximum score of the logarithm of the reciprocal of the remaining capacity, multiplied by a term that increases exponentially with increasing bin index, and an additional term that is inversely proportional to the potential leftover space.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the logarithm of the reciprocal of the remaining capacity\n    log_recip_capacity = np.log(1 / (bins - item))\n    \n    # Calculate the exponential term based on the bin index\n    exp_term = np.exp(np.arange(len(bins)))\n    \n    # Calculate the inverse term based on the potential leftover space\n    inv_term = 1 / (bins - item)\n    \n    # Combine the terms to get the final score\n    scores = log_recip_capacity * exp_term * inv_term\n    \n    return scores",
+          "objective": 0.03552,
+          "other_inf": null
+     }
+]

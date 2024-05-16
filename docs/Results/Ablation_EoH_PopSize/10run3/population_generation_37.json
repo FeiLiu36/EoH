@@ -1,0 +1,62 @@
+[
+     {
+          "algorithm": "Common backbone idea: Assigning scores to bins based on the ratio of the item size to the product of the remaining capacity of the bin raised to the power determined by its index.\n\nNew algorithm description: The new algorithm assigns scores to bins based on the ratio of the logarithm of the item size to the product of the remaining capacity of the bin raised to the power determined by its index, with a penalty term applied based on the inverse of the maximum bin capacity to prioritize bins with smaller remaining capacities, and a scaling factor applied to maintain self-consistency.\n\nNew algorithm implementation:\n``` ",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    bin_index = np.arange(1, num_bins + 1)\n    max_bin_capacity = np.max(bins)\n    penalties = (1 / bins) ** (bin_index + 1) * np.log(max_bin_capacity)\n    scaling_factor = np.prod(penalties) / np.mean(penalties)\n    scores = np.log(item) / ((bins - item) * penalties) * scaling_factor\n    return scores",
+          "objective": 0.00604,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on the combination of the item size and the remaining capacity of the bin, with additional terms designed to prioritize bins with smaller remaining capacities, and penalize large remaining capacities. The algorithm takes into account the maximum capacity of the bins and applies a scaling factor to maintain self-consistency.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    bin_indices = np.arange(num_bins) + 1\n    max_bin_capacity = np.max(bins)\n    penalties = (1 / bins) ** bin_indices * np.log(max_bin_capacity)\n    scaling_factor = np.prod(penalties) / np.mean(penalties)\n    scores = item / ((bins - item) * penalties) * scaling_factor\n    return scores",
+          "objective": 0.00614,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: Assigning scores to bins based on the ratio of the item size to the product of the remaining capacity of the bin raised to the power determined by its index.\n\nNew algorithm description: The new algorithm assigns scores to bins based on the ratio of the logarithm of the item size to the product of the remaining capacity of the bin raised to the power determined by its index, with a penalty term applied based on the inverse of the maximum bin capacity to prioritize bins with smaller remaining capacities, and a scaling factor applied to maintain self-consistency.\n\nNew algorithm implementation:\n``` ",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    bin_index = np.arange(1, num_bins + 1)\n    penalties = (1 / bins) ** bin_index\n    scaling_factor = np.sum(penalties) / np.mean(penalties)\n    scores = np.log(item) / ((bins - item) * penalties) * scaling_factor\n    return scores",
+          "objective": 0.00624,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: Assigning scores to bins based on a ratio involving the item size, remaining capacity of the bin, and a penalty factor.\n\nNew algorithm description: The new algorithm assigns scores to bins based on the ratio of the logarithm of the item size to the product of the remaining capacity of the bin raised to the power determined by its index, with an additional penalty term proportional to the standard deviation of bin capacities and a scaling factor to maintain self-consistency.\n\nNew algorithm implementation:\n``` ",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    penalties = (1 / bins) ** (np.arange(1, num_bins + 1))\n    avg_bin_capacity = np.mean(bins)\n    std_capacity = np.std(bins)\n    scaling_factor = ((avg_bin_capacity + std_capacity) / avg_bin_capacity) ** 2\n    scaled_penalties = penalties * scaling_factor\n    scores = np.log(item) / ((bins - item) * scaled_penalties)\n    return scores",
+          "objective": 0.00634,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to bins based on the square of the product of the item size and the remaining capacity of the bin, with penalties based on the inverse of the bin capacity and a scaling factor to maintain self-consistency.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    penalties = np.power(1 / bins, np.arange(1, num_bins + 1))\n    scaling_factor = np.sum(penalties) / np.mean(penalties)\n    scores = (item * bins) ** 2 / (penalties * (bins - item)) * scaling_factor\n    return scores",
+          "objective": 0.00644,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to bins based on the square of the product of the item size and the remaining capacity of the bin, with penalties based on the inverse of the bin capacity and a scaling factor to maintain self-consistency.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    penalties = np.power(1 / bins, np.arange(1, num_bins + 1))\n    scaling_factor = 1\n    scores = (item * bins) ** 2 / (penalties * (bins - item)) * scaling_factor\n    return scores",
+          "objective": 0.00654,
+          "other_inf": null
+     },
+     {
+          "algorithm": "new_algorithm: The new algorithm assigns a score to each bin based on the square root of the item size divided by the product of the remaining capacity of the bin raised to the power determined by its index, with a balanced penalty applied to bins with smaller capacities and a bonus for bins with larger capacities, in order to minimize the number of used bins. The algorithm also takes into consideration the total remaining capacity of all bins.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    bin_weights = np.ones(num_bins)\n    penalties = (1 / bins) ** (np.arange(1, num_bins + 1))\n    bin_indices = np.arange(num_bins) + 1\n    scores = np.sqrt(item) / ((bins - item) * penalties) * (bin_indices ** 2) * bin_weights\n    return scores",
+          "objective": 0.00664,
+          "other_inf": null
+     },
+     {
+          "algorithm": "```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    penalties = np.power(1 / bins, np.arange(1, num_bins + 1))\n    scores = np.log(item + 1) / ((bins - item) * penalties)\n    return scores",
+          "objective": 0.00674,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: Assigning scores to bins based on the ratio of the item size to the product of the remaining capacity of the bin raised to the power determined by its index.\n\nNew algorithm description: The new algorithm assigns scores to bins based on the ratio of the logarithm of the item size to the product of the remaining capacity of the bin raised to the power determined by its index, with a penalty term applied based on the inverse of the maximum bin capacity to prioritize bins with smaller remaining capacities, and a scaling factor applied to maintain self-consistency.\n\nNew algorithm implementation:\n``` ",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    penalties = np.power(1 / bins, np.arange(1, num_bins + 1))\n    scores = np.log(item) / ((bins - item) * penalties)\n    return scores",
+          "objective": 0.00684,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns a score to each bin based on the logarithm of the item size divided by the product of the remaining capacity of the bin raised to the power determined by its index, with a balanced penalty applied to bins with smaller capacities and a bonus for bins with larger capacities, in order to minimize the number of used bins. The algorithm also takes into consideration the total remaining capacity of all bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    penalties = (1 / bins) ** np.arange(1, num_bins + 1)\n    bin_indices = np.arange(num_bins) + 1\n    scores = np.log(item) / ((bins - item) * penalties) * (bin_indices ** 2)\n    return scores",
+          "objective": 0.00694,
+          "other_inf": null
+     }
+]

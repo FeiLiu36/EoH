@@ -1,0 +1,62 @@
+[
+     {
+          "algorithm": "Backbone idea: The common backbone idea in the provided algorithms is to assign scores to bins based on their remaining capacity and adjust the scores based on various factors such as the item size and the position of the bin in the list.\n\nNew algorithm: The new algorithm assigns a score to each bin based on the ratio of the item size to the product of the remaining capacity of the bin and its index, with a higher penalty applied to bins with smaller capacities, in order to minimize the number of used bins.\n\nPython implementation:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = item / ((bins - item) * range(1, len(bins) + 1))\n    return scores",
+          "objective": 0.03884,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns a score to each bin based on the inverse of the difference between the item size and the rest capacity of the bin, divided by the index plus one, the bin capacity, and the square root of the bin capacity, with a higher penalty applied to bins with smaller capacities, in order to efficiently utilize bins with larger capacities.\n\nHere's the Python implementation of the new algorithm:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the absolute difference between item size and rest capacities of bins\n    diff = np.abs(item - bins)\n\n    # Calculate the scores for each bin\n    scores = (1 / diff) / ((np.arange(1, len(bins) + 1) + 1) * bins * np.sqrt(bins))\n\n    return scores",
+          "objective": 0.03914,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: The common backbone idea in the provided algorithms is to assign scores to bins based on their remaining capacity and adjust the scores based on various factors such as the item size and the position of the bin in the list.\n\nNew algorithm: The new algorithm assigns a score to each bin based on the ratio of the item size to the product of the remaining capacity and a function of the index, with a higher penalty applied to bins with smaller capacities, in order to minimize the number of used bins.\n\nPython implementation:\n\n``` ",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the function of the index\n    index_function = np.sqrt(np.log(np.arange(1, len(bins) + 1) + 1))\n\n    # Calculate the scores for each bin\n    scores = item / ((bins - item) * index_function)\n\n    return scores",
+          "objective": 0.03924,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm Description: The new algorithm assigns a score to each bin based on the ratio of the item size to the product of the difference between the item size and the rest capacity of the bin, the logarithm of the index plus one, and the square of the bin capacity, with a higher penalty applied to bins with smaller capacities.\n\nNew Algorithm Code:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the absolute difference between item size and rest capacities of bins\n    diff = np.abs(item - bins)\n\n    # Calculate the scores for each bin\n    scores = (item / (diff * np.log(np.arange(1, len(bins) + 1) + 1) * bins**2))\n    \n    return scores",
+          "objective": 0.03934,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns a score to each bin based on the ratio of the item size to the product of the difference between the item size and the rest capacity of the bin, the square root of the index plus one, and the bin capacity, with a higher penalty applied to bins with smaller capacities.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the absolute difference between item size and rest capacities of bins\n    diff = np.abs(item - bins)\n\n    # Calculate the scores for each bin\n    scores = (item / (diff * np.sqrt(np.arange(1, len(bins) + 1) + 1) * bins))\n    \n    return scores",
+          "objective": 0.03944,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns a score to each bin based on the ratio of the item size to the absolute difference between the item size and the rest capacity of the bin, divided by the index plus one and the bin capacity, with a higher penalty applied to bins with smaller capacities, in order to efficiently utilize bins with larger capacities.\n\nPython implementation:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the absolute difference between item size and rest capacities of bins\n    diff = np.abs(item - bins)\n\n    # Calculate the scores for each bin\n    scores = (item / diff) / ((np.arange(1, len(bins) + 1) + 1) * bins)\n    \n    return scores",
+          "objective": 0.03954,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: The new algorithm assigns a score to each bin based on the sum of the item size divided by the square of the absolute difference between the item size and the rest capacity of the bin, divided by the index plus one, the bin capacity, and the square root of the bin capacity, with a higher penalty applied to bins with smaller capacities, in order to efficiently utilize bins with larger capacities.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the absolute difference between item size and rest capacities of bins\n    diff = np.abs(item - bins)\n\n    # Calculate the scores for each bin\n    scores = (item / (diff**2)) / ((np.arange(1, len(bins) + 1) + 1) * bins * np.sqrt(bins))\n\n    return scores",
+          "objective": 0.03964,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm Description: The new algorithm assigns a score to each bin based on the ratio of the item size to the product of the difference between the item size and the rest capacity of the bin, the cube root of the index plus one, and the square of the bin capacity, with a higher penalty applied to bins with smaller capacities.\n\nNew Algorithm Code:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the absolute difference between item size and rest capacities of bins\n    diff = np.abs(item - bins)\n\n    # Calculate the scores for each bin\n    scores = (item / (diff * np.cbrt(np.arange(1, len(bins) + 1) + 1) * bins**2))\n    \n    return scores",
+          "objective": 0.03974,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Backbone idea: The common backbone idea in the provided algorithms is to assign scores to bins based on their remaining capacity and adjust the scores based on various factors such as the item size and the position of the bin in the list.\n\nNew algorithm: The new algorithm assigns a score to each bin based on the ratio of the item size to the product of the remaining capacity of the bin and its index, with a higher penalty applied to bins with smaller capacities, in order to minimize the number of used bins.\n\nPython implementation:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = item / ((bins - item) * 10)\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm assigns a score to each bin based on the ratio of the item size to the rest capacity of the bin multiplied by a penalty factor determined by the bin index and the maximum capacity, with a higher penalty applied to bins with larger capacities. The penalty factor is calculated using a power function with a base of 2 and an exponent of the bin index minus 1 divided by the maximum capacity minus 1, to ensure that smaller bins have a higher penalty and larger bins have a lower penalty, in order to optimize the bin assignment and minimize the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    ratios = item / bins\n    penalties = np.power(2, (np.arange(1, len(bins) + 1) - 1) / (max_capacity - 1))\n    scores = ratios * penalties\n    return scores",
+          "objective": 0.03994,
+          "other_inf": null
+     }
+]

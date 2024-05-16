@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "Algorithm description: The new algorithm calculates a score for a given item based on its comparison with a list of bins by first determining the maximum capacity of the bins, then computing a score using a modified formula involving the bins and the item, adjusting the scores for bins greater than the item, updating the scores based on differences between consecutive elements, and finally returning the resulting scores with an added penalty for bins that are close to full.\n\nCode:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = (1 / item**2) * (bins - max(bins))**2 + (1 / item**3) * bins**2\n    scores[bins > item] = -scores[bins > item]\n    scores[1:] -= scores[:-1]\n    return scores",
+          "objective": 0.00584,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm will calculate the scores for each bin based on a combination of the bin's rest capacity, the item size, a penalty factor for bins with lower capacities, a bonus score for bins with rest capacity equal to the item size, an exponential decay factor based on the cumulative sum of the rest capacities divided by the maximum capacity, and an adjustment based on the logarithm of the bin indices, with adjusted values for the penalty factor, bonus score, and decay factor.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    epsilon = 1e-6  # Small value to avoid division by zero\n    penalty_factor = 0.3  # Adjusted penalty factor\n    bonus_score = 25  # Adjusted bonus score\n    decay_factor = 0.9  # Adjusted decay factor\n    \n    scores = bins / (item + epsilon)\n    scores -= penalty_factor / (np.log(np.arange(1, len(bins) + 1)))\n    scores += bonus_score * (bins == item)\n    scores *= decay_factor ** (np.cumsum(bins) / bins.max())\n    \n    return scores",
+          "objective": 0.00594,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: This algorithm calculates a score for a given item based on its comparison with a list of bins by first determining the maximum capacity of the bins, then computing a score using a formula involving the bins and the item, adjusting the scores for bins greater than the item, updating the scores based on differences between consecutive elements, and finally returning the resulting scores with an added penalty for bins that are close to full.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_bin_cap = max(bins)\n    scores = (bins - max_bin_cap)**2 / item + bins**2 / (item**2)\n    scores += bins**2 / item**3\n    scores[bins > item] = -scores[bins > item]\n    scores[1:] -= scores[:-1]\n    scores += 0.1 * (bins / max_bin_cap)**2\n    return scores",
+          "objective": 0.00624,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Based on the backbone idea, the new algorithm will calculate the scores for each bin by considering the ratio of each bin's rest capacity to the item size, the natural logarithm of the bin indices, a penalty factor for bins with maximum capacity squared, a bonus score for bins with rest capacity equal to the item size, an additional factor that encourages the utilization of bins with lower rest capacities, and an exponential decay factor based on the cumulative sum of the rest capacities divided by the maximum capacity, with adjusted values for the penalty factor, bonus score, and additional factor, multiplied by a normalization factor based on the sum of the scores to maintain self-consistency.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    epsilon = 1e-6\n    indices = np.log(np.arange(len(bins)) + 1)\n    penalty_factor = 1\n    bonus_score = 20\n    additional_factor = 0.5\n    decay_factor = 0.9\n\n    scores = bins / (item + epsilon) + indices\n    scores += bonus_score * (bins == item)\n    scores += additional_factor * (1 - bins / (item + epsilon))\n    scores *= (decay_factor ** (np.cumsum(bins) / bins.max())) * (penalty_factor ** 2)\n    scores /= scores.sum()\n\n    return scores",
+          "objective": 0.00634,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: All the provided algorithms calculate scores for each bin based on the ratio of the bin's rest capacity to the item size, with additional adjustments or penalties based on bin indices, rest capacity utilization, or other factors.\n\nNew algorithm description: The score function will calculate the scores for each bin by considering the ratio of each bin's rest capacity to the item size, the logarithm of the bin indices, a penalty factor for bins with maximum capacity, a bonus score for bins with rest capacity equal to the item size, an additional factor that encourages the utilization of bins with lower rest capacities, and an exponential decay factor based on the cumulative sum of the rest capacities divided by the maximum capacity, with adjusted values for the penalty factor, bonus score, and additional factor.\n\nNew Algorithm Code:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    epsilon = 1e-6\n    indices = np.zeros(len(bins))\n    penalty_factor = 0\n    bonus_score = 15\n    additional_factor = 0.4\n    decay_factor = 0.95\n\n    scores = bins / (item + epsilon) + indices\n    scores += bonus_score * (bins == item)\n    scores += additional_factor * (1 - bins / (item + epsilon))\n    scores *= decay_factor ** (np.cumsum(bins) / bins.max())\n\n    return scores",
+          "objective": 0.00644,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates a score for each bin based on its remaining capacity compared to the maximum capacity, by penalizing bins that are close to full, and then adjusts the scores based on the difference between consecutive elements.\n\nHere is the implementation of the new algorithm in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_bin_cap = max(bins)\n    remaining_cap = max_bin_cap - bins\n    capacity_penalty = 0.2 * remaining_cap / max_bin_cap\n    scores = (bins - max_bin_cap)**2 / item + bins**2 / (item**2)\n    scores += bins**2 / item**3\n    scores[bins > item] = -scores[bins > item]\n    scores[1:] -= scores[:-1]\n    scores += capacity_penalty**2\n    return scores",
+          "objective": 0.00654,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Algorithm description: \nThis algorithm calculates a score for a given item based on its comparison with a list of bins by first determining the maximum capacity of the bins, then computing a score using a formula involving the bins and the item, adjusting the scores for bins greater than the item, updating the scores based on differences between consecutive elements, and finally returning the resulting scores with an added penalty for bins that are close to full.\n\nNew algorithm description:\nThis new algorithm adjusts the score calculation in the original algorithm by adding a penalty term that takes into account the remaining capacity of each bin, giving higher scores to bins with higher capacity left compared to the maximum capacity.\n\nCode: \n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_bin_cap = max(bins)\n    bin_cap_ratio = bins / max_bin_cap\n    capacity_penalty = 0.2 * bin_cap_ratio\n    scores = (bins - max_bin_cap)**2 / item + bins**2 / (item**2)\n    scores += bins**2 / item**3\n    scores[bins > item] = -scores[bins > item]\n    scores[1:] -= scores[:-1]\n    scores += capacity_penalty**2\n    return scores",
+          "objective": 0.00664,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Algorithm description: The new algorithm calculates a score for a given item based on its comparison with a list of bins by first determining the maximum capacity of the bins, then computing a score using a modified formula involving the bins and the item, adjusting the scores for bins greater than the item, updating the scores based on differences between consecutive elements, and finally returning the resulting scores with an added penalty for bins that are close to full.\n\nCode:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_bin_cap = max(bins)\n    scores = (bins - max_bin_cap)**2 / (item**2) + bins**2 / (item**3)\n    scores[bins > item] = -scores[bins > item]\n    scores[1:] -= scores[:-1]\n    scores += 0.2 * np.exp(-0.1 * (bins / max_bin_cap))\n    return scores",
+          "objective": 0.00674,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThis algorithm calculates a score for a given item based on its comparison with a list of bins by first determining the maximum capacity of the bins, then computing a score using a formula involving the bins and the item, adjusting the scores for bins greater than the item, updating the scores based on differences between consecutive elements, and finally returning the resulting scores.\n",
+          "code": "import numpy as np\ndef score(item, bins):\n    max_bin_cap = max(bins)\n    score = (bins - max_bin_cap)**2 / item + bins**2 / (item**2)\n    score += bins**2 / item**3\n    score[bins > item] = -score[bins > item]\n    score[1:] -= score[:-1]\n    return score",
+          "objective": 0.0068,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The common backbone idea in the provided algorithms is to calculate the scores for each bin based on the ratio of the bin's remaining capacity to the item size, with additional adjustments based on factors such as bin index, cumulative sum of capacities, penalty factors, logarithmic terms, and bonus scores.\n\nNew Algorithm Description: The new algorithm will calculate the scores for each bin based on a combination of the logarithm of the bin indices, the ratio of each bin's rest capacity to the item size, and the cumulative sum of rest capacities, while considering penalty factors for bins with maximum capacity, a bonus score for bins with rest capacity equal to the item size, and an exponential decay factor that promotes the usage of lower rest capacities.\n\nCode:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    epsilon = 1e-6  # Small value to avoid division by zero\n    decay_factor = 0.9\n    bonus_score = 12\n    \n    scores = np.log(range(1, len(bins) + 1)) * bins / (item + epsilon)\n    scores -= np.where(bins == bins.max(), 0.75, 0)\n    scores += np.where(bins == item, bonus_score, 0)\n    scores *= decay_factor ** (np.cumsum(bins) / bins.max())\n    \n    return scores",
+          "objective": 0.00684,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on a combination of the ratio of each bin's rest capacity to the item size, the logarithm of the bin indices, the cumulative sum of rest capacities raised to a power, and an adjustment based on a penalty factor for bins with maximum capacity, a bonus score for bins with rest capacity equal to the item size, and a decay factor that gradually decreases the score contribution of higher rest capacities.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    epsilon = 1e-6  # Small value to avoid division by zero\n    indices = np.log(np.arange(1, len(bins) + 1))\n    cumulative_sum = np.cumsum(bins)\n    decay_factor = 0.8\n    \n    scores = indices * bins / (item + epsilon)\n    scores -= 0.6 * (bins == bins.max())  # Simplified penalty_factor\n    scores += 20 * (bins == item)  # Simplified bonus_score\n    scores *= decay_factor ** (cumulative_sum / bins.max())\n\n    return scores",
+          "objective": 0.00694,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin by considering the ratio of each bin's rest capacity to the item size, the inverse of the indices, a penalty factor for bins with maximum capacity, a bonus score for bins with rest capacity equal to the item size, an additional factor that promotes the usage of lower rest capacities, and a decay factor based on the cumulative sum of the rest capacities divided by the maximum capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    ratios = bins / item\n    inverse_indices = 1 / (np.arange(len(bins)) + 1)\n\n    scores = ratios - inverse_indices\n    scores -= 0.7 * (bins == bins.max())\n    scores += 20 * (bins == item)\n    scores += 0.3 * (1 - ratios)\n    scores *= 0.9 ** (np.cumsum(bins) / bins.max())\n\n    return scores",
+          "objective": 0.00704,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns scores to each bin based on the ratio of the bin's rest capacity to the item size, with additional adjustments considering the bin indices, penalties for bins with maximum capacity, bonus scores for bins with rest capacity equal to the item size, an additional factor that encourages the utilization of bins with lower rest capacities, and an exponential decay factor based on the cumulative sum of the rest capacities divided by the maximum capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    epsilon = 1e-6\n    indices = np.arange(len(bins))  # Simplified component: Initialize indices as range from 0 to len(bins)-1\n    bonus_score = 15\n    additional_factor = 0.4\n    decay_factor = 0.95\n\n    scores = bins / (item + epsilon) + np.log(indices + 1)\n    scores += bonus_score * (bins == item)\n    scores += additional_factor * (1 - bins / (item + epsilon))\n    scores *= decay_factor ** (np.cumsum(bins) / bins.max())\n\n    return scores",
+          "objective": 0.00714,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Backbone Idea: The common backbone idea in all the provided algorithms is to calculate scores for each bin based on the ratio of the bin's remaining capacity to the item size, with additional adjustments or penalties based on bin indices, rest capacity utilization, or other factors.\n\nNew Algorithm Description: The score function will calculate the scores for each bin based on the ratio of each bin's remaining capacity to the item size, with additional penalties for bins with lower indices, a bonus score for bins with rest capacity equal to the item size, and an exponential decay factor raised to the power of the ratio of each bin's remaining capacity to the maximum capacity, while also adjusting the scores based on the cumulative sum of the remaining capacities.\n\nCode:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins, penalty_factor=0.7, bonus_score=20, decay_factor=0.9):\n    epsilon = 1e-6  # Small value to avoid division by zero\n\n    ratios = bins / (item + epsilon)\n    inverse_indices = 1 / (np.arange(len(bins)) + 1)\n    cumulative_sum = np.cumsum(bins)    \n    \n    scores = ratios - inverse_indices\n    scores -= penalty_factor * (bins == bins.max())\n    scores += bonus_score * (bins == item)\n    scores *= decay_factor ** (cumulative_sum / bins.max())\n\n    return scores",
+          "objective": 0.00724,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin by considering the ratio of each bin's rest capacity to the item size, the square root of the bin indices, a penalty factor for bins with maximum capacity squared, a bonus score for bins with rest capacity equal to the item size, an additional factor that encourages the utilization of bins with lower rest capacities, and an exponential decay factor based on the cumulative sum of the rest capacities divided by the maximum capacity, with adjusted values for the penalty factor, bonus score, and additional factor, multiplied by a normalization factor based on the sum of the scores to maintain self-consistency.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    epsilon = 1e-6\n    indices = np.sqrt(np.arange(len(bins)) + 1)\n    penalty_factor = 1\n    bonus_score = 20\n    additional_factor = 0.5\n    decay_factor = 0.9\n\n    scores = bins / (item + epsilon) + indices\n    scores += bonus_score * (bins == item)\n    scores += additional_factor * (1 - bins / (item + epsilon))\n    scores *= (decay_factor ** (np.cumsum(bins) / bins.max())) * (penalty_factor ** 2)\n    scores /= scores.sum()\n\n    return scores",
+          "objective": 0.00734,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin by considering the ratio of each bin's rest capacity to the item size, the logarithm of the bin indices, a penalty factor for bins with maximum capacity, a bonus score for bins with rest capacity equal to the item size, an additional factor that promotes the usage of lower rest capacities, and a decay factor based on the cumulative sum of the rest capacities divided by the maximum capacity, with adjusted values for the penalty factor, bonus score, additional factor, logarithmic term, and decay factor.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    epsilon = 1e-6\n    indices = np.log(np.arange(len(bins)) + 1)\n    penalty_factor = 0.2\n    bonus_score = 10\n    additional_factor = 0.5\n    decay_factor = 0.9\n\n    scores = bins / (item + epsilon) + indices\n    scores -= penalty_factor * (bins == bins.max())\n    scores += bonus_score * (bins == item)\n    scores += additional_factor * (1 - bins / (item + epsilon))\n    scores *= decay_factor ** (np.cumsum(bins) / bins.max())\n\n    return scores",
+          "objective": 0.00745,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the score for each bin based on a combination of the ratio of each bin's remaining capacity to the item size, a penalty factor for bins with lower indices, a bonus score for bins with rest capacity equal to the item size, an exponential decay factor raised to the power of the ratio of each bin's remaining capacity to the maximum capacity, and an adjustment based on the cumulative sum of the remaining capacities, with different parameter settings compared to the provided algorithm.\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    epsilon = 1e-6  # Small value to avoid division by zero\n\n    ratios = bins / (item + epsilon)\n    inverse_indices = 1 / (np.arange(len(bins)) + 1)\n    penalty_factor = 0.5  # Changed penalty factor to 0.5\n    bonus_score = 10  # Changed bonus score to 10\n    decay_factor = 0.95  # Changed decay factor to 0.95\n    cumulative_sum = np.cumsum(bins)    \n    \n    scores = ratios - inverse_indices\n    scores -= penalty_factor * (bins == bins.max())\n    scores += bonus_score * (bins == item)\n    scores *= decay_factor ** (cumulative_sum / bins.max())\n\n    return scores",
+          "objective": 0.00755,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on the ratio of each bin's rest capacity to the item size, the logarithm of the bin indices, the exponential decay factor raised to the power of the cumulative sum of the rest capacities, a bonus score for bins with rest capacities equal to the item size, and a penalty factor for bins with maximum capacity, while also applying additional adjustments based on the bin indices and the ratio of each bin's rest capacity to the maximum capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    epsilon = 1e-6\n    indices = np.log(np.arange(1, len(bins) + 1))\n    decay_factor = 0.9\n    bonus_score = 10\n    penalty_factor = 0.5\n    cumulative_sum = np.cumsum(bins)\n    \n    ratios = bins / (item + epsilon)\n    \n    scores = ratios + indices\n    scores *= decay_factor ** (cumulative_sum / bins.max())\n    scores += bonus_score * (bins == item)\n    scores -= penalty_factor * (bins == bins.max())\n    \n    return scores",
+          "objective": 0.00765,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm adjusts the score for each bin based on the ratio of each bin's remaining capacity to the item size, with an additional bonus score for bins with rest capacity equal to the item size, an inverse bonus score for bins with higher indices, and a decay factor raised to the power of the ratio of each bin's remaining capacity to the maximum capacity, while also adjusting the scores based on the cumulative sum of the remaining capacities.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    epsilon = 1e-6  # Small value to avoid division by zero\n    \n    ratios = bins / (item + epsilon)\n    inverse_indices = 1 / (np.arange(len(bins)) + 1)\n    bonus_score = 20\n    inverse_bonus_score = -10\n    decay_factor = 0.9\n    cumulative_sum = np.cumsum(bins)    \n    \n    scores = ratios\n    scores += bonus_score * (bins == item)\n    scores += inverse_bonus_score * inverse_indices\n    scores *= decay_factor ** (cumulative_sum / bins.max())\n\n    return scores",
+          "objective": 0.00775,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin by taking into account the ratio between the item's size and each bin's rest capacity, a penalty factor for bins with maximum capacity, a bonus score for bins with rest capacity equal to the item size, and a modified cumulative sum of the rest capacities that accounts for the decay rate over time.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scaling_factor = 100  # Simplified scaling factor for ratios\n\n    ratios = bins / (item * scaling_factor)\n    cumulative_sum = np.cumsum(bins)\n    decay_factor = np.exp(-0.05 * (cumulative_sum / bins.max()))  # Simplified decay factor\n\n    scores = ratios\n    scores += 10 * (bins == item)\n    scores *= decay_factor\n\n    return scores",
+          "objective": 0.00795,
+          "other_inf": null
+     }
+]

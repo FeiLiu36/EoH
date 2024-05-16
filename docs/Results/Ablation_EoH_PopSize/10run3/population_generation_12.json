@@ -1,0 +1,62 @@
+[
+     {
+          "algorithm": "The new algorithm assigns a score to each bin based on the ratio of the item size to the product of the remaining capacity of the bin raised to a power determined by its index, with an additional penalty term to promote performance and minimize the number of used bins, using different parameter settings.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    bin_index = np.arange(1, num_bins + 1)\n    bin_weights = (1 - bins / np.sum(bins))\n    scores = item / (np.power(bins - item, bin_index + 3) + np.sqrt(np.power(bins, 4) - item**4)) * bin_weights\n    return scores",
+          "objective": 0.03189,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns a score to each bin based on the ratio of the item size to the product of the square of the difference between the item size and the rest capacity of the bin, the bin index plus one raised to the power of its index, multiplied by the bin capacity, with a higher penalty applied to bins with larger capacities, in order to utilize bins with smaller capacities. \n\nPython implementation:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the absolute difference between item size and rest capacities of bins\n    diff = np.abs(item - bins)\n\n    # Calculate the scores for each bin\n    scores = (item / (diff**2 * (np.arange(len(bins)) + 1)**np.arange(len(bins)))) * bins\n    \n    return scores",
+          "objective": 0.032,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Identifying the common backbone idea in the provided algorithms: The common backbone idea in the provided algorithms is to assign a score to each bin based on the ratio of the item size to the product of the remaining capacity of the bin raised to the power determined by its index, with additional penalty terms to promote performance and minimize the number of used bins.\n\nNew algorithm description: The new algorithm assigns a score to each bin based on the ratio of the item size to the product of the remaining capacity of the bin raised to the power determined by its index, with an added logarithm term and a penalty term that increases with smaller capacities, aimed at minimizing the number of used bins.\n\nPython implementation:\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    bin_index = np.arange(1, num_bins + 1)\n    bin_weights = (1 - bins / np.sum(bins))\n    scores = item / (np.power(bins - item, bin_index) * np.log(bins + 1)) + (1 / np.power(bin_index, 2)) * bin_weights\n    return scores",
+          "objective": 0.0327,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Backbone idea: The common backbone idea in the provided algorithms is to assign scores to bins based on their remaining capacity and adjust the scores based on various factors such as the item size and the position of the bin in the list.\n\nNew algorithm: The new algorithm assigns a score to each bin based on a combination of the ratio of the item size to the product of the remaining capacity of the bin raised to a power determined by its index, and the logarithm of the remaining capacity of the bin, with an additional penalty term to promote performance and minimize the number of used bins.\n\nPython implementation:\n\n```\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    bin_index = np.arange(1, num_bins + 1)\n    bin_weights = (1 - bins / np.sum(bins))\n    scores = item / (np.power(bins - item, bin_index) * np.log(bins)) * bin_weights\n    return scores",
+          "objective": 0.033,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns a score to each bin based on the ratio of the square root of the item size to the product of the remaining capacity of the bin raised to the power of its index, with a penalty term that increases with smaller capacities, in order to minimize the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.sqrt(item) / np.power(bins - item, np.arange(1, len(bins) + 1)) + 1 / np.arange(1, len(bins) + 1)**2\n    return scores",
+          "objective": 0.0331,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Algorithm description: The new algorithm assigns a score to each bin based on the ratio of the item size to the product of the remaining capacity of the bin raised to the power determined by its index, with a balanced penalty applied to bins with smaller capacities, in order to minimize the number of used bins. The algorithm also takes into consideration the total remaining capacity of all bins.\n\nPython implementation:\n```\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    total_capacity = np.sum(bins)\n    bin_weights = (1 - bins / total_capacity)\n    scores = item / (bins - item)**np.arange(1, num_bins + 1) * bin_weights\n    return scores",
+          "objective": 0.0332,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: The new algorithm assigns a score to each bin based on the ratio of the item size to the product of the remaining capacity of the bin raised to a power determined by its index, with a balanced penalty applied to bins with smaller capacities, in order to minimize the number of used bins.\n\nPython implementation:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = item / np.power(bins - item, np.arange(1, len(bins) + 1))\n    return scores",
+          "objective": 0.0334,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns a score to each bin based on the ratio of the item size to the product of the remaining capacity of the bin raised to the power determined by its index plus one, with an additional penalty term to promote performance and minimize the number of used bins.\n\nPython implementation:\n\n```\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    bin_index = np.arange(1, num_bins + 1)\n    bin_weights = 1 / np.sum(bins)\n    scores = item / (np.power(bins - item, bin_index + 1) + np.sqrt(np.power(bins, 2) - item**2)) * bin_weights\n    return scores",
+          "objective": 0.03391,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm:\nThe new algorithm assigns a score to each bin based on the ratio of the item size to the product of the remaining capacity of the bin raised to the power determined by its index plus one, with an additional penalty term to promote performance and minimize the number of used bins, using different parameter settings.\n\nPython implementation:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    bin_index = np.arange(1, num_bins + 1)\n    bin_weights = (1 - bins / np.sum(bins))\n    scores = item / (np.power(bins - item, bin_index + 2) + np.sqrt(np.power(bins, 3) - item**3)) * bin_weights\n    return scores",
+          "objective": 0.03431,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Algorithm description: The new algorithm assigns a score to each bin based on the ratio of the item size to the product of the remaining capacity of the bin raised to the power determined by the cube root of its index, with an additional penalty term to promote performance and minimize the number of used bins.\n\nCode:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = len(bins)\n    bin_index = np.arange(1, num_bins+1)\n    bin_weights = (1 - bins / np.sum(bins))\n    scores = item / (np.power(bins - item, bin_index) + np.cbrt(np.power(bins, 3) - item**3)) * bin_weights\n    return scores",
+          "objective": 0.03552,
+          "other_inf": null
+     }
+]

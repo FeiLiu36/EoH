@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "My new algorithm calculates the scores for each bin based on a combination of the bin's remaining capacity, the size of the item, and a penalty term that takes into account the number of already assigned items to each bin, aiming to evenly distribute the items and minimize the number of used bins. The penalty term is adjusted to favor bins with lower capacities, promoting a more efficient use of space. Additionally, the algorithm incorporates a logarithmic function and a weighted factor to further optimize the assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacity = bins - item\n    num_assigned_items = max_capacity - remaining_capacity\n\n    scores = (item / remaining_capacity) + (remaining_capacity / max_capacity) * num_assigned_items + np.log(remaining_capacity) + np.cos(num_assigned_items) - np.log2(bins)\n    return scores",
+          "objective": 0.00644,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign scores to bins based on a combination of the bin's remaining capacity, the item size, the number of assigned items, and a logarithmic penalty term that favors bins with higher capacities, promoting a more balanced distribution and efficient use of space. To promote performance and avoid utilizing the random component, I will implement the new algorithm using Numpy arrays and vectorized operations.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    num_assigned_items = np.max(bins) - remaining_capacity\n\n    scores = item / remaining_capacity + (remaining_capacity / np.max(bins)) * num_assigned_items + np.log10(remaining_capacity) * np.log2(num_assigned_items) - np.exp(-np.max(bins) / remaining_capacity)\n    return scores",
+          "objective": 0.00654,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm will assign scores to bins based on the bin's remaining capacity, the item size, the number of assigned items, and a logarithmic penalty term that favors bins with lower capacities, promoting a more balanced distribution and efficient use of space.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    num_assigned_items = np.max(bins) - remaining_capacity\n\n    scores = item / remaining_capacity + (remaining_capacity / np.max(bins)) * num_assigned_items + np.log2(remaining_capacity) * np.log10(num_assigned_items) + np.exp(-np.max(bins) / remaining_capacity)\n    return scores",
+          "objective": 0.00664,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: Assign scores to bins based on a combination of the bin's remaining capacity, the item size, the number of assigned items, and a power penalty term that favors bins with lower capacities, promoting a more efficient use of space.\n\nPython implementation:\n\n```\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacity = bins - item\n    num_assigned_items = max_capacity - remaining_capacity\n\n    scores = item / remaining_capacity + (remaining_capacity / max_capacity) * num_assigned_items + np.power(remaining_capacity, 0.5) + np.sqrt(num_assigned_items)\n    return scores",
+          "objective": 0.00674,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns scores to each bin based on their current capacity, the size of the item, and a penalty term that takes into account both the number of already assigned items to each bin and the exponential of the square root of the ratio between the bin's remaining capacity and the maximum capacity, with the goal of evenly distributing the items among bins and minimizing the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacity = bins - item\n    num_assigned_items = max_capacity - remaining_capacity\n    ratio = remaining_capacity / max_capacity\n\n    scores = item / remaining_capacity + ratio * num_assigned_items + np.exp(-remaining_capacity / max_capacity) + np.cos(num_assigned_items) + np.exp(np.sqrt(ratio))\n    return scores",
+          "objective": 0.00684,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns scores to each bin based on a combination of the bin's remaining capacity, the size of the item, and a penalty term that takes into account the number of already assigned items to each bin, with the goal of evenly distributing the items and minimizing the number of used bins. The penalty term is adjusted to favor bins with higher capacities, promoting a more balanced distribution. Additionally, the algorithm incorporates a combination of exponential, logarithmic, and trigonometric functions to optimize the assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    num_assigned_items = np.max(bins) - remaining_capacity\n\n    scores = item / remaining_capacity + remaining_capacity / np.max(bins) * num_assigned_items\n    return scores",
+          "objective": 0.00694,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns scores to each bin based on a combination of the bin's remaining capacity, the item size, and a penalty term that takes into account the number of already assigned items to each bin, with the aim of achieving a balanced distribution of items while minimizing the number of used bins. The algorithm also incorporates a logarithmic transformation of the remaining capacity and item size to further optimize the assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    num_assigned_items = np.max(bins) - remaining_capacity\n\n    scores = (item / remaining_capacity) + (remaining_capacity / np.max(bins)) * num_assigned_items + np.log1p(remaining_capacity) + np.cos(num_assigned_items)\n    return scores",
+          "objective": 0.00704,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Common backbone idea: Assigning scores to bins based on their current capacity, the size of the item, and a penalty term that considers the number of already assigned items to each bin. \n\nNew algorithm description: Assign scores to bins based on a combination of the bin's remaining capacity, the item size, the number of assigned items, and a logarithmic penalty term that favors bins with lower capacities, promoting a more efficient use of space.\n\nPython implementation:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacity = bins - item\n    num_assigned_items = max_capacity - remaining_capacity\n\n    scores = item / remaining_capacity + (remaining_capacity / max_capacity) * num_assigned_items + np.log(remaining_capacity) + np.sqrt(num_assigned_items)\n    return scores",
+          "objective": 0.00714,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on a combination of the bin's remaining capacity, the size of the item, and a penalty term that takes into account the number of already assigned items to each bin, with the goal of evenly distributing the items and minimizing the number of used bins. The penalty term is adjusted to favor bins with lower capacities, promoting a more equal distribution. Additionally, the algorithm incorporates a combination of exponential and hyperbolic functions to optimize the assignment, increasing the complexity and performance of the function.\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacity = bins - item\n    num_assigned_items = max_capacity - remaining_capacity\n\n    penalty = np.exp(-remaining_capacity) * np.tanh(num_assigned_items)\n\n    scores = (item / remaining_capacity) + (remaining_capacity / max_capacity) * num_assigned_items + penalty\n    return scores",
+          "objective": 0.00724,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to bins based on a combination of the bin's remaining capacity, the item size, the number of assigned items, and a logarithmic penalty term that favors bins with lower capacities, promoting a more efficient use of space.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacity = bins - item\n    num_assigned_items = max_capacity - remaining_capacity\n\n    scores = item / remaining_capacity + (remaining_capacity / max_capacity) * num_assigned_items + np.log(remaining_capacity) + 1 / np.sqrt(num_assigned_items)\n    return scores",
+          "objective": 0.00734,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns scores to each bin based on their current capacity, the size of the item, and a penalty term that takes into account the number of already assigned items to each bin, with the goal of evenly distributing the items among bins and minimizing the number of used bins. The penalty term is adjusted to favor bins with lower capacities, promoting a more efficient use of space.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    num_assigned_items = max_capacity - (bins - item)\n\n    scores = item / (bins - item) + (bins - item) / max_capacity * num_assigned_items + np.sqrt(bins - item / max_capacity) + np.cos(num_assigned_items)\n    return scores",
+          "objective": 0.00745,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns scores to bins based on the remaining capacity of each bin, the size of the item, the number of assigned items, and a penalty term that favors bins with lower capacities, promoting a more efficient use of space while maintaining a balanced distribution.\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    num_assigned_items = np.max(bins) - remaining_capacity\n\n    penalty = np.log(1 + remaining_capacity / np.max(bins))\n\n    scores = (item / remaining_capacity) + (remaining_capacity / np.max(bins)) * num_assigned_items + penalty\n    return scores",
+          "objective": 0.00755,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: Assign scores to bins based on the combination of the bin's remaining capacity, the item size, the number of assigned items, and a logarithmic term that favors bins with higher capacities, promoting a more balanced distribution and efficient use of space. Implement the algorithm using vectorized operations for improved performance.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    num_assigned_items = np.max(bins) - remaining_capacity\n\n    scores = item / remaining_capacity + (remaining_capacity / np.max(bins)) * num_assigned_items + np.log(remaining_capacity) / np.log(np.max(bins))\n    return scores",
+          "objective": 0.00765,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns scores to each bin based on a combination of the bin's remaining capacity, the item size, and a penalty term that takes into account the number of already assigned items to each bin, with the aim of achieving a balanced distribution of items while minimizing the number of used bins. The algorithm also incorporates a logarithmic transformation of the remaining capacity and item size to further optimize the assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacities = bins - item\n    assigned_items = np.max(bins) - remaining_capacities - 1\n\n    scores = (item / remaining_capacities) + (remaining_capacities / np.max(bins)) * assigned_items + np.log1p(remaining_capacities) + np.cos(assigned_items)\n    return scores",
+          "objective": 0.00775,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Backbone idea: The provided algorithms assign scores to bins based on the remaining capacity of each bin, the size of the item, and some penalty terms that consider the number of assigned items and the ratio of capacities.\n\nNew algorithm description: Assign scores to bins by combining the item size, the remaining capacity of each bin, a penalty term based on the difference between the maximum capacity and the remaining capacity, and a term that promotes a more balanced distribution of items among the bins. Implement the algorithm using efficient numpy operations for improved performance.\n\nPython implementation:\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    num_assigned_items = np.max(bins) - remaining_capacity\n    ratio_capacity = remaining_capacity / np.max(bins)\n\n    scores = item / remaining_capacity + ratio_capacity * num_assigned_items + (np.log(remaining_capacity) / np.log(np.max(bins))) * (1 - ratio_capacity)\n    return scores",
+          "objective": 0.00785,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: Assign scores to bins based on a combination of the bin's remaining capacity, the item size, the number of assigned items, and a power-law penalty term that favors bins with lower capacities, promoting a more efficient use of space while ensuring a balanced distribution.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacity = bins - item\n    num_assigned_items = max_capacity - remaining_capacity\n\n    penalty = (remaining_capacity / max_capacity) ** 2\n\n    scores = (item / remaining_capacity) + (remaining_capacity / max_capacity) * num_assigned_items + penalty\n    return scores",
+          "objective": 0.00795,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm aims to promote the utilization of larger capacity bins while still maintaining a balanced distribution of items. \n\nAlgorithm description:\n1. Calculate the maximum capacity of the bins.\n2. Calculate the remaining capacity of each bin after assigning the item.\n3. Calculate the penalty term that favors bins with lower capacities.\n4. Calculate the number of assigned items in each bin.\n5. Calculate the scores for each bin based on a combination of the item size, remaining capacity, penalty term, and number of assigned items.\n6. Return the scores for the bins.\n\nPython implementation:\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n\n    num_assigned_items = np.max(bins) - remaining_capacity\n\n    scores = item / remaining_capacity + (remaining_capacity / np.max(bins)) * num_assigned_items + np.exp(-remaining_capacity / np.max(bins)) + np.sin(-num_assigned_items)\n    return scores",
+          "objective": 0.00805,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm involves assigning scores to each bin based on a combination of the bin's remaining capacity, the size of the item, and a penalty term that takes into account the number of already assigned items to each bin, with the objective of evenly distributing the items and minimizing the number of used bins. The penalty term is adjusted to favor bins with lower capacities, promoting a more equal distribution. Additionally, the algorithm incorporates a combination of logarithmic and trigonometric functions to optimize the assignment, increasing the complexity and performance of the function.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacity = bins - item\n    num_assigned_items = max_capacity - remaining_capacity\n\n    penalty = np.log1p(remaining_capacity) * np.sin(num_assigned_items)\n\n    scores = (item / remaining_capacity) + (remaining_capacity / max_capacity) * num_assigned_items + penalty\n    return scores",
+          "objective": 0.00815,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm will assign scores to bins based on the bin's remaining capacity, the item size, and the number of assigned items. It will also include a penalty term that penalizes bins with smaller capacities to encourage a more balanced distribution of items. To further promote efficient use of space, the penalty term will be modified to have an exponential decay with respect to the remaining capacity, and an additional term will be introduced to penalize bins with a large number of assigned items.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    remaining_capacity = bins - item\n    num_assigned_items = np.max(bins) - remaining_capacity\n\n    scores = item / remaining_capacity + (remaining_capacity / np.max(bins)) * num_assigned_items + np.exp(-remaining_capacity / np.max(bins)) * np.log2(num_assigned_items) + np.exp(-num_assigned_items / np.max(bins))\n    return scores",
+          "objective": 0.00825,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm incorporates a combination of exponential, logarithmic, and trigonometric functions to assign scores to each bin based on the remaining capacity, item size, and a penalty term that favors bins with lower capacities, with the goal of achieving a balanced distribution and minimizing the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    remaining_capacity = bins - item\n    num_assigned_items = max_capacity - remaining_capacity\n\n    penalty = np.exp(-remaining_capacity / max_capacity) * np.log1p(num_assigned_items) + np.sin(num_assigned_items) - np.cos(remaining_capacity)\n\n    scores = (item / remaining_capacity) + (remaining_capacity / max_capacity) * num_assigned_items + penalty\n    return scores",
+          "objective": 0.00835,
+          "other_inf": null
+     }
+]

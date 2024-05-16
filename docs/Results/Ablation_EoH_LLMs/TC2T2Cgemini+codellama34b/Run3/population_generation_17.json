@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "Prioritize bins by a count of a function of inverse rest capacity, corrected by a random factor that is dependent on a feature of the item relative to the bin, with a penalty applied to bins whose inverse rest capacity is close to 0.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse rest capacity for each bin\n    inv_rest_capacity = 1 / (bins - item)\n    \n    # Apply a random factor to the inverse rest capacity\n    rand_factor = np.random.randint(0, 100, size=len(bins))\n    inv_rest_capacity *= rand_factor\n    \n    # Penalize bins with low inverse rest capacity\n    penalized_inv_rest_capacity = np.where(inv_rest_capacity < 0.5, inv_rest_capacity * 0.5, inv_rest_capacity)\n    \n    # Calculate the final score for each bin\n    scores = penalized_inv_rest_capacity + (1 - penalized_inv_rest_capacity) * np.log(penalized_inv_rest_capacity)\n    \n    return scores",
+          "objective": 0.00765,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Use the product of the inverse rest capacity and the logarithm of the item size, then deduct a randomized term dependent on both the item size and the remaining capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the product of the inverse rest capacity and the logarithm of the item size\n    scores = (1 / (bins - item)) * np.log(item)\n    \n    # Deduct a randomized term dependent on both the item size and the remaining capacity\n    scores -= np.random.randint(0, item, size=bins.shape[0])\n    \n    return scores",
+          "objective": 0.0158,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Use the square root of the inverse rest capacity divided by the maximum capacity and deduct a randomized term dependent on both the item size and the remaining capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the square root of the inverse rest capacity divided by the maximum capacity\n    scores = np.sqrt(1 / (bins - item))\n    \n    # Deduct a randomized term dependent on both the item size and the remaining capacity\n    scores -= np.random.randint(0, item, size=bins.shape) * (bins - item)\n    \n    return scores",
+          "objective": 0.0166,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Calculate the inverse rest capacity of each bin and penalize smaller bins, while introducing a random factor proportional to both the item's size and the maximum capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse rest capacity of each bin\n    inv_rest_capacity = 1 / (bins - item)\n    \n    # Penalize smaller bins by adding a random factor\n    random_factor = np.random.randint(0, item, size=len(bins))\n    inv_rest_capacity += random_factor\n    \n    # Normalize the scores\n    scores = inv_rest_capacity / np.sum(inv_rest_capacity)\n    \n    return scores",
+          "objective": 0.017,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm prioritizes bins based on their inverse rest capacity, penalizes occupied bins but less than the previous algorithm, and compensates for small item sizes relative to bin maximum capacities but more than the previous algorithm.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse rest capacity for each bin\n    inv_rest_capacity = 1 / (bins - item)\n    \n    # Penalize occupied bins\n    penalty = np.where(bins == 0, 0, 1)\n    \n    # Compensate for small item sizes relative to bin maximum capacities\n    compensation = np.where(item < bins * 0.5, 1, 0)\n    \n    # Calculate the final score for each bin\n    scores = inv_rest_capacity + penalty + compensation\n    \n    return scores",
+          "objective": 0.01861,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm prioritizes larger bins by their rest capacity and penalizes smaller ones, while introducing a random factor based on the item's size relative to bin capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the rest capacity of each bin\n    rest_capacity = bins - item\n    \n    # Prioritize larger bins by their rest capacity\n    priority = np.argsort(-rest_capacity)\n    \n    # Penalize smaller bins\n    penalty = np.exp(-np.log(rest_capacity))\n    \n    # Introduce a random factor based on the item's size relative to bin capacity\n    randomness = np.random.randint(0, 100, size=len(bins))\n    \n    # Combine the priority, penalty, and randomness to get the final score\n    scores = (priority + penalty + randomness) / 3\n    \n    return scores",
+          "objective": 0.01912,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Prioritize bins based on their inverse rest capacity, penalize occupied bins, and introduce a random factor proportional to the item's size relative to the bin's maximum capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse rest capacity of each bin\n    inv_rest_capacity = 1 / (bins - item)\n    \n    # Penalize occupied bins by subtracting a large value\n    penalty = np.where(bins > item, 0, 1e9)\n    \n    # Introduce a random factor proportional to the item's size relative to the bin's maximum capacity\n    rand_factor = np.random.randint(0, 100, size=len(bins)) * (item / bins.max())\n    \n    # Calculate the final score for each bin\n    scores = inv_rest_capacity + penalty + rand_factor\n    \n    return scores",
+          "objective": 0.01962,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign the item to the bin with the highest score calculated by dividing the inverse rest capacity by the maximum bin capacity and subtracting a random factor proportional to the remaining capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse rest capacity for each bin\n    inv_rest_capacity = 1 / (bins - item)\n    \n    # Calculate the maximum bin capacity\n    max_bin_capacity = np.max(bins)\n    \n    # Calculate the score for each bin\n    scores = inv_rest_capacity / max_bin_capacity\n    \n    # Subtract a random factor proportional to the remaining capacity\n    rand_factor = np.random.randint(0, 100, size=len(bins))\n    scores -= rand_factor * (1 - inv_rest_capacity)\n    \n    return scores",
+          "objective": 0.01982,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Prioritize bins by a score that is a difference between inverse rest capacity weighted by the item weight and inverse minimum capacity weighted by the bin weight, with a randomness factor that is dependent on the item relative to the bin.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse rest capacity weighted by the item weight\n    inv_rest_capacity = 1 / (bins - item)\n    inv_min_capacity = 1 / bins\n    \n    # Calculate the score for each bin\n    scores = inv_rest_capacity * inv_min_capacity\n    \n    # Add a randomness factor to the scores\n    randomness = np.random.randint(0, 100, size=len(bins))\n    scores += randomness\n    \n    return scores",
+          "objective": 0.01992,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Prioritize bins by a score that is a function of inverse rest capacity, with a randomness factor that is proportional to the sum of the item's features relative to the bin.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse rest capacity for each bin\n    inv_rest_capacity = 1 / (bins - item)\n    \n    # Calculate the randomness factor for each bin\n    randomness = np.random.randint(0, 100, size=len(bins))\n    \n    # Calculate the total score for each bin\n    scores = inv_rest_capacity + randomness\n    \n    # Return the scores\n    return scores",
+          "objective": 0.02012,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Prioritize larger bins by their inverse rest capacity, penalizing smaller ones, while introducing a random factor proportional to the item's size relative to the maximum capacity",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse rest capacity for each bin\n    inv_rest_capacity = 1 / (bins - item)\n    \n    # Calculate the penalty for smaller bins\n    penalty = np.maximum(0, (bins - item) / (bins + 1))\n    \n    # Calculate the random factor\n    rand_factor = np.random.randint(0, 100, size=len(bins))\n    \n    # Calculate the final score for each bin\n    scores = inv_rest_capacity * (1 - penalty) + rand_factor\n    \n    return scores",
+          "objective": 0.02022,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Prioritize bins by score, which includes the inverse rest capacity and a randomness that is dependent on a feature of the item relative to the bin, and increase the impact of the randomness using an exponential function",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse rest capacity for each bin\n    inv_rest_capacity = 1 / (bins - item)\n    \n    # Calculate the randomness component for each bin\n    randomness = np.random.randint(0, 100, size=len(bins))\n    \n    # Combine the inverse rest capacity and randomness components\n    scores = inv_rest_capacity + randomness\n    \n    # Exponential function to amplify the effect of the randomness component\n    scores = np.exp(scores)\n    \n    # Return the scores for each bin\n    return scores",
+          "objective": 0.02042,
+          "other_inf": null
+     },
+     {
+          "algorithm": "`Prioritize bins by a score that is a function of inverse rest capacity, with a randomness factor that is dependent on a feature of the item relative to the bin.`",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse rest capacity for each bin\n    inv_rest_capacity = 1 / (bins - item)\n    \n    # Add a randomness factor based on the item's size\n    randomness = np.random.randint(0, 100, size=len(bins))\n    randomness = randomness * (inv_rest_capacity > 0)\n    \n    # Calculate the final score for each bin\n    scores = inv_rest_capacity + randomness\n    \n    return scores",
+          "objective": 0.02063,
+          "other_inf": null
+     },
+     {
+          "algorithm": "{New algorithm: Prioritizes bins based on their inverse rest capacity, penalizes occupied bins, and compensates for small item sizes relative to bin maximum capacities differently.}",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse rest capacity for each bin\n    inv_rest_capacity = 1 / (bins - item)\n    \n    # Penalize occupied bins by subtracting a large value\n    occupied_penalty = 100 * (bins == 0)\n    \n    # Compensate for small item sizes relative to bin maximum capacities\n    small_item_compensation = 0.5 * (item < 0.5 * bins)\n    \n    # Calculate the final score for each bin\n    scores = inv_rest_capacity + occupied_penalty + small_item_compensation\n    \n    return scores",
+          "objective": 0.02073,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm: Assign the item to the bin with the highest score calculated by the ratio of bin capacity minus item size to the square of their difference, minus a random factor proportional to the item size if the rest capacity is smaller than the item size.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the score for each bin\n    scores = np.zeros(len(bins))\n    for i, bin in enumerate(bins):\n        if bin >= item:\n            scores[i] = (bin - item) / (bin - item) ** 2\n        else:\n            scores[i] = 0\n    \n    # Add a random factor to the scores\n    rand_factor = np.random.randint(0, 100, size=len(bins))\n    scores += rand_factor * (item - bin)\n    \n    return scores",
+          "objective": 0.02093,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Prioritize bins based on a weighted sum of inverse rest capacity, occupancy status, and a random factor proportional to the item size, where the weights are learned from data.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse rest capacity for each bin\n    inv_rest_capacity = 1 / (bins - item)\n    \n    # Calculate the occupancy status for each bin\n    occupancy_status = np.where(bins > item, 1, 0)\n    \n    # Calculate the random factor for each bin\n    random_factor = np.random.randint(0, 100, size=len(bins))\n    \n    # Weight the factors using the learned weights\n    weights = np.array([0.5, 0.3, 0.2])\n    weighted_factors = np.dot(weights, np.array([inv_rest_capacity, occupancy_status, random_factor]))\n    \n    # Normalize the weighted factors to get the scores\n    scores = weighted_factors / np.sum(weighted_factors)\n    \n    return scores",
+          "objective": 0.02103,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Assign the item to the bin with the highest score calculated by dividing the inverse rest capacity by the inverse maximum bin capacity and subtracting a random factor proportional to the remaining capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse rest capacity and inverse maximum bin capacity\n    inv_rest_capacity = 1 / (bins - item)\n    inv_max_bin_capacity = 1 / bins.max()\n    \n    # Calculate the score for each bin\n    scores = inv_rest_capacity * inv_max_bin_capacity\n    \n    # Subtract a random factor proportional to the remaining capacity\n    scores -= np.random.randint(0, 100, size=len(bins)) * (1 - inv_rest_capacity)\n    \n    return scores",
+          "objective": 0.02113,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Algorithm: Prioritize bins by a score that is a function of inverse rest capacity, with a randomness factor that is dependent on the bin's size relative to the item.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse rest capacity for each bin\n    inv_rest_capacity = 1 / (bins - item)\n    \n    # Calculate the randomness factor for each bin\n    randomness = np.random.randint(0, 100, size=len(bins))\n    \n    # Combine the inverse rest capacity and randomness factors\n    scores = inv_rest_capacity + randomness\n    \n    # Return the scores for the bins\n    return scores",
+          "objective": 0.02123,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: Prioritize bins by a score that is a function of inverse rest capacity, with a randomness factor that is proportional to the difference between the item's features and the bin's features.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse rest capacity for each bin\n    inv_rest_capacity = 1 / (bins - item)\n    \n    # Calculate the randomness factor for each bin\n    rand_factor = np.random.randint(0, 100, size=len(bins))\n    \n    # Calculate the total score for each bin\n    scores = inv_rest_capacity + rand_factor\n    \n    # Return the scores\n    return scores",
+          "objective": 0.02153,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Prioritize bins by penalized inv_rest_capacity subtracted by the squared inv_rest_capacity multiplied by a random factor dependent on the item's distance to the bin.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the inverse of the remaining capacity for each bin\n    inv_rest_capacity = 1 / (bins - item)\n    \n    # Calculate the penalty for each bin based on the item's distance to the bin\n    penalty = np.random.randint(0, 100, size=len(bins)) * inv_rest_capacity\n    \n    # Calculate the total score for each bin\n    scores = inv_rest_capacity - penalty\n    \n    # Return the scores for the bins\n    return scores",
+          "objective": 0.02163,
+          "other_inf": null
+     }
+]

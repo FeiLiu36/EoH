@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "\nThe algorithm assigns an item to the bin with the maximum score and updates the rest capacity of the bin accordingly, until all items are assigned. The score for each bin is calculated as the bin's current capacity divided by the difference between the bin's capacity and the item size, plus the number of times the bin has been used.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = bins / (bins - item) + np.arange(len(bins))\n    return scores",
+          "objective": 0.03843,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe algorithm assigns an item to the bin with the maximum score, considering the rest capacity of each bin, in order to minimize the number of used bins. \n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    scores[bins != bins.max()] = item / (bins[bins != bins.max()] - item + 1)\n    return scores",
+          "objective": 0.03914,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm uses a combination of the item size and the rest capacity of each bin to calculate the score for each bin.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    scores[bins != bins.max()] = item * bins[bins != bins.max()] / (bins[bins != bins.max()] - item + 1)\n    return scores",
+          "objective": 0.03964,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe algorithm assigns an item to the bin with the maximum score, considering the rest capacity of each bin, in order to minimize the number of used bins. \n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    scores[bins != bins.max()] = np.log(item / (bins[bins != bins.max()] - item + 1))\n    return scores",
+          "objective": 0.03974,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nMy new algorithm assigns scores to each bin based on the remaining capacity of the bin, where bins with the maximum capacity have a score of zero, and bins with smaller capacities have higher scores based on a certain formula.\nIn each step, the item will be assigned to the bin with the maximum score, and if the rest capacity of a bin equals the maximum capacity, it will not be used.\nThe final goal is to minimize the number of used bins.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = bins.max() - bins\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm, called \"Dynamic Binning\" (DB), dynamically adjusts the scores for each bin based on the current state of the bins and the item being assigned.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Initialize the scores for each bin as the inverse of its capacity\n    scores = 1 / bins\n    # Calculate the distance between the item size and the bin capacity for each bin\n    distances = np.abs(bins - item)\n    # Adjust the score based on the distance between the item size and the bin capacity\n    scores -= distances / bins\n    # Adjust the score based on the number of items already assigned to each bin\n    scores += np.log(np.sum(bins <= item))\n    # Set the score for the bin with the minimum distance to 0\n    scores[np.argmin(distances)] = 0\n    return scores",
+          "objective": 0.04014,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm, called \"Dynamic Binning\" (DB), dynamically adjusts the scores for each bin based on the current state of the bins and the item being assigned.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Initialize the scores for each bin as a constant value\n    scores = 1\n    # Calculate the absolute difference between the item size and the bin capacity for each bin\n    distances = np.abs(bins - item)\n    # Adjust the score based on the distance between the item size and the bin capacity\n    scores -= 0.1 * distances\n    # Adjust the score based on the number of items already assigned to each bin\n    scores += 0.1 * np.log(np.sum(bins <= item))\n    # Set the score for the bin with the minimum distance to 0\n    scores[np.argmin(distances)] = 0\n    return scores",
+          "objective": 0.04075,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe algorithm assigns an item to the bin with the maximum score, considering the rest capacity of each bin, in order to minimize the number of used bins. \n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    scores[bins != bins.max()] = item / bins[bins != bins.max()]\n    return scores",
+          "objective": 0.04095,
+          "other_inf": null
+     },
+     {
+          "algorithm": " Common backbone idea: Minimizing the number of used bins while considering the distance between the item size and the bin capacity, and the number of items already in the bin.\n\nNew algorithm: \"Minimize the number of used bins by considering the distance between the item size and the bin capacity, and the number of items already in the bin, while also using a penalty term for bins with high standard deviation of the remaining bins' capacities, and adjusting the score based on the number of items already assigned to each bin.\"\n\nDescription: The algorithm assigns an item to the bin with the minimum score, considering the rest capacity of each bin, in order to minimize the number of used bins, while also taking into account the distance between the item size and the bin capacity, and the number of items already in the bin, and also using a penalty term for bins with high standard deviation of the remaining bins' capacities, and adjusting the score based on the number of items already assigned to each bin.\n\nImplementation:\n```\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the distance between the item size and the bin capacity for each bin\n    distances = np.abs(bins - item)\n    # Calculate the number of items already in each bin\n    num_items = np.count_nonzero(bins)\n    # Calculate the standard deviation of the remaining bins' capacities\n    std_capacity = np.std(bins)\n    # Calculate the penalty term for bins with high standard deviation of the remaining bins' capacities\n    penalty = std_capacity / item\n    # Calculate the score for each bin as the inverse of the distance between the item size and the bin capacity, multiplied by the number of items already in the bin, and adding the penalty term\n    scores = (1 / distances) * (len(bins) - num_items) + penalty\n    # Adjust the score based on the number of items already assigned to each bin\n    scores -= np.log(num_items)\n    # Assign the item to the bin with the lowest score\n    min_score_index = np.argmin(scores)\n    # Set the score for the bin with the lowest score to 0\n    scores[min_score_index] = 0\n    return scores",
+          "objective": 0.04105,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm, called \"Minimize Wasted Space\" (MWS), assigns an item to the bin with the minimum wasted space, considering the distance between the item size and the bin capacity, and the number of items already in the bin.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the distance between the item size and the bin capacity for each bin\n    distances = np.abs(bins - item)\n    # Calculate the minimum wasted space for each bin\n    min_wasted_spaces = np.min(bins - item)\n    # Assign the item to the bin with the minimum wasted space\n    min_wasted_space_index = np.argmin(min_wasted_spaces)\n    # Calculate the score for each bin as the inverse of the distance between the item size and the bin capacity, multiplied by the number of items already in the bin\n    scores = (1 / distances) * (len(bins) - np.count_nonzero(bins))\n    # Set the score for the bin with the minimum wasted space to 0\n    scores[min_wasted_space_index] = 0\n    return scores",
+          "objective": 0.04115,
+          "other_inf": null
+     },
+     {
+          "algorithm": " Common backbone idea: Minimizing the number of used bins while considering the distance between the item size and the bin capacity, and the number of items already assigned to each bin.\n\nNew algorithm: \"Minimize the number of used bins by prioritizing the distance between the item size and the bin capacity, and the number of items already assigned to each bin, while also considering the number of items that can fit in each bin.\"\n\nDescription: The algorithm assigns an item to the bin with the minimum score, considering the rest capacity of each bin, in order to minimize the number of used bins, while also taking into account the distance between the item size and the bin capacity, and the number of items already assigned to each bin, and the number of items that can fit in each bin.\n\nImplementation:\n```\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the distance between the item size and the bin capacity for each bin\n    distances = np.abs(bins - item)\n    # Calculate the score for each bin as the inverse of the distance between the item size and the bin capacity\n    scores = 1 / distances\n    # Adjust the score based on the number of items already assigned to each bin\n    scores -= np.log(np.sum(bins <= item))\n    # Adjust the score based on the number of items that can fit in each bin\n    scores -= np.log(np.sum(bins > item))\n    # Set the score for the bin with the minimum distance to 0\n    scores[np.argmin(distances)] = 0\n    return scores",
+          "objective": 0.04145,
+          "other_inf": null
+     },
+     {
+          "algorithm": " Common backbone idea: Maximizing the minimum score.\nNew algorithm: \"Maximize the minimum score with a twist\".\n\nDescription: The algorithm assigns an item to the bin with the minimum score, considering the rest capacity of each bin, in order to maximize the minimum score, while also taking into account the distance between the item size and the bin capacity, and the number of items already in the bin, but with a twist: instead of assigning the item to the bin with the minimum score directly, it first calculates the score for each bin as the inverse of the distance between the item size and the bin capacity, multiplied by the number of items already in the bin, and then assigns the item to the bin with the highest score.\n\nImplementation:\n```\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the distance between the item size and the bin capacity for each bin\n    distances = np.abs(bins - item)\n    # Calculate the score for each bin as the inverse of the distance between the item size and the bin capacity, multiplied by the number of items already in the bin\n    scores = (1 / distances) * (len(bins) - np.count_nonzero(bins))\n    # Assign the item to the bin with the highest score\n    max_score_index = np.argmax(scores)\n    # Set the score for the bin with the highest score to 0\n    scores[max_score_index] = 0\n    return scores",
+          "objective": 0.04155,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Algorithm: \n1. Initialize an empty array named scores with the same size as bins.\n2. For each bin capacity in bins:\n    a. If the bin capacity equals the maximum capacity, set its score to 0.\n    b. Otherwise, calculate the score of the bin by dividing the bin capacity by the item size.\n       Note: If the division results in a floating-point value, round it down to the nearest integer.\n    c. Assign the calculated score to the corresponding index in scores array.\n3. Return the scores array.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.where(bins >= item, 0, np.clip(bins / item, 0, None))\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm: \"Minimize the maximum score\"",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the ratio of rest capacity of each bin to the item size\n    ratios = bins.astype(float) / item\n    \n    # Set the score for bins with equal rest capacity to the maximum capacity as 0\n    ratios[bins == max(bins)] = 0\n    \n    # Calculate the scores for each bin by dividing the ratios with the bin index\n    scores = ratios / np.arange(1, len(bins)+1)\n    \n    return scores",
+          "objective": 0.04246,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe algorithm assigns an item to the bin with the maximum score, considering the rest capacity of each bin, in order to minimize the number of used bins. \n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    scores[bins != bins.max()] = np.log(item / bins[bins != bins.max()])\n    return scores",
+          "objective": 0.04266,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm uses a combination of the item size, the rest capacity of each bin, and the number of items already assigned to each bin to calculate the score for each bin.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the distance between the item size and the bin capacity for each bin\n    distances = np.abs(bins - item)\n    # Calculate the score for each bin as the inverse of the distance between the item size and the bin capacity\n    scores = 1 / distances\n    # Adjust the score based on the number of items already assigned to each bin\n    scores += np.log(np.sum(bins <= item))\n    # Set the score for the bin with the minimum distance to 0\n    scores[np.argmin(distances)] = 0\n    return scores",
+          "objective": 0.04457,
+          "other_inf": null
+     },
+     {
+          "algorithm": " New algorithm: \"Maximize the number of used bins by considering the distance between the item size and the bin capacity, and the number of items already in the bin, while also using a reward term for bins with low standard deviation of the remaining bins' capacities, and adjusting the score based on the number of items already assigned to each bin.\"\n\nDescription: The algorithm assigns an item to the bin with the highest score, considering the rest capacity of each bin, in order to maximize the number of used bins, while also taking into account the distance between the item size and the bin capacity, and the number of items already in the bin, and also using a reward term for bins with low standard deviation of the remaining bins' capacities, and adjusting the score based on the number of items already assigned to each bin.\n\nImplementation:\n```\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the distance between the item size and the bin capacity for each bin\n    distances = np.abs(bins - item)\n    # Calculate the number of items already in each bin\n    num_items = np.count_nonzero(bins)\n    # Calculate the standard deviation of the remaining bins' capacities\n    std_capacity = np.std(bins)\n    # Calculate the reward term for bins with low standard deviation of the remaining bins' capacities\n    reward = std_capacity / item\n    # Calculate the score for each bin as the inverse of the distance between the item size and the bin capacity, multiplied by the number of items already in the bin, and adding the reward term\n    scores = (1 / distances) * (len(bins) - num_items) + reward\n    # Adjust the score based on the number of items already assigned to each bin\n    scores += np.log(num_items)\n    # Assign the item to the bin with the highest score\n    max_score_index = np.argmax(scores)\n    # Set the score for the bin with the highest score to 0\n    scores[max_score_index] = 0\n    return scores",
+          "objective": 0.04658,
+          "other_inf": null
+     },
+     {
+          "algorithm": " New algorithm: \"Maximize the sum of the squares of the ratios between the item sizes and the rest capacities of the bins, while also considering the number of empty bins and the standard deviation of the remaining bins' capacities.\"\n\nPython function:\n```\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the ratio of the item size to the rest capacity of each bin\n    ratios = item / bins\n    \n    # Set the score for bins with equal rest capacity to the maximum capacity as 0\n    ratios[bins == max(bins)] = 0\n    \n    # Calculate the scores for each bin by squaring the ratios\n    scores = ratios ** 2\n    \n    # Maximize the sum of the scores by assigning the item to the bin with the largest ratio\n    max_ratio_index = np.argmax(ratios)\n    scores[max_ratio_index] = 0\n    \n    # Consider the number of empty bins and the standard deviation of the remaining bins' capacities\n    num_empty_bins = np.count_nonzero(bins == np.max(bins))\n    std_capacity = np.std(bins)\n    scores -= (num_empty_bins + 1) * (std_capacity / item)\n    \n    return scores",
+          "objective": 0.04729,
+          "other_inf": null
+     },
+     {
+          "algorithm": " New algorithm: \"Minimize the number of used bins by considering the distance between the item size and the bin capacity, the number of items already in the bin, and the standard deviation of the remaining bins' capacities, while also using a penalty term for bins with high standard deviation of the remaining bins' capacities and a bonus term for bins with low standard deviation of the remaining bins' capacities.\"\n\nDescription: The algorithm assigns an item to the bin with the minimum score, considering the rest capacity of each bin, in order to minimize the number of used bins, while also taking into account the distance between the item size and the bin capacity, the number of items already in the bin, the standard deviation of the remaining bins' capacities, and a penalty term for bins with high standard deviation of the remaining bins' capacities and a bonus term for bins with low standard deviation of the remaining bins' capacities.\n\nImplementation:\n```\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the distance between the item size and the bin capacity for each bin\n    distances = np.abs(bins - item)\n    # Calculate the number of items already in each bin\n    num_items = np.count_nonzero(bins)\n    # Calculate the standard deviation of the remaining bins' capacities\n    std_capacity = np.std(bins)\n    # Calculate the penalty term for bins with high standard deviation of the remaining bins' capacities\n    penalty = std_capacity / item\n    # Calculate the bonus term for bins with low standard deviation of the remaining bins' capacities\n    bonus = (1 - std_capacity) / item\n    # Calculate the score for each bin as the inverse of the distance between the item size and the bin capacity, multiplied by the number of items already in the bin, adding the penalty term, and subtracting the bonus term\n    scores = (1 / distances) * (len(bins) - num_items) + penalty - bonus\n    # Assign the item to the bin with the lowest score\n    min_score_index = np.argmin(scores)\n    # Set the score for the bin with the lowest score to 0\n    scores[min_score_index] = 0\n    return scores",
+          "objective": 0.04799,
+          "other_inf": null
+     },
+     {
+          "algorithm": " New algorithm: \"Maximize the number of used bins by considering the distance between the item size and the bin capacity, and the number of items already in the bin, while also using a reward term for bins with low standard deviation of the remaining bins' capacities.\"\n\nDescription: The algorithm assigns an item to the bin with the highest score, considering the rest capacity of each bin, in order to maximize the number of used bins, while also taking into account the distance between the item size and the bin capacity, and the number of items already in the bin, and also using a reward term for bins with low standard deviation of the remaining bins' capacities.\n\nImplementation:\n```\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    # Calculate the distance between the item size and the bin capacity for each bin\n    distances = np.abs(bins - item)\n    # Calculate the number of items already in each bin\n    num_items = np.count_nonzero(bins)\n    # Calculate the standard deviation of the remaining bins' capacities\n    std_capacity = np.std(bins)\n    # Calculate the reward term for bins with low standard deviation of the remaining bins' capacities\n    reward = std_capacity / item\n    # Calculate the score for each bin as the inverse of the distance between the item size and the bin capacity, multiplied by the number of items already in the bin, and adding the reward term\n    scores = (1 / distances) * (len(bins) - num_items) + reward\n    # Assign the item to the bin with the highest score\n    max_score_index = np.argmax(scores)\n    # Set the score for the bin with the highest score to 0\n    scores[max_score_index] = 0\n    return scores",
+          "objective": 0.04829,
+          "other_inf": null
+     }
+]

@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "\nThe new algorithm assigns scores to each bin based on their remaining capacity, index position, and a combination of penalties and rewards that consider the difference in capacity compared to the item size, the inverse of the absolute difference between the bin's capacity and the item size, the bin's position in the list, and the logarithmic factor, using a combination of exponential, logarithmic, trigonometric, and absolute value functions along with penalty terms, reward terms, and the inverse difference factor to create a complex and effective scoring system. The only difference from the provided code is that the sine function is replaced with a cosine function.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = bins.size\n    avg_capacity = np.mean(bins)\n    middle_index = num_bins // 2\n    \n    scores = np.exp(-np.abs(bins - item)) * np.log(avg_capacity - bins + 1) + np.log(1/(np.abs(bins - item) + 1)) + np.cos(np.pi * bins / item) + np.abs(np.arange(num_bins) - middle_index) + (np.log(bins + 1))**2 + (bins == item) * item**3\n    return scores",
+          "objective": 0.00674,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThis algorithm calculates a score for a given item based on its comparison with a list of bins by first determining the maximum capacity of the bins, then computing a score using a formula involving the bins and the item, adjusting the scores for bins greater than the item, updating the scores based on differences between consecutive elements, and finally returning the resulting scores.\n",
+          "code": "import numpy as np\ndef score(item, bins):\n    max_bin_cap = max(bins)\n    score = (bins - max_bin_cap)**2 / item + bins**2 / (item**2)\n    score += bins**2 / item**3\n    score[bins > item] = -score[bins > item]\n    score[1:] -= score[:-1]\n    return score",
+          "objective": 0.0068,
+          "other_inf": null
+     },
+     {
+          "algorithm": "This algorithm calculates a score for a given item based on its comparison with a list of bins by first determining the maximum capacity of the bins, then computing a score using a formula involving the bins and the item, adjusting the scores for bins greater than the item, updating the scores based on differences between consecutive elements, and finally returning the resulting scores.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_bin_cap = max(bins)\n    scores = (bins - max_bin_cap)**2 / item + bins**2 / (item**2)\n    scores += bins**2 / item**3\n    scores[bins > item] = -scores[bins > item]\n    scores[1:] -= scores[:-1]\n    return scores",
+          "objective": 0.00684,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on their remaining capacity, index position, and a combination of penalties and rewards that consider the difference in capacity compared to the item size, the logarithmic factor, the bin's position in the list, and the absolute difference between the bin's capacity and the item size, using a combination of exponential, logarithmic, trigonometric, and absolute value functions along with penalty terms, reward terms, and the absolute difference factor to create a complex and effective scoring system.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = bins.size\n    max_capacity = np.max(bins)\n    middle_index = num_bins // 2\n    \n    scores = np.exp(-np.abs(bins - item)) * np.log(max_capacity - bins + 1) + np.sqrt(bins + 1) + np.log(max_capacity - bins + 2) + np.log(bins + 2) + np.sin(np.pi * bins / item) + np.abs(np.arange(num_bins) - middle_index) + (np.log(np.abs(bins - item) + 1))**2 + (bins == item) * item**3\n    return scores",
+          "objective": 0.00694,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm aims to assign scores to bins based on their remaining capacity, the index position in the list, the logarithmic ratio of their capacity to the item size, a penalization factor that encourages using bins with lower remaining capacity, and a factor that biases the scores towards bins that are closer to the mean of the remaining capacities, using a combination of exponential, logarithmic, trigonometric, and power functions along with penalty terms and the absolute difference between the item size and the bin capacities, resulting in a highly intricate scoring system.\n\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = bins.size\n    mean_capacity = np.mean(bins)\n    middle_index = num_bins // 2\n    \n    scores = np.exp(-np.abs(bins - item)**2) * np.log(np.abs(mean_capacity - bins) + 1)**2 + np.sin(np.pi * bins / item)**2 + np.log(bins + 1) + np.abs(np.arange(num_bins) - middle_index) + np.sqrt(np.abs(bins - item))\n\n    return scores",
+          "objective": 0.00704,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: The new algorithm assigns scores to bins based on their remaining capacity, their index position in the list, a factor that biases the scores towards bins with lower remaining capacity, and a penalty term that encourages using bins with lower remaining capacity, using a combination of exponential, logarithmic, and power functions along with the square root of the absolute difference between the item size and the bin capacities.\n\nCode:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = bins.size\n    middle_index = num_bins // 2\n    \n    scores = np.exp(-np.abs(bins - item)**2) * (np.log(bins + 1)**2) + np.abs(np.arange(num_bins) - middle_index) + np.sqrt(np.abs(bins - item))\n    \n    return scores",
+          "objective": 0.00724,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on their remaining capacity, index position, and a combination of penalties and rewards that consider the difference in capacity compared to the item size, the logarithmic factor, the bin's position in the list, and the absolute difference between the bin's capacity and the item size, using a combination of exponential, logarithmic, trigonometric, and absolute value functions along with penalty terms, reward terms, and the absolute difference factor to create a complex and effective scoring system.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    middle_index = len(bins) // 2\n    \n    scores = np.exp(-np.abs(bins - item)) + np.sin(np.pi * bins / item) + np.abs(np.arange(len(bins)) - middle_index) + (np.log(np.abs(bins - item) + 1))**2 + (bins == item) * item**3\n    return scores",
+          "objective": 0.00734,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on their remaining capacity, the index position in the list, the logarithmic ratio of their capacity to the item size, a penalization factor that encourages using bins with lower remaining capacity, a factor that biases the scores towards bins that are closer to the mean of the remaining capacities squared, and an additional factor based on the inverse of the logarithmic function of the absolute difference between the item size and the bin capacities, using a combination of exponential, logarithmic, trigonometric, power, and absolute value functions along with penalty terms and the square root of the absolute difference between the item size and the bin capacities to create a complex and effective scoring system.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = bins.size\n    mean_capacity = np.mean(bins)\n    middle_index = num_bins // 2\n    \n    scores = np.exp(-np.abs(bins - item)**2) * np.log(np.abs(mean_capacity - bins) + 1)**2 + np.sin(np.pi * bins / item)**2 + np.log(bins + 1) + np.abs(np.arange(num_bins) - middle_index) + np.sqrt(np.abs(bins - item)) + 1/(np.log(np.abs(bins - item) + 1) + 1)\n    \n    return scores",
+          "objective": 0.00755,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to bins based on their remaining capacity, their index position in the list, a factor that biases the scores towards bins with higher remaining capacity, and a penalty term that encourages using bins with higher remaining capacity, using a combination of exponential, logarithmic, and power functions along with the square root of the absolute difference between the item size and the bin capacities.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = bins.size\n    middle_index = num_bins // 2\n\n    scores = np.exp(-np.abs(bins - item)**3) * (np.log(bins + 2)**3) + np.abs(np.arange(num_bins) - middle_index) + np.sqrt(np.abs(bins - item)*2)\n\n    return scores",
+          "objective": 0.00765,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: The modified algorithm assigns scores to bins based on their remaining capacity, their index position in the list, the logarithmic ratio of their capacity to the item size, a penalization factor that encourages using bins with lower remaining capacity, and a factor that biases the scores towards bins that are closer to the mean of the remaining capacities squared, using a combination of exponential, logarithmic, trigonometric, and power functions along with penalty terms and the square root of the absolute difference between the item size and the bin capacities. Additionally, the modified algorithm introduces a new term that multiplies the previous scores by the square of the item size divided by the remaining capacity, with an additional logarithmic transformation and an exponential factor with parameter -2.\n\nCode:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = bins.size\n    mean_capacity = np.mean(bins)\n    middle_index = num_bins // 2\n    \n    scores = np.exp(-np.abs(bins - item)**3) * np.log(np.abs(mean_capacity - bins) + 1)**3 + np.sin(np.pi * bins / item)**3 + np.log(bins + 1) + np.abs(np.arange(num_bins) - middle_index) + np.sqrt(np.abs(bins - item)) * np.log((item**2) / bins) * np.log((item**2) / bins)**2 * np.exp(-2)\n    \n    return scores",
+          "objective": 0.00785,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe new algorithm assigns scores to bins based on their remaining capacity, their index position in the list, the logarithmic ratio of their capacity to the item size, a penalization factor that encourages using bins with lower remaining capacity, and a factor that biases the scores towards bins that are closer to the mean of the remaining capacities squared, using a combination of exponential, logarithmic, trigonometric, and power functions along with penalty terms and the square root of the absolute difference between the item size and the bin capacities. The modified algorithm introduces a new term that multiplies the previous scores by the square of the item size divided by the remaining capacity, with an additional logarithmic transformation.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = bins.size\n    mean_capacity = np.mean(bins)\n    middle_index = num_bins // 2\n    \n    scores = np.exp(-np.abs(bins - item)**3) * np.log(np.abs(mean_capacity - bins) + 1)**3 + np.sin(np.pi * bins / item)**3 + np.log(bins + 1) + np.abs(np.arange(num_bins) - middle_index) + np.sqrt(np.abs(bins - item)) * np.log((item**2) / bins)\n    \n    return scores",
+          "objective": 0.00805,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New Algorithm Description:\nThe new algorithm assigns scores to each bin based on their remaining capacity, index position, and a combination of penalties and rewards that consider the product of the bin's remaining capacity and the item size, the absolute difference between the bin's capacity and the item size, the bin's position in the list, and the logarithmic factor, using a combination of exponential, logarithmic, trigonometric, and absolute value functions along with penalty terms, reward terms, and the inverse difference factor to create a complex and effective scoring system.\n\nNew Algorithm Implementation:\n\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = bins.size\n    max_capacity = np.max(bins)\n    middle_index = num_bins // 2\n    \n    scores = np.exp(-bins * item) * np.log(max_capacity - bins + 1) + np.log(1/np.abs(bins - item) + 1) + np.sin(np.pi * bins / item) + np.abs(np.arange(num_bins) - middle_index) + (np.log(bins + 1))**2 + (bins == item) * item**3\n    return scores",
+          "objective": 0.00825,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe new algorithm assigns scores to bins based on their remaining capacity, their index position in the list, a factor that biases the scores towards bins with higher remaining capacity, and a penalty term that encourages using bins with lower remaining capacity using a combination of exponential, logarithmic, and power functions along with the square root of the absolute difference between the item size and the bin capacities.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = bins.size\n    middle_index = num_bins // 2\n\n    scores = np.exp(-np.abs(bins - item)**4) * (np.log(bins + 1)**4) + np.abs(np.arange(num_bins) - middle_index) + np.sqrt(np.abs(bins - item)*3)\n\n    return scores",
+          "objective": 0.00845,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The common backbone idea in the provided algorithms is to assign scores to each bin based on their remaining capacity, the difference between the item size and bin capacities, and the position of the bin in the list. \n\nNew algorithm description: The new algorithm assigns scores to bins based on their remaining capacity, the square root of the absolute difference between the item size and the bin capacities, the logarithmic factor, and a penalty term that encourages using bins with lower remaining capacity, using a combination of exponential, logarithmic, power, and absolute value functions along with penalty terms and the square root factor to create a complex and effective scoring system.\n\nCode:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = bins.size\n    middle_index = num_bins // 2\n    \n    scores = np.exp(-np.abs(bins - item)**2) * np.log(bins + 1) + np.sqrt(np.abs(bins - item)) + np.log(np.abs(bins - item) + 1) + np.abs(np.arange(num_bins) - middle_index) + (np.log(np.abs(bins - item) + 1))**2 + (bins == item) * item**2\n    \n    return scores",
+          "objective": 0.00885,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on the bin's remaining capacity, its position in the list, and a combination of penalty and reward terms that consider the difference in capacity compared to the item size, the inverse of the absolute difference between the bin's capacity and the item size, the logarithmic factor, and the square root of the capacity, along with penalty terms, reward terms, and the inverse difference factor to create a unique and effective scoring system.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    middle_index = len(bins) // 2\n\n    scores = (bins - item) * np.exp(-np.abs(bins - item)) * np.log(max_capacity - bins + 1) + np.sqrt(bins) + np.log(1/(np.abs(bins - item) + 1)) + np.abs(np.arange(len(bins)) - middle_index) + (np.log(bins + 1))**2 + np.sin(np.pi * bins / item) + (bins == item) * item**3\n    return scores",
+          "objective": 0.00895,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on a combination of the remaining capacity, the index position, and various mathematical functions to create a complex scoring system.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n\n    scores = (np.exp(-np.abs(bins - item)) * np.log(max_capacity - bins + 1) +\n              np.log(max_capacity - bins + 2) * np.sin(np.pi * bins / item) +\n              np.sqrt(bins + 1) +\n              np.log(bins + 2) +\n              np.abs(np.arange(bins.size) - bins.size // 2) +\n              1/(np.abs(bins - item) + 1))\n\n    return scores",
+          "objective": 0.00956,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe new algorithm calculates the scores for each bin based on their remaining capacity, the index position in the list, a penalization factor that encourages using bins with lower remaining capacity, a factor that biases the scores towards bins with capacities close to a fraction of the item size, and an additional factor based on the inverse of the logarithmic function of the absolute difference between the item size and the bin capacities, using a combination of exponential, trigonometric, logarithmic, and absolute value functions along with penalty terms and the inverse logarithmic difference factor to create a complex and effective scoring system.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = bins.size\n    middle_index = num_bins // 2\n    \n    scores = np.exp(-np.abs(bins - item)) * np.log(np.sqrt(bins + 1)) + np.sqrt(bins + 1) + np.log(bins + 2) + np.sin(np.pi * bins / item) + np.abs(np.arange(num_bins) - middle_index) + 1/np.log(np.abs(bins - item) + 1)\n    return scores",
+          "objective": 0.01016,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on their remaining capacity, the index position in the list, a penalization factor that encourages using bins with lower remaining capacity, a factor that biases the scores towards bins with capacities close to a fraction of the item size, and an additional factor based on the natural logarithm of the absolute difference between the item size and the bin capacities, using a combination of exponential, trigonometric, logarithmic, and square root functions along with penalty terms and the inverse natural logarithmic difference factor to create a complex and effective scoring system.\n\nHere's the Python implementation of the new score function:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = bins.size\n    middle_index = num_bins // 2\n    \n    scores = np.exp(-np.abs(bins - item)) * np.sqrt(np.abs(bins - item)) * np.log(np.abs(bins + 1)) + np.sqrt(bins + 1) + np.log(bins + 2) + np.sin(np.pi * bins / item) + np.abs(np.arange(num_bins) - middle_index) + 1/np.log(np.abs(bins - item) + 1)\n    return scores",
+          "objective": 0.01026,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on their remaining capacity, the index position in the list, a penalization factor that encourages using bins with lower remaining capacity, a factor that biases the scores towards bins with capacities close to a fraction of the item size, and an additional factor based on the square root of the absolute difference between the item size and the bin capacities, using a combination of exponential, trigonometric, logarithmic, and square root functions along with penalty terms and the inverse logarithmic difference factor to create a complex and effective scoring system.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = bins.size\n    middle_index = num_bins // 2\n    \n    scores = np.exp(-np.abs(bins - item)) * np.sqrt(np.abs(bins - item)) * np.log(np.sqrt(bins + 1)) + np.sqrt(bins + 1) + np.log(bins + 2) + np.sin(np.pi * bins / item) + np.abs(np.arange(num_bins) - middle_index) + 1/np.log(np.abs(bins - item) + 1)\n    return scores",
+          "objective": 0.01036,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on their remaining capacity, the index position in the list, a penalization factor that encourages using bins with higher remaining capacity, a factor that biases the scores towards bins with capacities away from a fraction of the item size, and an additional factor based on the logarithmic function of the absolute difference between the item size and the bin capacities, using a combination of exponential, trigonometric, logarithmic, and absolute value functions along with penalty terms and the logarithmic difference factor to create a complex and effective scoring system.\n\nHere is the implementation in Python:\n\n```",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    num_bins = bins.size\n    middle_index = num_bins // 2\n    \n    scores = np.exp(-np.abs(bins - item)**2) * np.log(np.sqrt(bins + 1)**3) + np.sqrt(bins + 1) + np.log(bins + 2) + np.sin(np.pi * bins / item**2) + np.abs(np.arange(num_bins) - middle_index) + 1/np.log(np.abs(bins - item) + 2)\n    return scores",
+          "objective": 0.01067,
+          "other_inf": null
+     }
+]

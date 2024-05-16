@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "Algorithm description: The new algorithm selects the top jobs to perturb by calculating the sum of execution time for each job across all machines, updating the execution time matrix by dividing the execution time of each job on each machine by a random perturbation factor, and returns the perturbed jobs and the updated matrix.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    sum_execution_time = np.sum(time_matrix, axis=1)\n    perturb_jobs = np.argsort(sum_execution_time)[:n // 2]\n    perturbation_factors = np.random.uniform(0.9, 1.1, size=(n, m))\n    new_matrix = time_matrix / perturbation_factors\n    return new_matrix, perturb_jobs",
+          "objective": 3154.84375,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm selects the top jobs to perturb by calculating the variance of execution time for each job across all machines, updating the execution time matrix by multiplying the execution time of each job on each machine by a random perturbation factor, and returns the perturbed jobs and the updated matrix.\n\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    variance_execution_time = np.var(time_matrix, axis=1)\n    perturb_jobs = np.argsort(variance_execution_time)[:n // 2]\n    perturbation_factors = np.random.uniform(0.9, 1.1, size=(n, m))\n    new_matrix = time_matrix * perturbation_factors\n    return new_matrix, perturb_jobs",
+          "objective": 3155.14062,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe new algorithm selects the top jobs to perturb by calculating the minimum execution time for each job across all machines, updating the execution time matrix by dividing the execution time of each job on each machine by a random perturbation factor, and returns the perturbed jobs and the updated matrix.\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    min_execution_time = np.min(time_matrix, axis=1)\n    perturb_jobs = np.argsort(min_execution_time)[:n // 2]\n    perturbation_factors = np.random.uniform(0.9, 1.1, size=(n, m))\n    new_matrix = time_matrix / perturbation_factors\n    return new_matrix, perturb_jobs",
+          "objective": 3155.20312,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm selects the top jobs to perturb by calculating the maximum execution time for each job across all machines, updating the execution time matrix by multiplying the execution time of each job on each machine by a random perturbation factor, and returns the perturbed jobs and the updated matrix.",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    max_execution_time = np.max(time_matrix, axis=1)\n    perturb_jobs = np.argsort(max_execution_time)[:n // 2]\n    perturbation_factors = np.random.uniform(0.9, 1.1, size=(n, m))\n    new_matrix = time_matrix * perturbation_factors\n    return new_matrix, perturb_jobs",
+          "objective": 3155.375,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Algorithm description:\nThe new algorithm selects the top jobs to perturb by calculating a weighted score for each job based on the execution time on each machine and a user-defined scoring function, updating the execution time matrix by multiplying the execution time of each job on each machine by a random perturbation factor, and returns the perturbed jobs and the updated matrix.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    weights = [0.5, 0.3, 0.2] # User-defined weight values\n    scores = np.zeros(n)\n    for i in range(n):\n        job_times = time_matrix[i]\n        job_score = sum([w*t for (w, t) in zip(weights, job_times)])\n        scores[i] = job_score\n    perturb_jobs = np.argsort(scores)[:n // 2]\n    perturbation_factors = np.random.uniform(0.9, 1.1, size=(n, m))\n    new_matrix = time_matrix * perturbation_factors\n    return new_matrix, perturb_jobs",
+          "objective": 3156.1875,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm selects the top jobs to perturb by calculating the average execution time for each job across all machines, updating the execution time matrix by multiplying the execution time of each job on each machine by a random perturbation factor, and returns the perturbed jobs and the updated matrix.",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    avg_execution_time = np.mean(time_matrix, axis=1)\n    perturb_jobs = np.argsort(avg_execution_time)[:n // 2]\n    perturbation_factors = np.random.uniform(0.9, 1.1, size=(n, m))\n    new_matrix = time_matrix * perturbation_factors\n    return new_matrix, perturb_jobs",
+          "objective": 3157.5,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm selects the top jobs to perturb based on their position in the current job sequence, updates the execution time matrix by multiplying the execution time of each job on each machine by a random perturbation factor, and returns the perturbed jobs and the updated matrix.\n\n```",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    perturb_jobs = np.argsort(current_sequence)[:n // 2]\n    perturbation_factors = np.random.uniform(0.9, 1.1, size=(n, m))\n    new_matrix = time_matrix * perturbation_factors\n    return new_matrix, perturb_jobs",
+          "objective": 3158.04688,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description:\n\nThe algorithm starts by calculating the makespan of the current sequence using the given time matrix. Then, it selects a machine randomly. Next, it selects the job with the longest execution time on that machine. Finally, it perturbs the execution time of the selected job within a lower range and a higher range. This process is repeated for a specified number of iterations, and at the end, it selects the top jobs to be perturbed based on their execution time on each machine, considering the jobs with the longest execution time.\n\nNew code implementation for the function get_matrix_and_jobs:\n\n```",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    makespan = np.max(np.sum(time_matrix[current_sequence], axis=1))\n    new_matrix = time_matrix.copy()\n\n    num_iterations = 10\n\n    for _ in range(num_iterations):\n        machine = np.random.randint(0, m)\n        longest_job = np.argmax(new_matrix[:, machine])\n        perturb_range = 0.2 * new_matrix[longest_job, machine]\n        perturb_time = np.random.uniform(new_matrix[longest_job, machine] - perturb_range, new_matrix[longest_job, machine] + perturb_range)\n        new_matrix[longest_job, machine] = perturb_time\n\n    perturb_jobs = np.argsort(np.max(new_matrix, axis=1))[-5:]\n    return new_matrix, perturb_jobs",
+          "objective": 3158.53125,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: \n\nThe algorithm starts by calculating the makespan of the current sequence using the given time matrix. Then, it updates the execution time matrix by randomly selecting a job on each machine and perturbing its execution time within a higher range and a lower range. Finally, it selects the top jobs to be perturbed based on their execution time on each machine, considering the jobs with the shortest execution time.\n\nNew code implementation for the function get_matrix_and_jobs:\n\n```",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    makespan = np.max(np.sum(time_matrix[current_sequence], axis=1))\n    new_matrix = time_matrix.copy()\n\n    for i in range(m):\n        perturb_job = np.random.randint(0, n)\n        perturb_time = np.random.uniform(0.8 * new_matrix[perturb_job, i], 0.2 * new_matrix[perturb_job, i])\n        new_matrix[perturb_job, i] = perturb_time\n\n    perturb_jobs = np.argsort(np.max(new_matrix, axis=1))[:5]\n    return new_matrix, perturb_jobs",
+          "objective": 3160.625,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Algorithm description: The new algorithm selects the top jobs to perturb by calculating the maximum execution time for each machine, updating the execution time matrix by multiplying the execution time of each job on each machine by a randomly generated perturbation factor within a specific range, and returns the perturbed jobs and the updated matrix.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    max_execution_time = np.max(time_matrix, axis=0)\n    perturb_jobs = np.argsort(max_execution_time)[:n // 2]\n    perturbation_factors = np.random.uniform(0.8, 1.2, size=(n, m))\n    new_matrix = time_matrix * perturbation_factors\n    return new_matrix, perturb_jobs",
+          "objective": 3161.04688,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: The new algorithm starts by calculating the makespan of the current sequence using the given time matrix. Next, it updates the execution time matrix by iterating through each machine and selecting the job with the maximum execution time. It perturbs the execution time of the selected job within a higher range, based on a different parameter setting of the score function. Finally, it selects the top jobs to be perturbed based on their execution time, considering the jobs with the shortest execution time on each machine.\n\nNew code implementation for the function get_matrix_and_jobs:\n\n```",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    makespan = np.max(np.sum(time_matrix[current_sequence], axis=1))\n    new_matrix = time_matrix.copy()\n\n    for i in range(m):\n        max_execution_time = np.max(new_matrix[:, i])\n        max_jobs = np.where(new_matrix[:, i] == max_execution_time)[0]\n        perturb_job = np.random.choice(max_jobs)\n        # New parameter settings of the score function\n        perturb_time = np.random.uniform(1.1 * max_execution_time, 1.5 * max_execution_time)\n        new_matrix[perturb_job, i] = perturb_time\n\n    perturb_jobs = np.argsort(np.max(new_matrix, axis=1))[:5]\n    return new_matrix, perturb_jobs",
+          "objective": 3161.59375,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm selects the top jobs to perturb by calculating the average execution time for each job on each machine, updating the execution time matrix by multiplying the execution time of each job on each machine by a randomly generated perturbation factor within a specific range, and returns the perturbed jobs and the updated matrix.",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    avg_execution_time = np.mean(time_matrix, axis=1)\n    perturb_jobs = np.argsort(avg_execution_time)[:n // 2]\n    perturbation_factors = np.random.uniform(0.8, 1.2, size=(n, m))\n    new_matrix = time_matrix * perturbation_factors\n    return new_matrix, perturb_jobs",
+          "objective": 3161.64062,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: \n\nThe algorithm begins by calculating the makespan of the current sequence using the given time matrix. Then, it updates the execution time matrix by randomly selecting a job on each machine and perturbing its execution time within a lower range and a higher range. Finally, it selects the top jobs to be perturbed based on their execution time on each machine, considering the jobs with the longest execution time.\n\nNew code implementation for the function get_matrix_and_jobs:\n\n```",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    makespan = np.max(np.sum(time_matrix[current_sequence], axis=1))\n    new_matrix = time_matrix.copy()\n\n    for i in range(m):\n        perturb_job = np.random.randint(0, n)\n        perturb_time = np.random.uniform(0.2 * new_matrix[perturb_job, i], 0.8 * new_matrix[perturb_job, i])\n        new_matrix[perturb_job, i] = perturb_time\n\n    perturb_jobs = np.argsort(-np.max(new_matrix, axis=1))[:5]\n    return new_matrix, perturb_jobs",
+          "objective": 3162.25,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: The new algorithm selects the top jobs to perturb by calculating the minimum execution time for each job across all machines, updating the execution time matrix by multiplying the execution time of each job on each machine by a random perturbation factor between 0.8 and 1.2, and returns the perturbed jobs and the updated matrix.\n\nCode:\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    min_execution_time = np.min(time_matrix, axis=1)\n    perturb_jobs = np.argsort(min_execution_time)[:n // 2]\n    perturbation_factors = np.random.uniform(0.8, 1.2, size=(n, m))\n    new_matrix = time_matrix * perturbation_factors\n    return new_matrix, perturb_jobs",
+          "objective": 3162.70312,
+          "other_inf": null
+     },
+     {
+          "algorithm": "Algorithm description: The new algorithm selects the top jobs to perturb by calculating the maximum execution time for each job across all machines, updating the execution time matrix by multiplying the execution time of each job on each machine by a random perturbation factor within the range [0.8, 1.2], and returns the perturbed jobs and the updated matrix.\n\nCode:\n\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    max_execution_time = np.max(time_matrix, axis=1)\n    perturb_jobs = np.argsort(max_execution_time)[:n // 2]\n    perturbation_factors = np.random.uniform(0.8, 1.2, size=(n, m))\n    new_matrix = time_matrix * perturbation_factors\n    return new_matrix, perturb_jobs",
+          "objective": 3163.15625,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: \n\nThe algorithm starts by calculating the makespan of the current sequence using the given time matrix. Then, it updates the execution time matrix by randomly selecting a job on each machine and perturbing its execution time within a lower range and a higher range. Finally, it selects the top jobs to be perturbed based on their execution time on each machine, considering the jobs with the longest execution time.\n\nNew code implementation for the function get_matrix_and_jobs:\n\n```",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    makespan = np.max(np.sum(time_matrix[current_sequence], axis=1))\n    new_matrix = time_matrix.copy()\n\n    for i in range(m):\n        perturb_job = np.random.randint(0, n)\n        perturb_time = np.random.uniform(1.2 * new_matrix[perturb_job, i], 0.8 * new_matrix[perturb_job, i])\n        new_matrix[perturb_job, i] = perturb_time\n\n    perturb_jobs = np.argsort(np.max(new_matrix, axis=1))[-5:]\n    return new_matrix, perturb_jobs",
+          "objective": 3165.64062,
+          "other_inf": null
+     },
+     {
+          "algorithm": "New algorithm description: \n\nThe algorithm starts by calculating the makespan of the current sequence using the given time matrix. Then, it updates the execution time matrix by randomly selecting a job on each machine and perturbing its execution time within a higher range and a lower range. Finally, it selects the top jobs to be perturbed based on their execution time on each machine, considering the jobs with the longest execution time.\n\nNew code implementation for the function get_matrix_and_jobs:\n\n```",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    makespan = np.max(np.sum(time_matrix[current_sequence], axis=1))\n    new_matrix = time_matrix.copy()\n\n    for i in range(m):\n        perturb_job = np.random.randint(0, n)\n        perturb_time = np.random.uniform(1.2 * new_matrix[perturb_job, i], 0.8 * new_matrix[perturb_job, i])\n        new_matrix[perturb_job, i] = perturb_time\n\n    perturb_jobs = np.argsort(np.max(new_matrix, axis=1))[::-1][:5]\n    return new_matrix, perturb_jobs",
+          "objective": 3166.375,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe new algorithm selects the top jobs to perturb by calculating the maximum execution time for each job across all machines, updating the execution time matrix by multiplying the execution time of each job on each machine by a random perturbation factor from a given range, and returns the perturbed jobs and the updated matrix.\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    max_execution_time = np.max(time_matrix, axis=1)\n    perturb_jobs = np.argsort(max_execution_time)[:n // 2]\n    perturbation_factors = np.random.uniform(0.7, 1.3, size=(n, m))\n    new_matrix = time_matrix * perturbation_factors\n    return new_matrix, perturb_jobs",
+          "objective": 3168.5625,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm starts by calculating the makespan of the current sequence using the given time matrix. Then, it updates the execution time matrix by randomly selecting a job on each machine and perturbing its execution time within a different range. Finally, it selects the top jobs to be perturbed based on their execution time on each machine, considering the jobs with the shortest execution time.",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    makespan = np.max(np.sum(time_matrix[current_sequence], axis=1))\n    new_matrix = time_matrix.copy()\n\n    for i in range(m):\n        perturb_job = np.random.randint(0, n)\n        perturb_time = np.random.uniform(0.8 * new_matrix[perturb_job, i], 1.2 * new_matrix[perturb_job, i])\n        new_matrix[perturb_job, i] = perturb_time\n\n    perturb_jobs = np.argsort(np.min(new_matrix, axis=1))[:5]\n    return new_matrix, perturb_jobs",
+          "objective": 3168.60938,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm selects the top jobs to perturb based on a score function that calculates the sum of execution times for each job across all machines, updates the execution time matrix by multiplying the execution time of each job on each machine by a random perturbation factor within the range [0.7, 1.3], and returns the perturbed jobs and the updated matrix.",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    sum_execution_time = np.sum(time_matrix, axis=1)\n    perturb_jobs = np.argsort(sum_execution_time)[:n // 2]\n    perturbation_factors = np.random.uniform(0.7, 1.3, size=(n, m))\n    new_matrix = time_matrix * perturbation_factors\n    return new_matrix, perturb_jobs",
+          "objective": 3168.85938,
+          "other_inf": null
+     }
+]

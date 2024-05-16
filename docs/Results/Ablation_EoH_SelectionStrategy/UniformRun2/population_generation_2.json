@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on a combination of the bin's remaining capacity, the logarithmic function of the reciprocal of the difference between the bin's capacity and the item size, the square root of the bin's capacity, and a constant factor that promotes earlier bins, with the aim of minimizing the number of used bins.",
+          "code": "import numpy as np\nfrom math import sqrt\n\ndef score(item, bins):\n    constant_factor = 0.9  # Adjust this constant factor based on desired promotion of earlier bins\n    scores = np.log(bins / (bins - item + 1)) + np.sqrt(bins) + constant_factor * np.arange(len(bins))\n    return scores",
+          "objective": 0.03612,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe algorithm assigns an item to the bin with the maximum score and updates the rest capacity of the bin accordingly, until all items are assigned. The score for each bin is calculated as the bin's current capacity divided by the difference between the bin's capacity and the item size, plus the number of times the bin has been used.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = bins / (bins - item) + np.arange(len(bins))\n    return scores",
+          "objective": 0.03843,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe algorithm assigns an item to the bin with the maximum score, considering the rest capacity of each bin, in order to minimize the number of used bins. \n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    scores[bins != bins.max()] = item / (bins[bins != bins.max()] - item + 1)\n    return scores",
+          "objective": 0.03914,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe new algorithm assigns an item to the bin with the maximum score, considering the rest capacity of each bin and penalizing bins that have a smaller rest capacity, in order to minimize the number of used bins. The score for each bin is calculated based on the item size divided by the difference between the bin's rest capacity and the item size, plus a penalty term that is multiplied by the ratio of the bin's rest capacity to the maximum rest capacity among all bins.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = bins.max()\n    scores = np.zeros_like(bins)\n    scores[bins != max_capacity] = ((item / (bins[bins != max_capacity] - item + 1)) + 0.5 * bins[bins != max_capacity] / max_capacity)\n    return scores",
+          "objective": 0.03934,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe algorithm assigns an item to the bin with the maximum score, considering the rest capacity of each bin, in order to minimize the number of used bins. \n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = item / bins\n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns scores to each bin based on the logarithmic function of the bin's remaining capacity, the difference between the bin's remaining capacity and the size of the item, and a constant factor that promotes earlier bins, while also accounting for the number of times the bin has been used.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    constant_factor = 0.8  # Adjust this constant factor based on desired promotion of earlier bins\n    scores = np.log(bins) / np.log(bins - item + 1) + constant_factor * np.arange(len(bins)) + np.arange(len(bins))\n    return scores",
+          "objective": 0.03994,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns scores to each bin based on the remaining capacity of the bin, where bins with the maximum capacity have a score of zero, and bins with smaller capacities have higher scores based on a certain formula, taking into account both the remaining capacity and the current usage count of the bin. In each step, the item will be assigned to the bin with the maximum score, and if the remaining capacity of a bin equals the maximum capacity, it will not be used. The final goal is to minimize the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = bins.max()\n    scores = np.zeros_like(bins)\n    \n    for i in range(len(bins)):\n        curr_bin = bins[i]\n        if curr_bin == max_capacity:\n            scores[i] = 0\n        else:\n            scores[i] = (max_capacity - curr_bin) / (np.sqrt(curr_bin) * (np.log(curr_bin + 1)**2 + 1))\n    \n    return scores",
+          "objective": 0.04085,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns items to bins based on a score function, where each bin is assigned the item with the maximum score, and empty bins with maximum capacity are not used; the goal is to minimize the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros_like(bins)\n    max_capacity = np.max(bins)\n    scores[bins != max_capacity] = item / bins[bins != max_capacity]\n    return scores",
+          "objective": 0.04095,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns scores to each bin based on the remaining capacity of the bin, where bins with the maximum capacity have a score of zero, and bins with smaller capacities have higher scores based on a certain formula, taking into account both the remaining capacity and the current usage count of the bin. In each step, the item will be assigned to the bin with the maximum score, and if the remaining capacity of a bin equals the maximum capacity, it will not be used. The final goal is to minimize the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = bins.max()\n    scores = np.zeros_like(bins)\n    \n    for i in range(len(bins)):\n        curr_bin = bins[i]\n        if curr_bin == max_capacity:\n            scores[i] = 0\n        else:\n            scores[i] = (max_capacity - curr_bin) / (curr_bin + 1)\n    \n    return scores",
+          "objective": 0.04105,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns an item to the bin with the maximum score, calculated as the bin's current capacity divided by the item size, plus the number of times the bin has been used, to promote performance and minimize the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = bins / item + np.arange(len(bins))\n    return scores",
+          "objective": 0.04196,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns items to bins based on a score function, where each bin is assigned the item with the maximum score, and empty bins with maximum capacity are not used; the goal is to minimize the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.ones_like(bins)\n    return scores",
+          "objective": 0.04226,
+          "other_inf": null
+     },
+     {
+          "algorithm": "scores = (bins - item)**2 + constant_factor * np.power(order, 2)",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    order = np.arange(len(bins)) + 1\n    constant_factor = 0.5\n    scores = (bins - item)**2 + constant_factor * np.power(order, 2)\n    return scores",
+          "objective": 0.04246,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns scores to each bin based on the remaining capacity of the bin, where bins with the maximum capacity have a score of zero, bins with an available capacity less than half the maximum capacity have a score of 1, and bins with an available capacity greater than half the maximum capacity have a score equal to the available capacity minus half the maximum capacity divided by the maximum capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = bins.max()\n    half_max_capacity = max_capacity / 2\n    scores = np.zeros_like(bins)\n    \n    for i in range(len(bins)):\n        curr_bin = bins[i]\n        if curr_bin == max_capacity:\n            scores[i] = 0\n        elif curr_bin < half_max_capacity:\n            scores[i] = 1\n        else:\n            scores[i] = (curr_bin - half_max_capacity) / max_capacity\n    \n    return scores",
+          "objective": 0.04266,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to the bins based on their remaining capacities and the size of the current item, using a combination of exponential and logarithmic functions.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    constant_factor = 0.5 # Adjust this constant factor based on desired promotion of earlier bins\n    scores = np.exp(bins/item) - np.log(np.log(np.log(bins + item))) + constant_factor * np.power(np.arange(len(bins)) + 1, 2)\n    return scores",
+          "objective": 0.04286,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe new algorithm assigns scores to each bin based on a combination of exponential and power functions, as well as the logarithm of the bin's current capacity, with a constant factor adjusting the promotion of earlier bins, and the square of the index of the bin within the bins array.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    constant_factor = 1.5 # Adjust this constant factor based on desired promotion of earlier bins\n    scores = np.exp(bins/item) - np.power(np.log(bins + item), 2) + constant_factor * np.power(np.arange(len(bins)), 2)\n    return scores",
+          "objective": 0.04306,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns scores to each bin based on the remaining capacity of the bin, taking into account both the current usage count of the bin and the item size, using a combination of exponentiation, logarithm, and power functions, as well as a constant factor to adjust the promotion of earlier bins and the index of the bin within the bins array.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    constant_factor = 2.0 # Adjust this constant factor based on desired promotion of earlier bins\n    scores = np.exp(bins/item) - np.power(np.log(bins + item), 2) + constant_factor * np.power(np.arange(len(bins)), 2)\n    return scores",
+          "objective": 0.04316,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on a combination of logarithmic and exponential functions, the reciprocal of the bin's current capacity, a constant factor that adjusts the promotion of earlier bins, and the square of the index of the bin within the bins array.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    constant_factor = 0.9  # Adjust this constant factor based on desired promotion of earlier bins\n    scores = np.exp(bins / item) - np.log(np.log(bins + item)) + constant_factor / (bins + 1) + np.power(np.arange(len(bins)), 2)\n    return scores",
+          "objective": 0.04326,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The new algorithm assigns scores to each bin based on the remaining capacity of the bin, where bins with the maximum capacity have a score of zero, bins with an available capacity less than half the maximum capacity have a score of 1, and bins with an available capacity greater than half the maximum capacity have a score equal to the square root of twice the available capacity minus the maximum capacity.\n",
+          "code": "import numpy as np\nfrom math import sqrt\n\ndef score(item, bins):\n    max_capacity = bins.max()\n    half_max_capacity = max_capacity / 2\n    scores = np.zeros_like(bins)\n    \n    for i in range(len(bins)):\n        curr_bin = bins[i]\n        if curr_bin == max_capacity:\n            scores[i] = 0\n        elif curr_bin < half_max_capacity:\n            scores[i] = 1\n        else:\n            scores[i] = sqrt(2 * curr_bin - max_capacity)\n    \n    return scores",
+          "objective": 0.04347,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on a combination of the square root of the bin's current capacity, the exponential function of the item divided by the bin, and the square of the index of the bin within the bins array.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.sqrt(bins) + (item/bins) + np.arange(len(bins))\n    return scores",
+          "objective": 0.04357,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns scores to each bin based on the remaining capacity of the bin, where bins with the maximum capacity have a score of zero, bins with an available capacity less than half the maximum capacity have a score of 1, and bins with an available capacity greater than half the maximum capacity have a score equal to the square root of the available capacity minus half the maximum capacity.\nIn each step, the item will be assigned to the bin with the maximum score, and if the remaining capacity of a bin equals the maximum capacity, it will not be used.\nThe final goal is to minimize the number of used bins.",
+          "code": "import numpy as np\nfrom math import sqrt\n\ndef score(item, bins):\n    max_capacity = bins.max()\n    half_max_capacity = max_capacity / 2\n    scores = np.zeros_like(bins)\n    \n    for i in range(len(bins)):\n        curr_bin = bins[i]\n        if curr_bin == max_capacity:\n            scores[i] = 0\n        elif curr_bin < half_max_capacity:\n            scores[i] = 1\n        else:\n            scores[i] = sqrt(curr_bin - half_max_capacity)\n    \n    return scores",
+          "objective": 0.04377,
+          "other_inf": null
+     }
+]

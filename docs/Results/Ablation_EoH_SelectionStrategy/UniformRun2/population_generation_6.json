@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "scores = np.log(bins + 1 / (item - bins)) * np.sqrt(bins) + constant_factor * np.arange(len(bins))",
+          "code": "import numpy as np\nfrom math import sqrt\n\ndef score(item, bins):\n    constant_factor = 1.2  # Adjust this constant factor based on desired promotion of earlier bins\n    scores = np.log(bins + 1 / (item - bins)) * np.sqrt(bins) + constant_factor * np.arange(len(bins))\n    return scores",
+          "objective": 0.00775,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on the ratio between the bin's remaining capacity and the square root of the item size, the logarithmic function of the item size, the exponential function of the reciprocal of the difference between the bin's capacity and the item size, and a constant factor that promotes earlier bins, with the aim of minimizing the number of used bins.",
+          "code": "import numpy as np\nfrom math import log, sqrt, exp\n\ndef score(item, bins):\n    constant_factor = 0.5  # Adjust this constant factor based on desired promotion of earlier bins\n    \n    reciprocal = 1 / (bins - item)\n    scores = (bins - item) / sqrt(item) + log(item) + constant_factor * np.exp(reciprocal) + constant_factor * np.arange(len(bins))\n    \n    return scores",
+          "objective": 0.00785,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The common backbone idea in the provided algorithms is to assign scores to each bin based on a combination of the bin's remaining capacity and various mathematical functions involving the item size and the bin's capacity.",
+          "code": "import numpy as np\nfrom math import log, sqrt\n\ndef score(item, bins):\n    constant_factor = 0.7  # Adjust this constant factor based on desired promotion of earlier bins\n   \n    scores = (bins - item) / np.log(bins - item + 1) + constant_factor * np.sqrt(item) + constant_factor * np.arange(len(bins))\n    \n    return scores",
+          "objective": 0.00825,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nMy new algorithm assigns scores to each bin based on the combination of the bin's remaining capacity, the logarithmic function of the item size, and a weighted sum of the square root of the sum of the bin's capacity and the item size, the logarithmic function of the bin's remaining capacity, and a constant factor that promotes earlier bins, with the aim of minimizing the number of used bins.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    constant_factor = 2.0  # Adjust this constant factor based on desired promotion of earlier bins\n    scores = (bins / np.log1p(bins - item + 1)) + ((np.sqrt(bins + item) + np.log(bins - item + 1)) * np.log1p(bins))\n    scores += constant_factor * np.arange(len(bins))\n    return scores",
+          "objective": 0.01026,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nMy new algorithm assigns scores to each bin based on the bin's remaining capacity, the logarithmic function of the bin's capacity, the square root of the reciprocal of the difference between the bin's capacity and the item size, and a constant factor that promotes earlier bins, with the aim of minimizing the number of used bins. In this new algorithm, I will adjust the constant factor to 0.8.\n",
+          "code": "import numpy as np\nfrom math import sqrt, log\n\ndef score(item, bins):\n    constant_factor = 0.8  # Adjusted constant factor\n    scores = bins / np.log(bins) + np.sqrt(1/(bins - item)) + constant_factor * np.arange(len(bins))\n    return scores",
+          "objective": 0.01046,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nMy new algorithm assigns scores to each bin based on a combination of the bin's remaining capacity, the logarithmic function of the bin's capacity, the square root of the reciprocal of the difference between the bin's capacity and the item size, and a constant factor that promotes earlier bins, with the aim of minimizing the number of used bins.\n",
+          "code": "import numpy as np\nfrom math import sqrt, log\n\ndef score(item, bins):\n    constant_factor = 0.9  # Adjust this constant factor based on desired promotion of earlier bins\n    scores = bins / np.log(bins) + np.sqrt(1/(bins - item)) + constant_factor * np.arange(len(bins))\n    return scores",
+          "objective": 0.01177,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The new algorithm calculates the scores based on a modified formula that takes into account the bin capacity, the remaining capacity of each bin, and a constant factor. The main steps of the algorithm are as follows:\n1. Calculate the ratio between the remaining capacity of each bin and the total capacity of all bins.\n2. Calculate the scores using the formula: scores = (1 - ratio) * (1/(bins-item)) + constant_factor * bins + constant_factor * np.arange(len(bins))\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    ratio = (bins - np.min(bins)) / (np.max(bins) - np.min(bins))\n    scores = (1 - ratio) * (1/(bins-item)) + bins + np.arange(len(bins)) \n    return scores",
+          "objective": 0.01429,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on a combination of the bin's remaining capacity, the square root function of the item size, the logarithmic function of the reciprocal of the difference between the bin's capacity and the item size, and a constant factor that promotes earlier bins, with the aim of minimizing the number of used bins. The main steps are as follows:\n1. Calculate the reciprocal of the difference between the bin's capacity and the item size.\n2. Calculate the scores using the formula: scores = (bins - item) / np.sqrt(item) + np.log(1/reciprocal) + constant_factor * np.arange(len(bins))\n3. Return the calculated scores as output.",
+          "code": "import numpy as np\nfrom math import log, sqrt\n\ndef score(item, bins):\n    constant_factor = 0.5  # Adjust this constant factor based on desired promotion of earlier bins\n    \n    reciprocal = 1 / (bins - item)\n    scores = (bins - item) / np.sqrt(item) + np.log(reciprocal) + constant_factor * np.arange(len(bins))\n    \n    return scores",
+          "objective": 0.0161,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns scores to each bin based on the bin's remaining capacity, the logarithmic function of the bin's capacity, the square root of the reciprocal of the difference between the bin's capacity and the item size, and a constant factor that promotes earlier bins. The aim is to minimize the number of used bins.",
+          "code": "import numpy as np\nfrom math import sqrt, log\n\ndef score(item, bins):\n    constant_factor = 1.2  # Adjust this constant factor based on desired promotion of earlier bins\n    scores = bins / np.log(bins) + np.sqrt(1/(bins - item)) + constant_factor * np.arange(len(bins))\n    return scores",
+          "objective": 0.0165,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm assigns scores to each bin based on a combination of the bin's remaining capacity, the logarithmic function of the item size squared, the square root of the reciprocal of the difference between the bin's capacity and the item size squared, the reciprocal of the difference between the bin's capacity and three times the item size squared, and a constant factor that promotes earlier bins. The main steps are to calculate the scores by dividing the remaining capacity of each bin by the logarithmic function of the item size squared, adding the square root of the reciprocal of the difference between the bin's capacity and the item size squared, adding the reciprocal of the difference between the bin's capacity and three times the item size squared, and finally adding a constant factor multiplied by the index of each bin in the list.",
+          "code": "import numpy as np\nfrom math import sqrt, log\n\ndef score(item, bins):\n    constant_factor = 0.8  # Adjust this constant factor based on desired promotion of earlier bins\n    scores = bins / np.log(item**2) + np.sqrt(1/((bins - item)**2)) + 1/((bins - 3*item)**2) + constant_factor * np.arange(len(bins))\n    return scores",
+          "objective": 0.01771,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns scores to each bin based on a combination of the bin's remaining capacity, the square root of the logarithmic function of the item size, and a constant factor that promotes earlier bins, with the aim of minimizing the number of used bins.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    constant_factor = 0.7  # Adjust this constant factor based on desired promotion of earlier bins\n    scores = bins / np.sqrt(np.log1p(bins - item + 1)) + constant_factor * np.arange(len(bins))\n    return scores",
+          "objective": 0.01861,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores based on a modified formula that takes into account the bin capacity, the remaining capacity of each bin, and a constant factor. The main steps of the algorithm are as follows:\n1. Calculate the ratio between the remaining capacity of each bin and the total capacity of all bins.\n2. Calculate the scores using the formula: scores = (1 - ratio) * np.power(1/(bins-item), 2) + ratio * np.log(bins) + constant_factor * np.arange(len(bins))\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    total_capacity = np.sum(bins)\n    \n    # Simplified normalization of ratio array\n    ratio = (bins - np.min(bins)) / (np.max(bins) - np.min(bins))\n    \n    scores = (1 - ratio) * (1/(bins-item)) + np.arange(len(bins))\n    \n    return scores",
+          "objective": 0.02022,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns scores to each bin based on the combination of the bin's remaining capacity, the logarithmic function of the sum of the bin's capacity and the item size, the reciprocal of the difference between the bin's remaining capacity and the item size, and a constant factor that promotes earlier bins, with the aim of minimizing the number of used bins. The main steps are to calculate the scores by dividing the remaining capacity of each bin by the logarithmic function of the sum of the bin's capacity and the item size, adding the reciprocal of the difference between the bin's remaining capacity and the item size, and finally adding a constant factor multiplied by the index of each bin in the list.",
+          "code": "import numpy as np\nfrom math import log\n\ndef score(item, bins):\n    constant_factor = 2.0  # Adjust this constant factor based on desired promotion of earlier bins\n    scores = bins / np.log(bins + item) + 1 / (bins - item) + constant_factor * np.arange(len(bins))\n    return scores",
+          "objective": 0.02334,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns scores to each bin based on the combination of the bin's remaining capacity, the square root of the item size, the logarithmic function of the difference between the bin's capacity and the item size, and a weighted sum of the difference between the bin's remaining capacity and the size of the item, the logarithmic function of the bin's remaining capacity, and a constant factor that promotes earlier bins, with the aim of minimizing the number of used bins.",
+          "code": "import numpy as np\nfrom math import sqrt, log\n\ndef score(item, bins):\n    constant_factor = 0.5  # Adjust this constant factor based on desired promotion of earlier bins\n    weighted_sum = (item / (bins - item + 1)) + (np.log(bins - item + 1) / np.log(bins)) + (constant_factor * np.arange(len(bins)))\n    scores = bins / (np.sqrt(item) * np.log(bins - item + 1) * weighted_sum)\n    return scores",
+          "objective": 0.02515,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns scores to each bin based on a combination of the bin's remaining capacity, the logarithmic function of the item size, the square root of the sum of the bin's capacity and the item size, and a constant factor that promotes earlier bins, with the aim of minimizing the number of used bins. The main steps are to calculate the scores by dividing the remaining capacity of each bin by the logarithmic function of the item size, adding the square root of the sum of the bin's capacity and the item size, and finally adding a constant factor multiplied by the index of each bin in the list.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = bins / np.log1p(bins - item + 1) + np.sqrt(bins + item) + np.arange(len(bins))\n    return scores",
+          "objective": 0.02757,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the the scores for each bin based on their rest capacities, but in addition to the existing formula, it will also consider the square root of the item size and subtract a constant multiple of the bin index from the score.",
+          "code": "import numpy as np\nfrom math import sqrt\n\ndef score(item, bins):\n    scores = bins / np.log(np.sqrt(bins - item + 1)) + np.sqrt(bins) + 1.5 * np.arange(len(bins)) - sqrt(item) - 0.5 * np.arange(len(bins))\n    return scores",
+          "objective": 0.02817,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns scores to each bin based on a combination of the bin's remaining capacity, the logarithmic function of the item size, the square root of the sum of the bin's capacity and the item size, and a constant factor that promotes earlier bins, with the aim of minimizing the number of used bins. The main steps are to calculate the scores by dividing the remaining capacity of each bin by the logarithmic function of the item size, adding the square root of the sum of the bin's capacity and the item size, and finally adding a constant factor multiplied by the index of each bin in the list.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    constant_factor = 1.5  # Adjust this constant factor based on desired promotion of earlier bins\n    scores = bins / np.log1p(bins - item + 1) + np.sqrt(bins + item) + constant_factor * np.arange(len(bins))\n    return scores",
+          "objective": 0.02878,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm assigns scores to each bin based on the combination of the bin's remaining capacity, the logarithmic function of the item size, the square root of the sum of the bin's capacity and the item size, the reciprocal of the difference between the bin's remaining capacity and the item size, and a constant factor that promotes earlier bins, with the aim of minimizing the number of used bins. The main steps are to calculate the scores by dividing the remaining capacity of each bin by the logarithmic function of the item size, adding the square root of the sum of the bin's capacity and the item size, adding the reciprocal of the difference between the bin's remaining capacity and the item size, and finally adding a constant factor multiplied by the index of each bin in the list.",
+          "code": "import numpy as np\nfrom math import sqrt\n\ndef score(item, bins):\n    constant_factor = 1.5  # Adjust this constant factor based on desired promotion of earlier bins\n    scores = bins / np.log1p(bins - item + 1) + np.sqrt(bins + item) + 1 / (bins - item) + constant_factor * np.arange(len(bins))\n    return scores",
+          "objective": 0.02968,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nMy new algorithm assigns scores to each bin based on the combination of the bin's remaining capacity, the logarithmic function of the difference between the bin's capacity and the item size, and a weighted sum of the difference between the bin's remaining capacity and the size of the item, the logarithmic function of the bin's remaining capacity, and a constant factor that promotes earlier bins, with the aim of minimizing the number of used bins.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = bins / np.log(bins - item + 1) + np.log(bins - item + 1) + np.arange(len(bins))\n    return scores",
+          "objective": 0.03018,
+          "other_inf": null
+     },
+     {
+          "algorithm": "scores = bins / np.log(np.sqrt(bins - item + 1)) + np.sqrt(bins) + 1.5 * np.arange(len(bins))",
+          "code": "import numpy as np\nfrom math import sqrt\n\ndef score(item, bins):\n    scores = bins / np.log(np.sqrt(bins - item + 1)) + np.sqrt(bins) + 1.5 * np.arange(len(bins))\n    return scores",
+          "objective": 0.03028,
+          "other_inf": null
+     }
+]

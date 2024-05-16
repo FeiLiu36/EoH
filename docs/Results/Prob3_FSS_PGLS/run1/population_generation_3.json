@@ -1,0 +1,62 @@
+[
+     {
+          "algorithm": "\nThe new algorithm aims to identify the underutilized machines in the scheduling to balance the load and improve the overall makespan. The main steps include identifying the underutilized machines, selecting the top jobs from the underutilized machines, applying a new perturbation technique to the selected jobs, and returning the updated time matrix along with the perturbed jobs.\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    # Identify underutilized machines\n    machine_times = np.sum(time_matrix, axis=0)\n    underutilized_machines = np.argsort(machine_times)[:m]\n\n    # Select top jobs from underutilized machines\n    top_jobs = []\n    for machine in underutilized_machines:\n        top_job = np.argmin(time_matrix[:, machine])\n        top_jobs.append(top_job)\n    perturb_jobs, jobs_counts = np.unique(top_jobs, return_counts=True)\n    perturb_jobs = perturb_jobs[np.argsort(-jobs_counts)][:m]\n\n    # Apply new perturbation technique\n    new_matrix = time_matrix.copy()\n    for job in perturb_jobs:\n        perturbation = np.random.uniform(0.8, 1.2, size=new_matrix.shape[1])\n        new_matrix[job] *= perturbation\n\n    return new_matrix, perturb_jobs",
+          "objective": 3153.875,
+          "first_obj": null
+     },
+     {
+          "algorithm": "\nThe modified algorithm aims to identify bottleneck machines in the scheduling by calculating the total execution time for each machine and then selecting the top jobs from the bottleneck machines. These selected jobs will undergo a novel perturbation technique to improve the overall makespan of the scheduling.\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    machine_times = np.sum(time_matrix, axis=0)\n    bottleneck_machines = np.argsort(-machine_times)[:m]\n\n    top_jobs = np.argmax(time_matrix[:, bottleneck_machines], axis=0)\n    perturb_jobs, jobs_counts = np.unique(top_jobs, return_counts=True)\n    perturb_jobs = perturb_jobs[np.argsort(-jobs_counts)][:m]\n\n    new_matrix = time_matrix.copy()\n    for job in perturb_jobs:\n        perturbation = np.random.normal(1, 0.1, size=new_matrix.shape[1])\n        new_matrix[job] *= perturbation\n\n    return new_matrix, perturb_jobs",
+          "objective": 3154.53125,
+          "first_obj": null
+     },
+     {
+          "algorithm": "\nThe novel algorithm aims to identify the most delayed machines instead of bottleneck machines and select the top jobs from these machines to perturb. The perturbation technique will be based on the difference between the actual and expected completion time of jobs on the identified delayed machines.\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    delayed_machines = np.argmax(time_matrix, axis=1)\n    expected_completion_time = np.mean(time_matrix, axis=1)\n    delayed_jobs = np.where(time_matrix[current_sequence, delayed_machines] > expected_completion_time[current_sequence])[0]\n    perturb_jobs = np.unique(delayed_jobs)[:m]\n\n    new_matrix = time_matrix.copy()\n    for job in perturb_jobs:\n        perturbation = np.random.normal(1, 0.1, size=new_matrix.shape[1])\n        new_matrix[job] *= perturbation\n\n    return new_matrix, perturb_jobs",
+          "objective": 3154.875,
+          "first_obj": null
+     },
+     {
+          "algorithm": "Algorithm description: \nThe novel algorithm will first calculate the total processing time for each job across all machines based on the current sequence. Then, it will select the top jobs with the highest total processing time and update the execution time matrix by applying a different perturbation strategy to the selected jobs, aiming to further diversifying the search and minimize makespan.",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    total_processing_time = np.zeros(n)  # Initialize array to store total processing time for each job\n    for i, job in enumerate(current_sequence):  # Iterate through the current sequence\n        total_processing_time[job] += np.sum(time_matrix[i])  # Calculate the total processing time for each job\n        \n    perturb_jobs = np.argsort(total_processing_time)[-m:]  # Select top jobs with highest total processing time\n    new_matrix = time_matrix.copy()  # Create a copy of the original time matrix\n    for job in perturb_jobs:  # Iterate through the perturb jobs\n        perturbation = np.random.normal(1, 0.1, size=new_matrix.shape[1])  # Generate different perturbation for each machine\n        new_matrix[job] *= perturbation  # Update the execution time of perturb jobs\n    return new_matrix, perturb_jobs",
+          "objective": 3155.54688,
+          "first_obj": null
+     },
+     {
+          "algorithm": "\nThe modified algorithm aims to identify the bottleneck machines in the scheduling to improve the overall makespan. The main steps include identifying the bottleneck machines based on the execution time matrix, selecting the top jobs from the bottleneck machines, applying a novel perturbation technique to the selected jobs, and returning the updated time matrix along with the perturbed jobs.\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    # Identify bottleneck machines\n    machine_times = np.sum(time_matrix, axis=0)\n    bottleneck_machines = np.argsort(-machine_times)[:m]\n\n    # Select top jobs from bottleneck machines\n    top_jobs = []\n    for machine in bottleneck_machines:\n        top_job = np.argmax(time_matrix[:, machine])\n        top_jobs.append(top_job)\n    perturb_jobs, jobs_counts = np.unique(top_jobs, return_counts=True)\n    perturb_jobs = perturb_jobs[np.argsort(-jobs_counts)][:m]\n\n    # Apply novel perturbation technique\n    new_matrix = time_matrix.copy()\n    for job in perturb_jobs:\n        perturbation = np.random.normal(1, 0.1, size=new_matrix.shape[1])\n        new_matrix[job] *= perturbation\n\n    return new_matrix, perturb_jobs",
+          "objective": 3155.8125,
+          "first_obj": null
+     },
+     {
+          "algorithm": "\nThe modified algorithm aims to identify the bottleneck machines in the scheduling to improve the overall makespan. The main steps include identifying the bottleneck machines based on the execution time matrix, selecting the top jobs from the bottleneck machines, applying a novel perturbation technique to the selected jobs, and returning the updated time matrix along with the perturbed jobs.\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    machine_times = np.sum(time_matrix, axis=0)\n    bottleneck_machines = np.argsort(-machine_times)[:m]\n\n    top_jobs = []\n    for machine in bottleneck_machines:\n        top_job = np.argmax(time_matrix[:, machine])\n        top_jobs.append(top_job)\n    perturb_jobs, jobs_counts = np.unique(top_jobs, return_counts=True)\n    perturb_jobs = perturb_jobs[np.argsort(-jobs_counts)][:m]\n\n    new_matrix = time_matrix.copy()\n    for job in perturb_jobs:\n        perturbation = np.random.normal(1, 0.1, size=new_matrix.shape[1])\n        new_matrix[job] *= perturbation\n\n    return new_matrix, perturb_jobs",
+          "objective": 3156.0,
+          "first_obj": null
+     },
+     {
+          "algorithm": "\nThe modified algorithm aims to identify the bottleneck machines in the scheduling to improve the overall makespan. The main steps include identifying the bottleneck machines based on the execution time matrix, selecting the top jobs from the bottleneck machines, applying a novel perturbation technique to the selected jobs, and returning the updated time matrix along with the perturbed jobs.\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    # Identify bottleneck machines\n    machine_times = np.sum(time_matrix, axis=0)\n    bottleneck_machines = np.argsort(-machine_times)[:m]\n\n    # Select top jobs from bottleneck machines\n    top_jobs = np.argmax(time_matrix[:, bottleneck_machines], axis=0)\n    perturb_jobs, jobs_counts = np.unique(top_jobs, return_counts=True)\n    perturb_jobs = perturb_jobs[np.argsort(-jobs_counts)][:m]\n\n    # Apply novel perturbation technique\n    new_matrix = time_matrix.copy()\n    for job in perturb_jobs:\n        perturbation = np.random.normal(1, 0.1, size=new_matrix.shape[1])\n        new_matrix[job] *= perturbation\n\n    return new_matrix, perturb_jobs",
+          "objective": 3156.0625,
+          "first_obj": null
+     },
+     {
+          "algorithm": "\nThe new algorithm aims to update the execution time matrix and select the top jobs with the highest total processing time, to perturb them in order to minimize makespan and avoid local optimum scheduling. The main steps include calculating the total processing time for each job, selecting the top jobs with the highest total processing time, updating the execution time matrix based on the selected jobs by applying a perturbation strategy, and returning the updated matrix and the perturbed jobs.\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    total_processing_time = np.sum(time_matrix, axis=1)  # Calculate total processing time for each job\n    perturb_jobs = np.argsort(total_processing_time)[-m:]  # Select top jobs with highest total processing time\n    new_matrix = time_matrix.copy()  # Create a copy of the original time matrix\n    for job in perturb_jobs:  # Iterate through the perturb jobs\n        perturbation = np.random.normal(1, 0.1, size=new_matrix.shape[1])  # Generate different perturbation for each machine\n        new_matrix[job] *= perturbation  # Update the execution time of perturb jobs\n    return new_matrix, perturb_jobs",
+          "objective": 3156.8125,
+          "first_obj": null
+     },
+     {
+          "algorithm": "\nThe new algorithm aims to identify the critical paths in the scheduling to improve the overall makespan. The main steps include identifying the critical paths based on the execution time matrix, selecting the top jobs from the critical paths, applying a novel perturbation technique to the selected jobs, and returning the updated time matrix along with the perturbed jobs.\n",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    # Identify critical paths\n    critical_paths = np.argmax(time_matrix, axis=1)\n\n    # Select top jobs from critical paths\n    top_jobs = np.unique(critical_paths, return_counts=True)\n    perturb_jobs = top_jobs[0][np.argsort(-top_jobs[1])[:m]]\n\n    # Apply novel perturbation technique\n    new_matrix = time_matrix.copy()\n    for job in perturb_jobs:\n        perturbation = np.random.normal(1, 0.1, size=new_matrix.shape[1])\n        new_matrix[job] *= perturbation\n\n    return new_matrix, perturb_jobs",
+          "objective": 3157.0,
+          "first_obj": null
+     },
+     {
+          "algorithm": "\nThe modified algorithm first calculates the makespan for the current sequence using the time matrix. It then identifies the top jobs that contribute most to the makespan and selects them for perturbation with a probability inversely proportional to their contribution to the makespan. Afterward, it updates the time matrix by perturbing the execution times of the selected top jobs on randomly chosen machines.",
+          "code": "import numpy as np\n\ndef get_matrix_and_jobs(current_sequence, time_matrix, m, n):\n    makespan = np.max(np.cumsum(time_matrix[current_sequence], axis=1), axis=0)[-1]\n    job_contributions = np.sum(time_matrix, axis=1)\n    perturb_prob = 1 - (job_contributions / np.sum(job_contributions))  # Probability inversely proportional to job contribution\n    perturb_jobs = np.random.choice(np.arange(n), size=min(5, n), replace=False, p=perturb_prob / np.sum(perturb_prob))\n    \n    new_matrix = time_matrix.copy()\n    for job in perturb_jobs:\n        machine = np.random.randint(0, m)\n        new_matrix[job][machine], new_matrix[job][np.argmin(new_matrix[job])] = new_matrix[job][np.argmin(new_matrix[job])], new_matrix[job][machine]\n    \n    return new_matrix, perturb_jobs",
+          "objective": 3157.34375,
+          "first_obj": null
+     }
+]

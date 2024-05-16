@@ -1,0 +1,122 @@
+[
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on a combination of factors including the average capacity, the item size, and the position index of each bin. It penalizes bins that are close to the average capacity, incentivizes the utilization of bins with more space, and considers the position index of bins. The algorithm then assigns scores to each bin and returns an array of scores for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    avg_capacity = np.mean(bins)\n    item_weights = (item - bins) / (np.abs(bins - item) + 1)\n    position_index = np.arange(len(bins)) + 1\n\n    scores = np.where(bins >= avg_capacity, -position_index, (avg_capacity - bins) * item_weights + position_index)\n    \n    return scores",
+          "objective": 0.00684,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm is a modified version of the original algorithm. It uses a different parameter setting for the score function. The constant_value in the score function is set to 5, and the index_weights are raised to the power of 2 before being used in the score calculation.",
+          "code": "import numpy as np\n\ndef revised_score(item, bins):\n    residual_capacities = bins - item\n    index_weights = np.array(range(len(bins)))\n    scores = residual_capacities / index_weights\n    \n    return scores",
+          "objective": 0.00694,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on a modified version of the original score function, where the logarithm function is applied to the index weights and the residual capacities are raised to the power of the item squared before being used in the score calculation.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    residual_capacities = bins - item\n    scores = (residual_capacities + np.cos(item / residual_capacities)) * np.exp(item * residual_capacities)\n    \n    return scores",
+          "objective": 0.00704,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm is a modified version of the original algorithm. It uses a different parameter setting for the score function. The constant_value in the score function is set to 5, and the index_weights are raised to the power of 2 before being used in the score calculation.",
+          "code": "import numpy as np\n\ndef revised_score(item, bins):\n    residual_capacities = bins - item\n    index_weights = np.array(range(len(bins)))\n    scores = residual_capacities / index_weights\n\n    return scores",
+          "objective": 0.00714,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on a combination of factors including the item size, the logarithm of the residual capacity, and the product of the item size and the residual capacity, all divided by the position index of each bin plus a constant value of 5, and multiplied by the sine of the ratio between the item size and the residual capacity. The algorithm then assigns scores to each bin and returns an array of scores for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    residual_capacities = bins - item\n    scores = (item * (np.log(residual_capacities) + np.exp(item * residual_capacities))) / np.sin(item / residual_capacities)\n    return scores",
+          "objective": 0.00724,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe new algorithm calculates the scores for each bin based on the sum of the following factors: the square root of the item size divided by the logarithm of the residual capacity of the bin, multiplied by the exponent of the product between the item size and the residual capacity; the cosine of the ratio between the item size and the residual capacity, multiplied by the natural logarithm of the product of the item size and the residual capacity divided by the position index of the bin; and the reciprocal of the item size, multiplied by the square root of the sum of the residual capacity and a constant value.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    residual_capacities = bins - item\n    scores = (np.sqrt(item) / np.log(residual_capacities) * np.exp(item * residual_capacities)) + (np.cos(item / residual_capacities) * np.log(item * residual_capacities))\n\n    return scores",
+          "objective": 0.00734,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm is a modified version of the original algorithm. It uses a different parameter setting for the score function. The constant_value in the score function is set to 5, and the index_weights are raised to the power of 2 before being used in the score calculation.",
+          "code": "import numpy as np\n\ndef revised_score(item, bins):\n    residual_capacities = bins - item\n    index_weights = np.square(np.array(range(len(bins)))) ** 2\n    scores = residual_capacities / index_weights\n    \n    return scores",
+          "objective": 0.00745,
+          "other_inf": null
+     },
+     {
+          "algorithm": "My new algorithm calculates the scores for each bin based on a combination of factors including the remaining capacity, the item size, and the position index of each bin. It penalizes bins at maximum capacity, incentivizes the utilization of bins with more space, and considers the position index of bins. The algorithm then assigns scores to each bin and returns an array of scores for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    item_weights = (item - bins) / (np.abs(bins - item) + 1)\n    position_index = np.arange(len(bins)) + 1\n\n    scores = np.where(bins == max_capacity, -position_index, (max_capacity - bins) * item_weights + position_index)\n    \n    return scores",
+          "objective": 0.00755,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm is a modified version of the original algorithm. It uses a different parameter setting for the score function. The constant_value in the score function is set to 3, and the index_weights are raised to the power of 3 before being used in the score calculation.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    constant_value = 3\n    residual_capacities = bins - item\n    index_weights = np.square(np.array(range(len(bins))) + constant_value) ** 3\n    scores = (residual_capacities + np.sin(item / residual_capacities)) / index_weights * np.exp(item * residual_capacities)\n    \n    return scores",
+          "objective": 0.00765,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on a modified version of the original score function, where the logarithm function is applied to the index weights and the residual capacities are raised to the power of the item squared before being used in the score calculation.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    residual_capacities = bins - item\n    scores = (residual_capacities ** 3 + np.cos(item / residual_capacities)) / 5 * np.exp(item * residual_capacities)\n    \n    return scores",
+          "objective": 0.00775,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on a combination of factors including the item size, the logarithm of the residual capacity, and the product of the item size and the residual capacity, all divided by the position index of each bin plus a constant value of 5, and multiplied by the sine of the ratio between the item size and the residual capacity. The algorithm then assigns scores to each bin and returns an array of scores for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    index_weights = np.ones(len(bins))\n    scores = (item * (np.log(bins - item) + np.exp(item * (bins - item)))) / index_weights * np.sin(item / (bins - item))\n    \n    return scores",
+          "objective": 0.00785,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on the difference between the exponential of the product of the item size and the residual capacity and the logarithm of the sum of the item size and the residual capacity, all divided by the cube root of the position index of the bin plus a constant value of 5, and multiplied by the sine of the ratio between the item size and the residual capacity.",
+          "code": "import numpy as np\n\ndef score(item, bins, constant_value=5):\n    residual_capacities = bins - item\n    index_weights = np.arange(len(bins)) + constant_value\n    scores = (np.exp(item * residual_capacities) - np.log(item + residual_capacities)) / index_weights * np.sin(item / residual_capacities)\n    \n    return scores",
+          "objective": 0.00795,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on the square root of the residual capacity of the bin multiplied by the sine of the ratio between the item size and the residual capacity, divided by the logarithm of the position index of the bin plus a constant value of 3, and added by the exponential function of the product of the item size and the residual capacity multiplied by the cosine of the item size squared.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    residual_capacities = bins - item\n    scores = (np.sqrt(residual_capacities) * np.sin(item / residual_capacities)) / (np.log(np.arange(len(bins))) + 3) + np.exp(item * residual_capacities * np.cos(item**2))\n    \n    return scores",
+          "objective": 0.00805,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The common backbone idea in the provided algorithms is to calculate scores for each bin based on the item size and residual capacities, using various mathematical functions and modifying the index weights.}\n\n{My new algorithm: The new algorithm calculates the scores for each bin based on a modified version of the original score function, where the hyperbolic tangent and the natural logarithm functions are replaced with the logarithmic and exponential functions, respectively, and the indexing weights are squared and added to the bin capacities before being used in the score calculation.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    constant_value = 2\n    residual_capacities = bins - item\n    index_weights = bins\n    scores = ((residual_capacities + np.log(item / residual_capacities)) / index_weights) * np.exp(item * residual_capacities)\n\n    return scores",
+          "objective": 0.00815,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on a combination of factors including the item size, the remaining capacity, the position index of each bin, and the logarithm of the sum of the item size and the residual capacity, all divided by the square root of the index weights plus a constant value of 10, and multiplied by the sine of the ratio between the item size and the residual capacity. The algorithm then assigns scores to each bin and returns an array of scores for assignment.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    residual_capacities = bins - item\n    index_weights = np.sqrt(np.arange(len(bins)))\n    scores = (item * residual_capacities) / (np.log(item + residual_capacities) + index_weights) * np.sin(item / residual_capacities)\n    \n    return scores",
+          "objective": 0.00825,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm is a modified version of the original algorithm. It uses a different parameter setting for the score function. The constant_value in the score function is set to 5, and the index_weights are raised to the power of 2 before being used in the score calculation.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    constant_value = 5\n    residual_capacities = bins - item\n    index_weights = np.square(np.array(range(len(bins))) + constant_value) ** 2\n    scores = (residual_capacities + np.sin(item / residual_capacities)) / index_weights * np.exp(item * residual_capacities)\n    \n    return scores",
+          "objective": 0.00855,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on a modified version of the original score function, where the logarithm function is applied to the index weights and the residual capacities are raised to the power of the item squared before being used in the score calculation.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    residual_capacities = bins - item\n    scores = (residual_capacities ** (item ** 3) + np.cos(item / residual_capacities)) * np.exp(item * residual_capacities)\n    \n    return scores",
+          "objective": 0.00865,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm is a modified version of the original algorithm. It uses a different parameter setting for the score function. The constant_value in the score function is set to 5, and the index_weights are raised to the power of 2 before being used in the score calculation.",
+          "code": "import numpy as np\n\ndef revised_score(item, bins):\n    residual_capacities = bins - item\n    weight = np.mean(bins)  # Use the average capacity of the bins as the weight\n    scores = residual_capacities / weight\n    \n    return scores",
+          "objective": 0.00875,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The new algorithm calculates the scores for each bin based on a modified version of the original score function, where the logarithm function is applied to the index weights and the residual capacities are raised to the power of the item squared before being used in the score calculation.",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    constant_value = 5\n    residual_capacities = bins - item\n    scores = (residual_capacities ** (item ** 3) + np.cos(item / residual_capacities)) / constant_value * np.exp(item * residual_capacities)\n    \n    return scores",
+          "objective": 0.00885,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe new algorithm calculates the scores for each bin based on the sum of the following factors: the product of the item size and the logarithm of the residual capacity of the bin, multiplied by the sine of the ratio between the item size and the residual capacity, divided by the square root of the position index of the bin; and the square root of the reciprocal of the item size, multiplied by the exponential of the sum of the residual capacity and a constant value, raised to the power of the item size.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    constant_value = 5\n    residual_capacities = bins - item\n    indices = np.arange(1, len(residual_capacities) + 1)\n    scores = (item * np.log(residual_capacities) * np.sin(item / residual_capacities) / np.sqrt(indices)) + (np.sqrt(1 / item) * np.exp(residual_capacities + constant_value) ** item)\n\n    return scores",
+          "objective": 0.00895,
+          "other_inf": null
+     }
+]
