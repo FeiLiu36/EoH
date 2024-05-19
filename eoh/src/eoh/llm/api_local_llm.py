@@ -4,7 +4,7 @@ from typing import Collection
 import requests
 
 
-class LocalLLM:
+class InterfaceLocalLLM:
     """Language model that predicts continuation of provided source code.
     """
 

@@ -8,17 +8,13 @@ import re
 import concurrent.futures
 
 class InterfaceEC():
-    def __init__(self, pop_size, m, api_endpoint, api_key, llm_model, debug_mode, interface_prob, select,n_p,timeout,use_numba,**kwargs):
-        # -------------------- RZ: use local LLM --------------------
-        assert 'use_local_llm' in kwargs
-        assert 'url' in kwargs
-        # -----------------------------------------------------------
+    def __init__(self, pop_size, m, api_endpoint, api_key, llm_model,llm_use_local,llm_local_url, debug_mode, interface_prob, select,n_p,timeout,use_numba,**kwargs):
 
         # LLM settings
         self.pop_size = pop_size
         self.interface_eval = interface_prob
         prompts = interface_prob.prompts
-        self.evol = Evolution(api_endpoint, api_key, llm_model, debug_mode,prompts, **kwargs)
+        self.evol = Evolution(api_endpoint, api_key, llm_model,llm_use_local,llm_local_url, debug_mode,prompts, **kwargs)
         self.m = m
         self.debug = debug_mode
 

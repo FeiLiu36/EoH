@@ -4,13 +4,7 @@ from ...llm.interface_LLM import InterfaceLLM
 
 class Evolution():
 
-    def __init__(self, api_endpoint, api_key, model_LLM, debug_mode,prompts, **kwargs):
-        # -------------------- RZ: use local LLM --------------------
-        assert 'use_local_llm' in kwargs
-        assert 'url' in kwargs
-        self._use_local_llm = kwargs.get('use_local_llm')
-        self._url = kwargs.get('url')
-        # -----------------------------------------------------------
+    def __init__(self, api_endpoint, api_key, model_LLM,llm_use_local,llm_local_url, debug_mode,prompts, **kwargs):
 
         # set prompt interface
         #getprompts = GetPrompts()
@@ -36,11 +30,8 @@ class Evolution():
         self.model_LLM = model_LLM
         self.debug_mode = debug_mode # close prompt checking
 
-        # -------------------- RZ: use local LLM --------------------
-        if self._use_local_llm:
-            self.interface_llm = LocalLLM(self._url)
-        else:
-            self.interface_llm = InterfaceLLM(self.api_endpoint, self.api_key, self.model_LLM, self.debug_mode)
+
+        self.interface_llm = InterfaceLLM(self.api_endpoint, self.api_key, self.model_LLM,llm_use_local,llm_local_url, self.debug_mode)
 
     def get_prompt_i1(self):
         

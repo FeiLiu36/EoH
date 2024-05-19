@@ -1,0 +1,20 @@
+[
+     {
+          "algorithm": "\nMy new algorithm assigns an item to the bin with the highest score at each step, considering the rest capacity of the bins, in order to minimize the number of used bins.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    scores = np.zeros(len(bins))\n    \n    for i in range(len(bins)):\n        if bins[i] == np.max(bins):\n            scores[i] = 0\n        else:\n            scores[i] = (np.max(bins) - bins[i]) / item\n    \n    return scores",
+          "objective": 0.03984,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew algorithm: The novel score function assigns a score to each bin based on the bin's rest capacity and the item size, prioritizing bins with larger rest capacities while considering the maximum capacity constraint, in order to minimize the number of used bins.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    max_capacity = np.max(bins)\n    scores = np.zeros_like(bins)\n    \n    for i in range(len(bins)):\n        if bins[i] == max_capacity:\n            scores[i] = -1\n        else:\n            scores[i] = bins[i] - item - (max_capacity - bins[i])\n    \n    return scores",
+          "objective": 0.83389,
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe algorithm first calculates the normalized rest capacities of the bins based on the item size, then assigns a score to each bin by considering both the normalized capacity and the order of processing, finally returning the list of scores for the bins for assignment.\n",
+          "code": "import numpy as np\n\ndef score(item, bins):\n    normalized_caps = bins / item\n    sorted_caps_idx = np.argsort(normalized_caps)[::-1]\n    scores = np.zeros_like(bins)\n    for i, idx in enumerate(sorted_caps_idx):\n        scores[idx] = normalized_caps[idx] - (i * 0.01)  # Adjusting score based on order of processing\n    return scores",
+          "objective": 1.50196,
+          "other_inf": null
+     }
+]
