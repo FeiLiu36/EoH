@@ -42,7 +42,7 @@ A Platform for **Evolutionary Computation** + **Large Language Model** for autom
 
 ---
 ## News 🔥 
-+ 2024.5.31 [Evolve Cost-aware Acquisition Functions Using Large Language Models] has been accepted at **PPSN 2024**! 🎉
++ 2024.5.31 [Evolve Cost-aware Acquisition Functions Using Large Language Models](https://arxiv.org/abs/2404.16906) has been accepted at **PPSN 2024**! 🎉
 + 2024.5.31 [Towards Understanding the Effectiveness of Automatic Heuristic Design with Large Language Models] has been accepted at **PPSN 2024**! 🎉
 + 2024.5.5 [L-AutoDA: Leveraging Large Language Models for Automated Decision-based Adversarial Attacks](https://arxiv.org/abs/2401.15335) has been accepted at **GECCO 2024**! 🎉
 + 2024.5.2 [EoH (Evolution of Heuristics: Towards Efficient Automatic Algorithm Design using Large Language Model)](https://arxiv.org/abs/2401.02051) has been accepted at **ICML 2024**! 🎉
