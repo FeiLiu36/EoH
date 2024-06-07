@@ -183,7 +183,7 @@ python runEval.py
 ###### Example 3: Use EoH solve your local problem 
 
 ```bash
-cd examples/local_problem
+cd examples/user_XXX
 
 python runEoH.py
 ```
