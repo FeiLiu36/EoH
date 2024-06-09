@@ -1,0 +1,14 @@
+[
+     {
+          "algorithm": "Your algorithm: \n    # Calculate the improvement in mean and the reduction in uncertainty at the test input,\n    improvement = torch.max(mean_test_y - best_y, torch.tensor(0., dtype=torch.float64))\n    reduction = torch.max(best_y - mean_test_y, torch.tensor(0., dtype=torch.float64))\n    \n    # Calculate the cost-effectiveness of the test input,\n    cost_effectiveness = improvement / (cost_test_y + 1e-6)  # Adding a small value to avoid division by zero\n    \n    # Calculate the remaining budget ratio,\n    remaining_budget_ratio = (budget_total - budget_used) / (budget_total + 1e-6)  # Adding a small value to avoid division by zero\n    \n    # Combine the improvement, reduction, cost-effectiveness, and remaining budget ratio to quantify the utility,\n    utility_value = (improvement + reduction) * cost_effectiveness * remaining_budget_ratio\n    utility_value = utility_value.squeeze()\n    # ",
+          "code": "import torch\n\ndef utility(train_x, train_y, best_x, best_y, test_x, mean_test_y, std_test_y, cost_test_y, budget_used, budget_total):\n    # {Your algorithm: \n    # Calculate the improvement in mean and the reduction in uncertainty at the test input,\n    improvement = torch.max(mean_test_y - best_y, torch.tensor(0., dtype=torch.float64))\n    reduction = torch.max(best_y - mean_test_y, torch.tensor(0., dtype=torch.float64))\n    \n    # Calculate the cost-effectiveness of the test input,\n    cost_effectiveness = improvement / (cost_test_y + 1e-6)  # Adding a small value to avoid division by zero\n    \n    # Calculate the remaining budget ratio,\n    remaining_budget_ratio = (budget_total - budget_used) / (budget_total + 1e-6)  # Adding a small value to avoid division by zero\n    \n    # Combine the improvement, reduction, cost-effectiveness, and remaining budget ratio to quantify the utility,\n    utility_value = (improvement + reduction) * cost_effectiveness * remaining_budget_ratio\n    utility_value = utility_value.squeeze()\n    # }\n    \n    return utility_value",
+          "objective": 7.43463,
+          "other_inf": null
+     },
+     {
+          "algorithm": "```",
+          "code": "import torch\n\ndef utility(train_x, train_y, best_x, best_y, test_x, mean_test_y, std_test_y, cost_test_y, budget_used, budget_total):\n    # Implementation of the new utility algorithm\n    utility_value = torch.abs(mean_test_y - best_y) - cost_test_y * (budget_total - budget_used)\n    return utility_value",
+          "objective": 19.0526,
+          "other_inf": null
+     }
+]
