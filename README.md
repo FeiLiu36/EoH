@@ -192,30 +192,17 @@ python runEoH.py
 
 ### More Examples using EoH Platform (Code & Paper)
 
-#### Combinatorial Optimization
 
-- Online Bin Packing, greedy heuristic, [code](https://github.com/FeiLiu36/EoH/tree/main/examples/bp_online), [paper]
-- TSP, construct heuristic, [code](https://github.com/FeiLiu36/EoH/tree/main/examples/tsp_construct), [paper]
-- TSP, guided local search, [code], [paper]
-- Flow Shop Scheduling Problem (FSSP), guided local search, [code], [paper]
-
-#### Machine Learning
-
-- Attack, [code], [paper](https://arxiv.org/abs/2401.15335)
-
-#### Bayesian Optimization
-
-- Cost-aware Acquisition Function Design, [paper](https://arxiv.org/abs/2404.16906)
-
-#### Mathematics
-
-- Admissible sets
-
-#### Physics
-
-- Computational fluid dynamics
-
-  
+|  Area              |   Problem                                |  Paper                                                        |  Code                                                                                   |
+|-------------------------|----------------------------------------|---------------------------------|---------------------------------------------------------------|
+| Combinatorial Optimization | Online Bin Packing, greedy heuristic   | [paper]                                                       | [code](https://github.com/FeiLiu36/EoH/tree/main/examples/bp_online)                    |
+| Combinatorial Optimization | TSP, construct heuristic               | [paper]                                                       | [code](https://github.com/FeiLiu36/EoH/tree/main/examples/tsp_construct)                |
+| Combinatorial Optimization | TSP, guided local search               | [paper]                                                       | [code]                                                                                  |
+| Combinatorial Optimization | Flow Shop Scheduling Problem (FSSP), guided local search | [paper]                                                       | [code]                                                                                  |
+| Machine Learning          | Attack                                 | [paper](https://arxiv.org/abs/2401.15335)                     | [code]                                                                                  |
+| Bayesian Optimization     | Cost-aware Acquisition Function Design | [paper](https://arxiv.org/abs/2404.16906)                     |                                                                                         |
+| Mathematics               | Admissible sets                        |                                                               |                                                                                         |
+| Physics                   | Computational fluid dynamics           |                                                               |                                                                                         |  
 
 ## Use EoH in Your Application
 
