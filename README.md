@@ -195,12 +195,12 @@ python runEoH.py
 
 |  Area              |   Problem                                |  Paper                                                        |  Code                                                                                   |
 |-------------------------|----------------------------------------|---------------------------------|---------------------------------------------------------------|
-| Combinatorial Optimization | Online Bin Packing, greedy heuristic   | [paper]                                                       | [code](https://github.com/FeiLiu36/EoH/tree/main/examples/bp_online)                    |
-| Combinatorial Optimization | TSP, construct heuristic               | [paper]                                                       | [code](https://github.com/FeiLiu36/EoH/tree/main/examples/tsp_construct)                |
-| Combinatorial Optimization | TSP, guided local search               | [paper]                                                       | [code]                                                                                  |
-| Combinatorial Optimization | Flow Shop Scheduling Problem (FSSP), guided local search | [paper]                                                       | [code]                                                                                  |
+| Combinatorial Optimization | Online Bin Packing, greedy heuristic   | [paper]                                                       | [code](https://github.com/FeiLiu36/EoH/tree/main/examples/user_bp_online)                    |
+| | TSP, construct heuristic               | [paper]                                                       | [code](https://github.com/FeiLiu36/EoH/tree/main/examples/tsp_construct)                |
+|  | TSP, guided local search               | [paper]                                                       | [code](https://github.com/FeiLiu36/EoH/tree/main/examples/user_tsp_gls)                                                                                  |
+|   | Flow Shop Scheduling Problem (FSSP), guided local search | [paper]                                                       | [code](https://github.com/FeiLiu36/EoH/tree/main/examples/user_fssp_gls)                                                                                |
 | Machine Learning          | Attack                                 | [paper](https://arxiv.org/abs/2401.15335)                     | [code]                                                                                  |
-| Bayesian Optimization     | Cost-aware Acquisition Function Design | [paper](https://arxiv.org/abs/2404.16906)                     |                                                                                         |
+| Bayesian Optimization     | Cost-aware Acquisition Function Design | [paper](https://arxiv.org/abs/2404.16906)                     |  [code](https://github.com/FeiLiu36/EoH/tree/main/examples/user_bo_caf)                                                                                       |
 | Mathematics               | Admissible sets                        |                                                               |                                                                                         |
 | Physics                   | Computational fluid dynamics           |                                                               |                                                                                         |  
 
