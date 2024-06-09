@@ -76,7 +76,7 @@ If you find EoH helpful for your research or applied projects:
 @inproceedings{fei2024eoh,
     title={Evolution of Heuristics: Towards Efficient Automatic Algorithm Design Using Large Language Model},
     author={Fei Liu, Xialiang Tong, Mingxuan Yuan, Xi Lin, Fu Luo, Zhenkun Wang, Zhichao Lu, Qingfu Zhang},
-    booktitle={ICML},
+    booktitle={International Conference on Machine Learning (ICML)},
     year={2024},
     url={https://arxiv.org/abs/2401.02051}
 }
