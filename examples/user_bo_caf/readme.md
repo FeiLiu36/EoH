@@ -13,7 +13,9 @@ Leveraging the crossover and mutation in the algorithm space, EvolCAF offers a n
 - [EoH](https://github.com/FeiLiu36/EoH)
 - [BoTorch](https://github.com/pytorch/botorch)==0.9.2
 
-
+#### Quick Start
++ Install [EoH](https://github.com/FeiLiu36/EoH)
++ Python runEoH.py
 
 #### Cite the work
 
