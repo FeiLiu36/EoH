@@ -25,7 +25,7 @@ EvolCAF was introduced in
 @article{yao2024evolve,
   title={Evolve Cost-aware Acquisition Functions Using Large Language Models},
   author={Yao, Yiming and Liu, Fei and Cheng, Ji and Zhang, Qingfu},
-  journal={arXiv preprint arXiv:2404.16906},
+  journal={International Conference on Parallel Problem Solving From Nature (PPSN)},
   year={2024}
 }
 ```
