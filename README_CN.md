@@ -68,9 +68,9 @@ EOH在分钟/小时内设计出了非常有竞争力的算法/启发式方法。
 
 ```bibtex
 @inproceedings{fei2024eoh,
-    title={启发式的演变：利用大型语言模型实现高效自动算法设计},
-    author={刘飞，佟侠良，袁明轩，林喜，罗甫，王振坤，陆志超，张庆福},
-    booktitle={ICML},
+    title={Evolution of Heuristics: Towards Efficient Automatic Algorithm Design Using Large Language Model},
+    author={Fei Liu, Xialiang Tong, Mingxuan Yuan, Xi Lin, Fu Luo, Zhenkun Wang, Zhichao Lu, Qingfu Zhang},
+    booktitle={International Conference on Machine Learning (ICML)},
     year={2024},
     url={https://arxiv.org/abs/2401.02051}
 }
