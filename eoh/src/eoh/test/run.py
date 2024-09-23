@@ -16,7 +16,7 @@ from eoh.utils.getParas import Paras
 paras = Paras() 
 
 # Set parameters #
-paras.set_paras(method = "ael",    # ['ael','funsearch','reevo']
+paras.set_paras(method = "eoh",    
                 problem = "bp_online", #['tsp_construct','bp_online','tsp_gls','fssp_gls']
                 llm_api_endpoint = "XXX",
                 llm_api_key = "XXX",   # set your key
