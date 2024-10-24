@@ -14,7 +14,7 @@ class Paras():
         #####################
         self.ec_pop_size = 5  # number of algorithms in each population, default = 10
         self.ec_n_pop = 5 # number of populations, default = 10
-        self.ec_operators = None # evolution operators: ['e1','e2','m1','m2'], default = ['e1','m1']
+        self.ec_operators = None # evolution operators: ['e1','e2','m1','m2'], default =  ['e1','e2','m1','m2']
         self.ec_m = 2  # number of parents for 'e1' and 'e2' operators, default = 2
         self.ec_operator_weights = None  # weights for operators, i.e., the probability of use the operator in each iteration, default = [1,1,1,1]
         
@@ -70,20 +70,18 @@ class Paras():
         if self.ec_operators == None:
             if self.method == 'eoh':
                 self.ec_operators  = ['e1','e2','m1','m2']
-                if self.ec_operator_weights == None:
-                    self.ec_operator_weights = [1, 1, 1, 1]
             elif self.method == 'ael':
                 self.ec_operators  = ['crossover','mutation']
-                if self.ec_operator_weights == None:
-                    self.ec_operator_weights = [1, 1]
             elif self.method == 'ls':
                 self.ec_operators  = ['m1']
-                if self.ec_operator_weights == None:
-                    self.ec_operator_weights = [1]
             elif self.method == 'sa':
                 self.ec_operators  = ['m1']
-                if self.ec_operator_weights == None:
-                    self.ec_operator_weights = [1]
+
+        if self.ec_operator_weights == None:
+            self.ec_operator_weights = [1 for _ in range(len(self.ec_operators))]
+        elif len(self.ec_operator) != len(self.ec_operator_weights):
+            print("Warning! Lengths of ec_operator_weights and ec_operator shoud be the same.")
+            self.ec_operator_weights = [1 for _ in range(len(self.ec_operators))]
                     
         if self.method in ['ls','sa'] and self.ec_pop_size >1:
             self.ec_pop_size = 1

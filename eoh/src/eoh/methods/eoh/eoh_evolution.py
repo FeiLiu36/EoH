@@ -108,6 +108,14 @@ The description must be inside a brace. Next, implement it in Python as a functi
 +self.joined_outputs+". "+self.prompt_inout_inf+" "\
 +self.prompt_other_inf+"\n"+"Do not give additional explanations."
         return prompt_content
+    
+    def get_prompt_m3(self,indiv1):
+        prompt_content = "First, you need to identify the main components in the function below. \
+Next, analyze whether any of these components can be overfit to the in-distribution instances. \
+Then, based on your analysis, simplify the components to enhance the generalization to potential out-of-distribution instances. \
+Finally, provide the revised code, keeping the function name, inputs, and outputs unchanged. \n"+indiv1['code']+"\n"\
++self.prompt_inout_inf+"\n"+"Do not give additional explanations."
+        return prompt_content
 
 
     def _get_alg(self,prompt_content):
@@ -242,6 +250,25 @@ The description must be inside a brace. Next, implement it in Python as a functi
 
         if self.debug_mode:
             print("\n >>> check prompt for creating algorithm using [ m2 ] : \n", prompt_content )
+            print(">>> Press 'Enter' to continue")
+            input()
+      
+        [code_all, algorithm] = self._get_alg(prompt_content)
+
+        if self.debug_mode:
+            print("\n >>> check designed algorithm: \n", algorithm)
+            print("\n >>> check designed code: \n", code_all)
+            print(">>> Press 'Enter' to continue")
+            input()
+
+        return [code_all, algorithm]
+    
+    def m3(self,parents):
+      
+        prompt_content = self.get_prompt_m3(parents)
+
+        if self.debug_mode:
+            print("\n >>> check prompt for creating algorithm using [ m3 ] : \n", prompt_content )
             print(">>> Press 'Enter' to continue")
             input()
       

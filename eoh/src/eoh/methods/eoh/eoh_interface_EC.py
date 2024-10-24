@@ -122,6 +122,9 @@ class InterfaceEC():
         elif operator == "m2":
             parents = self.select.parent_selection(pop,1)
             [offspring['code'],offspring['algorithm']] = self.evol.m2(parents[0]) 
+        elif operator == "m3":
+            parents = self.select.parent_selection(pop,1)
+            [offspring['code'],offspring['algorithm']] = self.evol.m3(parents[0]) 
         else:
             print(f"Evolution operator [{operator}] has not been implemented ! \n") 
 

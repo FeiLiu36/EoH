@@ -17,22 +17,23 @@ paras = Paras()
 
 # Set parameters #
 paras.set_paras(method = "eoh",    
-                problem = "bp_online", #['tsp_construct','bp_online','tsp_gls','fssp_gls']
-                llm_api_endpoint = "XXX",
+                ec_operators  = ['e1','e2','m1','m2','m3'], # operators in EoH
+                problem = "bp_online", # ['tsp_construct','bp_online','tsp_gls','fssp_gls']
+                llm_api_endpoint = "XXX", # set endpoint
                 llm_api_key = "XXX",   # set your key
-                llm_model = "gpt-3.5-turbo-1106",
+                llm_model = "XXX", # set llm
                 ec_pop_size = 4,
                 ec_n_pop = 2,
                 exp_n_proc = 4,
                 exp_debug_mode = False)
-# AEL initilization
+
+# EoH initilization
 evolution = eoh.EVOL(paras)
 
-
-# run AEL
+# run EoH
 evolution.run()
 
-# Generate AEL Report
+# Generate EoH Report
 # RC = ReportCreator(paras)
 # RC.generate_doc_report()
 

@@ -97,7 +97,7 @@ class EOH:
         if self.use_seed:
             with open(self.seed_path) as file:
                 data = json.load(file)
-            population = interface_ec.population_generation_seed(data)
+            population = interface_ec.population_generation_seed(data,self.exp_n_proc)
             filename = self.output_path + "/results/pops/population_generation_0.json"
             with open(filename, 'w') as f:
                 json.dump(population, f, indent=5)
