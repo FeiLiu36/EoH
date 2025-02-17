@@ -33,7 +33,10 @@ A Platform of Evolutionary Computation (EC) + Large Language Model (LLM) for Eff
 </div>
 <br>
 
-
+> [!Important]
+> This Rep will be maintained at a low frequency. Please visit our latest general-purpose Platform [LLM4AD](https://github.com/Optima-CityU/llm4ad)!
+> 
+> LLM4AD has a modulized framework with diverse methods (EoH, FunSearch, etc) and tasks (Optimization, Machine learning, etc).
 
 A Platform for **Evolutionary Computation** + **Large Language Model** for automatic algorithm design.
 
