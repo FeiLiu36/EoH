@@ -79,8 +79,8 @@ class Paras():
 
         if self.ec_operator_weights == None:
             self.ec_operator_weights = [1 for _ in range(len(self.ec_operators))]
-        elif len(self.ec_operator) != len(self.ec_operator_weights):
-            print("Warning! Lengths of ec_operator_weights and ec_operator shoud be the same.")
+        elif len(self.ec_operators) != len(self.ec_operator_weights):
+            print("Warning! Lengths of ec_operator_weights and ec_operators should be the same.")
             self.ec_operator_weights = [1 for _ in range(len(self.ec_operators))]
                     
         if self.method in ['ls','sa'] and self.ec_pop_size >1:
