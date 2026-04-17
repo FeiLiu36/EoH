@@ -91,10 +91,9 @@ class Paras():
     def set_evaluation(self):
         # Initialize evaluation settings
         if self.problem == 'bp_online':
-            self.eva_timeout = 20
-            self.eva_numba_decorator  = True
+            self.eva_timeout = 40
         elif self.problem == 'tsp_construct':
-            self.eva_timeout = 20
+            self.eva_timeout = 40
                 
     def set_paras(self, *args, **kwargs):
         

@@ -61,31 +61,6 @@ class TSPGLS():
         return np.mean(gaps)
     
 
-    # def evaluateGLS(self,heuristic):
-
-    #     nins = 64    
-    #     gaps = np.zeros(nins)
-
-    #     print("Start evaluation ...")   
-
-    #     inputs = [(x,self.opt_costs[x],  self.instances[x], self.coords[x],self.time_limit,self.ite_max,self.perturbation_moves) for x in range(nins)]
-    #     #gaps = Parallel(n_jobs=nins)(delayed(solve_instance)(*input) for input in inputs)
-    #     try:
-    #             gaps = Parallel(n_jobs= 4, timeout = self.time_limit*1.1)(delayed(solve_instance)(*input) for input in inputs)
-    #     except:
-    #             print("### timeout or other error, return a large fitness value ###")
-    #             return 1E10
-    #     return np.mean(gaps)
-
-
-    # def evaluate(self):
-    #     try:        
-    #         fitness = self.evaluateGLS()
-    #         return fitness
-    #     except Exception as e:
-    #         print("Error:", str(e))  # Print the error message
-    #         return None
-
     def evaluate(self, code_string):
         try:
             # Suppress warnings
