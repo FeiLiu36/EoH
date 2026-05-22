@@ -302,7 +302,7 @@ Welcome to visit [a collection of references and research papers on LLM4Opt](htt
 
 
 ## Contributors
-<img src="https://github.com/FeiLiu36.png" width="60" div align=center> [Rui Zhang](https://github.com/FeiLiu36) 
+<img src="https://github.com/FeiLiu36.png" width="60" div align=center> [Fei Liu](https://github.com/FeiLiu36) 
 <img src="https://github.com/RayZhhh.png" width="60" div align=center> [Rui Zhang](https://github.com/RayZhhh) 
 <img src="https://github.com/yzy1996.png" width="60" div align=center> [Zhiyuan Yang](https://github.com/yzy1996) 
 <img src="https://github.com/pgg3.png" width="60" div align=center> [Ping Guo](https://github.com/pgg3)  

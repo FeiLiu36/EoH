@@ -16,7 +16,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'eoh', 's
 from eoh import BaseProblem
 
 
-# Encoding constants (same as LLM4AD)
+# Encoding constants
 _TRIPLES = [(0, 0, 0), (0, 0, 1), (0, 0, 2), (0, 1, 2), (0, 2, 1), (1, 1, 1), (2, 2, 2)]
 _INT_TO_WEIGHT = [0, 1, 1, 2, 2, 3, 3]
 
