@@ -149,21 +149,21 @@ class EOH:
                 op_w = self.operator_weights[i]
                 if (np.random.rand() < op_w):
                     parents, offsprings = interface_ec.get_algorithm(population, op)
-                self.add2pop(population, offsprings)  # Check duplication, and add the new offspring
-                for off in offsprings:
-                    print(" Obj: ", off['objective'], end="|")
-                # if is_add:
-                #     data = {}
-                #     for i in range(len(parents)):
-                #         data[f"parent{i + 1}"] = parents[i]
-                #     data["offspring"] = offspring
-                #     with open(self.output_path + "/results/history/pop_" + str(pop + 1) + "_" + str(
-                #             na) + "_" + op + ".json", "w") as file:
-                #         json.dump(data, file, indent=5)
-                # populatin management
-                size_act = min(len(population), self.pop_size)
-                population = self.manage.population_management(population, size_act)
-                print()
+                    self.add2pop(population, offsprings)  # Check duplication, and add the new offspring
+                    for off in offsprings:
+                        print(" Obj: ", off['objective'], end="|")
+                    # if is_add:
+                    #     data = {}
+                    #     for i in range(len(parents)):
+                    #         data[f"parent{i + 1}"] = parents[i]
+                    #     data["offspring"] = offspring
+                    #     with open(self.output_path + "/results/history/pop_" + str(pop + 1) + "_" + str(
+                    #             na) + "_" + op + ".json", "w") as file:
+                    #         json.dump(data, file, indent=5)
+                    # populatin management
+                    size_act = min(len(population), self.pop_size)
+                    population = self.manage.population_management(population, size_act)
+                    print()
 
 
             # Save population to a file
@@ -182,4 +182,3 @@ class EOH:
             for i in range(len(population)):
                 print(str(population[i]['objective']) + " ", end="")
             print()
-

@@ -138,8 +138,7 @@ class LS:
                 op_w = self.operator_weights[i]
                 if (np.random.rand() < op_w):
                     parents, offsprings = interface_ec.get_algorithm(population, op)
-                    
-                self.manage.population_management(population,offsprings[0],temperature)
+                    self.manage.population_management(population,offsprings[0],temperature)
 
             # Save population to a file
             filename = self.output_path + "/results/pops/population_generation_" + str(pop + 1) + ".json"
@@ -157,4 +156,3 @@ class LS:
             for i in range(len(population)):
                 print(str(population[i]['objective']) + " ", end="")
             print()
-
