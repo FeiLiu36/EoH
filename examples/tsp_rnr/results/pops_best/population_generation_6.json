@@ -1,0 +1,6 @@
+{
+    "algorithm": "The new algorithm first applies a random 3-opt perturbation to the current tour, then selects for removal the nodes whose two incident edges in the perturbed tour have the largest product (instead of sum) of distances, thereby focusing on structurally expensive pairs while increasing randomness.",
+    "code": "def destroy_nodes(current_tour: np.ndarray, distance_matrix: np.ndarray,\n                  n_destroy: int) -> np.ndarray:\n    n = len(current_tour)\n    \n    # Perturb the tour with a random 3-opt move: reverse two random segments\n    i = np.random.randint(0, n - 2)\n    j = np.random.randint(i + 1, n - 1)\n    k = np.random.randint(j + 1, n)\n    perturbed = current_tour.copy()\n    perturbed[i:j+1] = perturbed[i:j+1][::-1]\n    perturbed[j+1:k+1] = perturbed[j+1:k+1][::-1]\n    \n    # Compute product of incident edge distances for each node\n    incident_products = np.array([\n        distance_matrix[perturbed[k], perturbed[(k-1) % n]] *\n        distance_matrix[perturbed[k], perturbed[(k+1) % n]]\n        for k in range(n)\n    ])\n    \n    # Select nodes with largest product of incident distances\n    top_indices = np.argsort(incident_products)[-n_destroy:]\n    return current_tour[top_indices]",
+    "objective": 5.68053,
+    "other_inf": null
+}

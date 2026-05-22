@@ -1,0 +1,7 @@
+{
+    "sample_order": 17,
+    "operator": "m2",
+    "algorithm": "This algorithm uses simulated annealing with a temperature schedule that controls a softmax selection probability, combining rank-based weights with exponential scaling to gradually shift from exploration to exploitation.",
+    "code": "import numpy as np\n\ndef select(\n    fitnesses: np.ndarray,\n    k: int,\n    tournament_size: int,\n) -> np.ndarray:\n    pop_size = len(fitnesses)\n    # Compute ranks (0 = best, pop_size-1 = worst)\n    ranks = np.argsort(np.argsort(fitnesses))\n    # Simulated annealing temperature: starts high (exploration), decreases linearly with generation count\n    # Use a fixed generation estimate based on pop_size and k (typical eaSimple uses k = pop_size)\n    # Temperature schedule: T = max(0.1, 1.0 - generation_index / 100)\n    # For simplicity, estimate generation index from tournament_size (proxy for progress)\n    gen_estimate = min(1.0, tournament_size / 10.0)  # heuristic: early if tournament_size small\n    T = max(0.1, 1.0 - gen_estimate)\n    # Boltzmann/softmax weights: negative fitness lower = better, so use -ranks as energy\n    # Lower rank means better -> higher probability\n    softmax_weights = np.exp(-ranks / T)\n    # Probabilities\n    probs = softmax_weights / softmax_weights.sum()\n    # Select k parents with replacement\n    selected = np.random.choice(pop_size, size=k, replace=True, p=probs)\n    return selected",
+    "objective": 1.32295
+}

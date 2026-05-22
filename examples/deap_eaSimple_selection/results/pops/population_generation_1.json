@@ -1,0 +1,26 @@
+[
+    {
+        "algorithm": "This algorithm uses rank-based selection with linear pressure and adaptive noise injection based on fitness coefficient of variation to dynamically balance exploration and exploitation.",
+        "code": "import numpy as np\n\ndef select(\n    fitnesses: np.ndarray,\n    k: int,\n    tournament_size: int,\n) -> np.ndarray:\n    pop_size = len(fitnesses)\n    # Compute coefficient of variation of fitness as diversity measure\n    std_fit = np.std(fitnesses)\n    mean_fit = np.mean(fitnesses)\n    if mean_fit == 0:\n        cv = 0.0\n    else:\n        cv = std_fit / abs(mean_fit)\n    # Rank-based selection with linear pressure\n    # Lower fitness = better, so rank 0 is best, rank pop_size-1 is worst\n    ranks = np.argsort(np.argsort(fitnesses))\n    # Linear ranking: selection probability proportional to (pop_size - rank)\n    # Higher rank (worse) gets lower probability\n    rank_weights = pop_size - ranks\n    # Adaptive noise: inject randomness proportional to diversity (cv)\n    noise_scale = 0.1 * cv  # more noise when diversity high (exploration)\n    noisy_weights = rank_weights + np.random.randn(pop_size) * noise_scale * rank_weights.mean()\n    # Ensure non-negative weights\n    noisy_weights = np.maximum(noisy_weights, 0.0)\n    # Probabilities proportional to noisy weights\n    probs = noisy_weights / noisy_weights.sum()\n    # Select k parents with replacement using these probabilities\n    selected = np.random.choice(pop_size, size=k, replace=True, p=probs)\n    return selected",
+        "objective": 1.32941,
+        "other_inf": null
+    },
+    {
+        "algorithm": "Adaptive tournament selection with temperature-based probabilistic scaling: sort fitness values, convert to selection probabilities via a Boltzmann distribution with a temperature parameter that decreases linearly from a high initial value (exploration) to a low final value (exploitation) over generations, then use tournament selection on probability-weighted ranks.",
+        "code": "import numpy as np\n\ndef select(\n    fitnesses: np.ndarray,\n    k: int,\n    tournament_size: int,\n) -> np.ndarray:\n    pop_size = len(fitnesses)\n    # Use temperature annealing based on an estimate of generation number\n    # (no state passed, so we approximate using fitness diversity)\n    f_min = fitnesses.min()\n    f_max = fitnesses.max()\n    f_range = f_max - f_min\n    if f_range < 1e-12:\n        # Fall back to uniform if all equal\n        return np.random.choice(pop_size, k, replace=True)\n    \n    # Boltzmann scaling: temperature proportional to fitness range (adaptive)\n    T = 0.5 * f_range  # high temperature early (exploration), shrinks as range shrinks\n    # Compute Boltzmann probabilities (lower fitness -> higher probability)\n    exponents = - (fitnesses - f_min) / T\n    # Clip exponents to avoid overflow\n    exponents = np.clip(exponents, -700, 700)\n    weights = np.exp(exponents)\n    probs = weights / weights.sum()\n    \n    # Use tournament selection on probability-weighted indices with a small twist:\n    # sample candidates according to probs, then pick best among them\n    selected = np.empty(k, dtype=int)\n    for i in range(k):\n        candidates = np.random.choice(pop_size, size=tournament_size, replace=False, p=probs)\n        selected[i] = candidates[np.argmin(fitnesses[candidates])]\n    return selected",
+        "objective": 1.36171,
+        "other_inf": null
+    },
+    {
+        "algorithm": "Hybrid rank-based selection with adaptive Boltzmann exploration: convert fitnesses to ranks, compute selection probabilities via a softmax over negative ranks with a temperature parameter that decreases over generations (annealing), then sample parents proportional to these probabilities.",
+        "code": "import numpy as np\n\ndef select(\n    fitnesses: np.ndarray,\n    k: int,\n    tournament_size: int,\n) -> np.ndarray:\n    pop_size = len(fitnesses)\n    temperature = max(0.1, 1.0 - (k / (pop_size * 10)))  # simple annealing schedule\n    \n    # Rank-based fitness (1 = best, pop_size = worst)\n    ranks = np.argsort(np.argsort(fitnesses)) + 1\n    # Boltzmann (softmax) selection probabilities over negative ranks\n    exp_vals = np.exp(-ranks / temperature)\n    probs = exp_vals / np.sum(exp_vals)\n    \n    selected = np.random.choice(pop_size, size=k, replace=True, p=probs)\n    return selected",
+        "objective": 1.40706,
+        "other_inf": null
+    },
+    {
+        "algorithm": "Use rank-based selection with linear scaling to create a probability distribution, then sample parents via roulette wheel selection to reduce selection pressure while maintaining diversity and avoiding premature convergence.",
+        "code": "import numpy as np\n\ndef select(\n    fitnesses: np.ndarray,\n    k: int,\n    tournament_size: int,\n) -> np.ndarray:\n    pop_size = len(fitnesses)\n    ranks = np.argsort(np.argsort(fitnesses))\n    rank_values = pop_size - ranks\n    probabilities = rank_values / rank_values.sum()\n    selected = np.random.choice(pop_size, size=k, p=probabilities)\n    return selected",
+        "objective": 1.40798,
+        "other_inf": null
+    }
+]

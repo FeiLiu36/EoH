@@ -1,0 +1,6 @@
+{
+    "algorithm": "The algorithm iteratively selects the nearest feasible unvisited customer until capacity is exhausted, then returns to the depot to start a new route.",
+    "code": "def select_next_node(current_node: int, depot: int, unvisited_nodes: np.ndarray,\n                     rest_capacity: float, demands: np.ndarray,\n                     distance_matrix: np.ndarray) -> int:\n    \"\"\"Select the next node to visit in a CVRP greedy construction.\n\n    Args:\n        current_node:    index of the current node (0 = depot)\n        depot:           index of the depot (always 0)\n        unvisited_nodes: array of feasible unvisited customer indices\n                         (already filtered to satisfy remaining capacity)\n        rest_capacity:   remaining vehicle capacity\n        demands:         demand of every node (index 0 = depot demand = 0)\n        distance_matrix: pairwise Euclidean distance matrix\n    Returns:\n        Index of the next node to visit, or 0 to return to the depot early.\n    \"\"\"\n    if len(unvisited_nodes) == 0:\n        return depot\n    return unvisited_nodes[np.argmin(distance_matrix[current_node][unvisited_nodes])]",
+    "objective": 13.61078,
+    "other_inf": null
+}

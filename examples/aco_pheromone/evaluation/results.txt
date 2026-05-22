@@ -1,0 +1,28 @@
+ACO Pheromone Update – Evaluation Results
+n_cities=50  n_instance=5  n_ants=25  iter_max=200  n_runs=10  rho=0.1
+----------------------------------------------------------------------------
+  Heuristic                      | Instance    | Mean tour length        Std
+----------------------------------------------------------------------------
+  Baseline (Ant System)          | instance  0 | mean:   6.0531  std:  0.0542
+  Baseline (Ant System)          | instance  1 | mean:   5.8258  std:  0.0479
+  Baseline (Ant System)          | instance  2 | mean:   5.7201  std:  0.0606
+  Baseline (Ant System)          | instance  3 | mean:   5.5992  std:  0.0376
+  Baseline (Ant System)          | instance  4 | mean:   5.6725  std:  0.0637
+  OVERALL Baseline (Ant System)  | mean tour length: 5.7742
+----------------------------------------------------------------------------
+  EoH heuristic                  | instance  0 | mean:   6.0531  std:  0.0542
+  EoH heuristic                  | instance  1 | mean:   5.8258  std:  0.0479
+  EoH heuristic                  | instance  2 | mean:   5.7201  std:  0.0606
+  EoH heuristic                  | instance  3 | mean:   5.5992  std:  0.0376
+  EoH heuristic                  | instance  4 | mean:   5.6725  std:  0.0637
+  OVERALL EoH heuristic          | mean tour length: 5.7742
+----------------------------------------------------------------------------
+
+  Per-instance improvement (EoH vs Ant System, lower tour length = better):
+  TIE     instance  0  gain: +0.0000 (+0.00%)  (6.0531 → 6.0531)
+  TIE     instance  1  gain: +0.0000 (+0.00%)  (5.8258 → 5.8258)
+  TIE     instance  2  gain: +0.0000 (+0.00%)  (5.7201 → 5.7201)
+  TIE     instance  3  gain: +0.0000 (+0.00%)  (5.5992 → 5.5992)
+  TIE     instance  4  gain: +0.0000 (+0.00%)  (5.6725 → 5.6725)
+
+  Overall gap vs baseline: +0.00%  (5.7742 → 5.7742)

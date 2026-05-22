@@ -5,7 +5,7 @@
 EoH: Evolution of Heuristics 
 </h1>
 <h3 align="center">
-A Platform of Evolutionary Computation (EC) + Large Language Model (LLM) for Efficient Automatic Algorithm Design 
+A Platform of Evolutionary Computation (EC) + Large Language Model (LLM) for Automatic Algorithm/Heuristic Design 
 </h3>
 
 [Chinese Version 中文版本](./README_CN.md)
@@ -33,30 +33,26 @@ A Platform of Evolutionary Computation (EC) + Large Language Model (LLM) for Eff
 </div>
 <br>
 
-> [!Important]
-> This Rep will be maintained at a low frequency. Please visit our latest general-purpose Platform [LLM4AD](https://github.com/Optima-CityU/llm4ad)!
-> 
-> LLM4AD has a modulized framework with diverse methods (EoH, FunSearch, etc) and tasks (Optimization, Machine learning, etc).
+A Lightweight and User-Friendly EoH Framework for LLM-driven Automated Algorithm/Heuristic Design
 
-A Platform for **Evolutionary Computation** + **Large Language Model** for automatic algorithm design.
+> [!Note]
+> **Using the old EoH version?** If your code uses `Paras` / `eoh.EVOL`, it targets the legacy v0.1 interface.
+> Download or install the old version from the [**v0.1 release**](https://github.com/FeiLiu36/EoH/releases/tag/v0.1):
+> The current `main` branch uses the new `LLMConfig` / `EoH` / `BaseProblem` API documented below.
 
 <img src="./docs/figures/eoh.JPG" alt="eoh" width="600" height="280" div align=center>
 
 
 ---
 ## News 🔥 
-+ 2025.6 🎉🎉 We're excited to share that **EoH** recently set a **New World Record in Circle Packing Problem**, achieving a score of 2.63594 for 26 circles !  [Results here](https://github.com/Optima-CityU/llm4ad/tree/main/example/circle_packing)
-+ 2024.10.30, Survey Paper [A Systematic Survey on Large Language Models for Algorithm Design](https://arxiv.org/pdf/2410.14716) has been uploaded to Arxiv ! 🎉
-+ 2024.5.31, [Evolve Cost-aware Acquisition Functions Using Large Language Models](https://arxiv.org/abs/2404.16906) has been accepted at **PPSN 2024 (Best Paper Nomination)** ! 🎉
-+ 2024.5.31, [Understanding the Importance of Evolutionary Search in Automated Heuristic Design with Large Language Models](https://arxiv.org/pdf/2407.10873) has been accepted at **PPSN 2024**! 🎉
-+ 2024.5.5, [L-AutoDA: Leveraging Large Language Models for Automated Decision-based Adversarial Attacks](https://arxiv.org/abs/2401.15335) has been accepted at **GECCO 2024**! 🎉
-+ 2024.5.2, [EoH (Evolution of Heuristics: Towards Efficient Automatic Algorithm Design using Large Language Model)](https://arxiv.org/abs/2401.02051) has been accepted at **ICML 2024 (Oral, Top 1.5%)**! 🎉
++ 2026.02 🎉🎉 **New Champion!** EoH won the [CVRPLib BKS competition](https://galgos.inf.puc-rio.br/cvrplib/index.php/en/bks_challenge/score/) and established **51 new Best Known Solutions** on large-scale CVRP benchmarks.
++ 2026.01 🎉🎉 Our Survey Paper ["A Systematic Survey on Large Language Models for Algorithm Design"](https://arxiv.org/pdf/2410.14716) has been accepted by [**ACM Computing Surveys**](https://dl.acm.org/journal/csur) ! A Rep for the Survey can be found [here](https://github.com/FeiLiu36/LLM4AlgorithmDesign)
++ 2025.06 🎉🎉 We're excited to share that **EoH** recently set a **New World Record in Circle Packing Problem**, achieving a score of 2.63594 for 26 circles !  [Results here](https://github.com/Optima-CityU/llm4ad/tree/main/example/circle_packing)
++ 2024.05, [EoH (Evolution of Heuristics: Towards Efficient Automatic Algorithm Design using Large Language Model)](https://arxiv.org/abs/2401.02051) has been accepted at **ICML 2024 (Oral, Top 1.5%)**! 🎉
 
 ---
 
 ## Introduction 📖
-
-
 
 Heuristics are indispensable for tackling complex search and optimization problems. However, manual heuristic design is tedious and demands significant human intuition and experience. 
 
@@ -64,16 +60,11 @@ EOH introduces a novel paradigm that leverages the synergy between Large Languag
 
 <img src="./docs/figures/framework.jpg" alt="eoh" width="500" height="auto" div align=center>
 
+EOH designs very competitive algorithms/heuristics in minutes/hours. Notably, it surpasses FunSearch, identifying superior heuristics with significantly fewer computational budgets (i.e., queries to LLMs) on online bin packing problem.
 
-
-
-EOH designs very competetive algorithms/heuristics in minutes/hours.  Notably, It surpasses FunSearch, identifying superior heuristics with significantly fewer computational budgets (i.e., queries to LLMs) on online bin packing problem.
-
-The following Figure shows the Evolution of EOH on the online bin packing problem. We outline the key **thoughts** and the corresponding **code** **snippets** that have contributed to the best results during evolution. Additionally, we mark the prompt strategies that result in improvement. Finally, we present the optimal heuristic in the final population and compare it to the heuristics designed by humans and from FunSearch.
+The following figure shows the evolution of EOH on the online bin packing problem. We outline the key **thoughts** and the corresponding **code snippets** that have contributed to the best results during evolution. Additionally, we mark the prompt strategies that result in improvement. Finally, we present the optimal heuristic in the final population and compare it to the heuristics designed by humans and from FunSearch.
 
 <img src="./docs/figures/evolution.jpg" alt="eoh" width="1000" height="auto">
-
-
 
 If you find EoH helpful for your research or applied projects:
 
@@ -87,11 +78,15 @@ If you find EoH helpful for your research or applied projects:
 }
 ```
 
-If you are interested on LLM4Opt or EoH, you can:
+If you are interested in LLM4Opt or EoH, you can:
 
 1) Contact us through email fliu36-c@my.cityu.edu.hk.
 2) Visit [a collection of references and research papers on LLM4Opt](https://github.com/FeiLiu36/LLM4Opt)
-3) Join our Group (coming soon)
+3) Join our QQ Group
+
+
+   <img src="./docs/figures/qq.png" alt="" style="width: 30%; height: auto;">
+
 
 If you encounter any difficulty using the code, you can contact us through the above or submit an [issue](https://github.com/FeiLiu36/EoH/issues)
 
@@ -100,7 +95,6 @@ If you encounter any difficulty using the code, you can contact us through the a
 ## Requirements
 
 - python >= 3.10
-- numba
 - numpy
 - joblib
 
@@ -110,130 +104,196 @@ If you encounter any difficulty using the code, you can contact us through the a
 
 #### Step 1: Install EoH
 
-We suggest install and run EoH in [conda](https://conda.io/projects/conda/en/latest/index.html) env with python>=3.10
+We suggest installing and running EoH in a [conda](https://conda.io/projects/conda/en/latest/index.html) environment with python >= 3.10.
 
 ```bash
 cd eoh
-
 pip install .
 ```
 
-#### Step 2: Try Example: 
+#### Step 2: Configure your LLM and run an example
 
-**<span style="color: red;">Setup your Endpoint and Key for remote LLM or Setup your local LLM before start !</span>** 
-
-For example, set the llm_api_endpoint to "api.deepseek.com", set llm_api_key to "your key", and set llm_model to "deepseek-chat".
+**<span style="color: red;">Set up your endpoint and key for a remote LLM, or configure a local LLM, before starting!</span>**
 
 ```python
-from eoh import eoh
-from eoh.utils.getParas import Paras
+from eoh import EoH, LLMConfig
+from prob import MyProblem  # your problem class (see "Use EoH in Your Application" below)
 
-# Parameter initilization #
-paras = Paras() 
+llm = LLMConfig(
+    api_endpoint="api.deepseek.com",  # e.g. "api.openai.com" or "api.deepseek.com"
+    api_key="your-api-key",
+    model="deepseek-chat",            # e.g. "gpt-4o", "deepseek-chat"
+    timeout=150,
+)
 
-# Set parameters #
-paras.set_paras(method = "eoh",    # ['ael','eoh']
-                problem = "bp_online", #['tsp_construct','bp_online']
-                llm_api_endpoint = "xxx", # set your LLM endpoint
-                llm_api_key = "xxx",   # set your LLM key
-                llm_model = "gpt-3.5-turbo-1106",
-                ec_pop_size = 5, # number of samples in each population
-                ec_n_pop = 5,  # number of populations
-                exp_n_proc = 4,  # multi-core parallel
-                exp_debug_mode = False)
+task = MyProblem(timeout=40, n_processes=4)
 
-# initilization
-evolution = eoh.EVOL(paras)
-
-# run 
-evolution.run()
+eoh = EoH(
+    llm=llm,
+    problem=task,
+    pop_size=5,       # population size per generation
+    n_pop=20,         # number of generations
+    operators=['e1', 'e2', 'm1', 'm2'],
+    output_dir="./results",
+)
+eoh.run()
 ```
-
-
 
 ###### Example 1: Constructive Algorithm for TSP
 
 ```bash
 cd examples/tsp_construct
-
 python runEoH.py
-
 ```
 **Evaluation**
 ```bash
 cd examples/tsp_construct/evaluation
-
-copy your heuristic to heuristic.py (Note that the function name/input/output must align with the evaluation block!!)
-
+# copy your heuristic to heuristic.py (function name/input/output must match the evaluation block)
 python runEval.py
 ```
 
-###### Example 2: Online Bin Packing 
-(**<span style="color: red;">Generate new best heuristic and Beat Funsearch in 30 minutes on your personal computer !</span>**  i7-10700 2.9Ghz, 32 GB)
+###### Example 2: Online Bin Packing
+(**<span style="color: red;">Generate a new best heuristic in 30 minutes on your personal computer!</span>** i7-10700 2.9GHz, 32 GB)
 
 ```bash
 cd examples/bp_online
-
 python runEoH.py
 ```
 **Evaluation**
 ```bash
 cd examples/bp_online/evaluation
-
-copy your heuristic to heuristic.py (Note that the function name/input/output must align with the evaluation block!!)
-
+# copy your heuristic to heuristic.py (function name/input/output must match the evaluation block)
 python runEval.py
 ```
 
-###### Example 3: Use EoH solve your local problem 
 
-```bash
-cd examples/user_XXX
-
-python runEoH.py
-```
-
-
-
-### More Examples using EoH Platform (Code & Paper)
-
-
-|  Area              |   Problem                                |  Paper                                                        |  Code                                                                                   |
-|-------------------------|----------------------------------------|---------------------------------|---------------------------------------------------------------|
-| Combinatorial Optimization | Online Bin Packing, greedy heuristic   | [paper]                                                       | [code](https://github.com/FeiLiu36/EoH/tree/main/examples/user_bp_online)                    |
-| | TSP, construct heuristic               | [paper]                                                       | [code](https://github.com/FeiLiu36/EoH/tree/main/examples/tsp_construct)                |
-|  | TSP, guided local search               | [paper]                                                       | [code](https://github.com/FeiLiu36/EoH/tree/main/examples/user_tsp_gls)                                                                                  |
-|   | Flow Shop Scheduling Problem (FSSP), guided local search | [paper]                                                       | [code](https://github.com/FeiLiu36/EoH/tree/main/examples/user_fssp_gls)                                                                                |
-| Machine Learning          | Attack                                 | [paper](https://arxiv.org/abs/2401.15335)                     | [code](https://github.com/pgg3/L-AutoDA)                                                                                  |
-| Bayesian Optimization     | Cost-aware Acquisition Function Design | [paper](https://arxiv.org/abs/2404.16906)                     |  [code](https://github.com/FeiLiu36/EoH/tree/main/examples/user_bo_caf)                                                                                       |
-| Mathematics               | Admissible sets                        |                                                               |                                                                                         |
-| Physics                   | Computational fluid dynamics           |                                                               |                                                                                         |  
 
 ## Use EoH in Your Application
 
-A Step-by-step guide is provided in [here](./docs/QuickGuide.md) (coming soon)
+Define your problem by subclassing `BaseProblem`. You need to provide:
+- `template_program`: a Python function (or class) skeleton the LLM will evolve.
+- `task_description`: a one-sentence description of what the LLM should optimise.
+- `evaluate_program`: a method that receives the generated callable and returns a float fitness (lower is better), or `None` on failure.
+
+```python
+import numpy as np
+from eoh import EoH, LLMConfig, BaseProblem
+
+
+class MyProblem(BaseProblem):
+    template_program = '''
+def heuristic(x: np.ndarray) -> float:
+    """Compute a score for input x."""
+    return float(x.mean())
+'''
+    task_description = "Design a heuristic function that minimises the mean of the input."
+
+    def evaluate_program(self, program_str: str, callable_func) -> float | None:
+        # Replace with your actual evaluation logic
+        score = callable_func(np.random.rand(10))
+        return score  # lower is better
+
+
+llm = LLMConfig(
+    api_endpoint="api.deepseek.com",
+    api_key="your-api-key",
+    model="deepseek-chat",
+)
+
+task = MyProblem(timeout=30, n_processes=4)
+
+eoh = EoH(llm=llm, problem=task, pop_size=5, n_pop=20, output_dir="./results")
+eoh.run()
+```
+
+EoH supports three template kinds, detected automatically:
+- **`function`** — a single function (most common).
+- **`multi_function`** — multiple cooperating functions; the last one is the entry point.
+- **`class`** — a class with a designated method; the class name is the entry point.
+
+See [`examples/tsp_construct_class`](https://github.com/FeiLiu36/EOH/tree/main/examples/tsp_construct_class) and [`examples/tsp_construct_multifunction`](https://github.com/FeiLiu36/EOH/tree/main/examples/tsp_construct_multifunction) for class and multi-function examples.
+
+
+
+## Examples
+
+The table below lists all 33 example tasks included in the `examples/` directory.
+
+| Name | Description | Link | Note |
+|------|-------------|------|------|
+| `aco_pheromone` | Design a pheromone update rule for Ant Colony Optimization on TSP. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/aco_pheromone) | |
+| `admissible_set` | Design a priority function for greedy construction of maximum-cardinality symmetric admissible sets. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/admissible_set) | |
+| `ale_breakout` | Evolve an action-selection heuristic for an Atari Breakout agent. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/ale_breakout) | Requires ALE |
+| `ale_pong` | Evolve an action-selection heuristic for an Atari Pong agent. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/ale_pong) | Requires ALE |
+| `bbob_metaheuristic` | Design a complete single-objective metaheuristic for continuous black-box optimization. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/bbob_metaheuristic) | Class template |
+| `bo_acquisition` | Design an acquisition function for Bayesian Optimization to guide candidate selection. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/bo_acquisition) | [PPSN 2024 Best Paper Nomination](https://arxiv.org/abs/2404.16906) |
+| `bp_online` | Design a bin-scoring function for online bin packing to minimise the number of used bins. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/bp_online) | EoH paper benchmark |
+| `cmaes_cov_update` | Design a covariance matrix update rule for CMA-ES on 10-D benchmarks. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/cmaes_cov_update) | |
+| `cvrp_construct` | Design a greedy constructive heuristic for the Capacitated Vehicle Routing Problem. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/cvrp_construct) | |
+| `de_crossover_100d` | Design an adaptive crossover operator for Differential Evolution at 100 dimensions. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/de_crossover_100d) | High-dimensional |
+| `de_mutation` | Design a novel mutation operator for Differential Evolution on 10-D benchmarks. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/de_mutation) | |
+| `deap_eaSimple_selection` | Design a parent selection operator for a DEAP genetic algorithm on 10-D benchmarks. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/deap_eaSimple_selection) | Uses DEAP |
+| `es_step_size` | Design a step-size adaptation rule for (1+λ)-Evolution Strategy. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/es_step_size) | |
+| `evo_dynamic` | Design a population response strategy for dynamic optimization under periodic environment changes. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/evo_dynamic) | Dynamic environment |
+| `fssp_gls` | Design a guided local search perturbation for flow-shop scheduling to minimise makespan. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/fssp_gls) | |
+| `gnn_aggregation` | Design a neighborhood aggregation function for GNN node classification. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/gnn_aggregation) | Requires PyTorch |
+| `large_scale_es` | Design diagonal variance adaptation for separable CMA-ES at 100 dimensions. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/large_scale_es) | High-dimensional |
+| `mobbob_metaheuristic` | Design a multi-objective metaheuristic to maximise hypervolume on 2-objective BBOB. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/mobbob_metaheuristic) | Multi-objective; class template |
+| `moead_decomposition` | Design a decomposition function for MOEA/D to convert multi-objective problems into scalar subproblems. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/moead_decomposition) | Multi-objective |
+| `nsga2_crowding` | Design a crowding-distance metric for NSGA-II to maximise hypervolume on ZDT problems. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/nsga2_crowding) | Multi-objective |
+| `nsga2_pymoo` | Design a crossover operator for NSGA-II via pymoo on ZDT problems. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/nsga2_pymoo) | Multi-objective; uses pymoo |
+| `nurse_rostering` | Design a shift-assignment priority function for nurse rostering to balance workload and preferences. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/nurse_rostering) | |
+| `one_plus_one` | Design a mutation noise generator for nevergrad's (1+1)-ES on 10-D benchmarks. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/one_plus_one) | Uses nevergrad |
+| `portfolio_construct` | Design an asset scoring function for greedy portfolio construction to maximise Sharpe ratio. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/portfolio_construct) | |
+| `pso_velocity` | Design a velocity update rule for Particle Swarm Optimization on 10-D benchmarks. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/pso_velocity) | |
+| `sa_acceptance` | Design an acceptance probability function for Simulated Annealing on 10-D benchmarks. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/sa_acceptance) | |
+| `tabu_tsp` | Design a move-scoring function for Tabu Search with 2-opt moves on TSP. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/tabu_tsp) | |
+| `tpe_bandwidth` | Design an observation-weighting function for Optuna's Tree-structured Parzen Estimator. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/tpe_bandwidth) | Uses Optuna |
+| `tsp_construct` | Design a next-node selection heuristic for greedy TSP tour construction. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/tsp_construct) | EoH paper benchmark |
+| `tsp_construct_class` | Design a TSP constructive heuristic as a class with a `select_next_node` method. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/tsp_construct_class) | Class template example |
+| `tsp_construct_multifunction` | Design two cooperating functions (node scoring + selection) for TSP construction. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/tsp_construct_multifunction) | Multi-function template example |
+| `tsp_gls` | Design an edge-distance update strategy for TSP Guided Local Search. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/tsp_gls) | |
+| `tsp_rnr` | Design a destroy operator (node selection) for a ruin-and-recreate TSP algorithm. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/tsp_rnr) | |
 
 
 
 ## LLMs 
 
-1) Remote LLM + API (e.g., GPT3.5, Deepseek, Gemini Pro) (**Recommended !**):
-   + OpenAI API.
-   + [Deepseek API](https://platform.deepseek.com/)
-   + Other APIs: 
-     + https://yukonnet.site/
-     + https://github.com/chatanywhere/GPT_API_free
-     + https://www.api2d.com/
-2) Local LLM Deployment + API (e.g., Llamacode, instruct Llama, gemma, deepseek, ...):
-   + Step 1: Download Huggingface Model, for example, download gemma-2b-it (git clone https://huggingface.co/google/gemma-2b-it)
-   + Step 2: 
-     + cd llm_server
-     + python gemma_instruct_server.py
-   + Step 3: Copy your url generated by running your server to request.py ( For example, set url='http://127.0.0.1:11012/completions') to test your server deployment. 
-   + Step 4: Copy your url generated by running your server to runEoH.py in your example. (For example, set url='http://127.0.0.1:11012/completions')
-   + Step 5: Python runEoH.py
-3) Your Implementation: 
-   + If you want to use other LLM or if you want to use your own GPT API or local LLMs, please add your interface in ael/llm
+#### 1) Remote LLM via API (Recommended)
+
+Set `api_endpoint`, `api_key`, and `model` in `LLMConfig`. Any OpenAI-compatible endpoint works:
+
+```python
+llm = LLMConfig(
+    api_endpoint="api.openai.com",   # or "api.deepseek.com", etc.
+    api_key="your-api-key",
+    model="gpt-4o",
+    timeout=150,
+)
+```
+
+Supported providers include:
+- [OpenAI API](https://platform.openai.com/)
+- [DeepSeek API](https://platform.deepseek.com/)
+- Any other OpenAI-compatible endpoint
+
+#### 2) Local LLM
+
+Set `use_local=True` and point `local_url` to your running inference server:
+
+```python
+llm = LLMConfig(
+    use_local=True,
+    local_url="http://127.0.0.1:11012/completions",
+    timeout=180,
+)
+```
+
+The local server must accept POST requests in the format expected by `api_local_llm.py`. Any server that serves a Hugging Face model (e.g., via a simple Flask/FastAPI wrapper) and returns `{"content": ["<generated text>"]}` will work.
+
+#### 3) Custom Implementation
+
+Subclass the LLM interface in `eoh/src/eoh/llm/` to integrate any other LLM provider.
 
 
 
@@ -242,6 +302,7 @@ Welcome to visit [a collection of references and research papers on LLM4Opt](htt
 
 
 ## Contributors
+<img src="https://github.com/FeiLiu36.png" width="60" div align=center> [Rui Zhang](https://github.com/FeiLiu36) 
 <img src="https://github.com/RayZhhh.png" width="60" div align=center> [Rui Zhang](https://github.com/RayZhhh) 
 <img src="https://github.com/yzy1996.png" width="60" div align=center> [Zhiyuan Yang](https://github.com/yzy1996) 
 <img src="https://github.com/pgg3.png" width="60" div align=center> [Ping Guo](https://github.com/pgg3)  

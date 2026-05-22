@@ -1,0 +1,954 @@
+[
+    {
+        "sample_order": 201,
+        "operator": "e2",
+        "algorithm": "The algorithm computes a weighted average of ball_y and a memory of past ball positions to estimate a smoothed trajectory, then moves the paddle toward that trajectory using a dynamic dead zone that shrinks as the ball approaches horizontally.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Use exponential moving average of ball_y as smoothed target\n    # (simulated with current and previous observation; here we use a simple\n    #  blend with a constant offset based on horizontal distance)\n    smoothed_y = int(ball_y * 0.7 + 100 * 0.3)  # bias toward center\n    \n    # Adjust target based on horizontal distance: closer => more precise\n    distance = 160 - ball_x\n    offset = max(1, distance // 10)\n    target_y = ball_y + (5 if ball_y > 100 else -5)  # simple direction bias\n    \n    # Dynamic dead zone: wider when far, narrower when close\n    dead_zone = max(1, distance // 15)\n    \n    if target_y < paddle_y - dead_zone:\n        return 2\n    elif target_y > paddle_y + dead_zone:\n        return 3\n    return 0",
+        "objective": 12.6
+    },
+    {
+        "sample_order": 202,
+        "operator": "e2",
+        "algorithm": "The new algorithm uses a nonlinear response: it multiplies the ball-to-paddle distance by a gain factor and applies a minimum movement threshold to decide action intensity.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    diff = ball_y - paddle_y\n    if abs(diff) > 8:\n        if diff < -8:\n            return 2  # UP\n        else:\n            return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 203,
+        "operator": "e1",
+        "algorithm": "The new algorithm tracks the ball's vertical position over a short history to estimate its acceleration, then uses a combination of proportional and derivative control with dynamic dead zone scaling based on the ball's horizontal distance.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    if not hasattr(select_action, 'history'):\n        select_action.history = []\n    \n    select_action.history.append(ball_y)\n    if len(select_action.history) > 5:\n        select_action.history.pop(0)\n    \n    if len(select_action.history) >= 2:\n        vel_y = select_action.history[-1] - select_action.history[-2]\n        if len(select_action.history) >= 3:\n            accel_y = (select_action.history[-1] - select_action.history[-2]) - (select_action.history[-2] - select_action.history[-3])\n        else:\n            accel_y = 0\n        predicted_y = ball_y + vel_y + 0.5 * accel_y\n    else:\n        predicted_y = ball_y\n    \n    predicted_y = max(17, min(194, predicted_y))\n    \n    dist_to_paddle = 160 - ball_x\n    dead_zone = max(5, 20 - dist_to_paddle // 10)\n    \n    error = predicted_y - paddle_y\n    if error < -dead_zone:\n        return 2\n    elif error > dead_zone:\n        return 3\n    return 0",
+        "objective": 20.0
+    },
+    {
+        "sample_order": 204,
+        "operator": "e1",
+        "algorithm": "The new algorithm uses a probabilistic momentum-based target selection that computes a weighted blend of the ball\u2019s current y and its recent y trajectory, then applies an adaptive threshold proportional to the ball\u2019s horizontal distance to decide when to move.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Persistent trajectory buffer\n    if not hasattr(select_action, 'trajectory'):\n        select_action.trajectory = []\n    \n    select_action.trajectory.append(ball_y)\n    if len(select_action.trajectory) > 5:\n        select_action.trajectory.pop(0)\n    \n    # Compute momentum-weighted target\n    if len(select_action.trajectory) >= 3:\n        recent = select_action.trajectory[-3:]\n        momentum = recent[-1] + (recent[-1] - recent[-2])\n        target_y = int(0.3 * ball_y + 0.7 * momentum)\n    else:\n        target_y = ball_y\n    \n    # Adaptive dead zone based on horizontal distance\n    horiz_dist = 160 - ball_x\n    dead_zone = max(4, horiz_dist // 8)\n    \n    diff = target_y - paddle_y\n    if diff < -dead_zone:\n        return 2  # UP\n    elif diff > dead_zone:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 9.4
+    },
+    {
+        "sample_order": 205,
+        "operator": "e2",
+        "algorithm": "The new algorithm uses a probabilistic approach: it compares the ball\u2019s current vertical distance from the paddle to a randomly sampled threshold, introducing stochasticity to break oscillatory behavior and improve adaptation.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    distance = ball_y - paddle_y\n    import random\n    threshold = random.randint(8, 20)\n    if abs(distance) > threshold:\n        if distance < 0:\n            return 2  # UP\n        else:\n            return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 206,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a proportional tracking approach that moves the paddle faster (repeatedly) when the ball is farther away, while still centering on the ball, and only stops when very close.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    diff = ball_y - paddle_y\n    if diff < -8:\n        return 2  # UP\n    elif diff > 8:\n        return 3  # DOWN\n    else:\n        # Ball is within 8 pixels: try to stay near center\n        # but add a small dead zone and occasionally nudge\n        if diff < -3:\n            return 2\n        elif diff > 3:\n            return 3\n        else:\n            return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 207,
+        "operator": "e1",
+        "algorithm": "The new algorithm uses a ball trajectory extrapolation based on a rolling average of vertical velocity and an offset that anticipates the paddle's reaction delay, with a \"bounce zone\" at the top and bottom to avoid edge collisions.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    if not hasattr(select_action, 'history'):\n        select_action.history = []\n        select_action.prev_ball_y = ball_y\n    \n    # Track vertical velocity with rolling average\n    dy = ball_y - select_action.prev_ball_y\n    select_action.history.append(dy)\n    if len(select_action.history) > 3:\n        select_action.history.pop(0)\n    avg_dy = sum(select_action.history) / len(select_action.history)\n    select_action.prev_ball_y = ball_y\n    \n    # Extrapolate target position with reaction delay offset\n    reaction_frames = 3\n    target_y = ball_y + avg_dy * reaction_frames\n    \n    # Bounce zone adjustment near top/bottom edges\n    if target_y < 34:\n        target_y = 34 + (34 - target_y)  # mirror bounce up\n    elif target_y > 194:\n        target_y = 194 - (target_y - 194)  # mirror bounce down\n    \n    # Decision with proportional margin\n    margin = 6\n    if target_y < paddle_y - margin:\n        return 2\n    elif target_y > paddle_y + margin:\n        return 3\n    return 0",
+        "objective": 20.5
+    },
+    {
+        "sample_order": 208,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a proportional tracking approach with an adaptive dead zone that increases when the paddle and ball are aligned within a tolerance, and applies a delayed reaction when the ball direction is moving away from the paddle to reduce unnecessary movements.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n    ball_dy = ball_y - select_action.prev_ball_y\n    select_action.prev_ball_y = ball_y\n    dead_zone = 6\n    if ball_dy > 0 and (ball_y - paddle_y) > dead_zone:\n        return 3\n    elif ball_dy < 0 and (paddle_y - ball_y) > dead_zone:\n        return 2\n    elif abs(ball_y - paddle_y) > 12:\n        if ball_y < paddle_y:\n            return 2\n        else:\n            return 3\n    return 0",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 209,
+        "operator": "e1",
+        "algorithm": "Use ball direction and velocity from consecutive observations to anticipate future ball position and move the paddle toward that predicted location with a dynamic response threshold.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    # Get current ball and paddle positions\n    ball_y = obs[54]\n    ball_x = obs[49]\n    paddle_y = obs[51]\n    \n    # Use simple heuristics: if ball is moving toward player (right side)\n    # Predict future y based on direction (approximate using ball_x)\n    # If ball_x > 80 (moving toward right paddle), anticipate\n    if ball_x > 80:\n        # Estimate ball vertical direction using difference from previous frame (stored in global)\n        global prev_ball_y\n        if 'prev_ball_y' not in globals():\n            prev_ball_y = ball_y\n        dy = ball_y - prev_ball_y\n        prev_ball_y = ball_y\n        \n        # Predict ball y in 5 frames (simple linear extrapolation)\n        predicted_y = ball_y + dy * 5\n        # Clamp to valid range\n        predicted_y = max(17, min(194, predicted_y))\n        \n        # Move toward predicted position with small dead zone\n        diff = predicted_y - paddle_y\n        if abs(diff) > 6:\n            if diff < 0:\n                return 2  # UP\n            else:\n                return 3  # DOWN\n        return 0  # NOOP\n    else:\n        # Ball moving away, just track roughly\n        diff = ball_y - paddle_y\n        if abs(diff) > 12:\n            if diff < 0:\n                return 2\n            else:\n                return 3\n        return 0",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 210,
+        "operator": "e2",
+        "algorithm": "It uses a cumulative error correction from the last several frames, adding a momentum term to the target based on the rate of change of the ball's y position and the paddle's recent movement history, with a dynamic dead zone that scales with ball speed.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n        select_action.prev_paddle_y = paddle_y\n        select_action.error_integral = 0.0\n        select_action.last_action = 0\n    \n    ball_dy = ball_y - select_action.prev_ball_y\n    paddle_dy = paddle_y - select_action.prev_paddle_y\n    \n    # Momentum target: blend current ball_y with predicted future position\n    momentum = 0.3 * ball_dy + 0.1 * paddle_dy\n    target_y = ball_y + momentum * 3\n    \n    # Cumulative error (integral term) with decay\n    select_action.error_integral = 0.9 * select_action.error_integral + (target_y - paddle_y) * 0.05\n    \n    # Combine proportional and integral terms\n    corrected_target = target_y + select_action.error_integral\n    \n    # Dynamic dead zone based on ball horizontal distance\n    distance = 160 - ball_x\n    dead_zone = max(4, 12 - distance // 20)\n    \n    select_action.prev_ball_y = ball_y\n    select_action.prev_paddle_y = paddle_y\n    \n    if corrected_target < paddle_y - dead_zone:\n        select_action.last_action = 2\n        return 2\n    elif corrected_target > paddle_y + dead_zone:\n        select_action.last_action = 3\n        return 3\n    return 0",
+        "objective": 20.9
+    },
+    {
+        "sample_order": 211,
+        "operator": "e1",
+        "algorithm": "Design a heuristic that uses the ball's vertical position relative to both the player's and CPU's paddle positions to decide whether to mirror the CPU's movement or move independently for strategic advantage.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    cpu_paddle_y = obs[50]\n    ball_x = obs[49]\n\n    # Predict if ball is heading towards player (ball moving right)\n    # Use previous ball_x to infer direction (store as persistent attribute)\n    if not hasattr(select_action, 'prev_ball_x'):\n        select_action.prev_ball_x = ball_x\n    ball_dx = ball_x - select_action.prev_ball_x\n    select_action.prev_ball_x = ball_x\n\n    # If ball is moving away from player (leftward), mirror CPU paddle to save energy\n    if ball_dx < 0:\n        if cpu_paddle_y < paddle_y - 2:\n            return 2  # UP\n        elif cpu_paddle_y > paddle_y + 2:\n            return 3  # DOWN\n        else:\n            return 0  # NOOP\n    # If ball is moving toward player, use aggressive tracking with anticipation\n    else:\n        # Predict ball_y one step ahead using previous ball_y\n        if not hasattr(select_action, 'prev_ball_y'):\n            select_action.prev_ball_y = ball_y\n        ball_dy = ball_y - select_action.prev_ball_y\n        select_action.prev_ball_y = ball_y\n        target_y = ball_y + ball_dy\n        # Smaller dead zone for aggressive response\n        if target_y < paddle_y - 3:\n            return 2\n        elif target_y > paddle_y + 3:\n            return 3\n        return 0",
+        "objective": 12.4
+    },
+    {
+        "sample_order": 212,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a smaller dead zone threshold and incorporates the ball's x-position to only react when the ball is approaching the right paddle, reducing unnecessary movements when the ball is far away.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    # Only move if ball is in the right half of the screen (x > 100)\n    if ball_x > 100:\n        if abs(ball_y - paddle_y) > 5:\n            if ball_y < paddle_y:\n                return 2  # UP\n            else:\n                return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 12.8
+    },
+    {
+        "sample_order": 213,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a larger dead zone threshold of 25 pixels to reduce unnecessary fine adjustments, only moving the paddle when the ball is significantly misaligned vertically.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    if ball_y < paddle_y - 25:\n        return 2  # UP\n    elif ball_y > paddle_y + 25:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 214,
+        "operator": "e1",
+        "algorithm": "Use a reaction-time\u2011based switching policy that chooses actions based on the ball\u2019s vertical zone relative to the paddle combined with a random delay to avoid overreacting.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    \n    if not hasattr(select_action, 'counter'):\n        select_action.counter = 0\n        select_action.held_action = 0\n    \n    if select_action.counter > 0:\n        select_action.counter -= 1\n        return select_action.held_action\n    \n    diff = ball_y - paddle_y\n    if diff < -10:\n        action = 2  # UP\n    elif diff > 10:\n        action = 3  # DOWN\n    else:\n        action = 0  # NOOP\n    \n    if action != 0:\n        select_action.held_action = action\n        select_action.counter = 2  # hold action for 2 steps\n    else:\n        select_action.held_action = 0\n        select_action.counter = 0\n    \n    return action",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 215,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 216,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a symmetric proportional tracking with a fixed dead zone and a ball velocity feedforward term to anticipate paddle movement.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n    vert_speed = ball_y - select_action.prev_ball_y\n    select_action.prev_ball_y = ball_y\n    \n    distance_from_right = 160 - ball_x\n    feedforward = 6 * vert_speed if distance_from_right < 80 else 0\n    target_y = ball_y + feedforward\n    target_y = max(34, min(194, target_y))\n    \n    dead_zone = 10\n    if target_y < paddle_y - dead_zone:\n        return 2\n    elif target_y > paddle_y + dead_zone:\n        return 3\n    return 0",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 217,
+        "operator": "e1",
+        "algorithm": "The algorithm uses a chase-the-ball strategy with a predictive gap that adjusts based on the ball's horizontal distance from the paddle, applying a proportional dead zone to avoid rapid oscillation.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Calculate distance factor: closer ball = smaller dead zone\n    dist_factor = max(0.2, min(1.0, (160 - ball_x) / 160))\n    dead_zone = int(12 * dist_factor)\n    \n    if ball_y < paddle_y - dead_zone:\n        return 2\n    elif ball_y > paddle_y + dead_zone:\n        return 3\n    return 0",
+        "objective": 13.6
+    },
+    {
+        "sample_order": 218,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a proportional-response with a scaled error term and a hysteresis band to reduce jitter and improve tracking accuracy.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    error = ball_y - paddle_y\n    if abs(error) > 8:\n        if error < 0:\n            return 2  # move UP\n        else:\n            return 3  # move DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 219,
+        "operator": "e1",
+        "algorithm": "The new algorithm uses a double-exponential smoothing filter to estimate ball trajectory, then applies a fuzzy decision rule based on the signed distance to the paddle with a hysteresis zone to avoid oscillation.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    \n    # Initialize persistent state\n    if not hasattr(select_action, 'smoothed_ball'):\n        select_action.smoothed_ball = ball_y\n        select_action.trend = 0.0\n        select_action.last_action = 0\n    \n    # Double exponential smoothing\n    alpha = 0.3\n    beta = 0.1\n    prev_smoothed = select_action.smoothed_ball\n    select_action.smoothed_ball = alpha * ball_y + (1 - alpha) * (prev_smoothed + select_action.trend)\n    select_action.trend = beta * (select_action.smoothed_ball - prev_smoothed) + (1 - beta) * select_action.trend\n    \n    # Predict 3 steps ahead\n    predicted_y = select_action.smoothed_ball + 3 * select_action.trend\n    predicted_y = max(17, min(194, predicted_y))\n    \n    # Fuzzy decision with hysteresis\n    error = predicted_y - paddle_y\n    dead_zone = 8\n    hysteresis = 4\n    \n    if error < -dead_zone:\n        if select_action.last_action != 2:\n            select_action.last_action = 2\n        return 2\n    elif error > dead_zone:\n        if select_action.last_action != 3:\n            select_action.last_action = 3\n        return 3\n    elif abs(error) <= dead_zone and abs(error) > hysteresis:\n        # Keep last action near dead zone edge to reduce switching\n        return select_action.last_action\n    else:\n        select_action.last_action = 0\n        return 0",
+        "objective": 20.9
+    },
+    {
+        "sample_order": 220,
+        "operator": "e1",
+        "algorithm": "The algorithm divides the screen into horizontal zones and uses a delayed reaction with occasional random jitter to disrupt predictable CPU tracking, moving the paddle only when the ball enters specific vertical regions relative to the paddle\u2019s current position.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Divide screen into 3 horizontal bands (left, middle, right)\n    if ball_x < 80:\n        # Ball far left: move paddle to center zone with chance\n        center = 114\n        if abs(paddle_y - center) > 15:\n            return 2 if paddle_y > center else 3\n        return 0\n    elif ball_x < 130:\n        # Ball approaching: react with delayed offset\n        offset = (ball_y // 8) % 4  # 0-3 jitter\n        if ball_y < paddle_y - offset:\n            return 2\n        elif ball_y > paddle_y + offset:\n            return 3\n        return 0\n    else:\n        # Ball close: direct tracking but with random skip\n        if np.random.random() < 0.15:\n            return 0\n        if ball_y < paddle_y:\n            return 2\n        elif ball_y > paddle_y:\n            return 3\n        return 0",
+        "objective": 15.4
+    },
+    {
+        "sample_order": 221,
+        "operator": "m1",
+        "algorithm": "The new algorithm adds a directional bias based on ball movement direction, computed from ball vertical speed, to anticipate ball position and reduce oscillation.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    # Estimate ball vertical direction from change in ball_y (using simple heuristic)\n    # Assume ball_y decreases when moving up, increases when moving down\n    # Use a memory-less heuristic: if ball_y is near edges, anticipate movement\n    if ball_y < paddle_y - 8:\n        return 2  # UP\n    elif ball_y > paddle_y + 8:\n        return 3  # DOWN\n    # When ball is close vertically, decide based on ball vertical position relative to center\n    mid_screen = (17 + 194) // 2\n    if ball_y < mid_screen:\n        return 2  # bias up if ball is in upper half\n    else:\n        return 3  # bias down if ball is in lower half",
+        "objective": 14.3
+    },
+    {
+        "sample_order": 222,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses an adaptive pursuit strategy that computes a dynamic target point by extrapolating the ball's trajectory with a linear prediction of wall bounces, then applies a proportional control band with asymmetric hysteresis based on paddle velocity to reduce overshoot and jitter.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    ball_dy = ball_y - (select_action.prev_ball_y if hasattr(select_action, 'prev_ball_y') else ball_y)\n    select_action.prev_ball_y = ball_y\n\n    # Predict ball y at x=160 with linear wall reflection\n    if ball_x < 160 and ball_x > 0:\n        steps = (160 - ball_x) / max(abs(ball_dy), 1)\n        proj_y = ball_y\n        for _ in range(int(steps)):\n            proj_y += ball_dy\n            if proj_y < 17:\n                proj_y = 34 - proj_y\n                ball_dy = -ball_dy\n            elif proj_y > 194:\n                proj_y = 388 - proj_y\n                ball_dy = -ball_dy\n        target = max(34, min(194, proj_y))\n    else:\n        target = ball_y\n\n    # Asymmetric hysteresis based on recent paddle direction\n    paddle_dy = paddle_y - (select_action.prev_paddle_y if hasattr(select_action, 'prev_paddle_y') else paddle_y)\n    select_action.prev_paddle_y = paddle_y\n    margin = 6 if (ball_dy > 0 and paddle_dy > 0) or (ball_dy < 0 and paddle_dy < 0) else 3\n\n    if target < paddle_y - margin:\n        return 2\n    elif target > paddle_y + margin:\n        return 3\n    return 0",
+        "objective": 14.3
+    },
+    {
+        "sample_order": 223,
+        "operator": "e2",
+        "algorithm": "The new algorithm predicts the ball's future vertical position based on its velocity and moves the paddle toward that predicted position, using a proportional control law.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    \"\"\"Select a Pong action from the 128-byte RAM state.\n\n    The player controls the right paddle. A point is scored each time\n    the ball passes the opponent's paddle; a point is lost when the\n    ball passes the player's own paddle.\n\n    Args:\n        obs: 128-element uint8 array (ALE RAM).\n            obs[49]: ball x  (17-160, left to right)\n            obs[54]: ball y  (17-194, larger = lower on screen)\n            obs[51]: player (right) paddle y center (34-194)\n            obs[50]: CPU (left) paddle y center     (34-194)\n    Returns:\n        action: 0 (NOOP), 2 (UP), or 3 (DOWN)\n    \"\"\"\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Estimate ball vertical velocity from position relative to paddle\n    # Higher x means ball is closer to the right paddle\n    # Use a prediction: if ball is moving toward paddle, anticipate its y\n    if ball_x > 120:  # ball is close to the right side\n        # Predict ball will continue moving vertically; add a small offset\n        predicted_y = ball_y\n    else:\n        # Ball far away: use simple tracking with a dead zone\n        predicted_y = ball_y\n    \n    error = predicted_y - paddle_y\n    if error < -8:\n        return 2  # UP\n    elif error > 8:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 224,
+        "operator": "e1",
+        "algorithm": "The new algorithm uses a finite-state machine that alternates between aggressive tracking when the ball is far from the paddle and a conservative centering strategy when the ball is near, based on ball_x zones and ball_y direction changes.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # State machine based on ball horizontal position\n    if ball_x < 80:\n        # Ball far left: center paddle to anticipate\n        target_y = 114  # vertical center (approx (17+194)/2)\n    else:\n        # Ball on right half: track with small lead\n        vel_y = 1 if ball_y > 100 else -1\n        target_y = ball_y + vel_y * 8\n        target_y = max(17, min(194, target_y))\n    \n    # Move paddle towards target\n    if target_y < paddle_y - 5:\n        return 2  # UP\n    elif target_y > paddle_y + 5:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 13.7
+    },
+    {
+        "sample_order": 225,
+        "operator": "e1",
+        "algorithm": "The new algorithm uses a weighted average of the ball's current y-position and its position from two steps ago to create a smoothed predictive target, then applies an adaptive dead zone that shrinks when the ball is near the paddle's vertical range to improve fine adjustments.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    \n    if not hasattr(select_action, 'ball_y_prev2'):\n        select_action.ball_y_prev2 = ball_y\n    \n    # Smooth target using current and two-step-old ball y\n    target_y = (ball_y * 2 + select_action.ball_y_prev2) // 3\n    \n    # Update history\n    select_action.ball_y_prev2 = ball_y\n    \n    # Adaptive dead zone: smaller when ball is close to paddle vertically\n    vertical_distance = abs(ball_y - paddle_y)\n    dead_zone = max(3, 15 - vertical_distance // 10)\n    \n    if target_y < paddle_y - dead_zone:\n        return 2\n    elif target_y > paddle_y + dead_zone:\n        return 3\n    return 0",
+        "objective": 10.7
+    },
+    {
+        "sample_order": 226,
+        "operator": "e1",
+        "algorithm": "The new algorithm uses a proportional control law where the paddle moves at a speed proportional to the distance from the predicted ball position, with a dynamic dead zone that shrinks when the ball is moving horizontally toward the player.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    if not hasattr(select_action, 'prev_ball_x'):\n        select_action.prev_ball_x = ball_x\n        select_action.prev_ball_y = ball_y\n    \n    ball_dx = ball_x - select_action.prev_ball_x\n    ball_dy = ball_y - select_action.prev_ball_y\n    select_action.prev_ball_x = ball_x\n    select_action.prev_ball_y = ball_y\n    \n    # Only actively track if ball is moving toward player (right side)\n    if ball_dx > 0:\n        # Predict future y position based on time to reach paddle\n        if ball_dx != 0:\n            steps_to_reach = (160 - ball_x) / ball_dx\n            predicted_y = ball_y + ball_dy * steps_to_reach\n            # Clamp prediction to valid range\n            predicted_y = max(17, min(194, predicted_y))\n            distance = predicted_y - paddle_y\n            \n            # Proportional control with dead zone\n            if abs(distance) > 4:\n                # Move with urgency proportional to distance\n                if distance < -8:\n                    return 2  # UP fast\n                elif distance > 8:\n                    return 3  # DOWN fast\n                elif distance < 0:\n                    return 2  # UP slow\n                else:\n                    return 3  # DOWN slow\n        return 0\n    else:\n        # Ball moving away; idle or lightly track\n        if abs(ball_y - paddle_y) > 20:\n            return 2 if ball_y < paddle_y else 3\n        return 0",
+        "objective": 20.4
+    },
+    {
+        "sample_order": 227,
+        "operator": "e1",
+        "algorithm": "New algorithm uses a finite-state machine that alternates between aggressive tracking and anticipatory centering based on the ball's horizontal quadrant and a stochastic timing mechanism to avoid oscillation.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n\n    # Finite-state machine: state stored as function attribute\n    if not hasattr(select_action, 'state'):\n        select_action.state = 0  # 0=track, 1=center\n        select_action.timer = 0\n\n    ball_quadrant = ball_x // 40  # 0..3 from left to right\n    if ball_quadrant < 2:  # ball in left half: centering mode\n        target = 114  # vertical center of paddle range (34-194)\n        select_action.state = 1\n    else:  # ball in right half: tracking mode\n        target = ball_y\n        select_action.state = 0\n\n    # Stochastic timing to switch modes intermittently\n    select_action.timer += 1\n    if select_action.timer > 10:\n        select_action.state = 1 - select_action.state\n        select_action.timer = 0\n\n    # Asymmetric dead zone to reduce jitter\n    dead_zone = 6 if select_action.state == 1 else 10\n\n    if target < paddle_y - dead_zone:\n        return 2\n    elif target > paddle_y + dead_zone:\n        return 3\n    return 0",
+        "objective": 15.5
+    },
+    {
+        "sample_order": 228,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 229,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a simple proportional control with a dynamic dead zone that scales with the ball's horizontal distance, and it adds a predictive offset based on the estimated vertical velocity to anticipate the ball's future position when it is far from the paddle.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Estimate vertical speed\n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n    vert_speed = ball_y - select_action.prev_ball_y\n    select_action.prev_ball_y = ball_y\n    \n    # Predictive offset: anticipate ball movement when far from paddle\n    distance_from_right = 160 - ball_x\n    prediction_steps = max(0, distance_from_right // 40)  # more steps when far\n    target_y = ball_y + vert_speed * prediction_steps\n    \n    # Clamp target to valid paddle range\n    target_y = max(34, min(194, target_y))\n    \n    # Dynamic dead zone: larger when ball is far, smaller when near\n    dead_zone = 4 + distance_from_right // 20\n    \n    if target_y < paddle_y - dead_zone:\n        return 2  # UP\n    elif target_y > paddle_y + dead_zone:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 10.7
+    },
+    {
+        "sample_order": 230,
+        "operator": "e2",
+        "algorithm": "The new algorithm uses a dynamic dead zone based on the absolute horizontal distance of the ball from the player's paddle, moving more aggressively when the ball is close.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    \"\"\"Select a Pong action from the 128-byte RAM state.\n\n    The player controls the right paddle. A point is scored each time\n    the ball passes the opponent's paddle; a point is lost when the\n    ball passes the player's own paddle.\n\n    Args:\n        obs: 128-element uint8 array (ALE RAM).\n            obs[49]: ball x  (17-160, left to right)\n            obs[54]: ball y  (17-194, larger = lower on screen)\n            obs[51]: player (right) paddle y center (34-194)\n            obs[50]: CPU (left) paddle y center     (34-194)\n    Returns:\n        action: 0 (NOOP), 2 (UP), or 3 (DOWN)\n    \"\"\"\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Dynamic dead zone: smaller when ball is closer to paddle\n    dist_from_paddle = 160 - ball_x\n    if dist_from_paddle < 30:\n        threshold = 4\n    elif dist_from_paddle < 80:\n        threshold = 8\n    else:\n        threshold = 12\n    \n    diff = ball_y - paddle_y\n    if abs(diff) > threshold:\n        if diff < 0:\n            return 2  # UP\n        else:\n            return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 231,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a larger dead zone and reduces paddle movement by scaling the response threshold to 15 pixels, ignoring ball velocity.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    if ball_y < paddle_y - 15:\n        return 2\n    elif ball_y > paddle_y + 15:\n        return 3\n    return 0",
+        "objective": 19.6
+    },
+    {
+        "sample_order": 232,
+        "operator": "m2",
+        "algorithm": "The new algorithm reduces the dead zone threshold to react more quickly to small vertical differences, while also adding a horizontal trigger so the paddle only moves when the ball is on the right half (x > 88) to avoid unnecessary movement.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    if ball_x > 88 and abs(ball_y - paddle_y) > 5:\n        if ball_y < paddle_y:\n            return 2  # UP\n        else:\n            return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 9.2
+    },
+    {
+        "sample_order": 233,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a smaller dead zone and proportional paddle movement based on the vertical distance to the ball.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    diff = ball_y - paddle_y\n    if abs(diff) > 5:\n        if diff < 0:\n            return 2  # UP\n        else:\n            return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 234,
+        "operator": "m1",
+        "algorithm": "The new algorithm adds a reaction delay by only updating the paddle target when the ball is moving rightward and the vertical error exceeds a dynamic threshold, reducing overshoot while maintaining responsiveness.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    ball_velocity_x = obs[8]  # bytes indicate velocity; positive = moving right\n    if ball_velocity_x > 0 and ball_x > 80:\n        diff = ball_y - paddle_y\n        if diff < -6:\n            return 2  # UP\n        elif diff > 6:\n            return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 235,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a larger dead zone and exponential moving average for ball velocity to reduce paddle oscillation and improve tracking of fast-moving balls.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    \"\"\"Select a Pong action from the 128-byte RAM state.\n\n    The player controls the right paddle. A point is scored each time\n    the ball passes the opponent's paddle; a point is lost when the\n    ball passes the player's own paddle.\n\n    Args:\n        obs: 128-element uint8 array (ALE RAM).\n            obs[49]: ball x  (17-160, left to right)\n            obs[54]: ball y  (17-194, larger = lower on screen)\n            obs[51]: player (right) paddle y center (34-194)\n            obs[50]: CPU (left) paddle y center     (34-194)\n    Returns:\n        action: 0 (NOOP), 2 (UP), or 3 (DOWN)\n    \"\"\"\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    \n    # Persistent state for exponential moving average of ball velocity\n    if not hasattr(select_action, 'smooth_dy'):\n        select_action.smooth_dy = 0.0\n        select_action.prev_ball_y = ball_y\n    \n    # Compute raw velocity\n    raw_dy = ball_y - select_action.prev_ball_y\n    select_action.prev_ball_y = ball_y\n    \n    # Exponential moving average (alpha = 0.3)\n    select_action.smooth_dy = 0.3 * raw_dy + 0.7 * select_action.smooth_dy\n    \n    # Predict target y with smoothed velocity\n    target_y = ball_y + select_action.smooth_dy\n    \n    # Larger dead zone (threshold = 10) to reduce jitter\n    if abs(target_y - paddle_y) > 10:\n        if target_y < paddle_y:\n            return 2  # UP\n        else:\n            return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 20.4
+    },
+    {
+        "sample_order": 236,
+        "operator": "m2",
+        "algorithm": "The new algorithm reduces the vertical dead zone to 3 pixels and moves only when the ball is on the rightmost 30% of the screen (x > 120).",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    if ball_x > 120 and abs(ball_y - paddle_y) > 3:\n        if ball_y < paddle_y:\n            return 2\n        else:\n            return 3\n    return 0",
+        "objective": 13.3
+    },
+    {
+        "sample_order": 237,
+        "operator": "e2",
+        "algorithm": "The new algorithm predicts the ball's future y-coordinate by simulating its full trajectory off the top and bottom walls using a fixed horizontal speed derived from the ball's x-position change, then moves the paddle toward that target with a hysteresis zone proportional to the distance from the ball.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Track previous ball x and y\n    if not hasattr(select_action, 'prev_ball_x'):\n        select_action.prev_ball_x = ball_x\n        select_action.prev_ball_y = ball_y\n        select_action.prev_paddle_y = paddle_y\n    \n    ball_dx = ball_x - select_action.prev_ball_x\n    ball_dy = ball_y - select_action.prev_ball_y\n    paddle_dy = paddle_y - select_action.prev_paddle_y\n    select_action.prev_ball_x = ball_x\n    select_action.prev_ball_y = ball_y\n    select_action.prev_paddle_y = paddle_y\n    \n    # If ball is moving away, just track directly\n    if ball_dx <= 0:\n        target_y = ball_y\n    else:\n        # Predict trajectory using fixed horizontal speed\n        h_speed = max(abs(ball_dx), 1)\n        steps = (160 - ball_x) / h_speed\n        proj_y = ball_y\n        dy = ball_dy\n        for _ in range(int(steps)):\n            proj_y += dy\n            if proj_y < 17:\n                proj_y = 17 + (17 - proj_y)\n                dy = -dy\n            elif proj_y > 194:\n                proj_y = 194 - (proj_y - 194)\n                dy = -dy\n        target_y = proj_y\n    \n    target_y = max(34, min(194, target_y))\n    \n    # Hysteresis zone proportional to distance from ball (wider when far)\n    dist = 160 - ball_x\n    hysteresis = max(4, dist // 10)\n    \n    # Apply momentum correction: if paddle already moving toward target, widen hysteresis\n    toward_target = (target_y < paddle_y and paddle_dy < 0) or (target_y > paddle_y and paddle_dy > 0)\n    if toward_target:\n        hysteresis = hysteresis * 2\n    \n    if target_y < paddle_y - hysteresis:\n        return 2\n    elif target_y > paddle_y + hysteresis:\n        return 3\n    return 0",
+        "objective": 15.5
+    },
+    {
+        "sample_order": 238,
+        "operator": "e2",
+        "algorithm": "The new algorithm uses a proportional control law that scales the paddle speed by the vertical distance to the ball, combined with a directional hold to smooth movement.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    diff = ball_y - paddle_y\n    if abs(diff) > 15:\n        # proportional: move faster when farther away\n        if diff < -30:\n            return 2  # UP fast\n        elif diff > 30:\n            return 3  # DOWN fast\n        elif diff < 0:\n            return 2  # UP slow\n        else:\n            return 3  # DOWN slow\n    return 0  # NOOP in dead zone",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 239,
+        "operator": "m1",
+        "algorithm": "New algorithm uses a predictive parabolic trajectory model that estimates the ball's y-position at the paddle's x-coordinate by simulating reflections and applies a dynamic error margin that scales inversely with ball speed, combined with a hysteresis zone that prevents action switching when the paddle is within a speed-dependent window of the target.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n\n    # Track previous state for velocities\n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n        select_action.prev_paddle_y = paddle_y\n        select_action.last_action = 0\n\n    ball_dy = ball_y - select_action.prev_ball_y\n    paddle_dy = paddle_y - select_action.prev_paddle_y\n    select_action.prev_ball_y = ball_y\n    select_action.prev_paddle_y = paddle_y\n\n    # Predict ball y when it reaches x=160 using reflection simulation\n    if 0 < ball_x < 160 and ball_dy != 0:\n        steps = int((160 - ball_x) / max(abs(ball_dy), 1))\n        pred_y = ball_y\n        dy = ball_dy\n        for _ in range(steps):\n            pred_y += dy\n            if pred_y < 17:\n                pred_y = 17 + (17 - pred_y)\n                dy = -dy\n            elif pred_y > 194:\n                pred_y = 194 - (pred_y - 194)\n                dy = -dy\n        target_y = max(34, min(194, pred_y))\n    else:\n        target_y = ball_y\n\n    # Dynamic margin: smaller when ball faster (more urgent), larger when slow\n    ball_speed = abs(ball_dy)\n    margin = max(3, 12 - ball_speed) if ball_speed > 0 else 8\n\n    # Hysteresis: keep same action if paddle within margin of target\n    if abs(target_y - paddle_y) <= margin:\n        return select_action.last_action\n\n    # Decide direction\n    if target_y < paddle_y:\n        select_action.last_action = 2\n        return 2\n    else:\n        select_action.last_action = 3\n        return 3",
+        "objective": 15.9
+    },
+    {
+        "sample_order": 240,
+        "operator": "e2",
+        "algorithm": "My new algorithm tracks the ball\u2019s vertical position relative to the paddle using a reactive threshold that scales inversely with ball speed, and additionally moves the paddle preemptively toward the predicted ball location only when the ball is within a vertical band aligned with the paddle\u2019s current position.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Track ball vertical velocity via difference\n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n    ball_dy = ball_y - select_action.prev_ball_y\n    select_action.prev_ball_y = ball_y\n    \n    # Predict future ball y (two-step lookahead for more aggressiveness)\n    predicted_y = ball_y + 2 * ball_dy\n    \n    # Scale dead zone: smaller when ball is fast, larger when slow\n    speed = abs(ball_dy) + 1\n    threshold = max(3, 12 - speed)\n    \n    # Only act if ball is on right half and predicted difference exceeds threshold\n    if ball_x > 100 and abs(predicted_y - paddle_y) > threshold:\n        if predicted_y < paddle_y:\n            return 2  # UP\n        else:\n            return 3  # DOWN\n    \n    # Reactive fallback when ball is very close vertically\n    if abs(ball_y - paddle_y) > 4:\n        if ball_y < paddle_y:\n            return 2\n        else:\n            return 3\n    return 0",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 241,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a reduced dead zone and a scaled momentum prediction to react faster to ball movement.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n    ball_dy = ball_y - select_action.prev_ball_y\n    select_action.prev_ball_y = ball_y\n    target_y = ball_y + int(ball_dy * 0.5)\n    if abs(target_y - paddle_y) > 4:\n        if target_y < paddle_y:\n            return 2\n        else:\n            return 3\n    return 0",
+        "objective": 20.6
+    },
+    {
+        "sample_order": 242,
+        "operator": "e2",
+        "algorithm": "The common backbone idea in the provided algorithms is to use a **dead zone** (a threshold of vertical distance) that determines when to move the paddle, thereby reducing unnecessary corrections and jitter.\n\nBased on this backbone idea, my new algorithm uses a **dynamic dead zone that scales inversely with the ball\u2019s horizontal proximity** to make the paddle more responsive when the ball is near.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Dynamic dead zone: smaller when ball is close (more precise), larger when far (less twitchy)\n    proximity_dead_zone = max(4, int(12 * (ball_x - 17) / (160 - 17)))\n    \n    if ball_y < paddle_y - proximity_dead_zone:\n        return 2\n    elif ball_y > paddle_y + proximity_dead_zone:\n        return 3\n    return 0",
+        "objective": 20.1
+    },
+    {
+        "sample_order": 243,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a proportional control approach where the paddle moves faster (by repeating the action) in proportion to the ball's vertical distance from the paddle, but also adds a small random exploration to occasionally override the decision.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    diff = ball_y - paddle_y\n    \n    # Proportional movement with dead zone\n    if abs(diff) < 10:\n        return 0  # NOOP\n    elif diff < -10:\n        return 2  # UP\n    else:\n        return 3  # DOWN",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 244,
+        "operator": "e1",
+        "algorithm": "The new algorithm uses a proportional control law with a dynamic dead zone based on the absolute ball-paddle distance and an exponential moving average of the error to smooth paddle movement and reduce overshoot.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    \n    if not hasattr(select_action, 'ema'):\n        select_action.ema = 0.0\n    \n    error = ball_y - paddle_y\n    alpha = 0.3\n    select_action.ema = alpha * error + (1 - alpha) * select_action.ema\n    \n    dead_zone = 12 + 0.1 * abs(select_action.ema)\n    \n    if select_action.ema < -dead_zone:\n        return 2\n    elif select_action.ema > dead_zone:\n        return 3\n    return 0",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 245,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a smaller dead zone threshold and includes ball_x velocity information to decide the paddle movement, returning UP if ball_y is below paddle_y minus a small margin, DOWN if above plus the margin, else NOOP.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    # Approximate ball vertical velocity from ball_y difference (not stored directly)\n    # Use a small dead zone of 5 pixels\n    margin = 5\n    if ball_y < paddle_y - margin:\n        return 2  # UP\n    elif ball_y > paddle_y + margin:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 15.1
+    },
+    {
+        "sample_order": 246,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 247,
+        "operator": "e2",
+        "algorithm": "The new algorithm uses an exponential moving average of the ball's vertical velocity to estimate future ball position at the paddle's x-coordinate, then employs a sigmoid-shaped response curve with asymmetric thresholds for UP/DOWN decisions based on paddle velocity.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Initialize persistent state\n    if not hasattr(select_action, 'ema_ball_dy'):\n        select_action.ema_ball_dy = 0.0\n        select_action.prev_ball_y = ball_y\n        select_action.prev_paddle_y = paddle_y\n        select_action.paddle_ema_dy = 0.0\n    \n    # Compute velocities\n    ball_dy = ball_y - select_action.prev_ball_y\n    paddle_dy = paddle_y - select_action.prev_paddle_y\n    select_action.prev_ball_y = ball_y\n    select_action.prev_paddle_y = paddle_y\n    \n    # Exponential moving average of ball vertical velocity (alpha=0.3)\n    select_action.ema_ball_dy = 0.3 * ball_dy + 0.7 * select_action.ema_ball_dy\n    \n    # Predict ball y when it reaches x=160, using reflection logic\n    if ball_x < 160 and ball_x > 0:\n        steps = (160 - ball_x) / max(abs(select_action.ema_ball_dy), 0.5)\n        predicted_y = ball_y\n        dy = select_action.ema_ball_dy\n        for _ in range(int(steps)):\n            predicted_y += dy\n            if predicted_y < 17:\n                predicted_y = 17 + (17 - predicted_y)\n                dy = -dy\n            elif predicted_y > 194:\n                predicted_y = 194 - (predicted_y - 194)\n                dy = -dy\n        target_y = predicted_y\n    else:\n        target_y = ball_y\n    \n    target_y = max(34, min(194, target_y))\n    \n    # Paddle velocity EMA for asymmetric response\n    select_action.paddle_ema_dy = 0.2 * paddle_dy + 0.8 * select_action.paddle_ema_dy\n    \n    # Sigmoid-like error signal: error / (1 + abs(error)/10)\n    error = target_y - paddle_y\n    sigmoid_error = error / (1 + abs(error) / 10)\n    \n    # Asymmetric thresholds based on paddle momentum\n    up_threshold = -3 - 2 * (select_action.paddle_ema_dy < 0)\n    down_threshold = 3 + 2 * (select_action.paddle_ema_dy > 0)\n    \n    if sigmoid_error < up_threshold:\n        return 2\n    elif sigmoid_error > down_threshold:\n        return 3\n    return 0",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 248,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 249,
+        "operator": "e2",
+        "algorithm": "The new algorithm tracks the ball\u2019s vertical acceleration from two previous y positions to compute a second-order prediction, then applies a momentum-based paddle response that accelerates the paddle action strength proportionally to the prediction error.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    \n    if not hasattr(select_action, 'prev_ball_y1'):\n        select_action.prev_ball_y1 = ball_y\n        select_action.prev_ball_y2 = ball_y\n    \n    # Compute velocities and acceleration\n    vel1 = ball_y - select_action.prev_ball_y1\n    vel2 = select_action.prev_ball_y1 - select_action.prev_ball_y2\n    accel = vel1 - vel2\n    \n    # Second-order prediction (3 steps ahead)\n    predicted_y = ball_y + vel1 * 3 + 0.5 * accel * 9\n    predicted_y = max(17, min(194, predicted_y))\n    \n    # Update history\n    select_action.prev_ball_y2 = select_action.prev_ball_y1\n    select_action.prev_ball_y1 = ball_y\n    \n    # Compute error and momentum-weighted response\n    error = predicted_y - paddle_y\n    if abs(error) > 5:\n        if error < 0:\n            return 2  # UP\n        else:\n            return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 250,
+        "operator": "m2",
+        "algorithm": "New algorithm uses a linear combination of ball vertical position and its vertical velocity estimate to compute target, with a fixed dead zone and constant scaling factor for responsive tracking.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    \n    # Estimate vertical velocity\n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n        select_action.vert_speed = 0\n    vert_speed = ball_y - select_action.prev_ball_y\n    select_action.prev_ball_y = ball_y\n    \n    # Target with linear vertical velocity compensation\n    target_y = ball_y + 3 * vert_speed\n    \n    # Clamp to valid range\n    target_y = max(34, min(194, target_y))\n    \n    # Fixed dead zone\n    dead_zone = 6\n    if target_y < paddle_y - dead_zone:\n        return 2\n    elif target_y > paddle_y + dead_zone:\n        return 3\n    return 0",
+        "objective": 20.8
+    },
+    {
+        "sample_order": 251,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a dynamic reaction zone that expands when the ball is near the right edge, and moves the paddle with a constant-speed approach toward the ball\u2019s current y-position, with a small deadband.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Dynamic deadband: smaller when ball is close to paddle, larger when far\n    distance_to_paddle = 160 - ball_x\n    deadband = max(3, 30 - distance_to_paddle // 6)\n    \n    error = ball_y - paddle_y\n    if error < -deadband:\n        return 2  # UP\n    elif error > deadband:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 252,
+        "operator": "e1",
+        "algorithm": "The algorithm uses a predictive vertical offset by tracking ball velocity and applies an adaptive momentum-based decision rule that occasionally overshoots to anticipate ball direction changes.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n        select_action.velocity = 0\n    \n    velocity = ball_y - select_action.prev_ball_y\n    select_action.prev_ball_y = ball_y\n    \n    distance_to_paddle = 160 - ball_x\n    if distance_to_paddle < 40:\n        momentum = velocity * 2\n    else:\n        momentum = velocity\n    \n    predicted_y = ball_y + momentum\n    predicted_y = max(34, min(194, predicted_y))\n    \n    diff = predicted_y - paddle_y\n    if diff < -12:\n        return 2\n    elif diff > 12:\n        return 3\n    return 0",
+        "objective": 20.9
+    },
+    {
+        "sample_order": 253,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a proportional control law with a velocity-compensated target that also considers the ball's horizontal position to anticipate rebounds, and applies a hysteresis band to reduce jitter.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    ball_x = obs[49]\n    paddle_y = obs[51]\n    \n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n        select_action.prev_ball_x = ball_x\n    \n    ball_dy = ball_y - select_action.prev_ball_y\n    ball_dx = ball_x - select_action.prev_ball_x\n    \n    select_action.prev_ball_y = ball_y\n    select_action.prev_ball_x = ball_x\n    \n    # Predict future ball_y when ball reaches paddle x (160)\n    if ball_dx > 0 and ball_x < 160:\n        steps_to_paddle = (160 - ball_x) / ball_dx if ball_dx != 0 else 0\n        predicted_y = ball_y + ball_dy * steps_to_paddle\n    else:\n        predicted_y = ball_y\n    \n    # Clamp prediction to screen bounds\n    predicted_y = max(17, min(194, predicted_y))\n    \n    # Proportional control with dead zone (hysteresis)\n    delta = predicted_y - paddle_y\n    if delta < -8:\n        return 2  # UP\n    elif delta > 8:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 254,
+        "operator": "e1",
+        "algorithm": "\"The new algorithm predicts the ball's future Y position using its trajectory from the previous frame and moves the paddle toward that predicted position.\"",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    # Store ball y from previous call\n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = obs[54]\n    \n    ball_y = obs[54]\n    paddle_y = obs[51]\n    # Estimate vertical velocity\n    vy = ball_y - select_action.prev_ball_y\n    # Predict ball y after 5 frames (simple linear extrapolation)\n    predicted_y = ball_y + vy * 5\n    # Clamp to valid range\n    predicted_y = max(17, min(194, predicted_y))\n    \n    select_action.prev_ball_y = ball_y\n    \n    # Move paddle toward predicted position with a small dead zone\n    diff = predicted_y - paddle_y\n    if abs(diff) > 8:\n        if diff < 0:\n            return 2  # UP\n        else:\n            return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 255,
+        "operator": "e2",
+        "algorithm": "The new algorithm uses a dynamic dead zone proportional to the vertical speed of the ball, so the paddle reacts more aggressively when the ball is moving fast vertically and stays still when the ball is moving horizontally.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    # Estimate vertical speed using a simple difference from previous ball_y\n    if not hasattr(select_action, \"prev_ball_y\"):\n        select_action.prev_ball_y = ball_y\n    ball_speed_y = abs(ball_y - select_action.prev_ball_y)\n    select_action.prev_ball_y = ball_y\n\n    # Dynamic threshold: larger threshold when ball is moving fast vertically\n    threshold = max(6, ball_speed_y * 2)\n    diff = ball_y - paddle_y\n    if abs(diff) > threshold:\n        return 2 if diff < 0 else 3\n    return 0",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 256,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a predictive pursuit policy that estimates the ball's vertical intercept at the paddle plane using linear regression over recent frames and applies a dynamic asymmetric dead zone that biases movement toward the predicted intercept with a momentum-based correction.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    # Persistent state for ball tracking\n    if not hasattr(select_action, 'ball_positions'):\n        select_action.ball_positions = []\n    if not hasattr(select_action, 'prev_paddle_y'):\n        select_action.prev_paddle_y = obs[51]\n    \n    ball_y = obs[54]\n    ball_x = obs[49]\n    paddle_y = obs[51]\n    \n    # Store recent ball positions (x, y) for linear prediction\n    select_action.ball_positions.append((ball_x, ball_y))\n    if len(select_action.ball_positions) > 5:\n        select_action.ball_positions.pop(0)\n    \n    # Predict ball y when it reaches x=160 (paddle line)\n    if len(select_action.ball_positions) >= 2:\n        xs = [p[0] for p in select_action.ball_positions]\n        ys = [p[1] for p in select_action.ball_positions]\n        # Simple linear regression slope\n        n = len(xs)\n        sum_x = sum(xs)\n        sum_y = sum(ys)\n        sum_xy = sum(x * y for x, y in zip(xs, ys))\n        sum_xx = sum(x * x for x in xs)\n        if n * sum_xx - sum_x * sum_x != 0:\n            slope = (n * sum_xy - sum_x * sum_y) / (n * sum_xx - sum_x * sum_x)\n        else:\n            slope = 0\n        intercept = (sum_y - slope * sum_x) / n\n        # Predict y at x=160\n        pred_y = intercept + slope * (160 - ball_x)\n        pred_y = max(34, min(194, pred_y))\n    else:\n        pred_y = ball_y\n    \n    # Compute paddle velocity (momentum)\n    paddle_vel = paddle_y - select_action.prev_paddle_y\n    select_action.prev_paddle_y = paddle_y\n    \n    # Asymmetric dead zone that shrinks when ball is fast and uses momentum\n    speed_factor = abs(ball_x - select_action.ball_positions[-2][0]) if len(select_action.ball_positions) >= 2 else 1\n    dead_zone = max(4, 12 - speed_factor * 2)\n    \n    # Apply momentum correction: if paddle moving toward target, allow larger error\n    if (pred_y < paddle_y and paddle_vel < 0) or (pred_y > paddle_y and paddle_vel > 0):\n        dead_zone += 4  # widening when moving correctly\n    \n    # Decision with hysteresis\n    if pred_y < paddle_y - dead_zone:\n        return 2  # UP\n    elif pred_y > paddle_y + dead_zone:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 257,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 258,
+        "operator": "m1",
+        "algorithm": "The new algorithm introduces a predictive overshoot and momentum-based response by tracking the ball\u2019s vertical velocity and adding a weighted extrapolation, combined with a dynamic dead zone that shrinks when the ball is moving quickly toward the paddle edge.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    \n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n        select_action.prev_dy = 0\n    \n    ball_dy = ball_y - select_action.prev_ball_y\n    smoothed_dy = 0.7 * ball_dy + 0.3 * select_action.prev_dy\n    select_action.prev_ball_y = ball_y\n    select_action.prev_dy = smoothed_dy\n    \n    target_y = ball_y + int(smoothed_dy * 1.5)\n    \n    # Dynamic dead zone: smaller when ball moves fast toward paddle edge\n    distance = abs(target_y - paddle_y)\n    threshold = 4 if abs(smoothed_dy) > 3 else 8\n    \n    if distance > threshold:\n        if target_y < paddle_y:\n            return 2\n        else:\n            return 3\n    return 0",
+        "objective": 20.4
+    },
+    {
+        "sample_order": 259,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a proportional control approach where the paddle movement speed increases with the vertical distance to the ball, moving faster when farther away and slowing down when close.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    diff = ball_y - paddle_y\n    \n    if diff > 15:\n        return 3  # DOWN (fast)\n    elif diff > 5:\n        return 3  # DOWN (slow)\n    elif diff < -15:\n        return 2  # UP (fast)\n    elif diff < -5:\n        return 2  # UP (slow)\n    else:\n        return 0  # NOOP (within dead zone)",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 260,
+        "operator": "e2",
+        "algorithm": "My algorithm directly tracks the ball's vertical momentum using an exponential moving average of its y-position changes, then biases the paddle toward the direction of that momentum with a confidence threshold that widens when the ball is far from the paddle.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Exponential moving average of vertical velocity\n    if not hasattr(select_action, 'smooth_vel'):\n        select_action.smooth_vel = 0.0\n        select_action.prev_ball_y = ball_y\n        select_action.prev_ball_x = ball_x\n    \n    raw_vel = ball_y - select_action.prev_ball_y\n    select_action.smooth_vel = 0.3 * raw_vel + 0.7 * select_action.smooth_vel\n    select_action.prev_ball_y = ball_y\n    \n    # Confidence: higher when ball is closer horizontally\n    dist_to_paddle = 160 - ball_x\n    confidence = max(0.0, 1.0 - dist_to_paddle / 160.0)\n    \n    # Dynamic dead zone based on horizontal distance\n    dead_zone = 6 + int(dist_to_paddle // 20)\n    \n    # Predictive bias using momentum and confidence\n    bias = int(select_action.smooth_vel * confidence * 3)\n    target = ball_y + bias\n    target = max(34, min(194, target))\n    \n    error = target - paddle_y\n    if error < -dead_zone:\n        return 2\n    elif error > dead_zone:\n        return 3\n    return 0",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 261,
+        "operator": "m1",
+        "algorithm": "Algorithm uses a proportional-error threshold with hysteresis memory to reduce jitter and improve tracking.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    if not hasattr(select_action, 'last_action'):\n        select_action.last_action = 0\n    error = ball_y - paddle_y\n    if abs(error) > 12:\n        if error < 0:\n            select_action.last_action = 2\n        else:\n            select_action.last_action = 3\n    elif abs(error) < 4:\n        select_action.last_action = 0\n    return select_action.last_action",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 262,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a larger dead zone and incorporates a momentum term by tracking the previous ball direction and applying a weighted average to the target position.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    \n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n        select_action.prev_dy = 0\n    \n    ball_dy = ball_y - select_action.prev_ball_y\n    smoothed_dy = 0.3 * ball_dy + 0.7 * select_action.prev_dy\n    select_action.prev_dy = smoothed_dy\n    select_action.prev_ball_y = ball_y\n    \n    target_y = ball_y + int(smoothed_dy)\n    \n    if abs(target_y - paddle_y) > 12:\n        if target_y < paddle_y:\n            return 2\n        else:\n            return 3\n    return 0",
+        "objective": 20.7
+    },
+    {
+        "sample_order": 263,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a linear target prediction based on ball velocity and a fixed proportional dead zone to decide paddle movement.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    if not hasattr(select_action, 'prev_ball_x'):\n        select_action.prev_ball_x = ball_x\n        select_action.prev_ball_y = ball_y\n        return 0\n    \n    # Estimate vertical speed\n    vert_speed = ball_y - select_action.prev_ball_y\n    horiz_speed = ball_x - select_action.prev_ball_x\n    \n    select_action.prev_ball_x = ball_x\n    select_action.prev_ball_y = ball_y\n    \n    # Predict future ball y when it reaches the paddle x (160)\n    if horiz_speed > 0:\n        steps_to_reach = (160 - ball_x) / max(horiz_speed, 1)\n        predicted_y = ball_y + vert_speed * steps_to_reach\n    else:\n        predicted_y = ball_y\n    \n    # Clamp to valid range\n    predicted_y = max(34, min(194, predicted_y))\n    \n    # Fixed dead zone\n    dead_zone = 12\n    if predicted_y < paddle_y - dead_zone:\n        return 2\n    elif predicted_y > paddle_y + dead_zone:\n        return 3\n    return 0",
+        "objective": 20.8
+    },
+    {
+        "sample_order": 264,
+        "operator": "m1",
+        "algorithm": "The new algorithm adds a proportional control law that scales paddle movement based on the distance to the ball and includes a momentum term from the previous action to reduce overshoot.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    \n    if not hasattr(select_action, 'prev_action'):\n        select_action.prev_action = 0\n    \n    # Proportional distance with dead zone (smaller than before)\n    diff = ball_y - paddle_y\n    \n    if abs(diff) > 4:\n        # Momentum: bias toward previous direction if still needed\n        if diff > 0:\n            if select_action.prev_action == 3:\n                return 3  # DOWN with momentum\n            else:\n                return 3\n        else:\n            if select_action.prev_action == 2:\n                return 2  # UP with momentum\n            else:\n                return 2\n    \n    select_action.prev_action = 0\n    return 0",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 265,
+        "operator": "e2",
+        "algorithm": "My new algorithm computes a dynamic threshold based on the ball's horizontal distance to the paddle, using a linear interpolation of the dead zone size, then moves the paddle proportionally only when the adjusted error exceeds this threshold.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Dynamic dead zone: smaller when ball is close, larger when far\n    distance_to_paddle = 160 - ball_x\n    dead_zone = 10 + distance_to_paddle // 8\n    \n    error = ball_y - paddle_y\n    if error < -dead_zone:\n        return 2  # UP\n    elif error > dead_zone:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 266,
+        "operator": "e2",
+        "algorithm": "My new algorithm uses a proportional control law based on the signed error between the ball's y position and the paddle's y position, scaled by a gain factor to determine movement intensity, with a dead zone that shrinks as the ball gets closer horizontally to the paddle.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Proportional gain increases as ball approaches horizontally\n    horizontal_distance = 160 - ball_x  # distance from right paddle\n    gain = max(1.0, 30.0 / max(horizontal_distance, 1))\n    \n    error = ball_y - paddle_y\n    scaled_error = error * gain\n    \n    if scaled_error < -8:\n        return 2  # UP\n    elif scaled_error > 8:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 267,
+        "operator": "e1",
+        "algorithm": "The algorithm uses a proportional-error approach where the vertical distance between the ball and paddle is mapped to a continuous error signal, and a dynamic threshold based on the ball's horizontal velocity (using ball_x change) determines whether to move, while also applying a hysteresis that favors the last chosen action to prevent oscillation.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n\n    if not hasattr(select_action, 'prev_ball_x'):\n        select_action.prev_ball_x = ball_x\n        select_action.last_action = 0\n\n    ball_dx = ball_x - select_action.prev_ball_x\n    select_action.prev_ball_x = ball_x\n\n    # Dynamic threshold: smaller when ball moving fast horizontally (less time to react)\n    speed_factor = max(0.5, 1.0 - abs(ball_dx) / 20.0)\n    base_threshold = 10\n    threshold = int(base_threshold * speed_factor)\n\n    error = ball_y - paddle_y\n\n    # Hysteresis: favor last action if error is small\n    if abs(error) <= threshold:\n        return select_action.last_action\n\n    if error < 0:\n        select_action.last_action = 2\n        return 2\n    else:\n        select_action.last_action = 3\n        return 3",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 268,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a proportional-differential controller with a distance-weighted error term and a momentum-based adaptive offset to anticipate the ball's arrival height while reducing overshoot near the paddle.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Estimate vertical speed and acceleration\n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n        select_action.vert_speed = 0\n        select_action.vert_accel = 0\n    vert_speed = ball_y - select_action.prev_ball_y\n    vert_accel = vert_speed - select_action.vert_speed\n    select_action.vert_accel = vert_accel\n    select_action.vert_speed = vert_speed\n    select_action.prev_ball_y = ball_y\n    \n    # Distance to right wall\n    dist_to_right = 160 - ball_x\n    \n    # Predict future y based on speed and acceleration, weighted by distance\n    predict_weight = max(0, 1.0 - dist_to_right / 160.0)\n    predicted_y = ball_y + vert_speed * 8 * predict_weight + 0.5 * vert_accel * 16 * predict_weight\n    predicted_y = max(34, min(194, predicted_y))\n    \n    # Proportional error with adaptive dead zone\n    error = predicted_y - paddle_y\n    dead_zone = 6 + dist_to_right // 40\n    \n    if error < -dead_zone:\n        return 2\n    elif error > dead_zone:\n        return 3\n    return 0",
+        "objective": 20.9
+    },
+    {
+        "sample_order": 269,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a proportional control approach with a dynamic dead zone based on the absolute vertical distance between the ball and the paddle, applying a scaling factor to reduce excessive movements and improve stability.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    diff = ball_y - paddle_y\n    # Dynamic dead zone: larger distance = more aggressive response\n    dead_zone = 8\n    if abs(diff) > dead_zone:\n        # Scale movement intensity based on distance\n        if diff > 0:\n            return 3  # DOWN\n        else:\n            return 2  # UP\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 270,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a larger predictive horizon based on the ball's horizontal distance to the paddle, a refined velocity estimate from two-frame differencing, and an adaptive dead zone proportional to the absolute error, with a damping factor to reduce overshoot.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Estimate vertical velocity using current and previous ball_y\n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n    vel_y = ball_y - select_action.prev_ball_y\n    select_action.prev_ball_y = ball_y\n    \n    # Predict ball_y based on horizontal distance to paddle (right side at x=160)\n    distance = 160 - ball_x\n    if distance <= 0:\n        steps_ahead = 1\n    else:\n        steps_ahead = min(12, distance // 12 + 1)\n    predicted_y = ball_y + vel_y * steps_ahead\n    predicted_y = max(17, min(194, predicted_y))\n    \n    # Compute error with adaptive dead zone\n    error = predicted_y - paddle_y\n    threshold = max(3, abs(error) // 4)\n    if error < -threshold:\n        return 2  # UP\n    elif error > threshold:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 20.8
+    },
+    {
+        "sample_order": 271,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a quadratic ball-trajectory prediction with a dynamic expansion-contraction dead zone based on ball proximity to the paddle.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    if not hasattr(select_action, 'prev_ball_x'):\n        select_action.prev_ball_x = ball_x\n        select_action.prev_ball_y = ball_y\n    \n    prev_ball_x = select_action.prev_ball_x\n    prev_ball_y = select_action.prev_ball_y\n    \n    dx = ball_x - prev_ball_x\n    dy = ball_y - prev_ball_y\n    \n    select_action.prev_ball_x = ball_x\n    select_action.prev_ball_y = ball_y\n    \n    # Predict future ball position when it reaches x = 160 (paddle plane)\n    if dx > 0:\n        steps_to_paddle = (160 - ball_x) / max(dx, 0.01)\n        predicted_y = ball_y + dy * steps_to_paddle\n    else:\n        predicted_y = ball_y\n    \n    predicted_y = max(34, min(194, predicted_y))\n    \n    distance_right = 160 - ball_x\n    dead_zone = max(4, 16 - distance_right // 12)\n    \n    if predicted_y < paddle_y - dead_zone:\n        return 2\n    elif predicted_y > paddle_y + dead_zone:\n        return 3\n    return 0",
+        "objective": 20.6
+    },
+    {
+        "sample_order": 272,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a proportional dead zone and an anticipatory offset, moving the paddle only when the ball\u2019s vertical distance exceeds a threshold scaled by the horizontal distance to the paddle.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_x = obs[49]\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    \n    # Determine if ball is moving toward the player's paddle (right side)\n    # Simple heuristic: ball_x > 80 means ball is on the right half\n    if ball_x > 80:\n        # Scale dead zone by horizontal proximity: closer ball = smaller threshold\n        proximity_factor = max(0.3, (160 - ball_x) / 80)  # between 0.3 and 1.0\n        dead_zone = int(12 * proximity_factor)\n        \n        diff = ball_y - paddle_y\n        if abs(diff) > dead_zone:\n            if diff < 0:\n                return 2  # UP\n            else:\n                return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 273,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 274,
+        "operator": "e2",
+        "algorithm": "The common backbone idea is tracking the ball's position and using a predicted or adjusted target point on the paddle's vertical axis, then moving the paddle toward that target with a dead zone to avoid jitter.\n\n(New algorithm: Use the ball's vertical velocity and its horizontal distance to the paddle to compute a time-to-intercept estimate, then move the paddle toward the interpolated ball position at that future time, with a hysteresis band that scales with the inverse of the horizontal distance.)",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    \"\"\"Select a Pong action from the 128-byte RAM state.\n\n    The player controls the right paddle. A point is scored each time\n    the ball passes the opponent's paddle; a point is lost when the\n    ball passes the player's own paddle.\n\n    Args:\n        obs: 128-element uint8 array (ALE RAM).\n            obs[49]: ball x  (17-160, left to right)\n            obs[54]: ball y  (17-194, larger = lower on screen)\n            obs[51]: player (right) paddle y center (34-194)\n            obs[50]: CPU (left) paddle y center     (34-194)\n    Returns:\n        action: 0 (NOOP), 2 (UP), or 3 (DOWN)\n    \"\"\"\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n        select_action.prev_ball_x = ball_x\n    \n    dy = ball_y - select_action.prev_ball_y\n    dx = ball_x - select_action.prev_ball_x\n    \n    select_action.prev_ball_y = ball_y\n    select_action.prev_ball_x = ball_x\n    \n    # Time to reach paddle x (160) assuming current horizontal speed\n    dist_to_paddle = 160 - ball_x\n    if dx > 0:\n        time_to_hit = dist_to_paddle / dx\n    else:\n        time_to_hit = 10.0  # ball moving away or slow, use a default\n    \n    # Predict ball y at interception time\n    predicted_y = ball_y + dy * time_to_hit\n    predicted_y = max(34, min(194, predicted_y))\n    \n    # Hysteresis band that shrinks as ball gets closer\n    hyst = max(4, 20 - dist_to_paddle // 8)\n    \n    if predicted_y < paddle_y - hyst:\n        return 2\n    elif predicted_y > paddle_y + hyst:\n        return 3\n    return 0",
+        "objective": 20.1
+    },
+    {
+        "sample_order": 275,
+        "operator": "e1",
+        "algorithm": "The new algorithm uses a proportional control law with a ramp-up speed based on the absolute vertical error, applying stronger corrective actions when the ball is farther from the paddle center.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    error = ball_y - paddle_y\n    if error < -8:\n        return 2  # UP\n    elif error > 8:\n        return 3  # DOWN\n    elif error < -3:\n        return 2\n    elif error > 3:\n        return 3\n    else:\n        return 0",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 276,
+        "operator": "m1",
+        "algorithm": "The new algorithm introduces a proportional control approach by calculating the difference between the ball's y-position and paddle center, applying a larger dead zone with hysteresis, and using a persistence counter to reduce oscillatory behavior when the ball is near the paddle.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    \"\"\"Select a Pong action from the 128-byte RAM state.\n\n    The player controls the right paddle. A point is scored each time\n    the ball passes the opponent's paddle; a point is lost when the\n    ball passes the player's own paddle.\n\n    Args:\n        obs: 128-element uint8 array (ALE RAM).\n            obs[49]: ball x  (17-160, left to right)\n            obs[54]: ball y  (17-194, larger = lower on screen)\n            obs[51]: player (right) paddle y center (34-194)\n            obs[50]: CPU (left) paddle y center     (34-194)\n    Returns:\n        action: 0 (NOOP), 2 (UP), or 3 (DOWN)\n    \"\"\"\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    \n    # Persistent state for hysteresis\n    if not hasattr(select_action, 'hysteresis_count'):\n        select_action.hysteresis_count = 0\n        select_action.last_action = 0\n    \n    diff = ball_y - paddle_y\n    dead_zone = 10\n    persist_frames = 3\n    \n    if abs(diff) > dead_zone:\n        select_action.hysteresis_count = 0\n        if diff < 0:\n            action = 2  # UP\n        else:\n            action = 3  # DOWN\n    else:\n        if select_action.hysteresis_count < persist_frames and select_action.last_action != 0:\n            action = select_action.last_action\n            select_action.hysteresis_count += 1\n        else:\n            action = 0  # NOOP\n            select_action.hysteresis_count = 0\n    \n    select_action.last_action = action\n    return action",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 277,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a proportional control approach with a deadband, where the paddle moves faster (returns action immediately) when the ball is far from the paddle but incorporates a small, fixed delay to reduce overshoot and jitter.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    diff = ball_y - paddle_y\n    if abs(diff) > 10:\n        if diff < 0:\n            return 2  # UP\n        else:\n            return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 278,
+        "operator": "m2",
+        "algorithm": "The new algorithm simplifies target prediction by computing a linear estimate of the ball's y-coordinate upon reaching the paddle's x-position using velocity-based reflection off both walls, and then applying a fixed asymmetric dead zone to avoid jittery movements.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n\n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n        select_action.prev_paddle_y = paddle_y\n        select_action.last_action = 0\n\n    ball_dy = ball_y - select_action.prev_ball_y\n    paddle_dy = paddle_y - select_action.prev_paddle_y\n    select_action.prev_ball_y = ball_y\n    select_action.prev_paddle_y = paddle_y\n\n    if ball_x < 160 and ball_dy != 0:\n        steps_to_reach = (160 - ball_x) / abs(ball_dy)\n        projected_y = ball_y\n        dy = ball_dy\n        for _ in range(int(steps_to_reach)):\n            projected_y += dy\n            if projected_y < 17:\n                projected_y = 17 + (17 - projected_y)\n                dy = -dy\n            elif projected_y > 194:\n                projected_y = 194 - (projected_y - 194)\n                dy = -dy\n        target_y = projected_y\n    else:\n        target_y = ball_y\n\n    target_y = max(34, min(194, target_y))\n\n    dead_zone = 10\n    if target_y < paddle_y - dead_zone:\n        select_action.last_action = 2\n        return 2\n    elif target_y > paddle_y + dead_zone:\n        select_action.last_action = 3\n        return 3\n    return 0",
+        "objective": 14.6
+    },
+    {
+        "sample_order": 279,
+        "operator": "m2",
+        "algorithm": "This algorithm uses a proportional controller with a fixed dead zone of 10 units, no velocity prediction, and moves the paddle towards the ball's current y position.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    dead_zone = 10\n    if ball_y < paddle_y - dead_zone:\n        return 2  # UP\n    elif ball_y > paddle_y + dead_zone:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 17.7
+    },
+    {
+        "sample_order": 280,
+        "operator": "e1",
+        "algorithm": "The algorithm repositions the paddle using a non\u2011linear mapping from the ball\u2019s vertical error to a probabilistic action selection, with random exploration inversely proportional to the error magnitude.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    error = ball_y - paddle_y\n    # non\u2011linear probability: small error \u2192 high chance of NOOP, large error \u2192 almost always move\n    import random\n    prob_move = 1.0 - 1.0 / (1.0 + (abs(error) / 20.0) ** 2)\n    if random.random() < prob_move:\n        if error < 0:\n            return 2  # UP\n        else:\n            return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 281,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses ball velocity estimated from a short-term memory buffer to compute a smoothed target position and applies a dynamic dead zone that adapts based on paddle proximity to reduce unnecessary corrections.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    \n    # Initialize persistent state\n    if not hasattr(select_action, 'ball_buffer'):\n        select_action.ball_buffer = [ball_y] * 3\n        select_action.prev_action = 0\n    \n    # Update rolling buffer of ball positions\n    select_action.ball_buffer.pop(0)\n    select_action.ball_buffer.append(ball_y)\n    \n    # Estimate velocity from buffer (averaged difference)\n    ball_dy = (select_action.ball_buffer[-1] - select_action.ball_buffer[0]) / 2.0\n    \n    # Predict target with slight smoothing\n    target_y = ball_y + ball_dy\n    \n    # Adaptive dead zone: larger when paddle is near screen edge to prevent overshoot\n    if paddle_y < 50 or paddle_y > 170:\n        dead_zone = 15\n    else:\n        dead_zone = 8\n    \n    diff = target_y - paddle_y\n    \n    if abs(diff) > dead_zone:\n        if diff < 0:\n            action = 2  # UP\n        else:\n            action = 3  # DOWN\n    else:\n        action = 0  # NOOP\n    \n    select_action.prev_action = action\n    return action",
+        "objective": 20.5
+    },
+    {
+        "sample_order": 282,
+        "operator": "e1",
+        "algorithm": "The new algorithm uses a proportional-derivative (PD) control strategy with a dynamic offset, predicting the ball's future vertical position based on its current velocity and acceleration, and applying a smooth zone where the action is proportional to the error.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n    if not hasattr(select_action, 'prev_ball_dy'):\n        select_action.prev_ball_dy = 0\n    ball_dy = ball_y - select_action.prev_ball_y\n    ball_ddy = ball_dy - select_action.prev_ball_dy\n    select_action.prev_ball_y = ball_y\n    select_action.prev_ball_dy = ball_dy\n    predicted_y = ball_y + ball_dy + 0.5 * ball_ddy\n    error = predicted_y - paddle_y\n    if error < -8:\n        return 2\n    elif error > 8:\n        return 3\n    else:\n        return 0",
+        "objective": 12.5
+    },
+    {
+        "sample_order": 283,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a simple proportional tracking with a fixed dead zone to center the paddle on the ball's current y-position, without any trajectory prediction or momentum adjustment, and with a smaller dead zone for more responsive but potentially oscillatory movement.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    dead_zone = 3\n    if ball_y < paddle_y - dead_zone:\n        return 2\n    elif ball_y > paddle_y + dead_zone:\n        return 3\n    return 0",
+        "objective": 15.8
+    },
+    {
+        "sample_order": 284,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a proportional-derivative controller on the ball\u2019s vertical position error with a smaller dead zone and no crude velocity estimate, instead directly tracking ball_y and paddle_y.  \n\\",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Estimate vertical velocity from last frame difference\n    # Simple proxy: use current ball_y compared to center\n    vel_y = 1 if ball_y > 100 else -1\n    \n    # Predict ball position 6 steps ahead (more anticipation)\n    predicted_y = ball_y + vel_y * 6\n    predicted_y = max(17, min(194, predicted_y))\n    \n    # Smaller gain for finer control\n    distance = 160 - ball_x\n    gain = max(2, distance // 30)\n    \n    error = predicted_y - paddle_y\n    if error < -gain:\n        return 2\n    elif error > gain:\n        return 3\n    return 0",
+        "objective": 8.0
+    },
+    {
+        "sample_order": 285,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a linear target prediction based on ball velocity combined with a fixed, small dead zone and a proportional gain that scales with distance from the paddle.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    if not hasattr(select_action, 'prev_ball_x'):\n        select_action.prev_ball_x = ball_x\n        select_action.prev_ball_y = ball_y\n    \n    dx = ball_x - select_action.prev_ball_x\n    dy = ball_y - select_action.prev_ball_y\n    \n    select_action.prev_ball_x = ball_x\n    select_action.prev_ball_y = ball_y\n    \n    if dx > 0:\n        # Ball moving right; predict future y\n        steps_to_reach = (160 - ball_x) / max(dx, 1)\n        target_y = ball_y + dy * steps_to_reach\n        target_y = max(34, min(194, target_y))\n    else:\n        target_y = ball_y\n    \n    dead_zone = 6\n    gain = 0.5\n    error = target_y - paddle_y\n    if error < -dead_zone:\n        return 2\n    elif error > dead_zone:\n        return 3\n    return 0",
+        "objective": 20.2
+    },
+    {
+        "sample_order": 286,
+        "operator": "e2",
+        "algorithm": "The algorithm uses a piecewise linear extrapolation of the ball's path, with a small random perturbation added to the target when the ball is far away, and a sigmoid-based dynamic dead zone that expands when the paddle and ball are moving in opposite directions.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    import numpy as np\n\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n\n    # Track previous ball position for velocity\n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n        select_action.prev_paddle_y = paddle_y\n        select_action.prev_ball_x = ball_x\n        select_action.step = 0\n\n    ball_dy = ball_y - select_action.prev_ball_y\n    paddle_dy = paddle_y - select_action.prev_paddle_y\n    ball_dx = ball_x - select_action.prev_ball_x\n    select_action.prev_ball_y = ball_y\n    select_action.prev_paddle_y = paddle_y\n    select_action.prev_ball_x = ball_x\n    select_action.step += 1\n\n    # Predict ball y when x reaches 160 (right edge)\n    if ball_dx > 0 and ball_x < 160:\n        steps = (160 - ball_x) / max(ball_dx, 1)\n        proj_y = ball_y\n        dy = ball_dy\n        for _ in range(int(steps)):\n            proj_y += dy\n            if proj_y < 17:\n                proj_y = 17 + (17 - proj_y)\n                dy = -dy\n            elif proj_y > 194:\n                proj_y = 194 - (proj_y - 194)\n                dy = -dy\n        target_y = proj_y\n    else:\n        target_y = ball_y\n\n    # Add small random perturbation when ball is far\n    distance = 160 - ball_x\n    if distance > 80 and select_action.step % 3 == 0:\n        target_y += np.random.randint(-4, 5)\n\n    target_y = max(34, min(194, target_y))\n\n    # Sigmoid-based dead zone: expands when paddle moves opposite to ball\n    opp_direction = (ball_dy > 0 and paddle_dy < 0) or (ball_dy < 0 and paddle_dy > 0)\n    dead_zone = 5 + int(8 / (1 + np.exp(-distance / 40))) * opp_direction\n\n    if target_y < paddle_y - dead_zone:\n        return 2\n    elif target_y > paddle_y + dead_zone:\n        return 3\n    return 0",
+        "objective": 16.6
+    },
+    {
+        "sample_order": 287,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a larger dead zone threshold and incorporates ball velocity by comparing the current ball y position to the previous one, moving the paddle only when the ball is moving toward the player and the vertical distance exceeds a higher threshold.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    # Use ball_x to determine direction (simple heuristic: ball moving right if x > 80)\n    ball_x = obs[49]\n    if ball_x < 80:\n        # Ball moving away or not yet threatening; maintain position with small dead zone\n        if abs(ball_y - paddle_y) > 15:\n            if ball_y < paddle_y:\n                return 2\n            else:\n                return 3\n        return 0\n    else:\n        # Ball on player side; react with smaller dead zone\n        if abs(ball_y - paddle_y) > 5:\n            if ball_y < paddle_y:\n                return 2\n            else:\n                return 3\n        return 0",
+        "objective": 13.4
+    },
+    {
+        "sample_order": 288,
+        "operator": "m2",
+        "algorithm": "The new algorithm directly tracks the ball's y-coordinate and moves the paddle toward it with a symmetric dead zone that increases when the ball is far from the paddle.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Dynamic dead zone: larger when ball is far away, smaller when close\n    distance = 160 - ball_x\n    dead_zone = max(3, distance // 10)\n    \n    error = ball_y - paddle_y\n    if error < -dead_zone:\n        return 2  # UP\n    elif error > dead_zone:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 289,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a proportional control approach, scaling the action based on the difference between the ball's predicted y-position and the paddle's y-position, with a dynamic dead zone that shrinks when the ball is near the paddle's edge to reduce overshoot.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    # Retrieve previous ball_y from a persistent attribute\n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n    # Compute ball vertical direction (positive = moving down)\n    ball_dy = ball_y - select_action.prev_ball_y\n    select_action.prev_ball_y = ball_y\n    # Anticipate ball position with a one-step prediction\n    target_y = ball_y + ball_dy\n    # Calculate difference and apply proportional dead zone\n    diff = target_y - paddle_y\n    dead_zone = max(4, 10 - abs(diff) // 10)  # smaller dead zone when closer\n    if abs(diff) > dead_zone:\n        if diff < 0:\n            return 2  # UP\n        else:\n            return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 290,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a proportional controller with a nonlinear deadband and directional hysteresis to reduce paddle jitter and anticipate ball movement.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    ball_vx = obs[48]  # ball delta x (can use for direction)\n    \n    # Determine if ball is moving toward player (right)\n    moving_toward = ball_vx > 0 if ball_x < 128 else True\n    \n    # Only actively track when ball is moving toward or close\n    if moving_toward or ball_x > 140:\n        error = ball_y - paddle_y\n        deadband = 6\n        if error < -deadband:\n            return 2  # UP\n        elif error > deadband:\n            return 3  # DOWN\n        return 0  # NOOP\n    else:\n        # Return to center when ball is far away\n        center = 114\n        error = center - paddle_y\n        if error < -8:\n            return 2\n        elif error > 8:\n            return 3\n        return 0",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 291,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a smaller dead zone (threshold = 5) and reverses the movement direction relative to the ball, moving down when the ball is above and up when below.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    if abs(ball_y - paddle_y) > 5:\n        if ball_y < paddle_y:\n            return 3  # DOWN (reverse direction)\n        else:\n            return 2  # UP (reverse direction)\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 292,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a proportional controller with a scaled error threshold and a dead zone that adapts based on ball horizontal distance to the paddle, while also incorporating a simple vertical velocity estimate from the current ball_y position relative to screen center.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Estimate vertical direction from ball position relative to center\n    vel_y = 1 if ball_y > 100 else -1\n    \n    # Predict ball y position ahead based on horizontal distance\n    distance = 160 - ball_x\n    steps_ahead = max(1, distance // 20)\n    predicted_y = ball_y + vel_y * steps_ahead\n    predicted_y = max(17, min(194, predicted_y))\n    \n    # Proportional gain scaled by distance\n    gain = 1 + distance // 40\n    \n    error = predicted_y - paddle_y\n    if error < -gain:\n        return 2\n    elif error > gain:\n        return 3\n    return 0",
+        "objective": 13.3
+    },
+    {
+        "sample_order": 293,
+        "operator": "e1",
+        "algorithm": "The algorithm uses reinforcement learning inspired temporal-difference error as a heuristic to decide when to move, based on the discrepancy between the current ball position and an exponentially smoothed target position that adapts to the ball's trend, combined with a randomized exploration trigger to break ties.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    import numpy as np\n\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n\n    # Initialize persistent state\n    if not hasattr(select_action, 'target_y'):\n        select_action.target_y = paddle_y\n        select_action.step_count = 0\n        select_action.last_ball_y = ball_y\n\n    # Exponentially smoothed target based on ball movement trend\n    ball_dy = ball_y - select_action.last_ball_y\n    select_action.last_ball_y = ball_y\n    learning_rate = 0.15\n    select_action.target_y = (1 - learning_rate) * select_action.target_y + learning_rate * (ball_y + ball_dy * 3)\n    select_action.target_y = max(34, min(194, select_action.target_y))\n\n    # Temporal-difference heuristic: compare current paddle position to target\n    error = select_action.target_y - paddle_y\n    threshold = 5 + abs(ball_dy) * 2  # dynamic threshold based on ball speed\n\n    # Occasional random action to break oscillation\n    select_action.step_count += 1\n    if select_action.step_count % 30 == 0 and np.random.rand() < 0.2:\n        return np.random.choice([2, 3])\n\n    if error < -threshold:\n        return 2\n    elif error > threshold:\n        return 3\n    return 0",
+        "objective": 20.9
+    },
+    {
+        "sample_order": 294,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a predictive offset by estimating the ball's vertical velocity and multiplying a step-ahead time to anticipate where the ball will be, then moves the paddle toward that predicted position with a small dead zone to reduce jitter.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    # Estimate vertical velocity from ball position (simplified: assume constant offset per frame)\n    # Use ball_x to infer direction: if ball moving right (toward player), predict more aggressively\n    # Dead zone threshold: 10 pixels\n    if ball_x > 80:  # ball is in right half, more urgent\n        offset = 12\n    else:  # ball in left half, less urgent\n        offset = 6\n    predicted_ball_y = ball_y + offset if ball_y < 100 else ball_y - offset  # crude direction guess\n    diff = predicted_ball_y - paddle_y\n    if abs(diff) > 8:\n        if diff < 0:\n            return 2  # UP\n        else:\n            return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 18.8
+    },
+    {
+        "sample_order": 295,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a larger dead zone and a proportional gain that scales inversely with the horizontal distance to the ball, combined with a simple threshold-based decision to avoid overcorrecting on small errors.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Distance-based gain: closer ball -> larger response\n    distance = 160 - ball_x\n    gain = max(6, distance // 15)\n    \n    error = ball_y - paddle_y\n    if error < -gain:\n        return 2\n    elif error > gain:\n        return 3\n    return 0",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 296,
+        "operator": "e1",
+        "algorithm": "The algorithm predicts the ball's future y-position by simulating a single bounce off the top or bottom wall using its current vertical direction, then moves the paddle toward that predicted point with a fixed dead zone to avoid jitter.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n\n    # Estimate vertical direction using persistent state\n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n        select_action.vert_speed = 0\n    vert_speed = ball_y - select_action.prev_ball_y\n    select_action.prev_ball_y = ball_y\n\n    # Predict future ball y when it reaches the right side (x=160)\n    if vert_speed != 0:\n        steps_to_right = max(1, (160 - ball_x) // 2)  # approximate steps\n        predicted_y = ball_y + vert_speed * steps_to_right\n        # Simulate bounces off top (17) and bottom (194)\n        while predicted_y < 17 or predicted_y > 194:\n            if predicted_y < 17:\n                predicted_y = 34 - predicted_y\n            elif predicted_y > 194:\n                predicted_y = 388 - predicted_y\n    else:\n        predicted_y = ball_y\n\n    # Clamp predicted y to valid range\n    predicted_y = max(17, min(194, predicted_y))\n\n    # Move paddle toward predicted y with dead zone of 10\n    if predicted_y < paddle_y - 10:\n        return 2  # UP\n    elif predicted_y > paddle_y + 10:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 18.5
+    },
+    {
+        "sample_order": 297,
+        "operator": "e1",
+        "algorithm": "The new algorithm uses a predictive approach, estimating ball trajectory by tracking its velocity over the last two frames to anticipate where the ball will intersect the paddle's y-plane, then moving the paddle toward that intercept point with a speed-adjusted dead zone to minimize overshoot.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    # Use static variables to store previous ball position and velocity\n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = obs[54]\n        select_action.ball_vy = 0\n    ball_y = obs[54]\n    # Update velocity estimate (simple difference)\n    select_action.ball_vy = ball_y - select_action.prev_ball_y\n    select_action.prev_ball_y = ball_y\n    \n    paddle_y = obs[51]\n    ball_x = obs[49]\n    # Predict future ball y when ball x reaches player paddle x (~157-160)\n    # Assume constant velocity and ball bounces off top/bottom (17, 194)\n    # Simple linear extrapolation for a few steps ahead\n    steps_to_paddle = max(1, (157 - ball_x) / 2.0)  # rough horizontal speed ~2 px/frame\n    predicted_y = ball_y + select_action.ball_vy * steps_to_paddle\n    # Clamp to screen bounds\n    predicted_y = max(17, min(194, predicted_y))\n    \n    # Move toward predicted position with dynamic dead zone proportional to distance\n    diff = predicted_y - paddle_y\n    dead_zone = max(5, abs(diff) * 0.2)  # larger dead zone when far\n    if abs(diff) > dead_zone:\n        if diff < 0:\n            return 2  # UP\n        else:\n            return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 20.6
+    },
+    {
+        "sample_order": 298,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a proportional controller with an adaptive dead zone based on the ball's horizontal distance, and it incorporates a simple predictive correction by adding a small offset in the direction of ball movement.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Estimate ball vertical direction using y-center comparison\n    vel_y = 1 if ball_y > 100 else -1\n    \n    # Predict ball y position a few steps ahead, scaled by horizontal distance\n    prediction_steps = max(1, (160 - ball_x) // 20)\n    predicted_y = ball_y + vel_y * prediction_steps\n    predicted_y = max(17, min(194, predicted_y))\n    \n    # Adaptive dead zone: larger when ball is far, smaller when close\n    dead_zone = max(2, (160 - ball_x) // 20)\n    \n    error = predicted_y - paddle_y\n    if error < -dead_zone:\n        return 2\n    elif error > dead_zone:\n        return 3\n    return 0",
+        "objective": 13.4
+    },
+    {
+        "sample_order": 299,
+        "operator": "e1",
+        "algorithm": "The new algorithm uses a predictive approach: it calculates the ball's vertical velocity by tracking its previous y-position and then moves the paddle to intercept the ball's estimated future y-position, while adding a dynamic offset based on the ball's horizontal distance to reduce overshooting.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    global prev_ball_y  # store previous ball y for velocity calculation\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Estimate vertical velocity\n    if 'prev_ball_y' not in globals():\n        prev_ball_y = ball_y\n    dy = ball_y - prev_ball_y\n    prev_ball_y = ball_y\n    \n    # Predict future ball y when it reaches the paddle x (~160)\n    dx_to_paddle = 160 - ball_x\n    if dx_to_paddle > 0 and dy != 0:\n        # Rough time steps estimate (assuming ball moves ~2 units per step horizontally)\n        steps = dx_to_paddle / 2.0\n        future_y = ball_y + dy * steps\n        # Clamp to valid range\n        future_y = max(17, min(194, future_y))\n    else:\n        future_y = ball_y\n    \n    # Move paddle toward predicted future position\n    if future_y < paddle_y - 5:\n        return 2  # UP\n    elif future_y > paddle_y + 5:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 13.5
+    },
+    {
+        "sample_order": 300,
+        "operator": "e2",
+        "algorithm": "My new algorithm uses a momentum-based approach that not only considers the current vertical difference but also tracks the ball\u2019s direction to anticipate future position, applying a dynamic dead zone that shrinks when the ball is moving toward the paddle.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Estimate ball direction from x position (moving right if x > 80)\n    ball_moving_toward = ball_x > 80\n    \n    # Dynamic dead zone: smaller when ball approaches, larger when moving away\n    threshold = 8 if ball_moving_toward else 20\n    \n    if abs(ball_y - paddle_y) > threshold:\n        if ball_y < paddle_y:\n            return 2  # UP\n        else:\n            return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 10.0
+    },
+    {
+        "sample_order": 301,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a proportional controller with a narrow dead zone and a learned look-ahead offset based on the vertical velocity estimated from the difference in ball_y between frames.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Estimate vertical velocity from last frame's ball_y stored globally\n    if not hasattr(select_action, 'last_ball_y'):\n        select_action.last_ball_y = ball_y\n    vel_y = ball_y - select_action.last_ball_y\n    select_action.last_ball_y = ball_y\n    \n    # Predict future ball y based on velocity and horizontal distance\n    distance_to_paddle = 160 - ball_x\n    look_ahead = min(distance_to_paddle // 4, 8)\n    predicted_y = ball_y + vel_y * look_ahead\n    predicted_y = max(17, min(194, predicted_y))\n    \n    # Proportional control with narrow dead zone\n    error = predicted_y - paddle_y\n    if error < -2:\n        return 2  # UP\n    elif error > 2:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 20.8
+    },
+    {
+        "sample_order": 302,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a two-step lookahead with a reduced dead zone and exponentially smoothed velocity to improve tracking accuracy.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n        select_action.smoothed_dy = 0.0\n    \n    raw_dy = ball_y - select_action.prev_ball_y\n    select_action.smoothed_dy = 0.7 * select_action.smoothed_dy + 0.3 * raw_dy\n    select_action.prev_ball_y = ball_y\n    \n    target_y = ball_y + 2 * select_action.smoothed_dy\n    \n    if abs(target_y - paddle_y) > 5:\n        if target_y < paddle_y:\n            return 2\n        else:\n            return 3\n    return 0",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 303,
+        "operator": "e1",
+        "algorithm": "The new algorithm uses a sinusoidal tracking law with a velocity-weighted phase shift and a stochastic jitter term to break symmetry and reduce dithering.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n        select_action.phase = 0.0\n    \n    ball_dy = ball_y - select_action.prev_ball_y\n    select_action.prev_ball_y = ball_y\n    \n    # Sinusoidal target with velocity phase shift\n    phase_shift = 0.3 * (ball_dy / 4.0)\n    select_action.phase = (select_action.phase + 0.1 + phase_shift) % (2 * 3.14159)\n    sin_offset = 6 * np.sin(select_action.phase)\n    \n    # Distance-based stochastic jitter to prevent stalling\n    dist_from_right = 160 - ball_x\n    jitter = 0 if dist_from_right > 80 else (np.random.randint(-2, 3) if dist_from_right > 30 else 0)\n    \n    target_y = ball_y + sin_offset + jitter\n    target_y = max(34, min(194, target_y))\n    \n    dead_zone = 5\n    if target_y < paddle_y - dead_zone:\n        return 2\n    elif target_y > paddle_y + dead_zone:\n        return 3\n    return 0",
+        "objective": 10.3
+    },
+    {
+        "sample_order": 304,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a proportional controller with a dead zone that increases with the ball\u2019s horizontal distance, while also incorporating the ball\u2019s estimated vertical velocity from the difference between current and previous ball_y (using a stored frame buffer) to predict the intercept y-coordinate.",
+        "code": "import numpy as np\n\n# Store previous ball_y for velocity estimation\n_prev_ball_y = 17.0\n\ndef select_action(obs: np.ndarray) -> int:\n    global _prev_ball_y\n    \n    ball_y = float(obs[54])\n    paddle_y = float(obs[51])\n    ball_x = float(obs[49])\n    \n    # Estimate vertical velocity (pixels per frame)\n    vel_y = ball_y - _prev_ball_y\n    _prev_ball_y = ball_y\n    \n    # Predict ball y when it reaches the player's x (160) assuming constant velocity\n    if ball_x < 160 and ball_x > 0:\n        steps_to_reach = (160 - ball_x) / max(1.0, abs(ball_x - (obs[49] if 'obs' in dir() else 0)))  # fallback\n        steps_to_reach = max(1, int((160 - ball_x) / 5.0))  # approximate horizontal speed ~5 px/frame\n    else:\n        steps_to_reach = 4  # default\n    \n    predicted_y = ball_y + vel_y * steps_to_reach\n    predicted_y = max(17.0, min(194.0, predicted_y))\n    \n    # Dead zone that grows with horizontal distance\n    distance = 160.0 - ball_x\n    dead_zone = max(3.0, distance / 8.0)\n    \n    error = predicted_y - paddle_y\n    if error < -dead_zone:\n        return 2  # UP\n    elif error > dead_zone:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 18.4
+    },
+    {
+        "sample_order": 305,
+        "operator": "e1",
+        "algorithm": "Use the ball's vertical velocity to predict future interception point and employ a proportional-derivative control law to smoothly center the paddle on that predicted position with a dynamic deadband.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n        select_action.prev_ball_x = obs[49]\n    \n    ball_dy = ball_y - select_action.prev_ball_y\n    ball_dx = obs[49] - select_action.prev_ball_x\n    select_action.prev_ball_y = ball_y\n    select_action.prev_ball_x = obs[49]\n    \n    # Predict future ball y when it reaches the right paddle x (approx 160)\n    if ball_dx > 0:\n        steps_to_reach = (160 - obs[49]) / max(ball_dx, 0.1)\n        predicted_y = ball_y + ball_dy * min(steps_to_reach, 20)  # cap prediction horizon\n    else:\n        predicted_y = ball_y\n    \n    error = predicted_y - paddle_y\n    deadband = 8\n    if error < -deadband:\n        return 2  # UP\n    elif error > deadband:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 306,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 307,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a proportional controller with a dynamic dead zone based on ball horizontal distance and a delayed reaction time to reduce paddle jitter.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Dynamic dead zone based on ball distance (larger distance = larger tolerance)\n    distance = 160 - ball_x\n    dead_zone = max(3, distance // 20)\n    \n    error = ball_y - paddle_y\n    if error < -dead_zone:\n        return 2\n    elif error > dead_zone:\n        return 3\n    return 0",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 308,
+        "operator": "m2",
+        "algorithm": "The new algorithm adds a proportional-deadband controller that scales paddle movement inversely with distance to the target, using a narrow dead zone and speed limiting to reduce overshoot while maintaining responsiveness.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    diff = ball_y - paddle_y\n    if diff < -5:\n        return 2\n    elif diff > 5:\n        return 3\n    return 0",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 309,
+        "operator": "m2",
+        "algorithm": "The new algorithm tracks the ball's recent vertical velocity more precisely using a two-frame difference and uses a dynamic paddle offset based on the ball's horizontal distance to balance reaction time and overshoot reduction.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Use static velocity estimate from last seen ball positions (simulated via stored values)\n    # For this heuristic, we assume ball_y_last and ball_x_last are tracked (here approximated)\n    # Since we only have current obs, we approximate velocity by ball_y relative to screen middle\n    # and ball_x direction (moving right = ball_x > previous)\n    \n    # Simple velocity proxy: direction based on ball_x (ball moves right when x > 80)\n    vel_y = 0\n    if ball_x > 100:\n        # Ball moving right, use vertical trend from ball_y position\n        if ball_y > 100:\n            vel_y = 2  # moving down\n        else:\n            vel_y = -2 # moving up\n    else:\n        # Ball moving left, reverse or zero\n        vel_y = 0\n    \n    # Predict ball y at right edge (x=160) using linear extrapolation\n    # Distance to go\n    dist_to_goal = 160 - ball_x\n    # Assume ball moves horizontally at ~2 pixels per frame (typical)\n    steps = max(1, dist_to_goal // 2)\n    predicted_y = ball_y + vel_y * steps\n    \n    # Clamp to valid range\n    predicted_y = max(17, min(194, predicted_y))\n    \n    # Dead zone and proportional offset\n    error = predicted_y - paddle_y\n    dead_zone = 8  # larger dead zone to prevent jitter\n    \n    if error < -dead_zone:\n        return 2  # UP\n    elif error > dead_zone:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 6.5
+    },
+    {
+        "sample_order": 310,
+        "operator": "e2",
+        "algorithm": "The agent computes a weighted centroid of future ball positions by linearly extrapolating along both axes for a fixed horizon of 6 frames, then applies a momentum-biased asymmetric dead zone to decide movement.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    if not hasattr(select_action, 'prev_ball_x'):\n        select_action.prev_ball_x = ball_x\n        select_action.prev_ball_y = ball_y\n        select_action.horiz_speed = 0\n        select_action.vert_speed = 0\n    \n    horiz_speed = ball_x - select_action.prev_ball_x\n    vert_speed = ball_y - select_action.prev_ball_y\n    select_action.prev_ball_x = ball_x\n    select_action.prev_ball_y = ball_y\n    \n    # Extrapolate 6 frames ahead\n    future_y = ball_y + 6 * vert_speed\n    future_y = max(34, min(194, future_y))\n    \n    # Momentum bias: prefer last action if ball is moving toward paddle\n    if not hasattr(select_action, 'last_action'):\n        select_action.last_action = 0\n    bias = 4 if (horiz_speed > 0 and select_action.last_action == 2) else \\\n           4 if (horiz_speed > 0 and select_action.last_action == 3) else 0\n    \n    diff = future_y - paddle_y\n    if diff < -bias:\n        select_action.last_action = 2\n        return 2\n    elif diff > bias:\n        select_action.last_action = 3\n        return 3\n    select_action.last_action = 0\n    return 0",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 311,
+        "operator": "e1",
+        "algorithm": "The new algorithm uses ballistic prediction by extrapolating the ball\u2019s vertical motion using a smoothed velocity estimate and a computed intercept time, then adds a proportional response with a ramp-up dead zone to minimize overcorrection.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    cpu_paddle_y = obs[50]\n\n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n        select_action.vel_sum = 0.0\n        select_action.vel_count = 0\n\n    raw_dy = ball_y - select_action.prev_ball_y\n    select_action.prev_ball_y = ball_y\n    select_action.vel_sum += raw_dy\n    select_action.vel_count += 1\n    if select_action.vel_count > 5:\n        select_action.vel_sum -= select_action.vel_sum / select_action.vel_count\n        select_action.vel_count = min(select_action.vel_count, 5)\n    smoothed_dy = select_action.vel_sum / max(1, select_action.vel_count)\n\n    # Predict intercept y when ball reaches paddle x (player paddle at x ~ 150)\n    if ball_x < 150 and smoothed_dy != 0:\n        steps_to_reach = (150 - ball_x) / max(1, abs(smoothed_dy))\n        predicted_y = ball_y + smoothed_dy * steps_to_reach\n    else:\n        predicted_y = ball_y\n\n    # Clamp predicted_y to valid range\n    predicted_y = max(17, min(194, predicted_y))\n\n    # Bias toward center when ball is far and moving away\n    if ball_x < 80 and abs(smoothed_dy) < 2:\n        predicted_y = 114  # center of screen\n\n    diff = predicted_y - paddle_y\n    dead_zone = 8\n    if diff > dead_zone:\n        return 3  # DOWN\n    elif diff < -dead_zone:\n        return 2  # UP\n    return 0  # NOOP",
+        "objective": 20.9
+    },
+    {
+        "sample_order": 312,
+        "operator": "e1",
+        "algorithm": "The new algorithm uses a momentum-based adaptive pursuit strategy that tracks the ball's vertical velocity and applies a time-decaying bias to anticipate future ball position, combined with a non-linear activation function for paddle movement.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    \n    # Initialize persistent state\n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n        select_action.vert_velocity = 0\n        select_action.bias = 0\n    \n    # Update vertical velocity estimate\n    vert_velocity = ball_y - select_action.prev_ball_y\n    select_action.prev_ball_y = ball_y\n    # Smooth velocity with momentum\n    select_action.vert_velocity = 0.7 * select_action.vert_velocity + 0.3 * vert_velocity\n    \n    # Time-decaying bias to anticipate ball path\n    select_action.bias = 0.9 * select_action.bias + 0.1 * select_action.vert_velocity\n    \n    # Predict future ball y using bias\n    predicted_y = ball_y + select_action.bias * 3\n    \n    # Clamp to valid range\n    predicted_y = max(34, min(194, predicted_y))\n    \n    # Non-linear sigmoid-like decision region\n    delta = predicted_y - paddle_y\n    if delta < -10:\n        return 2  # UP\n    elif delta > 10:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 313,
+        "operator": "e2",
+        "algorithm": "The new algorithm uses an adaptive dead zone that grows when the ball is close to the paddle vertically, minimizing tiny corrections, but shrinks when the ball is far, enabling faster response.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Adaptive dead zone: larger when ball is vertically close, smaller when far\n    distance = abs(ball_y - paddle_y)\n    dead_zone = max(5, 30 - distance // 2)\n    \n    if distance > dead_zone:\n        if ball_y < paddle_y:\n            return 2  # UP\n        else:\n            return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 7.8
+    },
+    {
+        "sample_order": 314,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a proportional-velocity dead zone that scales with both the ball's vertical speed and its horizontal distance, combined with a momentum-based smoothing term that prevents paddle oscillation.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Track ball vertical velocity\n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n        select_action.vert_speed = 0\n    vert_speed = ball_y - select_action.prev_ball_y\n    select_action.prev_ball_y = ball_y\n    \n    # Track ball horizontal velocity\n    if not hasattr(select_action, 'prev_ball_x'):\n        select_action.prev_ball_x = ball_x\n        select_action.horiz_speed = 0\n    horiz_speed = ball_x - select_action.prev_ball_x\n    select_action.prev_ball_x = ball_x\n    \n    # Predict future ball y using vertical momentum and proximity factor\n    distance_from_right = 160 - ball_x\n    proximity_factor = max(0.2, 1.0 - distance_from_right / 160.0)\n    predicted_y = ball_y + vert_speed * (3 + 5 * proximity_factor)\n    predicted_y = max(34, min(194, predicted_y))\n    \n    # Adaptive dead zone with hysteresis using vertical speed\n    base_dead_zone = 6 + abs(vert_speed) * 1.5\n    distance_dead_zone = 2 * distance_from_right // 40\n    dead_zone = max(3, base_dead_zone + distance_dead_zone)\n    \n    # Apply momentum: if already moving in correct direction, reduce dead zone\n    if hasattr(select_action, 'last_action'):\n        if (select_action.last_action == 2 and predicted_y < paddle_y - 2) or \\\n           (select_action.last_action == 3 and predicted_y > paddle_y + 2):\n            dead_zone = max(1, dead_zone - 4)\n    \n    if predicted_y < paddle_y - dead_zone:\n        select_action.last_action = 2\n        return 2\n    elif predicted_y > paddle_y + dead_zone:\n        select_action.last_action = 3\n        return 3\n    select_action.last_action = 0\n    return 0",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 315,
+        "operator": "e2",
+        "algorithm": "The new algorithm uses a proportional control law where paddle velocity is scaled by the signed distance to the ball, with a dead zone that shrinks linearly as the ball approaches the right edge, and applies a momentum discount to reduce jitter.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    if not hasattr(select_action, 'prev_action'):\n        select_action.prev_action = 0\n    \n    # Dead zone shrinks as ball approaches right side (ball_x up to 160)\n    dead_zone = max(3, 12 - (ball_x - 17) // 16)\n    \n    error = ball_y - paddle_y\n    \n    # Proportional response with hysteresis\n    if abs(error) > dead_zone:\n        if error > 0:\n            action = 3  # DOWN\n        else:\n            action = 2  # UP\n    else:\n        action = 0  # NOOP\n    \n    # Momentum discount: don't flip direction too quickly\n    if action != 0 and action != select_action.prev_action and abs(error) < 20:\n        action = 0\n    \n    select_action.prev_action = action\n    return action",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 316,
+        "operator": "m2",
+        "algorithm": "The new algorithm reduces the dead zone threshold to react more quickly to smaller vertical differences, and also considers ball direction by only moving when the ball is approaching the player's paddle.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_x = obs[49]\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    # Only react when ball is moving toward the right paddle (ball_x increasing)\n    if ball_x > 80:  # ball in right half\n        if ball_y < paddle_y - 3:\n            return 2  # UP\n        elif ball_y > paddle_y + 3:\n            return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 14.2
+    },
+    {
+        "sample_order": 317,
+        "operator": "e1",
+        "algorithm": "The new algorithm uses a reinforcement-learning-inspired hedge strategy: it computes a signed error between ball and paddle positions, then applies a non-linear logistic-like threshold with hysteresis (a stored previous error) to decide when to move, reducing jitter and overshoot.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    if not hasattr(select_action, 'prev_error'):\n        select_action.prev_error = 0.0\n    error = ball_y - paddle_y\n    # logistic sigmoid-like scaling and hysteresis\n    scaled = error / 30.0\n    signed = 1.0 / (1.0 + np.exp(-scaled)) - 0.5\n    movement = signed + 0.2 * select_action.prev_error\n    select_action.prev_error = movement\n    if movement < -0.15:\n        return 2\n    elif movement > 0.15:\n        return 3\n    return 0",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 318,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a proportional-derivative control approach by computing the ball's vertical velocity from the difference between its current y-position and the paddle's y-position, then applying a dynamic offset that scales with horizontal distance to predict the target paddle position.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Vertical velocity proxy based on ball position relative to paddle\n    vel_y = ball_y - paddle_y\n    # Normalize velocity to a small step size\n    if vel_y > 0:\n        vel_y = 1\n    elif vel_y < 0:\n        vel_y = -1\n    else:\n        vel_y = 0\n    \n    # Horizontal distance to right edge\n    dist_x = 160 - ball_x\n    # Predict steps assuming ~2 px/frame horizontal speed\n    steps = max(1, dist_x // 2)\n    # Predicted y with proportional-derivative term\n    predicted_y = ball_y + vel_y * steps + (steps // 4) * (ball_y - paddle_y) // 8\n    \n    # Clamp to valid range\n    predicted_y = max(17, min(194, predicted_y))\n    \n    # Dead zone to reduce jitter\n    error = predicted_y - paddle_y\n    dead_zone = 6\n    \n    if error < -dead_zone:\n        return 2\n    elif error > dead_zone:\n        return 3\n    return 0",
+        "objective": 12.0
+    },
+    {
+        "sample_order": 319,
+        "operator": "e2",
+        "algorithm": "The new algorithm uses a strategy that considers the ball's vertical speed and applies an asymmetric dead zone, moving the paddle proactively when the ball is moving toward it but reacting only when the ball is already far away when moving away, to minimize overcorrection.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n        select_action.prev_paddle_y = paddle_y\n    ball_dy = ball_y - select_action.prev_ball_y\n    select_action.prev_ball_y = ball_y\n    paddle_dy = paddle_y - select_action.prev_paddle_y\n    select_action.prev_paddle_y = paddle_y\n\n    # Predict ball position two steps ahead\n    target_y = ball_y + 2 * ball_dy\n\n    # Asymmetric dead zone: smaller threshold if ball moving toward paddle, larger if moving away\n    if ball_dy * paddle_dy >= 0:  # ball and paddle moving same direction or paddle stationary\n        threshold = 12\n    else:  # ball moving opposite to paddle direction\n        threshold = 18\n\n    diff = target_y - paddle_y\n    if diff < -threshold:\n        return 2  # UP\n    elif diff > threshold:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 20.6
+    },
+    {
+        "sample_order": 320,
+        "operator": "m1",
+        "algorithm": "Use a proportional control law with a dynamic dead zone that widens when the ball is far to the right, reducing overcorrection near the opponent's side.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    # Dynamic dead zone: larger when ball is far to the right (closer to player paddle)\n    dead_zone = 8 + (ball_x - 17) // 18  # ranges from ~8 to ~15\n    diff = ball_y - paddle_y\n    if diff < -dead_zone:\n        return 2  # UP\n    elif diff > dead_zone:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 321,
+        "operator": "e1",
+        "algorithm": "The new algorithm uses a \"mirror pursuit\" strategy that tracks the ball's vertical position relative to the CPU paddle's trajectory, then moves the player paddle to the opposite side of the ball's predicted destination to intercept rebounds.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    cpu_y = obs[50]\n    ball_x = obs[49]\n    \n    # Track ball direction and CPU movement\n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n        select_action.prev_cpu_y = cpu_y\n        select_action.prev_ball_x = ball_x\n    \n    ball_dy = ball_y - select_action.prev_ball_y\n    cpu_dy = cpu_y - select_action.prev_cpu_y\n    ball_dx = ball_x - select_action.prev_ball_x\n    \n    select_action.prev_ball_y = ball_y\n    select_action.prev_cpu_y = cpu_y\n    select_action.prev_ball_x = ball_x\n    \n    # Predict where ball will be when it reaches player's x-range\n    if ball_dx > 0 and ball_x > 80:  # ball moving right and past midpoint\n        # Estimate remaining x distance to player paddle (x\u2248160)\n        remaining_x = max(1, 160 - ball_x)\n        steps = max(1, remaining_x / max(1, ball_dx))\n        predicted_y = ball_y + ball_dy * steps\n        # Add CPU influence: anticipate where CPU is moving\n        predicted_y += cpu_dy * 0.3\n        \n        # Move to predicted position with slight overshoot correction\n        diff = predicted_y - paddle_y\n        if abs(diff) > 5:\n            return 2 if diff < 0 else 3\n    else:\n        # Ball moving away: shadow CPU position for fast recovery\n        shadow_y = cpu_y + cpu_dy * 2\n        diff = shadow_y - paddle_y\n        if abs(diff) > 8:\n            return 2 if diff < 0 else 3\n    \n    return 0",
+        "objective": 20.4
+    },
+    {
+        "sample_order": 322,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a larger dead zone threshold of 25 pixels and also considers the sign of ball velocity by tracking ball_y change between frames to make more accurate vertical corrections.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    # Compute ball velocity in y direction (requires storing previous ball_y)\n    # Use a static variable to persist across calls\n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n    ball_vel_y = ball_y - select_action.prev_ball_y\n    select_action.prev_ball_y = ball_y\n    \n    # Dead zone threshold\n    threshold = 25\n    diff = ball_y - paddle_y\n    if abs(diff) > threshold:\n        # If ball moving away from paddle in y, react more aggressively\n        if (diff > 0 and ball_vel_y > 0) or (diff < 0 and ball_vel_y < 0):\n            if diff > 0:\n                return 3  # DOWN\n            else:\n                return 2  # UP\n        else:\n            # Ball moving toward paddle, use standard follow\n            if diff > 0:\n                return 3\n            else:\n                return 2\n    # Small dead zone: do nothing\n    return 0",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 323,
+        "operator": "e2",
+        "algorithm": "The new algorithm predicts the ball's future vertical position using a second-order estimate of its acceleration, applies a dynamic dead zone that grows with the ball's horizontal distance from the paddle, and uses proportional control to smooth paddle movements.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n        select_action.prev_ball_dy = 0\n    \n    ball_dy = ball_y - select_action.prev_ball_y\n    ball_ddy = ball_dy - select_action.prev_ball_dy\n    \n    # Predict ball position 2 steps ahead using acceleration\n    predicted_y = ball_y + 2 * ball_dy + ball_ddy\n    \n    select_action.prev_ball_y = ball_y\n    select_action.prev_ball_dy = ball_dy\n    \n    # Dynamic dead zone: larger when ball is far horizontally\n    horizontal_dist = 160 - ball_x  # distance from right paddle\n    dead_zone = 5 + max(0, 10 - horizontal_dist // 10)\n    \n    diff = predicted_y - paddle_y\n    if abs(diff) > dead_zone:\n        # Proportional control: larger error -> faster response\n        if diff < -dead_zone:\n            return 2  # UP\n        else:\n            return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 20.6
+    },
+    {
+        "sample_order": 324,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a proportional-deadband approach that scales the required vertical distance for movement with the horizontal distance, enabling more aggressive pursuit when the ball is near and reducing overcorrection when far.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_x = obs[49]\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    dy = ball_y - paddle_y\n    \n    # Proportional deadband: larger horizontal distance -> larger allowed vertical error\n    horizontal_factor = max(1, (160 - ball_x) / 30)  # ball closer -> tighter tracking\n    dead_zone = 8 * horizontal_factor\n    \n    if abs(dy) > dead_zone:\n        if dy < 0:\n            return 2  # UP\n        else:\n            return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 325,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a proportional-derivative (PD) controller on the vertical error between the ball and paddle, with a dynamic dead zone that shrinks as the ball gets closer horizontally, to enable smooth tracking and reduced overshoot.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Calculate vertical error\n    error = ball_y - paddle_y\n    \n    # Dynamic dead zone: smaller when ball is close, larger when far\n    dist_to_paddle = 160 - ball_x\n    dead_zone = max(2, min(16, dist_to_paddle // 10))\n    \n    # Derivative: approximate vertical velocity from ball_y position relative to center\n    # (simple proxy: ball moving down if ball_y > 100, up if < 100)\n    vel_y = 1 if ball_y > 100 else -1 if ball_y < 90 else 0\n    \n    # PD control: combine error and velocity with distance-based scaling\n    # Increase derivative gain when ball is close for faster correction\n    kd = 2 if dist_to_paddle < 60 else 1\n    pd_value = error + kd * vel_y\n    \n    if pd_value < -dead_zone:\n        return 2  # UP\n    elif pd_value > dead_zone:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 326,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a proportional control with a velocity-enhanced target and an adaptive dead zone that shrinks when the ball is close to the paddle's vertical range, reducing overshoot.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n        select_action.prev_ball_x = ball_x\n    \n    ball_dy = ball_y - select_action.prev_ball_y\n    ball_dx = ball_x - select_action.prev_ball_x\n    \n    select_action.prev_ball_y = ball_y\n    select_action.prev_ball_x = ball_x\n    \n    # Only predict if ball is moving towards the right paddle\n    if ball_dx > 0 or ball_x > 80:\n        target_y = ball_y + ball_dy * 2\n    else:\n        target_y = ball_y\n    \n    # Adaptive dead zone: smaller when ball is near paddle's vertical range\n    distance = abs(target_y - paddle_y)\n    if abs(paddle_y - 114) < 40:\n        dead_zone = 4\n    else:\n        dead_zone = 8\n    \n    if distance > dead_zone:\n        if target_y < paddle_y:\n            return 2\n        else:\n            return 3\n    return 0",
+        "objective": 20.3
+    },
+    {
+        "sample_order": 327,
+        "operator": "m1",
+        "algorithm": "The new algorithm reduces paddle movement by only using the ball's y-velocity to predict its future vertical position, then moving the paddle toward that predicted position when the ball is approaching the player's side.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    ball_x = obs[49]\n    paddle_y = obs[51]\n    # Estimate ball vertical velocity from RAM (simplified: assume sign based on ball_x direction)\n    # If ball moving right (toward player), predict future y; else ignore\n    if ball_x > 80:  # ball on right half, moving toward player\n        # Simple prediction: assume ball continues in same vertical direction\n        # Use moving average of ball_y difference (approximate with current vs assumed previous)\n        # Since no history stored, just use a fixed offset to anticipate\n        predicted_y = ball_y + (ball_y - 80) // 10  # heuristic offset\n        if predicted_y < paddle_y:\n            return 2\n        elif predicted_y > paddle_y:\n            return 3\n        return 0\n    else:\n        # Ball moving away or far left, only react if large difference\n        if abs(ball_y - paddle_y) > 15:\n            if ball_y < paddle_y:\n                return 2\n            else:\n                return 3\n        return 0",
+        "objective": 16.1
+    },
+    {
+        "sample_order": 328,
+        "operator": "e1",
+        "algorithm": "The new algorithm estimates future ball position using a linear regression over the last few frames and applies a weighted combination of predicted ball arrival height and paddle center with a time-varying gain to produce smooth, anticipatory movement.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    # Initialize persistent state\n    if not hasattr(select_action, 'ball_y_history'):\n        select_action.ball_y_history = []\n        select_action.ball_x_history = []\n        select_action.step_count = 0\n\n    ball_y = obs[54]\n    ball_x = obs[49]\n    paddle_y = obs[51]\n\n    # Store recent history (last 5 frames)\n    select_action.ball_y_history.append(ball_y)\n    select_action.ball_x_history.append(ball_x)\n    if len(select_action.ball_y_history) > 5:\n        select_action.ball_y_history.pop(0)\n        select_action.ball_x_history.pop(0)\n\n    select_action.step_count += 1\n\n    # Default target is ball's current y\n    target_y = ball_y\n\n    # If we have enough history and ball is moving right, predict arrival\n    if len(select_action.ball_y_history) == 5:\n        # Linear regression on ball_y over time\n        xs = list(range(5))\n        ys = select_action.ball_y_history\n        n = 5\n        sum_x = sum(xs)\n        sum_y = sum(ys)\n        slope_y = (n * sum(x * y for x, y in zip(xs, ys)) - sum_x * sum_y) / (n * sum(x * x for x in xs) - sum_x * sum_x)\n\n        xs_x = list(range(len(select_action.ball_x_history)))\n        ys_x = select_action.ball_x_history\n        sum_x_x = sum(xs_x)\n        sum_y_x = sum(ys_x)\n        slope_x = (n * sum(x * y for x, y in zip(xs_x, ys_x)) - sum_x_x * sum_y_x) / (n * sum(x * x for x in xs_x) - sum_x_x * sum_x_x)\n\n        # Only predict if ball is moving right (toward player paddle)\n        if slope_x > 0 and slope_x < 10:  # sanity check for speed\n            # Estimate time to reach x=160 (right edge)\n            current_x = select_action.ball_x_history[-1]\n            if slope_x > 0:\n                frames_to_reach = (160 - current_x) / slope_x\n                predicted_y = select_action.ball_y_history[-1] + slope_y * frames_to_reach\n                predicted_y = max(34, min(194, predicted_y))\n                # Blend prediction with current ball_y, weighted by confidence (closer = more weight)\n                distance_factor = max(0, 1 - (160 - current_x) / 143)\n                target_y = predicted_y * distance_factor + ball_y * (1 - distance_factor)\n\n    # Apply smooth movement with inertia\n    if not hasattr(select_action, 'last_action'):\n        select_action.last_action = 0\n\n    # If ball is far, be more aggressive; if close, be precise\n    ball_dist = 160 - ball_x\n    dead_zone = max(4, 12 - ball_dist // 15)\n\n    if target_y < paddle_y - dead_zone:\n        action = 2\n    elif target_y > paddle_y + dead_zone:\n        action = 3\n    else:\n        action = 0\n\n    # Momentum: don't reverse direction too quickly (helps reduce jitter)\n    if select_action.last_action != 0 and action != 0 and action != select_action.last_action:\n        # Only switch if the error is large (> 15)\n        if abs(target_y - paddle_y) > 15:\n            select_action.last_action = action\n        else:\n            action = select_action.last_action\n    else:\n        select_action.last_action = action\n\n    return action",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 329,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a smaller dead zone (2 pixels) and directly tracks the ball's vertical direction by comparing its current y-position to 17 screenshots ago, then predicts the future ball y at the right wall using a larger horizontal speed estimate (3 pixels/frame) to enable earlier interception.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    # Track ball vertical direction using a stored previous y (simulated via current obs offset)\n    # As we only have current frame, approximate direction by noting if ball is moving towards right\n    # Use a simple heuristic: if ball_x > 80, assume ball moving right; else assume left\n    vel_y = 0\n    if ball_x > 80:\n        # Ball moving right: infer vertical direction from ball_y relative to screen center (105)\n        if ball_y > 105:\n            vel_y = 2  # moving down\n        else:\n            vel_y = -2 # moving up\n    else:\n        vel_y = 0\n    \n    # Predict ball y at right edge (x=160) with increased horizontal speed estimate\n    dist_to_goal = 160 - ball_x\n    steps = max(1, dist_to_goal // 3)  # assume ~3 pixels/frame horizontal speed\n    predicted_y = ball_y + vel_y * steps\n    predicted_y = max(17, min(194, predicted_y))\n    \n    # Smaller dead zone for faster response\n    error = predicted_y - paddle_y\n    dead_zone = 2\n    \n    if error < -dead_zone:\n        return 2  # UP\n    elif error > dead_zone:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 12.0
+    },
+    {
+        "sample_order": 330,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a proportional control approach with a dynamic dead zone that scales with the absolute vertical distance to the ball, adding a small momentum term to smooth paddle movement.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    \n    # Initialize persistent variables\n    if not hasattr(select_action, 'prev_paddle_y'):\n        select_action.prev_paddle_y = paddle_y\n        select_action.smooth_dy = 0\n    \n    # Compute smoothed paddle momentum\n    paddle_dy = paddle_y - select_action.prev_paddle_y\n    select_action.smooth_dy = 0.3 * paddle_dy + 0.7 * select_action.smooth_dy\n    select_action.prev_paddle_y = paddle_y\n    \n    # Calculate error with momentum-adjusted target\n    error = ball_y - (paddle_y + select_action.smooth_dy * 0.5)\n    \n    # Dynamic dead zone: larger distance allows smaller threshold\n    dead_zone = max(3, 8 - abs(error) // 20)\n    \n    if error < -dead_zone:\n        return 2  # UP\n    elif error > dead_zone:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 20.9
+    },
+    {
+        "sample_order": 331,
+        "operator": "e1",
+        "algorithm": "The new algorithm uses the ball\u2019s horizontal position to modulate an aggressive pursuit of the ball only when it is on the player\u2019s side, while applying a proportional correction based on vertical distance divided by a factor to reduce overshoot.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    # Only pursue aggressively when ball is on player's half (x > 88)\n    if ball_x > 88:\n        diff = ball_y - paddle_y\n        if diff > 5:\n            return 3  # DOWN\n        elif diff < -5:\n            return 2  # UP\n        else:\n            return 0  # NOOP\n    else:\n        # When ball is far, just move toward center of screen (y ~ 105)\n        center = 105\n        diff = paddle_y - center\n        if abs(diff) > 10:\n            if diff > 0:\n                return 2  # UP toward center\n            else:\n                return 3  # DOWN toward center\n        return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 332,
+        "operator": "e1",
+        "algorithm": "The new algorithm uses a linear extrapolation of ball position based on its vertical velocity, computed via a running average of the last three frames, and applies a hysteresis dead zone to avoid jitter.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n        select_action.prev2_ball_y = ball_y\n        select_action.prev3_ball_y = ball_y\n\n    # Update history\n    select_action.prev3_ball_y = select_action.prev2_ball_y\n    select_action.prev2_ball_y = select_action.prev_ball_y\n    select_action.prev_ball_y = ball_y\n\n    # Compute smoothed velocity over last 3 frames\n    vel_y = (ball_y - select_action.prev3_ball_y) / 2.0\n\n    # Predict ball y 6 frames ahead\n    target_y = ball_y + vel_y * 6\n    target_y = max(17, min(194, target_y))\n\n    # Hysteresis dead zone\n    diff = target_y - paddle_y\n    if diff < -8:\n        return 2  # UP\n    elif diff > 8:\n        return 3  # DOWN\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 333,
+        "operator": "m1",
+        "algorithm": "The new algorithm adds a proportional control factor based on the vertical distance between the ball and paddle, combined with a hysteresis dead zone to reduce oscillation.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    \"\"\"Select a Pong action from the 128-byte RAM state.\n\n    The player controls the right paddle. A point is scored each time\n    the ball passes the opponent's paddle; a point is lost when the\n    ball passes the player's own paddle.\n\n    Args:\n        obs: 128-element uint8 array (ALE RAM).\n            obs[49]: ball x  (17-160, left to right)\n            obs[54]: ball y  (17-194, larger = lower on screen)\n            obs[51]: player (right) paddle y center (34-194)\n            obs[50]: CPU (left) paddle y center     (34-194)\n    Returns:\n        action: 0 (NOOP), 2 (UP), or 3 (DOWN)\n    \"\"\"\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    if not hasattr(select_action, 'prev_error'):\n        select_action.prev_error = 0\n\n    error = ball_y - paddle_y\n    # Use a proportional factor and hysteresis\n    if abs(error) > 8 or abs(error) > 4 and abs(error - select_action.prev_error) > 2:\n        if error < 0:\n            select_action.prev_error = error\n            return 2  # UP\n        else:\n            select_action.prev_error = error\n            return 3  # DOWN\n    select_action.prev_error = error\n    return 0  # NOOP",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 334,
+        "operator": "e1",
+        "algorithm": "The algorithm uses a reactive dead-zone with integrated derivative control, estimating ball velocity and applying a scaled anticipatory correction while retaining a minimum movement threshold to filter noise.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n        select_action.prev_ball_dy = 0\n    ball_dy = ball_y - select_action.prev_ball_y\n    smooth_dy = 0.3 * ball_dy + 0.7 * select_action.prev_ball_dy\n    select_action.prev_ball_y = ball_y\n    select_action.prev_ball_dy = smooth_dy\n    target_y = ball_y + int(1.5 * smooth_dy)\n    delta = target_y - paddle_y\n    if delta < -12:\n        return 2\n    elif delta > 12:\n        return 3\n    return 0",
+        "objective": 21.0
+    },
+    {
+        "sample_order": 335,
+        "operator": "e2",
+        "algorithm": "Anticipate the ball's future vertical position using its vertical velocity and acceleration, and move the paddle toward that predicted position with a dynamic dead zone that scales inversely with the ball's horizontal proximity.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    if not hasattr(select_action, 'prev_ball_y'):\n        select_action.prev_ball_y = ball_y\n        select_action.prev_ball_dy = 0\n    \n    ball_dy = ball_y - select_action.prev_ball_y\n    ball_ddy = ball_dy - select_action.prev_ball_dy\n    \n    select_action.prev_ball_y = ball_y\n    select_action.prev_ball_dy = ball_dy\n    \n    predict_y = ball_y + ball_dy * 2 + ball_ddy * 0.5\n    \n    dead_zone = max(5, 20 - ball_x // 8)\n    \n    diff = predict_y - paddle_y\n    if diff < -dead_zone:\n        return 2\n    elif diff > dead_zone:\n        return 3\n    return 0",
+        "objective": 20.1
+    },
+    {
+        "sample_order": 336,
+        "operator": "e2",
+        "algorithm": "My new algorithm uses a momentum-weighted exponential moving average of the ball's vertical position offset relative to the paddle, combined with a dynamic hysteresis band that scales inversely with the ball's horizontal distance, to determine movement.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    ball_x = obs[49]\n    \n    if not hasattr(select_action, 'ema_offset'):\n        select_action.ema_offset = 0.0\n    \n    offset = ball_y - paddle_y\n    select_action.ema_offset = 0.85 * select_action.ema_offset + 0.15 * offset\n    \n    distance = 160 - ball_x\n    dead_zone = max(2, distance // 35)\n    \n    if select_action.ema_offset < -dead_zone:\n        return 2\n    elif select_action.ema_offset > dead_zone:\n        return 3\n    return 0",
+        "objective": 21.0
+    }
+]

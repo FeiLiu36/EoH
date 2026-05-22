@@ -1,0 +1,6 @@
+{
+    "algorithm": "Use a predictive approach where the ball\u2019s future y-coordinate is estimated by simulating bounces off the top and bottom walls based on a constant vertical velocity, and the paddle moves toward that predicted position with a dynamic offset that scales with the distance to the ball.",
+    "code": "def select_action(obs: np.ndarray) -> int:\n    ball_x = obs[49]\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    \n    # Estimate vertical velocity (positive = moving down)\n    vel_y = 4 if ball_y > 100 else -4\n    \n    # Predict ball y when it reaches x=160 (right paddle line)\n    frames_to_reach = max(1, (160 - ball_x) // 5)\n    pred_y = ball_y + vel_y * frames_to_reach\n    \n    # Simulate bounces off walls (y min=17, y max=194)\n    while pred_y < 17:\n        pred_y = 34 - pred_y\n    while pred_y > 194:\n        pred_y = 388 - pred_y\n    \n    # Dynamic offset based on horizontal distance to ball\n    distance = abs(160 - ball_x)\n    offset = min(12, max(4, distance // 10))\n    \n    if pred_y < paddle_y - offset:\n        return 2\n    elif pred_y > paddle_y + offset:\n        return 3\n    return 0",
+    "objective": -2.7,
+    "other_inf": null
+}

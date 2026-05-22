@@ -1,0 +1,618 @@
+[
+    {
+        "sample_order": 1,
+        "operator": "i1",
+        "algorithm": "The algorithm uses a sigmoid-based acceptance probability whose steepness adapts to the iteration progress, enabling high exploration early and sharp exploitation later.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    # Adaptive sigmoid acceptance: shape parameter grows with iteration\n    progress = iteration / max_iterations  # 0 to 1\n    # Steepness increases from 1 to 20 over the run\n    k = 1.0 + 19.0 * progress\n    # Midpoint shifts to larger delta_fitness early, smaller later\n    mid = 5.0 * (1.0 - progress) + 0.5 * progress\n    # Sigmoid: probability = 1 / (1 + exp(k * (delta_fitness - mid)))\n    prob = 1.0 / (1.0 + np.exp(k * (delta_fitness - mid)))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 2.11723
+    },
+    {
+        "sample_order": 2,
+        "operator": "i1",
+        "algorithm": "The new algorithm uses a sigmoid of the log-odds of the Boltzmann acceptance, modulated by a quadratic function of iteration progress to gradually shift from generous exploration to strict exploitation.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    # Quadratic progress factor: starts near 1, ends near 0\n    t = iteration / max_iterations\n    progress_factor = 1.0 - t * t  # quadratic decay\n\n    # Boltzmann log-odds baseline\n    boltzmann = np.exp(-delta_fitness / max(temperature, 1e-10))\n    log_odds = np.log(max(boltzmann, 1e-12) / max(1.0 - boltzmann, 1e-12))\n\n    # Scale log-odds by progress factor (reduces acceptance over time)\n    shifted_log_odds = log_odds * progress_factor\n\n    # Convert back to probability via sigmoid\n    prob = 1.0 / (1.0 + np.exp(-shifted_log_odds))\n    return float(prob)",
+        "objective": 1.73633
+    },
+    {
+        "sample_order": 3,
+        "operator": "i1",
+        "algorithm": "The new algorithm uses a modified sigmoid-based acceptance probability that incorporates iteration-aware scaling and an adaptive temperature exponent to balance exploration and exploitation more effectively than the classic Boltzmann criterion.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    \"\"\"Decide whether to accept a worse solution in Simulated Annealing.\n\n    Called only when the candidate is worse than the current solution\n    (delta_fitness > 0). Return a probability in [0, 1]; the harness\n    accepts the candidate if np.random.rand() < returned value.\n\n    Args:\n        delta_fitness:  f(candidate) - f(current) > 0 \u2014 how much worse the\n                        candidate is. Calibrated so the Boltzmann criterion\n                        exp(-delta_fitness / temperature) \u2248 0.5 at the start.\n        temperature:    current annealing temperature; starts at T0 (problem-\n                        specific, >0) and decreases geometrically to T0 * 1e-3.\n        iteration:      current iteration index (0-based)\n        max_iterations: total number of SA iterations planned\n    Returns:\n        probability in [0, 1] of accepting the worse candidate\n    \"\"\"\n    import numpy as np\n    # Adaptive exponent based on iteration progress\n    progress = iteration / max_iterations\n    beta = 1.0 + progress  # increases from 1 to 2\n    # Sigmoid-based acceptance with temperature-controlled steepness\n    steepness = 1.0 / max(temperature, 1e-10)\n    raw = 1.0 / (1.0 + np.exp(steepness * (delta_fitness ** beta) - 1.0))\n    # Ensure probability is in [0, 1]\n    return float(np.clip(raw, 0.0, 1.0))",
+        "objective": 1.72418
+    },
+    {
+        "sample_order": 4,
+        "operator": "i1",
+        "algorithm": "The proposed acceptance function uses a sigmoid of the negative Boltzmann exponent, scaled by a quadratic function of the iteration progress, to maintain higher exploration in early iterations and sharper rejection in later iterations.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    progress = iteration / max_iterations\n    scale = (1 - progress) ** 2  # quadratic decay from 1 to 0\n    boltzmann = np.exp(-delta_fitness / max(temperature, 1e-10))\n    # Sigmoid mapped to [0,1] with steepness controlled by scale\n    prob = 1 / (1 + np.exp(-scale * (boltzmann - 0.5) * 10))\n    return float(prob)",
+        "objective": 2.06413
+    },
+    {
+        "sample_order": 5,
+        "operator": "i1",
+        "algorithm": "The new acceptance probability uses a sigmoid of the log ratio of delta_fitness to a scaled temperature that adaptively shifts from permissive to strict based on iteration progress, enhancing exploration early and exploitation late.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    \"\"\"Decide whether to accept a worse solution in Simulated Annealing.\n\n    Called only when the candidate is worse than the current solution\n    (delta_fitness > 0). Return a probability in [0, 1]; the harness\n    accepts the candidate if np.random.rand() < returned value.\n\n    Args:\n        delta_fitness:  f(candidate) - f(current) > 0 \u2014 how much worse the\n                        candidate is. Calibrated so the Boltzmann criterion\n                        exp(-delta_fitness / temperature) \u2248 0.5 at the start.\n        temperature:    current annealing temperature; starts at T0 (problem-\n                        specific, >0) and decreases geometrically to T0 * 1e-3.\n        iteration:      current iteration index (0-based)\n        max_iterations: total number of SA iterations planned\n    Returns:\n        probability in [0, 1] of accepting the worse candidate\n    \"\"\"\n    # Adaptive sigmoid-based acceptance\n    # Progress factor: 0 at start, 1 at end\n    progress = iteration / max_iterations\n    # Shift parameter: starts low (more acceptance), ends high (less acceptance)\n    shift = 5.0 * progress  # 0 \u2192 5\n    # Scale temperature by a factor that decays with progress\n    scale = temperature * (1.0 + 9.0 * (1.0 - progress))  # starts 10x, ends 1x\n    # Use sigmoid of negative log-odds: 1 / (1 + exp( (delta_fitness/scale) - shift ))\n    z = delta_fitness / max(scale, 1e-10) - shift\n    prob = 1.0 / (1.0 + np.exp(z))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.81185
+    },
+    {
+        "sample_order": 6,
+        "operator": "i1",
+        "algorithm": "The algorithm uses an adaptive acceptance probability that combines a Boltzmann-like term with a dynamic exponent that increases over iterations, enforcing a progressive penalty on acceptance of worse solutions as the search advances.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    \"\"\"Decide whether to accept a worse solution in Simulated Annealing.\n\n    Called only when the candidate is worse than the current solution\n    (delta_fitness > 0). Return a probability in [0, 1]; the harness\n    accepts the candidate if np.random.rand() < returned value.\n\n    Args:\n        delta_fitness:  f(candidate) - f(current) > 0 \u2014 how much worse the\n                        candidate is. Calibrated so the Boltzmann criterion\n                        exp(-delta_fitness / temperature) \u2248 0.5 at the start.\n        temperature:    current annealing temperature; starts at T0 (problem-\n                        specific, >0) and decreases geometrically to T0 * 1e-3.\n        iteration:      current iteration index (0-based)\n        max_iterations: total number of SA iterations planned\n    Returns:\n        probability in [0, 1] of accepting the worse candidate\n    \"\"\"\n    epsilon = 1e-12\n    safe_temp = max(temperature, epsilon)\n    progress = iteration / max_iterations\n    exponent = 1.0 + 3.0 * progress  # increases from 1 to 4 over the run\n    numerator = delta_fitness ** exponent\n    denominator = safe_temp * (1.0 + progress)  # temperature scaling with progress\n    return np.exp(-numerator / max(denominator, epsilon))",
+        "objective": 1.68206
+    },
+    {
+        "sample_order": 7,
+        "operator": "i1",
+        "algorithm": "The new algorithm replaces the classic Boltzmann criterion with a sigmoid function whose steepness decreases over iterations, balancing exploration and exploitation by maintaining higher acceptance of moderately worse solutions in early stages while still allowing limited acceptance of very poor solutions later.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    \"\"\"Decide whether to accept a worse solution in Simulated Annealing.\n\n    Called only when the candidate is worse than the current solution\n    (delta_fitness > 0). Return a probability in [0, 1]; the harness\n    accepts the candidate if np.random.rand() < returned value.\n\n    Args:\n        delta_fitness:  f(candidate) - f(current) > 0 \u2014 how much worse the\n                        candidate is. Calibrated so the Boltzmann criterion\n                        exp(-delta_fitness / temperature) \u2248 0.5 at the start.\n        temperature:    current annealing temperature; starts at T0 (problem-\n                        specific, >0) and decreases geometrically to T0 * 1e-3.\n        iteration:      current iteration index (0-based)\n        max_iterations: total number of SA iterations planned\n    Returns:\n        probability in [0, 1] of accepting the worse candidate\n    \"\"\"\n    import numpy as np\n    # Progress ratio from 0 to 1\n    tau = iteration / max_iterations\n    # Sigmoid steepness that increases with progress (from gentle to sharp)\n    gamma = 1.0 + 4.0 * tau  # steepness grows from 1 to 5\n    # Normalized delta relative to temperature, with a floor to avoid division issues\n    norm_delta = delta_fitness / max(temperature, 1e-10)\n    # Sigmoid-based acceptance: probability = 1 / (1 + exp(gamma * norm_delta))\n    prob = 1.0 / (1.0 + np.exp(gamma * norm_delta))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.66013
+    },
+    {
+        "sample_order": 8,
+        "operator": "i1",
+        "algorithm": "The algorithm uses a sigmoid-based acceptance probability that sharpens over iterations, combining a temperature-dependent slope and a fitness-dependent offset to gradually reduce exploration while maintaining selective acceptance of near-worse solutions.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    # Sigmoid-based acceptance with adaptive sharpness\n    progress = iteration / max_iterations\n    # Slope increases with progress to become more selective\n    slope = 1.0 / max(temperature, 1e-10)\n    # Midpoint shifts to require smaller deltas at low temperatures\n    midpoint = 0.5 + 2.0 * progress\n    probability = 1.0 / (1.0 + np.exp(slope * (delta_fitness - midpoint)))\n    return float(probability)",
+        "objective": 2.24404
+    },
+    {
+        "sample_order": 9,
+        "operator": "e2",
+        "algorithm": "Use a piecewise linear acceptance probability whose slope and threshold adapt based on iteration progress and temperature decay.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    \"\"\"Decide whether to accept a worse solution in Simulated Annealing.\n\n    Called only when the candidate is worse than the current solution\n    (delta_fitness > 0). Return a probability in [0, 1]; the harness\n    accepts the candidate if np.random.rand() < returned value.\n\n    Args:\n        delta_fitness:  f(candidate) - f(current) > 0 \u2014 how much worse the\n                        candidate is. Calibrated so the Boltzmann criterion\n                        exp(-delta_fitness / temperature) \u2248 0.5 at the start.\n        temperature:    current annealing temperature; starts at T0 (problem-\n                        specific, >0) and decreases geometrically to T0 * 1e-3.\n        iteration:      current iteration index (0-based)\n        max_iterations: total number of SA iterations planned\n    Returns:\n        probability in [0, 1] of accepting the worse candidate\n    \"\"\"\n    import numpy as np\n    progress = iteration / max_iterations\n    # Dynamic cutoff: increases linearly from 1.0 to 3.0 over iterations\n    cutoff = 1.0 + 2.0 * progress\n    # Slope decreases from steep (0.5) to gentle (0.1) as temperature drops\n    slope = 0.5 - 0.4 * progress\n    # Piecewise linear: probability = 1 - slope * (delta_fitness / temperature)\n    # Clamped to [0, cutoff] -> then scaled to [0, 1]\n    raw = 1.0 - slope * (delta_fitness / max(temperature, 1e-10))\n    prob = np.clip(raw, 0.0, 1.0)\n    # Apply a sigmoidal smoothstep-like shaping for softening cutoff\n    prob = prob ** (1.0 + progress)\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.65026
+    },
+    {
+        "sample_order": 10,
+        "operator": "m1",
+        "algorithm": "New algorithm uses a piecewise acceptance rule combining a quadratic penalty for small delta_fitness with a threshold-based rejection for large delta_fitness, scaled by iteration progress to smoothly transition from lenient to strict acceptance.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Quadratic scaling for small delta, threshold cutoff for large delta\n    threshold = temperature * (1.0 - 0.9 * progress)  # decreases with iteration\n    if delta_fitness > threshold:\n        return 0.0\n    else:\n        # Quadratic penalty: probability = 1 - (delta_fitness / threshold)^2\n        ratio = delta_fitness / max(threshold, 1e-10)\n        prob = 1.0 - ratio * ratio\n        return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.87822
+    },
+    {
+        "sample_order": 11,
+        "operator": "e2",
+        "algorithm": "The acceptance probability is determined by a decaying exponential of delta_fitness, modulated by a dynamic power-law exponent that increases with the ratio of temperature to its initial value, combined with a hyperbolic tangent scaling of the exponent to create a smooth transition from high to low acceptance.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    \"\"\"Decide whether to accept a worse solution in Simulated Annealing.\n\n    Called only when the candidate is worse than the current solution\n    (delta_fitness > 0). Return a probability in [0, 1]; the harness\n    accepts the candidate if np.random.rand() < returned value.\n\n    Args:\n        delta_fitness:  f(candidate) - f(current) > 0 \u2014 how much worse the\n                        candidate is. Calibrated so the Boltzmann criterion\n                        exp(-delta_fitness / temperature) \u2248 0.5 at the start.\n        temperature:    current annealing temperature; starts at T0 (problem-\n                        specific, >0) and decreases geometrically to T0 * 1e-3.\n        iteration:      current iteration index (0-based)\n        max_iterations: total number of SA iterations planned\n    Returns:\n        probability in [0, 1] of accepting the worse candidate\n    \"\"\"\n    epsilon = 1e-12\n    safe_temp = max(temperature, epsilon)\n    progress = iteration / max_iterations\n    # Dynamic exponent controlled by temperature ratio and smoothed by tanh\n    temp_ratio = safe_temp / (1.0 * 1e3)  # normalized by final temperature\n    exponent_alpha = 0.5 + 2.0 * np.tanh(3.0 * (1.0 - progress))\n    # Base exponent = 1 + alpha * log(1 + temp_ratio)\n    exponent = 1.0 + exponent_alpha * np.log(1.0 + temp_ratio)\n    delta_scaled = (delta_fitness / safe_temp) ** exponent\n    return float(np.exp(-delta_scaled))",
+        "objective": 1.63617
+    },
+    {
+        "sample_order": 12,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a power-law acceptance probability whose exponent decreases with iteration progress, allowing gradually stricter rejection of worse solutions while maintaining high acceptance of small degradations early on.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    tau = iteration / max_iterations\n    power = 0.5 + 1.5 * (1 - tau)  # power decreases from 2.0 to 0.5\n    scaled_delta = delta_fitness / max(temperature, 1e-10)\n    prob = 1.0 / (1.0 + scaled_delta ** power)\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.80229
+    },
+    {
+        "sample_order": 13,
+        "operator": "e2",
+        "algorithm": "The new algorithm uses a piecewise linear decay of the acceptance probability with respect to delta_fitness, where the slope increases linearly with iteration progress, simulating a \"budget\" of allowed degradation that shrinks over time.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    tau = iteration / max_iterations\n    # Slope increases from 0.5 to 5.0 over iterations\n    slope = 0.5 + 4.5 * tau\n    # Piecewise linear: probability = max(0, 1 - slope * delta_fitness / temperature)\n    prob = max(0.0, 1.0 - slope * delta_fitness / max(temperature, 1e-10))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.66912
+    },
+    {
+        "sample_order": 14,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a logistic function of the ratio of delta_fitness to temperature, whose steepness is adaptively modulated by a cosine-annealed factor that cycles between exploration and exploitation phases based on iteration progress.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    epsilon = 1e-12\n    safe_temp = max(temperature, epsilon)\n    progress = iteration / max_iterations\n    \n    # Cyclic modulation factor using cosine annealing (0 to 1 and back)\n    cycle = np.cos(2.0 * np.pi * progress * 3.0)  # 3 full cycles\n    modulation = 0.5 + 0.5 * cycle  # ranges in [0, 1]\n    \n    # Steepness parameter for logistic function\n    steepness = 1.0 + 4.0 * modulation * (1.0 - progress)\n    \n    # Logistic acceptance: probability = 1 / (1 + exp(steepness * delta / temp))\n    logit_input = steepness * (delta_fitness / safe_temp)\n    prob = 1.0 / (1.0 + np.exp(logit_input))\n    \n    return float(prob)",
+        "objective": 1.66594
+    },
+    {
+        "sample_order": 15,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 16,
+        "operator": "e1",
+        "algorithm": "The new algorithm uses a Cauchy-like acceptance probability modulated by a sigmoidal function of iteration progress, where the scale parameter adapts based on the temperature decay rate.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    \"\"\"Decide whether to accept a worse solution in Simulated Annealing.\n\n    Called only when the candidate is worse than the current solution\n    (delta_fitness > 0). Return a probability in [0, 1]; the harness\n    accepts the candidate if np.random.rand() < returned value.\n\n    Args:\n        delta_fitness:  f(candidate) - f(current) > 0 \u2014 how much worse the\n                        candidate is. Calibrated so the Boltzmann criterion\n                        exp(-delta_fitness / temperature) \u2248 0.5 at the start.\n        temperature:    current annealing temperature; starts at T0 (problem-\n                        specific, >0) and decreases geometrically to T0 * 1e-3.\n        iteration:      current iteration index (0-based)\n        max_iterations: total number of SA iterations planned\n    Returns:\n        probability in [0, 1] of accepting the worse candidate\n    \"\"\"\n    epsilon = 1e-12\n    safe_temp = max(temperature, epsilon)\n    progress = iteration / max_iterations\n    # Sigmoid modulation: start near 1, end near 0\n    sigmoid_factor = 1.0 / (1.0 + np.exp(10.0 * (progress - 0.5)))\n    # Cauchy-like acceptance: scale based on temperature and progress\n    scale = safe_temp * (1.0 + 5.0 * (1.0 - progress))\n    prob = 1.0 / (1.0 + (delta_fitness / scale) ** 2)\n    # Modulate by sigmoid factor to reduce acceptance in later iterations\n    prob = prob * (0.2 + 0.8 * sigmoid_factor)\n    return float(min(max(prob, 0.0), 1.0))",
+        "objective": 1.68697
+    },
+    {
+        "sample_order": 17,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a doubly truncated Cauchy acceptance probability with a dynamic scale factor that shrinks linearly with iteration progress, maintaining heavy-tailed exploration early while enforcing stronger rejection of large deltas later.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    tau = iteration / max_iterations\n    scale = 1.0 - 0.9 * tau  # decreases from 1.0 to 0.1\n    prob = 1.0 / (1.0 + (delta_fitness / max(temperature, 1e-10)) ** 2 / scale)\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.7474
+    },
+    {
+        "sample_order": 18,
+        "operator": "e2",
+        "algorithm": "Use a logit-based acceptance probability where delta_fitness is first transformed by an iteration-dependent power law, then passed through a shifted and scaled logistic function whose steepness and midpoint adapt with temperature decay.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    safe_temp = max(temperature, 1e-10)\n    \n    # Power-law transformation that becomes more discriminative over time\n    power = 1.0 + 1.5 * progress ** 2\n    transformed_delta = (delta_fitness / safe_temp) ** power\n    \n    # Logistic function with adaptive midpoint and steepness\n    midpoint = 2.0 * (1.0 - progress) + 0.5\n    steepness = 1.0 + 2.0 * (1.0 - progress)\n    \n    # Probability from logistic: 1 / (1 + exp(steepness * (transformed_delta - midpoint)))\n    logit = steepness * (transformed_delta - midpoint)\n    prob = 1.0 / (1.0 + np.exp(logit))\n    \n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.71906
+    },
+    {
+        "sample_order": 19,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 20,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a sigmoid acceptance shaped by a temperature-scaled, iteration-decreasing penalty factor that is multiplied by a random-walk perturbation inspired by Gaussian noise, creating a non-monotonic acceptance rule.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    epsilon = 1e-12\n    safe_temp = max(temperature, epsilon)\n    progress = iteration / max_iterations\n    \n    # Random-walk perturbation factor (Gaussian noise)\n    noise = np.random.normal(0, 0.1 * (1 - progress))\n    \n    # Iteration-decreasing penalty factor\n    penalty = 1.0 + 2.0 * (1.0 - progress) ** 2\n    \n    # Sigmoid acceptance with shifted threshold\n    sigmoid_input = (delta_fitness / safe_temp) * penalty + noise\n    prob = 1.0 - 1.0 / (1.0 + np.exp(-sigmoid_input + 0.5))\n    \n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.68272
+    },
+    {
+        "sample_order": 21,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses an adaptive sigmoid-shaped acceptance probability that transitions from a flat high-acceptance plateau to a sharp rejection threshold, controlled by a progress-modulated scaling factor.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    epsilon = 1e-12\n    safe_temp = max(temperature, epsilon)\n    progress = iteration / max_iterations\n    \n    # Sigmoid shape factor: starts low (broad acceptance), increases with progress\n    k = 1.0 + 9.0 * progress ** 3\n    # Midpoint shifts: early iterations accept even large deltas, later reject quickly\n    midpoint = 0.5 * safe_temp * (1.0 + 5.0 * (1.0 - progress))\n    \n    # Probability from sigmoid: 1 / (1 + exp(k * (delta_fitness - midpoint)))\n    prob = 1.0 / (1.0 + np.exp(k * (delta_fitness - midpoint)))\n    return float(prob)",
+        "objective": 1.70485
+    },
+    {
+        "sample_order": 22,
+        "operator": "e2",
+        "algorithm": "Use a logistic sigmoid centered on an adaptively shifting threshold of delta_fitness/temperature, with the sigmoid's steepness increasing over iterations to gradually harden the acceptance boundary.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Threshold shifts from 2.0 to 0.5 over iterations\n    threshold = 2.0 - 1.5 * progress\n    # Steepness increases from 0.5 to 5.0\n    steepness = 0.5 + 4.5 * progress\n    # Logistic sigmoid centered at threshold\n    z = steepness * (threshold - delta_fitness / max(temperature, 1e-10))\n    prob = 1.0 / (1.0 + np.exp(-z))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.57724
+    },
+    {
+        "sample_order": 23,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a sigmoid-based acceptance probability where the midpoint and steepness adapt over iterations, transitioning from a generous early acceptance to a strict late-stage criterion.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    \"\"\"Decide whether to accept a worse solution in Simulated Annealing.\n\n    Called only when the candidate is worse than the current solution\n    (delta_fitness > 0). Return a probability in [0, 1]; the harness\n    accepts the candidate if np.random.rand() < returned value.\n\n    Args:\n        delta_fitness:  f(candidate) - f(current) > 0 \u2014 how much worse the\n                        candidate is. Calibrated so the Boltzmann criterion\n                        exp(-delta_fitness / temperature) \u2248 0.5 at the start.\n        temperature:    current annealing temperature; starts at T0 (problem-\n                        specific, >0) and decreases geometrically to T0 * 1e-3.\n        iteration:      current iteration index (0-based)\n        max_iterations: total number of SA iterations planned\n    Returns:\n        probability in [0, 1] of accepting the worse candidate\n    \"\"\"\n    epsilon = 1e-12\n    safe_temp = max(temperature, epsilon)\n    progress = iteration / max_iterations\n    # Adaptive sigmoid parameters\n    midpoint = 0.5 + 2.0 * progress  # midpoint increases with progress\n    steepness = 3.0 + 7.0 * (1.0 - progress)  # steepness decreases over time\n    # Normalize delta by temperature\n    normalized_delta = delta_fitness / safe_temp\n    # Sigmoid acceptance probability\n    prob = 1.0 - 1.0 / (1.0 + np.exp(-steepness * (normalized_delta - midpoint)))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.84031
+    },
+    {
+        "sample_order": 24,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a sigmoid-based acceptance probability where the inflection point and steepness are adapted dynamically based on iteration progress and temperature, with an additional non-linear scaling to encourage exploration in early iterations and exploitation later.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    \n    progress = iteration / max_iterations\n    # Inflection point shifts from 0.5 to 2.0 as iterations progress\n    inflection = 0.5 + 1.5 * progress\n    # Steepness decreases from 3.0 to 1.0\n    steepness = 3.0 - 2.0 * progress\n    # Scale delta by temperature and apply sigmoid\n    scaled_delta = (delta_fitness / max(temperature, 1e-10)) / inflection\n    prob = 1.0 / (1.0 + np.exp(steepness * (scaled_delta - 1.0)))\n    # Power shaping to further tune exploration/exploitation\n    prob = prob ** (1.0 + 0.5 * progress)\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.80895
+    },
+    {
+        "sample_order": 25,
+        "operator": "m1",
+        "algorithm": "The new algorithm replaces the Boltzmann criterion with a quadratic-exponential decay function where the decay rate increases with iteration progress, initially accepting large deltas more freely and then rapidly tightening to near-zero acceptance for any positive delta.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    tau = iteration / max_iterations\n    # Quadratic factor that grows from 0 to ~16 over iterations\n    alpha = (4.0 * tau) ** 2\n    # Normalized delta with temperature floor\n    norm_delta = delta_fitness / max(temperature, 1e-10)\n    # Quadratic-exponential acceptance: prob = exp(-(alpha * norm_delta)^2)\n    prob = np.exp(-((alpha * norm_delta) ** 2))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.9212
+    },
+    {
+        "sample_order": 26,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a shifted exponential acceptance criterion with an adaptive threshold that initially allows frequent acceptance of moderate worsening and gradually becomes more restrictive by penalizing large deltas more aggressively as iterations progress.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    tau = iteration / max_iterations\n    # Adaptive threshold: starts high, decreases over iterations\n    threshold = 1.0 - 0.9 * tau\n    # Normalized delta, with a floor for numerical stability\n    norm_delta = delta_fitness / max(temperature, 1e-10)\n    # Shifted exponential: prob = exp(-norm_delta) if norm_delta < threshold, else 0\n    if norm_delta < threshold:\n        prob = np.exp(-norm_delta)\n    else:\n        prob = 0.0\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.66654
+    },
+    {
+        "sample_order": 27,
+        "operator": "e1",
+        "algorithm": "The acceptance probability is computed via a logistic function whose steepness and midpoint are adaptively tuned by the iteration progress and the temperature decay, creating a smooth, non-exponential transition from exploratory to exploitative behaviour.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    epsilon = 1e-12\n    safe_temp = max(temperature, epsilon)\n    progress = iteration / max_iterations\n    \n    # Midpoint shifts from high delta to low delta as temperature drops\n    midpoint = 0.5 * (1.0 - progress) * safe_temp\n    # Steepness increases with progress to sharpen the decision boundary\n    steepness = 1.0 + 5.0 * progress\n    \n    logistic = 1.0 / (1.0 + np.exp(steepness * (delta_fitness - midpoint)))\n    return float(np.clip(logistic, 0.0, 1.0))",
+        "objective": 1.80065
+    },
+    {
+        "sample_order": 28,
+        "operator": "m2",
+        "algorithm": "New algorithm uses a sigmoid-based acceptance probability with an adaptive slope that decreases linearly with iteration progress to gradually reduce exploration.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    \"\"\"Decide whether to accept a worse solution in Simulated Annealing.\n\n    Called only when the candidate is worse than the current solution\n    (delta_fitness > 0). Return a probability in [0, 1]; the harness\n    accepts the candidate if np.random.rand() < returned value.\n\n    Args:\n        delta_fitness:  f(candidate) - f(current) > 0 \u2014 how much worse the\n                        candidate is. Calibrated so the Boltzmann criterion\n                        exp(-delta_fitness / temperature) \u2248 0.5 at the start.\n        temperature:    current annealing temperature; starts at T0 (problem-\n                        specific, >0) and decreases geometrically to T0 * 1e-3.\n        iteration:      current iteration index (0-based)\n        max_iterations: total number of SA iterations planned\n    Returns:\n        probability in [0, 1] of accepting the worse candidate\n    \"\"\"\n    epsilon = 1e-12\n    safe_temp = max(temperature, epsilon)\n    progress = iteration / max_iterations\n    # Adaptive slope that decreases linearly with progress\n    slope = 2.0 * (1.0 - progress) + 0.1\n    # Sigmoid-based acceptance with midpoint at delta_fitness = safe_temp\n    return float(1.0 / (1.0 + np.exp(slope * (delta_fitness / safe_temp - 1.0))))",
+        "objective": 1.95609
+    },
+    {
+        "sample_order": 29,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 30,
+        "operator": "m1",
+        "algorithm": "Use a sigmoid-based acceptance probability that dynamically adjusts its midpoint and steepness according to iteration progress and temperature decay, providing a softer transition from exploration to exploitation.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Midpoint shifts from delta_fitness/temperature = 1.0 to 0.1 over iterations\n    midpoint = 1.0 - 0.9 * progress\n    # Steepness increases from 2.0 to 8.0 as temperature drops\n    steepness = 2.0 + 6.0 * progress\n    # Sigmoid: 1 / (1 + exp(steepness * (delta_fitness/temperature - midpoint)))\n    x = delta_fitness / max(temperature, 1e-10)\n    prob = 1.0 / (1.0 + np.exp(steepness * (x - midpoint)))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.61575
+    },
+    {
+        "sample_order": 31,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a sigmoid-based acceptance criterion with an adaptive midpoint and slope that shift from promoting exploration to exploitation as temperature decays and iteration progresses.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Sigmoid midpoint: increases with progress to make acceptance harder\n    midpoint = 1.0 + 3.0 * progress\n    # Sigmoid steepness: decreases as temperature drops (more controlled acceptance)\n    steepness = 2.0 / (temperature + 1e-10) ** 0.5\n    # Compute probability using a shifted sigmoid\n    prob = 1.0 / (1.0 + np.exp(steepness * (delta_fitness / (temperature + 1e-10) - midpoint)))\n    # Shape further with progress to sharpen transition\n    prob = prob ** (0.5 + 0.5 * (1.0 - progress))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.85435
+    },
+    {
+        "sample_order": 32,
+        "operator": "e1",
+        "algorithm": "The new algorithm uses a Cauchy-Lorentz distribution-based acceptance probability with adaptive scaling that depends on both temperature and iteration progress to maintain higher exploration in early stages while still allowing occasional long jumps later.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    \n    progress = iteration / max_iterations\n    # Cauchy-Lorentz scale parameter that decreases with progress\n    gamma = 1.0 / (1.0 + 5.0 * progress)\n    # Normalized delta\n    norm_delta = delta_fitness / max(temperature, 1e-10)\n    # Cauchy-Lorentz acceptance probability (heavy-tailed, slower decay than exponential)\n    prob = 1.0 / (1.0 + (norm_delta / gamma) ** 2)\n    # Additional modulation: early iterations boost probability, later reduce it\n    modulation = 1.0 + 0.5 * np.exp(-4.0 * progress)\n    prob = np.clip(prob * modulation, 0.0, 1.0)\n    return float(prob)",
+        "objective": 1.68718
+    },
+    {
+        "sample_order": 33,
+        "operator": "e1",
+        "algorithm": "Use a hyperbolic tangent function of the ratio of delta_fitness to temperature, modulated by an arctangent factor based on iteration progress to create a smoothly decaying, non-Boltzmann acceptance curve.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Arctangent modulation factor: starts near 1.0, decays to ~0.1\n    modulation = 1.0 - 0.9 * (2.0 / np.pi) * np.arctan(10.0 * progress)\n    # Hyperbolic tangent acceptance: scales delta/temp ratio and shifts\n    x = delta_fitness / max(temperature, 1e-10)\n    prob = 0.5 * (1.0 - np.tanh(modulation * (x - 1.0)))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.69473
+    },
+    {
+        "sample_order": 34,
+        "operator": "e2",
+        "algorithm": "Use a Cauchy-based acceptance probability whose scale parameter shrinks exponentially with iteration progress, providing a heavy-tailed exploration phase that decays faster than Boltzmann.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Scale parameter shrinks from 1.0 at start to 0.001 at end\n    scale = np.exp(-6.9 * progress)  # exp(-6.9) \u2248 0.001\n    # Cauchy survival function: 1 - CDF; heavy-tailed at start, rapid decay later\n    x = delta_fitness / max(temperature, 1e-10)\n    prob = 1.0 / (1.0 + (x / scale)**2)\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.68642
+    },
+    {
+        "sample_order": 35,
+        "operator": "e1",
+        "algorithm": "Use a stochastic acceptance rule based on a truncated Cauchy distribution whose scale parameter decays with temperature, creating heavy-tailed exploration early that gradually collapses to nearly deterministic rejection of large deltas.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    scale = temperature * (1.0 + 9.0 * (1.0 - progress))\n    z = delta_fitness / max(scale, 1e-10)\n    prob = 0.5 - (1.0 / np.pi) * np.arctan(z)\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.7913
+    },
+    {
+        "sample_order": 36,
+        "operator": "e2",
+        "algorithm": "The acceptance probability is given by a power-law of a complementary error function of the scaled delta_fitness, whose exponent decays logarithmically with temperature while the erfc argument is shifted by a progress-dependent offset.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    epsilon = 1e-12\n    safe_temp = max(temperature, epsilon)\n    progress = iteration / max(max_iterations, 1)\n    \n    # Power-law exponent decays with log temperature\n    exponent = 1.0 + 0.5 * np.log(1.0 + safe_temp)\n    \n    # Shift parameter based on progress\n    shift = 1.0 - 0.8 * progress\n    \n    # Argument for erfc: scaled delta_fitness minus shift\n    arg = (delta_fitness / safe_temp) - shift\n    \n    # Complementary error function, clamped to avoid negative values\n    erfc_val = np.erfc(arg)\n    erfc_val = max(erfc_val, epsilon)\n    \n    # Power-law transformed\n    prob = erfc_val ** (1.0 / exponent)\n    \n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": null
+    },
+    {
+        "sample_order": 37,
+        "operator": "e2",
+        "algorithm": "Use a piecewise\u2011linear acceptance function whose breakpoint transitions from a high to a low ratio of delta_fitness/temperature, and whose slope of the linear decay increases with iterations, mimicking the hardening of an exponential\u2011like criterion without a smooth sigmoid.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Breakpoint moves from 2.0 to 0.1 over iterations\n    breakpoint = 2.0 - 1.9 * progress\n    # Slope increases from 0.2 to 2.0\n    slope = 0.2 + 1.8 * progress\n    x = delta_fitness / max(temperature, 1e-10)\n    if x <= breakpoint:\n        prob = 1.0 - slope * (x / breakpoint)\n    else:\n        prob = (1.0 - slope) * np.exp(-2.0 * (x - breakpoint))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.7417
+    },
+    {
+        "sample_order": 38,
+        "operator": "e1",
+        "algorithm": "The algorithm uses a Cauchy-Lorentz distribution to model acceptance, with the scale parameter decaying quadratically over iterations and the acceptance probability computed as the complementary cumulative distribution function of the ratio delta_fitness / temperature.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    epsilon = 1e-12\n    safe_temp = max(temperature, epsilon)\n    progress = iteration / max_iterations\n    \n    # Cauchy-Lorentz scale parameter decays quadratically from 1.0 to 0.01\n    scale = 1.0 - 0.99 * progress ** 2\n    scale = max(scale, 1e-6)\n    \n    # Use complementary CDF of Cauchy distribution: 0.5 - arctan(x/gamma)/pi\n    x = delta_fitness / safe_temp\n    prob = 0.5 - np.arctan(x / scale) / np.pi\n    \n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.74287
+    },
+    {
+        "sample_order": 39,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a sigmoid-based acceptance probability whose steepness parameter adapts via a cosine annealing schedule and a Boltzmann-like rescaling of delta_fitness.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    epsilon = 1e-12\n    safe_temp = max(temperature, epsilon)\n    progress = iteration / max_iterations\n    \n    # Sigmoid steepness modulated by cosine annealing\n    steepness = 1.0 + 3.0 * np.cos(np.pi * progress)\n    \n    # Rescaled delta\n    delta_scaled = delta_fitness / safe_temp\n    # Sigmoid-based acceptance: 1 / (1 + exp(steepness * delta_scaled))\n    prob = 1.0 / (1.0 + np.exp(steepness * delta_scaled))\n    \n    return float(prob)",
+        "objective": 1.97849
+    },
+    {
+        "sample_order": 40,
+        "operator": "m2",
+        "algorithm": "My new algorithm uses a sigmoid-based acceptance probability where the midpoint and slope adapt based on iteration progress, transitioning from high acceptance early on to very low acceptance later.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    \"\"\"Decide whether to accept a worse solution in Simulated Annealing.\n\n    Called only when the candidate is worse than the current solution\n    (delta_fitness > 0). Return a probability in [0, 1]; the harness\n    accepts the candidate if np.random.rand() < returned value.\n\n    Args:\n        delta_fitness:  f(candidate) - f(current) > 0 \u2014 how much worse the\n                        candidate is. Calibrated so the Boltzmann criterion\n                        exp(-delta_fitness / temperature) \u2248 0.5 at the start.\n        temperature:    current annealing temperature; starts at T0 (problem-\n                        specific, >0) and decreases geometrically to T0 * 1e-3.\n        iteration:      current iteration index (0-based)\n        max_iterations: total number of SA iterations planned\n    Returns:\n        probability in [0, 1] of accepting the worse candidate\n    \"\"\"\n    epsilon = 1e-10\n    safe_temp = max(temperature, epsilon)\n    progress = iteration / max_iterations\n    \n    # Sigmoid parameters that shift from exploration to exploitation\n    midpoint = 1.0 - 0.9 * progress  # midpoint decreases with progress\n    slope = 2.0 + 5.0 * progress    # slope increases with progress\n    \n    # Normalized delta using current temperature\n    normalized_delta = delta_fitness / safe_temp\n    \n    # Sigmoid-based acceptance: 1 / (1 + exp(slope * (normalized_delta - midpoint)))\n    return float(1.0 / (1.0 + np.exp(slope * (normalized_delta - midpoint))))",
+        "objective": 1.88105
+    },
+    {
+        "sample_order": 41,
+        "operator": "e2",
+        "algorithm": "First, the common backbone idea in both algorithms is to adapt the acceptance probability based on iteration progress and temperature, going beyond the static Boltzmann form.\n\nSecond, based on the backbone idea my new algorithm uses a **logistic decay modulated by iteration progress**, where the core exponent is computed as `delta_fitness` raised to a power that decreases with progress, then scaled by a temperature\u2011dependent factor that flips from amplification to attenuation.\n\nThird, here is the implementation:",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    epsilon = 1e-12\n    safe_temp = max(temperature, epsilon)\n    progress = iteration / max_iterations\n\n    # Power factor: decreases from 1.5 to 0.5 over iterations\n    power = 1.5 - 1.0 * progress\n\n    # Apply power to delta_fitness, then divide by a temperature that is\n    # modulated by progress to switch from encouraging to discouraging acceptance\n    modulated_temp = safe_temp * (1.0 + 9.0 * progress)\n\n    exponent = (delta_fitness ** power) / modulated_temp\n    prob = np.exp(-exponent)\n\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.91305
+    },
+    {
+        "sample_order": 42,
+        "operator": "e2",
+        "algorithm": "My new algorithm uses a quadratic penalty on the normalized delta, with its curvature increasing over iterations to smoothly transition from broad exploration to focused exploitation.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Curvature increases from 0.1 to 2.0 over iterations\n    curvature = 0.1 + 1.9 * progress\n    # Quadratic penalty: probability = 1 / (1 + curvature * (delta/temp)^2)\n    ratio = delta_fitness / max(temperature, 1e-10)\n    prob = 1.0 / (1.0 + curvature * ratio * ratio)\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.913
+    },
+    {
+        "sample_order": 43,
+        "operator": "e1",
+        "algorithm": "Use a combination of a decaying exponential baseline modulated by a sinusoidal oscillation that grows in amplitude over iterations, creating a wave-like acceptance pattern that periodically raises and lowers the probability to escape local minima.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Baseline Boltzmann with scaling factor\n    baseline = np.exp(-delta_fitness / max(temperature, 1e-10))\n    # Sinusoidal modulation: amplitude grows from 0 to 0.5, frequency increases slowly\n    modulation = 0.5 * progress * (1 + np.sin(10.0 * progress * np.pi + iteration * 0.1))\n    # Prob = baseline modulated, clipped to [0,1]\n    prob = baseline * (1.0 + modulation)\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.66876
+    },
+    {
+        "sample_order": 44,
+        "operator": "e2",
+        "algorithm": "Use a Cauchy-based acceptance probability where the scale parameter decays with temperature and the location parameter shifts with iteration progress to provide a heavier-tailed exploration phase.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Location shifts from high to low as progress increases\n    location = 2.0 - 1.8 * progress\n    # Scale decays with temperature\n    scale = temperature / (temperature + 1.0)\n    # Cauchy-based probability: 1 / (1 + ((x - location)/scale)^2)\n    x = delta_fitness / max(temperature, 1e-10)\n    prob = 1.0 / (1.0 + ((x - location) / max(scale, 1e-10)) ** 2)\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.69004
+    },
+    {
+        "sample_order": 45,
+        "operator": "e2",
+        "algorithm": "Use a generalized Gaussian (q-exponential) acceptance probability whose shape parameter q adapts from q>1 (heavy-tailed exploration) to q<1 (sharp exploitation) as iterations progress, modulated by temperature.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # q parameter: starts above 1 (heavy tail, exploratory) and ends below 1 (sharp, exploitative)\n    q = 1.5 - 1.8 * progress  # ranges from 1.5 down to -0.3, clamped to avoid divergence\n    q = np.clip(q, 0.5, 1.8)  # keep in valid range for q-exponential\n    x = delta_fitness / max(temperature, 1e-10)\n    # q-exponential: if q != 1, exp_q(x) = (1 + (1-q)*x)^(1/(1-q))\n    if abs(q - 1.0) < 1e-10:\n        prob = np.exp(-x)\n    else:\n        arg = 1.0 - (1.0 - q) * x\n        if arg <= 0:\n            prob = 0.0\n        else:\n            prob = arg ** (1.0 / (1.0 - q))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.8917
+    },
+    {
+        "sample_order": 46,
+        "operator": "e1",
+        "algorithm": "Use a Cauchy-Lorentz acceptance function with a time-dependent scale parameter that shrinks with the temperature, providing heavy-tailed exploration early and sharper rejection later.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Scale parameter decays from 1.0 to 0.01 over iterations\n    scale = 1.0 - 0.99 * progress\n    # Cauchy-Lorentz acceptance: 1 / (1 + (delta_fitness / (scale * temperature))^2)\n    x = delta_fitness / max(temperature * scale, 1e-10)\n    prob = 1.0 / (1.0 + x * x)\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.63977
+    },
+    {
+        "sample_order": 47,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a sigmoid-based acceptance probability that adapts its steepness inversely with the temperature ratio and directly with iteration progress, and includes a scaled delta_fitness offset to maintain initial acceptance near 0.5.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    epsilon = 1e-12\n    safe_temp = max(temperature, epsilon)\n    progress = iteration / max_iterations\n    temp_ratio = safe_temp / (1.0 * 1e3)\n    # Sigmoid steepness increases with progress and decreases with temp_ratio\n    sigmoid_steepness = 0.5 + 2.5 * (1.0 - np.exp(-3.0 * progress)) / (1.0 + temp_ratio)\n    # Offset delta_fitness to keep acceptance near 0.5 initially\n    offset = 0.5 * safe_temp * np.log(1.0 + progress)\n    prob = 1.0 / (1.0 + np.exp(sigmoid_steepness * (delta_fitness / safe_temp - offset)))\n    return float(prob)",
+        "objective": 1.72444
+    },
+    {
+        "sample_order": 48,
+        "operator": "e1",
+        "algorithm": "Use a concave quadratic acceptance probability whose curvature increases with iteration progress, creating an early broad exploration region that narrows to a sharp cut-off near the end.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Curvature increases from 0.2 to 2.0 over iterations\n    curvature = 0.2 + 1.8 * progress\n    # Normalised delta: ensure positivity\n    norm_delta = delta_fitness / max(temperature, 1e-10)\n    # Concave quadratic: prob = 1 - curvature * (norm_delta ** 2), clipped to [0, 1]\n    prob = 1.0 - curvature * (norm_delta ** 2)\n    prob = np.clip(prob, 0.0, 1.0)\n    return float(prob)",
+        "objective": 1.83522
+    },
+    {
+        "sample_order": 49,
+        "operator": "e1",
+        "algorithm": "Use a halved sinusoidal decay on a clipped ratio of delta_fitness to temperature, modulated by iteration progress, to produce a non-monotonic acceptance probability that oscillates between exploration and exploitation phases.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Ratio scaled to avoid extreme values\n    ratio = delta_fitness / max(temperature, 1e-10)\n    # Non-monotonic modulation: sine wave cycles between 0.5 and 1.0\n    modulation = 0.5 + 0.5 * np.sin(2 * np.pi * progress * 3)\n    # Halved sinusoidal decay of the ratio effect\n    prob = 0.5 * (1 + np.cos(np.clip(ratio * modulation, 0, np.pi)))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.87151
+    },
+    {
+        "sample_order": 50,
+        "operator": "e1",
+        "algorithm": "Use a piecewise acceptance probability based on the fractal dimension of the objective landscape, estimated from the ratio of delta_fitness to temperature, with a noise-modulated threshold that oscillates sinusoidally over iterations to periodically encourage exploration.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n\n    progress = iteration / max_iterations\n    # Fractal dimension estimate: higher when delta_fitness is small relative to temperature\n    fractal_dim = 1.0 + 1.0 / (1.0 + delta_fitness / max(temperature, 1e-10))\n    # Sinusoidal modulation to create non-monotonic acceptance behavior\n    modulation = 0.5 + 0.5 * np.sin(2 * np.pi * 3 * progress)\n    # Piecewise acceptance: use fractal dimension to shape a power-law decay\n    # The exponent is influenced by fractal_dim and modulation\n    exponent = 1.0 + fractal_dim * (1.0 - modulation)\n    x = delta_fitness / max(temperature, 1e-10)\n    prob = 1.0 / (1.0 + x ** exponent)\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.77879
+    },
+    {
+        "sample_order": 51,
+        "operator": "e1",
+        "algorithm": "The new algorithm uses a piecewise acceptance probability that combines a linear decay for small deltas (encouraging mild exploration) with an exponential cutoff for large deltas (preventing wild jumps), modulated by iteration progress.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Linear threshold: accept with probability decreasing linearly from 1 to 0\n    # when delta_fitness is below a temperature-scaled threshold\n    threshold = temperature * (2.0 - progress)  # shrinks with iteration\n    if delta_fitness <= threshold:\n        prob = 1.0 - delta_fitness / threshold\n    else:\n        # Exponential tail for large deltas, steepness increases with progress\n        steepness = 1.0 + 4.0 * progress\n        prob = np.exp(-steepness * (delta_fitness - threshold) / max(temperature, 1e-10))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.91593
+    },
+    {
+        "sample_order": 52,
+        "operator": "m2",
+        "algorithm": "New algorithm: A sigmoid-based acceptance probability that shifts from a high acceptance plateau to a steep rejection curve using a temperature- and progress-dependent midpoint and slope.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    \"\"\"Decide whether to accept a worse solution in Simulated Annealing.\n\n    Called only when the candidate is worse than the current solution\n    (delta_fitness > 0). Return a probability in [0, 1]; the harness\n    accepts the candidate if np.random.rand() < returned value.\n\n    Args:\n        delta_fitness:  f(candidate) - f(current) > 0 \u2014 how much worse the\n                        candidate is. Calibrated so the Boltzmann criterion\n                        exp(-delta_fitness / temperature) \u2248 0.5 at the start.\n        temperature:    current annealing temperature; starts at T0 (problem-\n                        specific, >0) and decreases geometrically to T0 * 1e-3.\n        iteration:      current iteration index (0-based)\n        max_iterations: total number of SA iterations planned\n    Returns:\n        probability in [0, 1] of accepting the worse candidate\n    \"\"\"\n    epsilon = 1e-12\n    safe_temp = max(temperature, epsilon)\n    progress = iteration / max_iterations\n    \n    # Sigmoid midpoint shifts from large delta to small delta as progress increases\n    midpoint = 0.1 + 2.0 * (1.0 - progress)\n    # Slope increases with progress to sharpen the transition\n    slope = 1.0 + 5.0 * progress\n    \n    # Normalize delta_fitness by temperature\n    normalized_delta = delta_fitness / safe_temp\n    \n    # Sigmoid: probability = 1 / (1 + exp(slope * (normalized_delta - midpoint)))\n    prob = 1.0 / (1.0 + np.exp(slope * (normalized_delta - midpoint)))\n    \n    return float(prob)",
+        "objective": 1.86759
+    },
+    {
+        "sample_order": 53,
+        "operator": "m2",
+        "algorithm": "New algorithm uses a logistic (sigmoid) acceptance probability with a temperature-dependent midpoint that shifts from generous to strict as iterations progress, combined with a slower initial exploration curve.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Midpoint shifts from 0.5 * temperature to 0.05 * temperature over iterations\n    midpoint = (0.5 - 0.45 * progress) * max(temperature, 1e-10)\n    # Steepness increases with progress: from 2.0 to 10.0\n    steepness = 2.0 + 8.0 * progress\n    # Logistic function: 1 / (1 + exp(steepness * (delta_fitness - midpoint)))\n    prob = 1.0 / (1.0 + np.exp(steepness * (delta_fitness - midpoint)))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.70864
+    },
+    {
+        "sample_order": 54,
+        "operator": "e2",
+        "algorithm": "My algorithm uses a Gumbel-softmax-inspired reparameterization where a noise-scaled logistic map of delta_fitness is passed through a temperature-dependent clipped sigmoidal step that transitions from a soft to hard acceptance threshold as the cooling progresses.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    progress = iteration / max_iterations\n    safe_temp = max(temperature, 1e-10)\n    # Map delta_fitness with a scaled logistic curve that widens early and narrows late\n    scale = 0.2 + 4.8 * (1.0 - progress)  # high spread early, low late\n    centered = (delta_fitness / safe_temp) - (1.0 + 2.0 * progress)  # shifting center\n    logistic_val = 1.0 / (1.0 + np.exp(-scale * centered))\n    # Apply a temperature-dependent sigmoidal gate that hardens with cooling\n    gate_steepness = 2.0 + 8.0 * progress\n    gate_center = 0.3 + 0.5 * progress\n    gate = 1.0 / (1.0 + np.exp(-gate_steepness * (logistic_val - gate_center)))\n    return float(np.clip(gate, 0.0, 1.0))",
+        "objective": 2.96095
+    },
+    {
+        "sample_order": 55,
+        "operator": "m2",
+        "algorithm": "Use a sigmoid-based acceptance with a temperature-dependent slope that transitions from near-uniform acceptance early to near-deterministic rejection late.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Slope increases from 0.1 to 10 over iterations\n    slope = 0.1 + 9.9 * (progress ** 2)\n    # Sigmoid centered at delta_fitness = temperature, scaled by slope\n    prob = 1.0 / (1.0 + np.exp(slope * (delta_fitness / max(temperature, 1e-10) - 1.0)))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.69638
+    },
+    {
+        "sample_order": 56,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a sigmoid-based acceptance probability that incorporates a dynamic midpoint and sharpness parameter, where the midpoint increases with iteration progress to reduce acceptance over time while maintaining a softer rejection of poor solutions in early stages.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    epsilon = 1e-12\n    safe_temp = max(temperature, epsilon)\n    progress = iteration / max_iterations\n    \n    # Dynamic sigmoid parameters\n    midpoint = 0.5 + 2.0 * progress  # shifts right over iterations\n    sharpness = 1.0 + 3.0 * (1.0 - progress)  # decreases over iterations\n    \n    # Normalize delta by temperature\n    normalized_delta = delta_fitness / safe_temp\n    \n    # Sigmoid-based acceptance probability\n    exponent = -sharpness * (normalized_delta - midpoint)\n    sigmoid_value = 1.0 / (1.0 + np.exp(exponent))\n    \n    return float(sigmoid_value)",
+        "objective": 3.44094
+    },
+    {
+        "sample_order": 57,
+        "operator": "e2",
+        "algorithm": "Use a *transformed sigmoid* whose argument is the *logarithm* of the Boltzmann ratio, with the logistic midpoint and slope both modulated by a sinusoidal function of iteration progress to create a cyclic softening/hardening rhythm.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max(max_iterations, 1)\n    # Boltzmann ratio\n    ratio = np.exp(-delta_fitness / max(temperature, 1e-10))\n    # Sinusoidal modulation of log-ratio\n    cycle = np.sin(2 * np.pi * progress * 3)  # 3 full cycles\n    midpoint = 0.3 + 0.4 * cycle  # oscillates between -0.1 and 0.7\n    slope = 2.0 + 1.5 * (1 - progress)  # declines from 3.5 to 2.0\n    # Log-sigmoid on log(ratio)\n    z = slope * (np.log(max(ratio, 1e-10)) - midpoint)\n    prob = 1.0 / (1.0 + np.exp(z))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 4.40791
+    },
+    {
+        "sample_order": 58,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 59,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a sigmoid-based acceptance criterion where the midpoint and slope adapt based on the normalized temperature and iteration progress, providing a smoother transition from exploration to exploitation.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    \"\"\"Decide whether to accept a worse solution in Simulated Annealing.\n\n    Called only when the candidate is worse than the current solution\n    (delta_fitness > 0). Return a probability in [0, 1]; the harness\n    accepts the candidate if np.random.rand() < returned value.\n\n    Args:\n        delta_fitness:  f(candidate) - f(current) > 0 \u2014 how much worse the\n                        candidate is. Calibrated so the Boltzmann criterion\n                        exp(-delta_fitness / temperature) \u2248 0.5 at the start.\n        temperature:    current annealing temperature; starts at T0 (problem-\n                        specific, >0) and decreases geometrically to T0 * 1e-3.\n        iteration:      current iteration index (0-based)\n        max_iterations: total number of SA iterations planned\n    Returns:\n        probability in [0, 1] of accepting the worse candidate\n    \"\"\"\n    epsilon = 1e-12\n    safe_temp = max(temperature, epsilon)\n    progress = iteration / max_iterations\n    \n    # Sigmoid-based acceptance: midpoint and slope depend on temperature and progress\n    temp_ratio = safe_temp / 1.0  # normalized by initial temperature (assumed T0=1)\n    midpoint = 0.5 + 0.5 * (1.0 - temp_ratio) * np.cos(np.pi * progress)\n    slope = 2.0 + 4.0 * (1.0 - progress)\n    \n    # Map delta_fitness to a sigmoid input\n    x = (delta_fitness / safe_temp) - midpoint\n    probability = 1.0 / (1.0 + np.exp(slope * x))\n    \n    return float(probability)",
+        "objective": 1.71985
+    },
+    {
+        "sample_order": 60,
+        "operator": "m1",
+        "algorithm": "Use a Boltzmann criterion enriched with a quadratic temperature modulation that multiplies the acceptance probability by a time-varying sigmoid factor favouring mid-iteration exploration and late\u2011iteration rejection.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Boltzmann baseline\n    boltzmann = np.exp(-delta_fitness / max(temperature, 1e-10))\n    # Quadratic modulation: peaks near progress=0.5, decays to 0 at ends\n    modulation = 4.0 * progress * (1.0 - progress)\n    # Combine: soft sigmoid of boltzmann modulated by quadratic factor\n    prob = boltzmann * (1.0 - 0.5 * modulation) + 0.5 * modulation\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.9364
+    },
+    {
+        "sample_order": 61,
+        "operator": "e1",
+        "algorithm": "Use a piecewise function that combines a quadratic decay phase and a constant acceptance floor, with the transition point shifting linearly over iterations to transition from exploration to exploitation.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n\n    progress = iteration / max_iterations\n    # Transition point: early iterations use quadratic region, later use constant floor\n    transition = 0.3 + 0.5 * progress  # shifts from 0.3 to 0.8\n    \n    # Normalize delta by temperature\n    norm_delta = delta_fitness / max(temperature, 1e-10)\n    \n    # Piecewise function\n    if norm_delta <= transition:\n        # Quadratic decay: 1 - (norm_delta / transition)^2\n        prob = 1.0 - (norm_delta / transition) ** 2\n    else:\n        # Constant acceptance floor that decays from 0.2 to 0.01\n        floor = 0.2 * (1.0 - 0.95 * progress)\n        prob = floor\n    \n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.72076
+    },
+    {
+        "sample_order": 62,
+        "operator": "m2",
+        "algorithm": "Use a sigmoid acceptance function where the midpoint and slope adapt based on iteration progress, providing a sharper transition from exploration to exploitation compared to the Cauchy-Lorentz baseline.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Midpoint shifts from high to low delta over iterations\n    midpoint = 1.0 - 0.9 * progress\n    # Slope increases from gentle to steep\n    slope = 5.0 + 20.0 * progress\n    # Sigmoid: 1 / (1 + exp(slope * (delta_fitness / (temperature * midpoint) - 1)))\n    x = delta_fitness / max(temperature * midpoint, 1e-10)\n    prob = 1.0 / (1.0 + np.exp(slope * (x - 1.0)))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.75898
+    },
+    {
+        "sample_order": 63,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 64,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 65,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 66,
+        "operator": "m2",
+        "algorithm": "Use a double-sigmoid acceptance rule where the first sigmoid provides a high initial acceptance that decays rapidly with delta_fitness, and a second sigmoid modulated by iteration progress gradually suppresses acceptance of large delta_fitness values.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # First sigmoid: base acceptance with sharp decay\n    z1 = -5.0 * (delta_fitness / max(temperature, 1e-10) - 1.0)\n    p1 = 1.0 / (1.0 + np.exp(z1))\n    # Second sigmoid: suppresses large delta_fitness as progress increases\n    z2 = 10.0 * (1.5 * progress - delta_fitness / max(temperature, 1e-10))\n    p2 = 1.0 / (1.0 + np.exp(z2))\n    # Combined acceptance probability\n    prob = p1 * (1.0 - 0.9 * progress) + p2 * 0.9 * progress\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 2.18596
+    },
+    {
+        "sample_order": 67,
+        "operator": "e1",
+        "algorithm": "The acceptance probability is computed via a sigmoid function whose midpoint shifts dynamically based on the temperature cooling schedule and whose steepness adapts to the iteration progress, combined with a quadratic penalty on delta_fitness to suppress large jumps early.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    safe_temp = max(temperature, 1e-12)\n    progress = iteration / max_iterations\n    # Sigmoid midpoint increases as temperature cools\n    midpoint = 0.5 + 1.5 * (1 - safe_temp / (1.0 * 1e3))\n    # Steepness increases with iteration progress\n    steepness = 2.0 + 8.0 * progress\n    # Quadratic penalty on delta_fitness to reduce large jumps early\n    penalty = delta_fitness ** 2 / (safe_temp * 10 + 1e-12)\n    # Sigmoid with shifted midpoint and steepness, plus penalty\n    z = steepness * (midpoint - penalty)\n    prob = 1.0 / (1.0 + np.exp(-z))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.83494
+    },
+    {
+        "sample_order": 68,
+        "operator": "e2",
+        "algorithm": "The new algorithm replaces the exponential function entirely with a sigmoid-based acceptance criterion that uses a dynamic mid-point and steepness, both modulated by iteration progress and temperature ratio.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    \"\"\"Decide whether to accept a worse solution in Simulated Annealing.\"\"\"\n    epsilon = 1e-12\n    safe_temp = max(temperature, epsilon)\n    progress = iteration / max_iterations\n    \n    # Sigmoid parameters: mid-point and steepness evolve with progress\n    mid = 0.1 + 0.4 * (1.0 - progress)  # shifts from 0.5 to 0.1\n    steepness = 2.0 + 8.0 * progress     # increases from 2 to 10\n    \n    # Temperature-ratio damping\n    temp_damp = 1.0 / (1.0 + safe_temp)\n    \n    # Normalized delta\n    delta_norm = delta_fitness / (1.0 + safe_temp)\n    \n    # Sigmoid: probability = 1 / (1 + exp(steepness * (delta_norm - mid)))\n    prob = 1.0 / (1.0 + np.exp(steepness * (delta_norm - mid)))\n    \n    # Apply temperature damping to ensure exploration at high T\n    prob = prob * (1.0 - 0.5 * temp_damp)\n    \n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.65803
+    },
+    {
+        "sample_order": 69,
+        "operator": "e2",
+        "algorithm": "Use an inverse-Gompertz acceptance function where the shape and scale parameters both evolve with iteration progress, creating an initially near-linear decay that transitions into an exponential cut-off.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Shape parameter: starts small (slow decay) and increases (sharp cut-off)\n    shape = 0.1 + 4.9 * progress\n    # Scale parameter: decreases to make acceptance stricter\n    scale = max(1.0 - 0.95 * progress, 0.05)\n    # Inverse Gompertz: 1 - exp(-shape * exp(-delta_fitness / (scale * temperature)))\n    x = delta_fitness / max(temperature * scale, 1e-10)\n    prob = 1.0 - np.exp(-shape * np.exp(-x))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.71411
+    },
+    {
+        "sample_order": 70,
+        "operator": "m2",
+        "algorithm": "Use a time-dependent softplus acceptance function with a shape parameter that transitions from sub-Boltzmann heavy tails to near-deterministic rejection.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Shape parameter: starts near 0 (heavy tails), ends near 1 (sharp rejection)\n    shape = 1.0 - 0.999 * progress\n    # Softplus-inspired acceptance: log(1 + exp(-x)) / log(2) where x = delta_fitness/(temperature * shape)\n    x = delta_fitness / max(temperature * shape, 1e-10)\n    prob = np.log1p(np.exp(-x)) / np.log(2.0)\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.6336
+    },
+    {
+        "sample_order": 71,
+        "operator": "m2",
+        "algorithm": "The algorithm uses an inverse logistic function with a linearly decreasing temperature-normalized threshold and a fixed sigmoid steepness, replacing the logistic sigmoid's steepness increase with a constant value to shift acceptance behavior from exploration to exploitation more abruptly.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Threshold decreases linearly from 2.0 to 0.5\n    threshold = 2.0 - 1.5 * progress\n    # Fixed steepness (no increase over time)\n    steepness = 2.0\n    # Inverse logistic: prob = 1 - sigmoid(steepness * (delta/temp - threshold))\n    z = steepness * (delta_fitness / max(temperature, 1e-10) - threshold)\n    prob = 1.0 - 1.0 / (1.0 + np.exp(-z))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.85695
+    },
+    {
+        "sample_order": 72,
+        "operator": "e2",
+        "algorithm": "Use a logarithmically compressed delta_fitness scaled by an inverse sigmoid of temperature decay and iteration progress, then pass through a complementary error function to get a smooth probability.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    progress = iteration / max_iterations\n    safe_temp = max(temperature, 1e-10)\n    \n    # Map temperature decay into a dynamic scaling factor (0 to 1)\n    temp_factor = np.clip(safe_temp / 1.0, 0.0, 1.0)\n    \n    # Inverse sigmoid of progress to control logarithmic compression\n    inv_sigmoid = np.log(progress + 1e-10) - np.log(1.0 - progress + 1e-10)\n    compression = 1.0 + 0.5 * np.tanh(inv_sigmoid * temp_factor)\n    \n    # Logarithmically compressed delta, scaled by temperature\n    x = np.log(1.0 + delta_fitness) / (safe_temp ** compression)\n    \n    # Complementary error function for acceptance probability\n    prob = 0.5 * (1.0 + np.math.erf(-x))\n    \n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.88843
+    },
+    {
+        "sample_order": 73,
+        "operator": "e1",
+        "algorithm": "Use a piecewise acceptance probability that applies a quadratic penalty scaled by a logistic decay factor and a stochastic resonance term modeled by a damped cosine of the iteration progress.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    epsilon = 1e-12\n    safe_temp = max(temperature, epsilon)\n    progress = iteration / max_iterations\n    # logistic decay factor from 1 to near 0\n    logistic_factor = 1.0 / (1.0 + np.exp(5.0 * (progress - 0.5)))\n    # quadratic penalty term\n    quadratic = (delta_fitness / safe_temp) ** 2\n    # stochastic resonance: damped cosine oscillation\n    resonance = 0.5 * np.exp(-3.0 * progress) * np.cos(4.0 * np.pi * progress)\n    prob = logistic_factor * np.exp(-quadratic) + resonance\n    prob = np.clip(prob, 0.0, 1.0)\n    return float(prob)",
+        "objective": 1.72422
+    },
+    {
+        "sample_order": 74,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a piecewise linear acceptance criterion whose threshold decays non-monotonically with a cosine-modulated progress factor, combined with a temperature-dependent slope that flattens the transition for small deltas while sharply penalizing large ones.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Non-monotonic threshold: oscillating decay using cosine\n    threshold = 0.5 * (1.0 + np.cos(2 * np.pi * progress * 3)) * (1.0 - progress)\n    # Temperature-dependent slope: steep at high T, gentle at low T\n    slope = 1.0 / (max(temperature, 1e-10) + 0.1)\n    # Piecewise linear acceptance: prob = max(0, 1 - slope * (delta_fitness - threshold))\n    raw = 1.0 - slope * (delta_fitness - threshold)\n    prob = np.clip(raw, 0.0, 1.0)\n    return float(prob)",
+        "objective": 1.70643
+    },
+    {
+        "sample_order": 75,
+        "operator": "m2",
+        "algorithm": "Use an adaptive linear acceptance criterion where the threshold linearly decreases from a high initial value to zero, and the acceptance probability is computed as a clipped linear function of the difference between threshold and scaled delta_fitness.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    progress = iteration / max_iterations\n    # Threshold linearly decreases from 5.0 to 0.0\n    threshold = 5.0 * (1.0 - progress)\n    # Scaled delta (using temperature only for basic normalization)\n    scaled_delta = delta_fitness / max(temperature, 1e-10)\n    # Linear acceptance: probability = max(0, min(1, (threshold - scaled_delta) / threshold))\n    if threshold <= 0:\n        return 0.0\n    prob = (threshold - scaled_delta) / threshold\n    return float(max(0.0, min(1.0, prob)))",
+        "objective": 1.81176
+    },
+    {
+        "sample_order": 76,
+        "operator": "e2",
+        "algorithm": "The common backbone idea is **sigmoid-based acceptance with dynamic midpoint and steepness that change with iteration progress**.\n\nBased on this, **use a hyperbolic tangent acceptance probability where the threshold and scale are modulated by both temperature and iteration progress, creating a smooth but non-sigmoid S-curve that transitions faster in mid-run and slower at extremes.**",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    progress = iteration / max_iterations\n    # Scale factor: starts high, decreases to near zero\n    scale = max(1.0 - progress * 0.99, 0.01)\n    # Threshold: decreases from 2.0 to 0.2 over iterations\n    threshold = 2.0 - 1.8 * progress\n    # Hyperbolic tangent acceptance: 0.5 * (1 - tanh((x - threshold) / scale))\n    x = delta_fitness / max(temperature, 1e-10)\n    prob = 0.5 * (1.0 - np.tanh((x - threshold) / scale))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.59573
+    },
+    {
+        "sample_order": 77,
+        "operator": "e1",
+        "algorithm": "Use a Rayleigh distribution survival function whose hazard rate is modulated by iteration progress and normalized by temperature, yielding a heavy-tailed acceptance that initially favors large jumps and gradually prunes them.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    progress = iteration / max_iterations\n    # Scale parameter of Rayleigh distribution: starts large, decreases\n    sigma = 2.0 * (1.0 - 0.9 * progress)\n    # Convert delta_fitness temperature-normalized into Rayleigh survival\n    x = delta_fitness / max(temperature, 1e-10)\n    # Survival function of Rayleigh: exp(-x^2 / (2 * sigma^2))\n    prob = np.exp(- (x ** 2) / (2.0 * sigma ** 2))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.67119
+    },
+    {
+        "sample_order": 78,
+        "operator": "m1",
+        "algorithm": "Use a doubly-adaptive acceptance criterion that combines a temperature-dependent power-law exponent with a multiplicative exploration bonus that decays non-monotonically via a cosine schedule.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Power-law exponent starts at 1.5 and decreases to 0.8 over iterations\n    exponent = 1.5 - 0.7 * progress\n    # Non-monotonic exploration bonus via cosine: peaks at 25% and 75% progress\n    bonus = 0.5 * (1.0 + np.cos(2 * np.pi * progress))\n    # Combined exponent with bonus, then use scaled exponential\n    scaled_delta = delta_fitness / max(temperature, 1e-10)\n    prob = np.exp(-scaled_delta ** exponent * (1.0 - 0.3 * bonus))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.85379
+    },
+    {
+        "sample_order": 79,
+        "operator": "e1",
+        "algorithm": "Use a sigmoid-shaped acceptance with a dynamic midpoint that shifts from low-delta acceptance early on to high-delta rejection late, combined with a temperature-scaled steepness.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Midpoint moves from 0.5*temperature to 0.05*temperature as progress increases\n    midpoint = 0.5 * temperature * (1.0 - 0.9 * progress)\n    # Steepness increases with inverse temperature and progress\n    steepness = 1.0 / max(temperature * (1.0 + progress), 1e-10)\n    # Sigmoid: 1 / (1 + exp(steepness * (delta_fitness - midpoint)))\n    prob = 1.0 / (1.0 + np.exp(steepness * (delta_fitness - midpoint)))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.70116
+    },
+    {
+        "sample_order": 80,
+        "operator": "m2",
+        "algorithm": "New algorithm uses a decaying exponential of the absolute difference between delta_fitness/temperature and a time-varying threshold, with the exponent's base decreasing over iterations to transition from soft to hard acceptance.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    \n    progress = iteration / max_iterations\n    # Threshold moves from 1.0 to 0.1\n    threshold = 1.0 - 0.9 * progress\n    # Base of exponent decays from 2.0 to 1.1\n    base = 2.0 - 0.9 * progress\n    # Compute exponent with absolute difference\n    exponent = np.abs(threshold - delta_fitness / max(temperature, 1e-10))\n    prob = base ** (-exponent)\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.80709
+    },
+    {
+        "sample_order": 81,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 82,
+        "operator": "e1",
+        "algorithm": "New algorithm uses a power-law modulated inverse temperature decay with an iteration-dependent exponent that progressively reduces acceptance of larger deteriorations while maintaining a heavy-tailed exploration profile.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Exponent starts near 0 (generous acceptance) and increases to ~3 (strict)\n    exponent = 0.2 + 2.8 * progress\n    # Power-law denominator: (1 + delta_fitness / temperature)^exponent\n    denominator = (1.0 + delta_fitness / max(temperature, 1e-10)) ** exponent\n    prob = 1.0 / denominator\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.78864
+    },
+    {
+        "sample_order": 83,
+        "operator": "m1",
+        "algorithm": "New algorithm: Use a cosine-shaped acceptance function where the acceptance probability periodically oscillates with iteration progress, modulated by an exponentially decaying envelope that tightens the acceptance band over time.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Envelope decays from 1 to 0.1 over iterations\n    envelope = 1.0 - 0.9 * progress\n    # Oscillation frequency increases with progress\n    freq = 3.0 + 7.0 * progress\n    # Cosine modulation: oscillates between -1 and 1\n    modulation = np.cos(2.0 * np.pi * freq * progress)\n    # Normalised delta_fitness ratio\n    ratio = delta_fitness / max(temperature, 1e-10)\n    # Acceptance probability: base decaying envelope times cosine-modulated sigmoid-like term\n    prob = envelope * (0.5 + 0.5 * np.tanh(2.0 * (modulation - ratio)))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.82868
+    },
+    {
+        "sample_order": 84,
+        "operator": "e2",
+        "algorithm": "Use a scaled Beta-distribution CDF, whose shape parameters evolve with iteration progress, to produce a non\u2011linear, bounded acceptance probability that mimics a gradually hardening sigmoid but with asymmetric tails.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    from scipy.stats import beta\n    progress = iteration / max_iterations\n    # Shape parameters: start with near-uniform (0.5,0.5), end with aggressive (5,1)\n    alpha = 0.5 + 4.5 * progress\n    beta_param = 2.0 - 1.5 * progress  # decreases from 2.0 to 0.5\n    # Normalise delta/temperature to [0,1] using threshold shifting\n    threshold = 2.0 - 1.5 * progress\n    x = delta_fitness / max(temperature, 1e-10)\n    x_normalised = np.clip(x / (threshold + 1e-10), 0.0, 1.0)\n    prob = 1.0 - beta.cdf(x_normalised, alpha, beta_param)\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.64756
+    },
+    {
+        "sample_order": 85,
+        "operator": "e1",
+        "algorithm": "Use a Cauchy\u2011inspired acceptance probability modulated by a memory\u2011based moving average of recent improvements, creating an adaptive tail that widens when progress stalls and narrows when improvement is steady.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    # Memory of recent improvements (simulated as an internal variable)\n    # For simplicity, we use a deterministic function based on iteration progress\n    progress = iteration / max_iterations\n    # Moving average coefficient: high when progress is low, low when progress is high\n    memory = 0.5 * (1.0 - np.cos(np.pi * progress))  # smooth from 0 to 1\n    # Cauchy scale parameter: starts large (heavy tails), shrinks over time, but expands when memory of poor progress is high\n    scale = temperature * (1.0 + 2.0 * (1.0 - memory))\n    # Cauchy-like acceptance: 1 / (1 + (delta_fitness / scale)^2)\n    prob = 1.0 / (1.0 + (delta_fitness / max(scale, 1e-10)) ** 2)\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.87491
+    },
+    {
+        "sample_order": 86,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a logistic-sigmoid acceptance probability with iteration-dependent midpoint and adaptive steepness, where the midpoint is the inverse temperature and the steepness increases linearly with progress to sharpen the acceptance boundary over time.",
+        "code": "import numpy as np\n\ndef acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    progress = iteration / max_iterations\n    # Midpoint: starts at 2.0 and decreases to 0.1 over iterations\n    midpoint = 2.0 - 1.9 * progress\n    # Steepness: increases linearly with progress from 0.5 to 5.0\n    steepness = 0.5 + 4.5 * progress\n    # Normalized delta\n    x = delta_fitness / max(temperature, 1e-10)\n    # Logistic sigmoid acceptance: 1 / (1 + exp(steepness * (x - midpoint)))\n    prob = 1.0 / (1.0 + np.exp(steepness * (x - midpoint)))\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.71358
+    },
+    {
+        "sample_order": 87,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 88,
+        "operator": "e2",
+        "algorithm": "Use a Cauchy-based acceptance probability whose scale parameter shrinks with temperature and iteration progress, giving a heavier-tailed early exploration and a sharper late rejection than Boltzmann.",
+        "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Scale parameter: starts large (heavy tails), decays to very small (sharp rejection)\n    scale = max(temperature * (1.0 - 0.99 * progress), 1e-10)\n    # Cauchy cumulative distribution function: 0.5 + (1/pi) * arctan(x)\n    # We map x = -delta_fitness / scale so that large positive delta gives low probability\n    x = -delta_fitness / scale\n    prob = 0.5 + (1.0 / np.pi) * np.arctan(x)\n    return float(np.clip(prob, 0.0, 1.0))",
+        "objective": 1.60938
+    }
+]

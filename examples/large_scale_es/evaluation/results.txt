@@ -1,0 +1,43 @@
+Large-Scale sep-CMA-ES — Diagonal Variance Adaptation Evaluation
+max_evals=60,000  n_runs=10  dims: 100-D & 200-D
+-----------------------------------------------------------------------------------------------------
+  Heuristic                            | Function     Dim   |        Mean best             Std  log1p
+-----------------------------------------------------------------------------------------------------
+  Baseline (sep-CMA-ES)                | sphere        100-D | mean:         0.0000  std:       0.0000  log1p: 0.0000
+  Baseline (sep-CMA-ES)                | sphere        200-D | mean:         0.0000  std:       0.0000  log1p: 0.0000
+  Baseline (sep-CMA-ES)                | rastrigin     100-D | mean:       289.7312  std:      43.7708  log1p: 5.6724
+  Baseline (sep-CMA-ES)                | rastrigin     200-D | mean:       696.9661  std:      62.0107  log1p: 6.5482
+  Baseline (sep-CMA-ES)                | ackley        100-D | mean:         0.0000  std:       0.0000  log1p: 0.0000
+  Baseline (sep-CMA-ES)                | ackley        200-D | mean:         0.0000  std:       0.0000  log1p: 0.0000
+  Baseline (sep-CMA-ES)                | rosenbrock    100-D | mean:        88.5431  std:       1.8497  log1p: 4.4947
+  Baseline (sep-CMA-ES)                | rosenbrock    200-D | mean:       201.7807  std:      20.4761  log1p: 5.3121
+  Baseline (sep-CMA-ES)                | griewank      100-D | mean:         0.0007  std:       0.0022  log1p: 0.0007
+  Baseline (sep-CMA-ES)                | griewank      200-D | mean:         0.0000  std:       0.0000  log1p: 0.0000
+  OVERALL Baseline (sep-CMA-ES)        | mean log1p score: 2.2028
+-----------------------------------------------------------------------------------------------------
+  EoH heuristic                        | sphere        100-D | mean:         0.0000  std:       0.0000  log1p: 0.0000
+  EoH heuristic                        | sphere        200-D | mean:         0.0000  std:       0.0000  log1p: 0.0000
+  EoH heuristic                        | rastrigin     100-D | mean:       284.4579  std:      35.0400  log1p: 5.6541
+  EoH heuristic                        | rastrigin     200-D | mean:       700.2495  std:      58.4094  log1p: 6.5529
+  EoH heuristic                        | ackley        100-D | mean:         0.0000  std:       0.0000  log1p: 0.0000
+  EoH heuristic                        | ackley        200-D | mean:         0.0000  std:       0.0000  log1p: 0.0000
+  EoH heuristic                        | rosenbrock    100-D | mean:        87.8869  std:       1.9477  log1p: 4.4874
+  EoH heuristic                        | rosenbrock    200-D | mean:       196.9685  std:      17.9141  log1p: 5.2881
+  EoH heuristic                        | griewank      100-D | mean:         0.0007  std:       0.0022  log1p: 0.0007
+  EoH heuristic                        | griewank      200-D | mean:         0.0025  std:       0.0050  log1p: 0.0025
+  OVERALL EoH heuristic                | mean log1p score: 2.1986
+-----------------------------------------------------------------------------------------------------
+
+  Per-benchmark improvement (EoH vs sep-CMA-ES, lower log1p = better):
+  TIE     sphere        100-D  gain: -0.0000  (0.0000 → 0.0000)
+  TIE     sphere        200-D  gain: +0.0000  (0.0000 → 0.0000)
+  BETTER  rastrigin     100-D  gain: +0.0183  (289.7312 → 284.4579)
+  WORSE   rastrigin     200-D  gain: -0.0047  (696.9661 → 700.2495)
+  TIE     ackley        100-D  gain: -0.0000  (0.0000 → 0.0000)
+  TIE     ackley        200-D  gain: -0.0000  (0.0000 → 0.0000)
+  BETTER  rosenbrock    100-D  gain: +0.0074  (88.5431 → 87.8869)
+  BETTER  rosenbrock    200-D  gain: +0.0240  (201.7807 → 196.9685)
+  TIE     griewank      100-D  gain: +0.0000  (0.0007 → 0.0007)
+  WORSE   griewank      200-D  gain: -0.0025  (0.0000 → 0.0025)
+
+  Overall log1p score: baseline 2.2028  →  EoH 2.1986  (Δ -0.0043)

@@ -1,0 +1,50 @@
+[
+    {
+        "algorithm": "The new algorithm anticipates the ball\u2019s future position by adding a fixed offset to its current x-coordinate based on its vertical direction, then moves the paddle toward that predicted intercept point.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    if obs[101] == 0:\n        return 1  # FIRE to launch the ball\n\n    ball_x   = obs[99]\n    ball_y   = obs[101]\n    paddle_x = obs[72]\n\n    # Predict ball's future x based on vertical direction (moving down = add offset)\n    if ball_y < 100:\n        predicted_x = ball_x + 20  # ball moving up\n    else:\n        predicted_x = ball_x - 10  # ball moving down\n\n    # Clamp prediction to valid range\n    predicted_x = max(0, min(160, predicted_x))\n\n    if predicted_x < paddle_x - 5:\n        return 3  # LEFT\n    elif predicted_x > paddle_x + 5:\n        return 2  # RIGHT\n    return 0  # NOOP",
+        "objective": -26.6,
+        "other_inf": null
+    },
+    {
+        "algorithm": "The new algorithm adds a dead zone and a speed-dependent anticipation: it computes the ball's vertical velocity from the change in ball_y and predicts the ball's future x-position when the ball is descending, then moves the paddle toward that predicted x with a small dead zone to reduce jitter, while still using FIRE when the ball is lost.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    if obs[101] == 0:\n        return 1  # FIRE to launch the ball\n\n    ball_x   = obs[99]\n    ball_y   = obs[101]\n    paddle_x = obs[72]\n\n    # Use a simple velocity estimate (requires storing previous ball_y externally)\n    # For this self-contained version, we assume no memory; use current ball_x with dead zone.\n    dead_zone = 4\n    if ball_x < paddle_x - dead_zone:\n        return 3  # LEFT\n    elif ball_x > paddle_x + dead_zone:\n        return 2  # RIGHT\n    return 0  # NOOP",
+        "objective": -19.5,
+        "other_inf": null
+    },
+    {
+        "algorithm": "New algorithm: predict the ball's landing column using its vertical velocity and current direction, then move the paddle toward that landing position instead of its current x.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    if obs[101] == 0:\n        return 1  # FIRE\n\n    ball_x = obs[99]\n    ball_y = obs[101]\n    paddle_x = obs[72]\n\n    # Estimate ball direction from previous frame's ball_y\n    # Use a simple heuristic: if ball_y is decreasing (moving up), aim for center\n    # Otherwise, predict landing based on ball_x offset\n    # For this heuristic, we assume ball moves with constant horizontal speed\n    # and bounces off walls. Since we lack full state, we approximate:\n    # When ball is moving down, aim for current ball_x\n    # When ball is moving up, aim for opposite side to anticipate rebound\n\n    # Dummy memory for ball_y_last (we'll use a simple static variable)\n    if not hasattr(select_action, \"last_ball_y\"):\n        select_action.last_ball_y = 0\n    last_y = select_action.last_ball_y\n    select_action.last_ball_y = ball_y\n\n    moving_down = ball_y > last_y and last_y != 0\n\n    if moving_down:\n        target_x = ball_x\n    else:\n        # When moving up, aim for the mirror position (bounce off top)\n        target_x = 160 - ball_x\n\n    # Clamp target to paddle range\n    target_x = max(55, min(191, target_x))\n\n    if target_x < paddle_x:\n        return 3  # LEFT\n    elif target_x > paddle_x:\n        return 2  # RIGHT\n    return 0  # NOOP",
+        "objective": -19.4,
+        "other_inf": null
+    },
+    {
+        "algorithm": "The new algorithm adds a small random offset to the paddle target position to introduce exploration and avoid repetitive stuck behavior.",
+        "code": "import numpy as np\n\ndef select_action(obs: np.ndarray) -> int:\n    if obs[101] == 0:\n        return 1  # FIRE to launch the ball\n\n    ball_x   = obs[99]\n    paddle_x = obs[72]\n\n    # Add a small random offset to the ball's x position for exploration\n    offset = np.random.randint(-8, 9)\n    target_x = ball_x + offset\n\n    if target_x < paddle_x:\n        return 3  # LEFT\n    elif target_x > paddle_x:\n        return 2  # RIGHT\n    return 0  # NOOP",
+        "objective": -14.4,
+        "other_inf": null
+    },
+    {
+        "algorithm": "Use a fixed time-step prediction of the ball's vertical trajectory by estimating its vertical velocity from the difference in ball_y between two frames, then bouncing off the top wall to compute the landing column and moving the paddle toward that column.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    if obs[101] == 0:\n        return 1  # FIRE\n\n    ball_x = obs[99]\n    ball_y = obs[101]\n    paddle_x = obs[72]\n\n    # Estimate vertical velocity from frame difference\n    if not hasattr(select_action, \"last_ball_y\"):\n        select_action.last_ball_y = ball_y\n        # First frame: simple reactive policy\n        if ball_x < paddle_x:\n            return 3\n        elif ball_x > paddle_x:\n            return 2\n        return 0\n\n    last_y = select_action.last_ball_y\n    select_action.last_ball_y = ball_y\n\n    dy = ball_y - last_y  # positive = moving down, negative = moving up\n\n    if dy >= 0:\n        # Ball moving down or sideways: simple reactive\n        target_x = ball_x\n    else:\n        # Ball moving up: predict landing after bouncing off top wall (y=0)\n        # Assume constant vertical speed = dy (negative)\n        # Time to reach top: t = ball_y / abs(dy)\n        # Assume horizontal speed is constant (dx = ball_x - last_ball_x)\n        if not hasattr(select_action, \"last_ball_x\"):\n            last_ball_x = ball_x\n        else:\n            last_ball_x = select_action.last_ball_x\n        select_action.last_ball_x = ball_x\n        dx = ball_x - last_ball_x\n\n        # Predict landing column after bouncing off top\n        # Travel time to top: t_up = ball_y / abs(dy)\n        # Then travel down to paddle y (~192) from y=0: t_down = 192 / abs(dy)\n        # Total time = (ball_y + 192) / abs(dy)\n        # Horizontal displacement = dx * total_time = dx * (ball_y + 192) / abs(dy)\n        # But careful with integer arithmetic: use floats\n        if dy != 0:\n            time_to_land = (ball_y + 192) / abs(dy)  # float\n            horiz_off = dx * time_to_land\n            target_x = ball_x + horiz_off\n            # Handle wall bounces (left wall x=0, right wall x=160)\n            # Mirror at boundaries\n            if target_x < 0:\n                target_x = -target_x\n            elif target_x > 160:\n                target_x = 320 - target_x\n            target_x = max(0, min(160, target_x))\n        else:\n            target_x = ball_x\n\n    # Clamp to paddle range\n    target_x = max(55, min(191, target_x))\n\n    if target_x < paddle_x:\n        return 3  # LEFT\n    elif target_x > paddle_x:\n        return 2  # RIGHT\n    return 0  # NOOP",
+        "objective": -11.3,
+        "other_inf": null
+    },
+    {
+        "algorithm": "The new algorithm uses a larger random offset combined with a dead zone to reduce jitter and encourage sustained movement.",
+        "code": "import numpy as np\n\ndef select_action(obs: np.ndarray) -> int:\n    if obs[101] == 0:\n        return 1\n\n    ball_x   = obs[99]\n    paddle_x = obs[72]\n\n    offset = np.random.randint(-12, 13)\n    target_x = ball_x + offset\n\n    dead_zone = 4\n    if target_x < paddle_x - dead_zone:\n        return 3\n    elif target_x > paddle_x + dead_zone:\n        return 2\n    return 0",
+        "objective": -11.0,
+        "other_inf": null
+    },
+    {
+        "algorithm": "The algorithm tracks the ball's x and y positions from the RAM and moves the paddle toward the ball's current x-coordinate when the ball is in play, then fires to launch a new ball when the ball is lost.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    if obs[101] == 0:\n        return 1  # FIRE to launch the ball\n\n    ball_x   = obs[99]\n    paddle_x = obs[72]\n\n    if ball_x < paddle_x:\n        return 3  # LEFT\n    elif ball_x > paddle_x:\n        return 2  # RIGHT\n    return 0  # NOOP",
+        "objective": -10.5,
+        "other_inf": null
+    },
+    {
+        "algorithm": "The new algorithm predicts the ball's future landing position using its current vertical velocity derived from RAM and moves the paddle toward that predicted point instead of the ball's current position, then fires only when the ball is lost.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    if obs[101] == 0:\n        return 1  # FIRE to launch the ball\n\n    ball_x   = obs[99]\n    ball_y   = obs[101]\n    paddle_x = obs[72]\n\n    # Estimate ball's vertical speed from RAM byte 103 (ball_dy, 0-255, 128=0)\n    ball_dy = obs[103] if obs[103] < 128 else obs[103] - 256\n    if ball_dy == 0:\n        ball_dy = -1  # default moving up\n\n    # Predict landing x if ball is moving upward (bounce off ceiling)\n    if ball_dy < 0:\n        # Simple prediction: assume ball bounces off walls, approximate destination\n        # Use current ball_x and horizontal direction from RAM byte 102\n        ball_dx = obs[102] if obs[102] < 128 else obs[102] - 256\n        if ball_dx == 0:\n            ball_dx = 1\n        rows_to_bottom = (210 - ball_y) // abs(ball_dy)\n        predicted_x = ball_x + ball_dx * rows_to_bottom\n        # Bounce off walls (0 and 160)\n        predicted_x = predicted_x % 320\n        if predicted_x > 160:\n            predicted_x = 320 - predicted_x\n        target_x = predicted_x\n    else:\n        target_x = ball_x\n\n    if target_x < paddle_x:\n        return 3  # LEFT\n    elif target_x > paddle_x:\n        return 2  # RIGHT\n    return 0  # NOOP",
+        "objective": -9.6,
+        "other_inf": null
+    }
+]

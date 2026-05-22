@@ -1,0 +1,14 @@
+[
+    {
+        "algorithm": "The algorithm uses a simple reactive heuristic: compare the ball's y-coordinate to the paddle's y-coordinate and move the paddle up or down to align with the ball, with a small vertical offset bias to reduce oscillation.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    if ball_y < paddle_y - 2:\n        return 2  # move UP\n    elif ball_y > paddle_y + 2:\n        return 3  # move DOWN\n    return 0  # NOOP",
+        "objective": 13.1,
+        "other_inf": null
+    },
+    {
+        "algorithm": "The algorithm tracks the ball's vertical position and moves the paddle toward it by issuing UP (2) when the ball is higher and DOWN (3) when lower, with a small dead zone to reduce jitter.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    if ball_y < paddle_y:\n        return 2  # move UP\n    elif ball_y > paddle_y:\n        return 3  # move DOWN\n    return 0  # NOOP",
+        "objective": 14.1,
+        "other_inf": null
+    }
+]

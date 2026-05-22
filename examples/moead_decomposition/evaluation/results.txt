@@ -1,0 +1,35 @@
+MOEA/D Decomposition Operator – Evaluation Results
+n_gen=200  n_runs=10  T=5  hv_samples=30000
+-----------------------------------------------------------------------------------
+  Decomposition                       | Problem              |    HV mean    HV std
+-----------------------------------------------------------------------------------
+  Tchebycheff (baseline)              | DTLZ2   7var 3obj | HV mean: 7.2685  std: 0.0016
+  Tchebycheff (baseline)              | DTLZ2  12var 3obj | HV mean: 7.2669  std: 0.0046
+  Tchebycheff (baseline)              | DTLZ2  20var 3obj | HV mean: 7.2228  std: 0.0428
+  Tchebycheff (baseline)              | DTLZ2  30var 3obj | HV mean: 7.0215  std: 0.1251
+  OVERALL Tchebycheff (baseline)      | mean HV: 7.1949
+-----------------------------------------------------------------------------------
+  Weighted Sum                        | DTLZ2   7var 3obj | HV mean: 7.0015  std: 0.0002
+  Weighted Sum                        | DTLZ2  12var 3obj | HV mean: 6.9795  std: 0.0369
+  Weighted Sum                        | DTLZ2  20var 3obj | HV mean: 6.9160  std: 0.0486
+  Weighted Sum                        | DTLZ2  30var 3obj | HV mean: 6.3618  std: 0.4825
+  OVERALL Weighted Sum                | mean HV: 6.8147
+-----------------------------------------------------------------------------------
+  PBI (theta=5)                       | DTLZ2   7var 3obj | HV mean: 7.2285  std: 0.0410
+  PBI (theta=5)                       | DTLZ2  12var 3obj | HV mean: 6.8851  std: 0.1883
+  PBI (theta=5)                       | DTLZ2  20var 3obj | HV mean: 6.3424  std: 0.2462
+  PBI (theta=5)                       | DTLZ2  30var 3obj | HV mean: 4.8254  std: 1.0421
+  OVERALL PBI (theta=5)               | mean HV: 6.3203
+-----------------------------------------------------------------------------------
+  EoH heuristic                       | DTLZ2   7var 3obj | HV mean: 7.3409  std: 0.0029
+  EoH heuristic                       | DTLZ2  12var 3obj | HV mean: 7.3221  std: 0.0187
+  EoH heuristic                       | DTLZ2  20var 3obj | HV mean: 7.2164  std: 0.1052
+  EoH heuristic                       | DTLZ2  30var 3obj | HV mean: 6.7629  std: 0.2870
+  OVERALL EoH heuristic               | mean HV: 7.1606
+-----------------------------------------------------------------------------------
+
+  Per-instance improvement: EoH vs Tchebycheff (higher HV = better)
+  BETTER  DTLZ2   7var  gain: +0.0724  (7.2685 → 7.3409)
+  BETTER  DTLZ2  12var  gain: +0.0551  (7.2669 → 7.3221)
+  WORSE   DTLZ2  20var  gain: -0.0064  (7.2228 → 7.2164)
+  WORSE   DTLZ2  30var  gain: -0.2586  (7.0215 → 6.7629)

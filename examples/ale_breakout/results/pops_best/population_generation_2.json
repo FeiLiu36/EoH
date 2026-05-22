@@ -1,0 +1,6 @@
+{
+    "algorithm": "The new algorithm anticipates the ball\u2019s future position by adding a fixed offset to its current x-coordinate based on its vertical direction, then moves the paddle toward that predicted intercept point.",
+    "code": "def select_action(obs: np.ndarray) -> int:\n    if obs[101] == 0:\n        return 1  # FIRE to launch the ball\n\n    ball_x   = obs[99]\n    ball_y   = obs[101]\n    paddle_x = obs[72]\n\n    # Predict ball's future x based on vertical direction (moving down = add offset)\n    if ball_y < 100:\n        predicted_x = ball_x + 20  # ball moving up\n    else:\n        predicted_x = ball_x - 10  # ball moving down\n\n    # Clamp prediction to valid range\n    predicted_x = max(0, min(160, predicted_x))\n\n    if predicted_x < paddle_x - 5:\n        return 3  # LEFT\n    elif predicted_x > paddle_x + 5:\n        return 2  # RIGHT\n    return 0  # NOOP",
+    "objective": -26.6,
+    "other_inf": null
+}

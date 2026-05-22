@@ -1,0 +1,6 @@
+{
+    "algorithm": "Algorithm: Prioritize visiting the nearest unvisited node first, then use a regret-based look-ahead that scores each candidate by the savings of merging a farthest and nearest future connection, to build a tour that minimizes total length.",
+    "code": "import numpy as np\n\ndef compute_node_scores(current_node: int, unvisited_nodes: np.ndarray,\n                        distance_matrix: np.ndarray,\n                        destination_node: int) -> np.ndarray:\n    unvisited = unvisited_nodes\n    dist_from_current = distance_matrix[current_node][unvisited]\n    dist_to_dest = distance_matrix[unvisited, destination_node]\n    # Regret score: penalize nodes far from current but reward those far from destination (to avoid leaving a costly edge for later)\n    scores = -dist_from_current + 0.5 * dist_to_dest\n    return scores\n\ndef select_next_node(current_node: int, destination_node: int,\n                     unvisited_nodes: np.ndarray,\n                     distance_matrix: np.ndarray) -> int:\n    scores = compute_node_scores(current_node, unvisited_nodes,\n                                 distance_matrix, destination_node)\n    return unvisited_nodes[np.argmax(scores)]",
+    "objective": 6.07672,
+    "other_inf": null
+}

@@ -1,0 +1,6 @@
+{
+    "algorithm": "New algorithm uses a mirrored prediction of ball trajectory with dynamic bounce-count and distance-weighted offset to decide paddle movement.",
+    "code": "def select_action(obs: np.ndarray) -> int:\n    ball_x = obs[49]\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    \n    # Estimate vertical velocity from direction\n    if ball_y > 100:\n        vel_y = 4\n    else:\n        vel_y = -4\n    \n    # Predict number of frames until ball reaches right side\n    dx = 160 - ball_x\n    frames = max(1, dx // 5)\n    \n    # Predict y after bounces\n    pred_y = ball_y + vel_y * frames\n    if pred_y < 17:\n        pred_y = 17 + (17 - pred_y)\n    if pred_y > 194:\n        pred_y = 194 - (pred_y - 194)\n    pred_y = max(17, min(194, pred_y))\n    \n    # Dynamic offset based on horizontal distance\n    if dx > 100:\n        offset = 10\n    elif dx > 50:\n        offset = 7\n    else:\n        offset = 4\n    \n    if pred_y < paddle_y - offset:\n        return 2\n    elif pred_y > paddle_y + offset:\n        return 3\n    return 0",
+    "objective": -6.6,
+    "other_inf": null
+}

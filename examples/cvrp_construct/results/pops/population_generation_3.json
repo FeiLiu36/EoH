@@ -1,0 +1,26 @@
+[
+    {
+        "algorithm": "The algorithm iteratively selects the nearest feasible unvisited customer until capacity is exhausted, then returns to the depot to start a new route.",
+        "code": "def select_next_node(current_node: int, depot: int, unvisited_nodes: np.ndarray,\n                     rest_capacity: float, demands: np.ndarray,\n                     distance_matrix: np.ndarray) -> int:\n    \"\"\"Select the next node to visit in a CVRP greedy construction.\n\n    Args:\n        current_node:    index of the current node (0 = depot)\n        depot:           index of the depot (always 0)\n        unvisited_nodes: array of feasible unvisited customer indices\n                         (already filtered to satisfy remaining capacity)\n        rest_capacity:   remaining vehicle capacity\n        demands:         demand of every node (index 0 = depot demand = 0)\n        distance_matrix: pairwise Euclidean distance matrix\n    Returns:\n        Index of the next node to visit, or 0 to return to the depot early.\n    \"\"\"\n    if len(unvisited_nodes) == 0:\n        return depot\n    return unvisited_nodes[np.argmin(distance_matrix[current_node][unvisited_nodes])]",
+        "objective": 13.61078,
+        "other_inf": null
+    },
+    {
+        "algorithm": "The new algorithm selects the next customer by maximizing a savings-like ratio that balances distance to the current node and proximity to the depot, to encourage returning to the depot efficiently as capacity diminishes.",
+        "code": "def select_next_node(current_node: int, depot: int, unvisited_nodes: np.ndarray,\n                     rest_capacity: float, demands: np.ndarray,\n                     distance_matrix: np.ndarray) -> int:\n    if len(unvisited_nodes) == 0:\n        return depot\n    # Compute a score: distance from current node to customer / distance from depot to customer\n    # Prefer customers that are close to current node but far from depot (savings-like idea)\n    dist_current = distance_matrix[current_node][unvisited_nodes]\n    dist_depot = distance_matrix[depot][unvisited_nodes]\n    # Avoid division by zero (depot distance is never zero for customers)\n    score = dist_current / (dist_depot + 1e-10)\n    # Also incorporate remaining capacity: favor smaller demands when capacity is low\n    capacity_factor = 1 + (rest_capacity / (demands[unvisited_nodes] + 1e-10))\n    adjusted_score = score / capacity_factor\n    # Select customer with minimum adjusted score\n    return unvisited_nodes[np.argmin(adjusted_score)]",
+        "objective": 14.15784,
+        "other_inf": null
+    },
+    {
+        "algorithm": "The new algorithm selects the next customer by maximizing a weighted sum of the distance saved relative to the depot and a penalty for large demands when capacity is low, promoting efficient route shapes and capacity-aware decisions.",
+        "code": "def select_next_node(current_node: int, depot: int, unvisited_nodes: np.ndarray,\n                     rest_capacity: float, demands: np.ndarray,\n                     distance_matrix: np.ndarray) -> int:\n    \"\"\"Select the next node to visit in a CVRP greedy construction.\n\n    Args:\n        current_node:    index of the current node (0 = depot)\n        depot:           index of the depot (always 0)\n        unvisited_nodes: array of feasible unvisited customer indices\n                         (already filtered to satisfy remaining capacity)\n        rest_capacity:   remaining vehicle capacity\n        demands:         demand of every node (index 0 = depot demand = 0)\n        distance_matrix: pairwise Euclidean distance matrix\n    Returns:\n        Index of the next node to visit, or 0 to return to the depot early.\n    \"\"\"\n    if len(unvisited_nodes) == 0:\n        return depot\n    dist_current = distance_matrix[current_node][unvisited_nodes]\n    dist_depot = distance_matrix[depot][unvisited_nodes]\n    # Savings-like score: larger is better\n    savings = dist_depot - dist_current\n    # Capacity penalty: favor smaller demands when capacity is low\n    demand_penalty = demands[unvisited_nodes] / (rest_capacity + 1e-10)\n    # Combined score (maximize)\n    score = savings - demand_penalty * dist_depot\n    return unvisited_nodes[np.argmax(score)]",
+        "objective": 14.29978,
+        "other_inf": null
+    },
+    {
+        "algorithm": "Select the unvisited customer that minimizes the product of distance from current node and distance from depot, divided by demand, to simultaneously favor nearby customers, depot-proximal customers, and high demand.",
+        "code": "def select_next_node(current_node: int, depot: int, unvisited_nodes: np.ndarray,\n                     rest_capacity: float, demands: np.ndarray,\n                     distance_matrix: np.ndarray) -> int:\n    if len(unvisited_nodes) == 0:\n        return depot\n    dist_current = distance_matrix[current_node][unvisited_nodes]\n    dist_depot = distance_matrix[depot][unvisited_nodes]\n    demands_subset = demands[unvisited_nodes]\n    # Score = (distance from current * distance from depot) / demand\n    score = (dist_current * dist_depot) / (demands_subset + 1e-10)\n    return unvisited_nodes[np.argmin(score)]",
+        "objective": 14.61261,
+        "other_inf": null
+    }
+]

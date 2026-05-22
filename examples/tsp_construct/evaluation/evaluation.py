@@ -1,7 +1,11 @@
+import importlib
+import os
+import sys
+import time
 import numpy as np
 import matplotlib.pyplot as plt
-import importlib
-import time
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 
 class Evaluation():

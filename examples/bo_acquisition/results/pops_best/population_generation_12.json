@@ -1,0 +1,6 @@
+{
+    "algorithm": "The algorithm uses a regret-weighted, entropy-aware acquisition that penalizes high-mean regions via a probabilistic thresholding of the posterior and adds an adaptive exploration bonus proportional to the differential entropy reduction rate.",
+    "code": "import numpy as np\nfrom scipy.stats import norm\nfrom scipy.special import erf\n\ndef acquisition(mu: np.ndarray, sigma: np.ndarray, f_best: float) -> np.ndarray:\n    # 1. Probability of improvement at a relaxed threshold\n    threshold = f_best + 0.1 * np.abs(f_best)\n    gamma = (threshold - mu) / (sigma + 1e-10)\n    pi = 0.5 * (1 + erf(gamma / np.sqrt(2)))\n    \n    # 2. Differential entropy reduction (exploration)\n    # Approximate reduction by log of sigma (higher sigma -> more info gain)\n    entropy = np.log(sigma + 1e-10)\n    entropy_reduction = -entropy  # want to maximize reduction\n    \n    # 3. Regret-aware weighting: focus where current best is hard to beat\n    regret_ratio = np.maximum(0, f_best - mu) / (np.abs(f_best) + 1e-10)\n    regret_weight = np.tanh(2.0 * regret_ratio)  # saturating weight\n    \n    # 4. Combined score: penalize high mean, reward high uncertainty, balance via regret\n    score = -mu + 1.5 * sigma * (1 + entropy_reduction) + 2.0 * pi * regret_weight\n    \n    return score",
+    "objective": -1.20565,
+    "other_inf": null
+}

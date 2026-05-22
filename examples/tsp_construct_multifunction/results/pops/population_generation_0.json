@@ -1,0 +1,20 @@
+[
+    {
+        "algorithm": "Algorithm: Prioritize visiting the nearest unvisited node first, then use a regret-based look-ahead that scores each candidate by the savings of merging a farthest and nearest future connection, to build a tour that minimizes total length.",
+        "code": "import numpy as np\n\ndef compute_node_scores(current_node: int, unvisited_nodes: np.ndarray,\n                        distance_matrix: np.ndarray,\n                        destination_node: int) -> np.ndarray:\n    unvisited = unvisited_nodes\n    dist_from_current = distance_matrix[current_node][unvisited]\n    dist_to_dest = distance_matrix[unvisited, destination_node]\n    # Regret score: penalize nodes far from current but reward those far from destination (to avoid leaving a costly edge for later)\n    scores = -dist_from_current + 0.5 * dist_to_dest\n    return scores\n\ndef select_next_node(current_node: int, destination_node: int,\n                     unvisited_nodes: np.ndarray,\n                     distance_matrix: np.ndarray) -> int:\n    scores = compute_node_scores(current_node, unvisited_nodes,\n                                 distance_matrix, destination_node)\n    return unvisited_nodes[np.argmax(scores)]",
+        "objective": 6.07672,
+        "other_inf": null
+    },
+    {
+        "algorithm": "The algorithm constructs a tour by greedily selecting the nearest unvisited node from the current node, using the negative distance as the priority score, and handling the final return to the destination separately.",
+        "code": "def compute_node_scores(current_node: int, unvisited_nodes: np.ndarray,\n                        distance_matrix: np.ndarray,\n                        destination_node: int) -> np.ndarray:\n    # Scores are simply the negative distances (closer nodes get higher scores)\n    return -distance_matrix[current_node][unvisited_nodes]\n\ndef select_next_node(current_node: int, destination_node: int,\n                     unvisited_nodes: np.ndarray,\n                     distance_matrix: np.ndarray) -> int:\n    scores = compute_node_scores(current_node, unvisited_nodes,\n                                 distance_matrix, destination_node)\n    return unvisited_nodes[np.argmax(scores)]",
+        "objective": 6.60788,
+        "other_inf": null
+    },
+    {
+        "algorithm": "Algorithm: Use a *dynamic look\u2011ahead score* that combines the distance from the current node to each candidate with an estimated saving related to the distance from that candidate to the destination, preferring nodes that are closer now but also keep a short final return feasible.",
+        "code": "import numpy as np\n\ndef compute_node_scores(current_node: int, unvisited_nodes: np.ndarray,\n                        distance_matrix: np.ndarray,\n                        destination_node: int) -> np.ndarray:\n    # Score = - (distance from current + 0.5 * distance to destination)\n    # Lower total path cost is better, so we negate for higher score = more preferred.\n    scores = - (distance_matrix[current_node][unvisited_nodes] \n                + 0.5 * distance_matrix[unvisited_nodes][:, destination_node])\n    return scores\n\n\ndef select_next_node(current_node: int, destination_node: int,\n                     unvisited_nodes: np.ndarray,\n                     distance_matrix: np.ndarray) -> int:\n    scores = compute_node_scores(current_node, unvisited_nodes,\n                                 distance_matrix, destination_node)\n    return unvisited_nodes[np.argmax(scores)]",
+        "objective": 7.19415,
+        "other_inf": null
+    }
+]

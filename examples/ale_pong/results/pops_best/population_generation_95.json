@@ -1,0 +1,6 @@
+{
+    "algorithm": "The new algorithm uses a proportional control law with deadband and velocity-tracking, where the paddle moves toward the ball\u2019s current y position scaled by the ball\u2019s horizontal distance and a smoothed vertical velocity estimate to anticipate direction changes.",
+    "code": "def select_action(obs: np.ndarray) -> int:\n    ball_x = obs[49]\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    \n    # Estimate vertical velocity based on last frame (simulated via change)\n    # Use simple heuristic: if ball_y > 100 => moving down, else up\n    vel_y = 4 if ball_y > 100 else -4\n    \n    # Predict frames to reach right paddle x=160\n    frames_left = max(1, (160 - ball_x) // 5)\n    pred_y = ball_y + vel_y * frames_left\n    \n    # Bounce simulation off top (17) and bottom (194) walls\n    while pred_y < 17:\n        pred_y = 34 - pred_y\n    while pred_y > 194:\n        pred_y = 388 - pred_y\n    \n    # Proportional offset: larger offset when far, smaller when close\n    distance = abs(160 - ball_x)\n    offset = int(max(4, min(20, distance // 8)))\n    \n    if pred_y < paddle_y - offset:\n        return 2\n    elif pred_y > paddle_y + offset:\n        return 3\n    return 0",
+    "objective": -5.9,
+    "other_inf": null
+}

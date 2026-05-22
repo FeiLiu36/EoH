@@ -1,0 +1,114 @@
+[
+    {
+        "sample_order": 401,
+        "operator": "e2",
+        "algorithm": "Use a sinusoidal time\u2011varying offset based on the ball\u2019s vertical velocity (approximated by frame\u2011to\u2011frame vertical difference) to create a rhythmic, predictive paddle pursuit that alternates between leading and trailing the ball.",
+        "code": "import numpy as np\n\ndef select_action(obs: np.ndarray) -> int:\n    if obs[101] == 0:\n        return 1\n\n    ball_x = obs[99]\n    ball_y = obs[101]\n    paddle_x = obs[72]\n\n    # Approximate vertical velocity using ball_y (since we only have current frame)\n    # Assume ball moves ~4 pixels per frame vertically on average\n    # Use a sinusoidal offset based on ball_y to create alternating lead/trail\n    phase = ball_y * 0.05  # scale to get a slow oscillation\n    offset = int(8 * np.sin(phase))  # oscillates between -8 and 8\n\n    target = ball_x + offset\n    target = max(55, min(191, target))\n\n    if target < paddle_x:\n        return 3\n    elif target > paddle_x:\n        return 2\n    return 0",
+        "objective": -13.4
+    },
+    {
+        "sample_order": 402,
+        "operator": "e2",
+        "algorithm": "The algorithm predicts the ball's destination column by reflecting its current horizontal position across the playfield width using its vertical direction (inferred from ball_y change), then moves the paddle toward that predicted landing point with a hysteresis zone.",
+        "code": "import numpy as np\n\ndef select_action(obs: np.ndarray) -> int:\n    if obs[101] == 0:\n        return 1\n\n    ball_x = obs[99]\n    ball_y = obs[101]\n    paddle_x = obs[72]\n\n    # Infer vertical direction from ball_y value (simplified: bouncing off top/bricks)\n    # Assume ball is moving down if ball_y > 100, else moving up\n    if ball_y > 100:\n        # Predict landing: reflect ball_x off side walls\n        # Playfield width ~160, paddle range 55-191\n        # Simple reflection: if ball moves down, target is opposite side\n        target_x = 160 - ball_x\n    else:\n        target_x = ball_x\n\n    # Clamp to paddle range\n    target_x = max(55, min(191, target_x))\n\n    # Hysteresis deadband\n    if abs(paddle_x - target_x) <= 12:\n        return 0\n\n    if target_x < paddle_x:\n        return 3\n    elif target_x > paddle_x:\n        return 2\n    return 0",
+        "objective": -0.0
+    },
+    {
+        "sample_order": 403,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a piecewise-linear mapping from ball height to an asymmetric aim offset, combined with a momentum-based hysteresis that delays direction reversal to reduce paddle oscillation.",
+        "code": "import numpy as np\n\ndef select_action(obs: np.ndarray) -> int:\n    if obs[101] == 0:\n        return 1\n\n    ball_x = obs[99]\n    ball_y = obs[101]\n    paddle_x = obs[72]\n\n    # Asymmetric height-based offset: aim right when high, left when low\n    if ball_y > 150:\n        aim_offset = -12\n    elif ball_y > 100:\n        aim_offset = -6\n    elif ball_y > 50:\n        aim_offset = 5\n    else:\n        aim_offset = 18\n\n    target_x = ball_x + aim_offset\n    target_x = max(55, min(191, target_x))\n\n    # Momentum hysteresis: require larger difference to switch direction\n    diff = target_x - paddle_x\n    if diff < -8:\n        return 3\n    elif diff > 8:\n        return 2\n    return 0",
+        "objective": -42.3
+    },
+    {
+        "sample_order": 404,
+        "operator": "e1",
+        "algorithm": "The new algorithm uses a proportional control with a dynamic prediction horizon: it predicts the ball's future x position by extrapolating its current velocity from the change in ball_x over multiple steps, using a running buffer of recent ball positions, and then positions the paddle to intercept that predicted x with a small cushion.",
+        "code": "import numpy as np\n\n# Global buffer to store recent ball x positions\n_ball_x_history = []\n\ndef select_action(obs: np.ndarray) -> int:\n    global _ball_x_history\n\n    if obs[101] == 0:\n        _ball_x_history.clear()\n        return 1\n\n    ball_x = obs[99]\n    ball_y = obs[101]\n    paddle_x = obs[72]\n\n    # Store ball x, keep last 5 positions\n    _ball_x_history.append(ball_x)\n    if len(_ball_x_history) > 5:\n        _ball_x_history.pop(0)\n\n    # Estimate horizontal velocity (simple linear regression over 3 most recent)\n    if len(_ball_x_history) >= 3:\n        xs = np.arange(len(_ball_x_history))\n        ys = np.array(_ball_x_history)\n        # slope estimate using least squares\n        slope = (np.mean(xs*ys) - np.mean(xs)*np.mean(ys)) / (np.mean(xs**2) - np.mean(xs)**2 + 1e-8)\n    else:\n        slope = 0.0\n\n    # Predict ball_x when it reaches paddle height (approx y=192)\n    # Time steps from current ball_y to y=192 assuming ball moves ~2.5 pixels per step vertically\n    if ball_y < 192:\n        steps_to_paddle = int((192 - ball_y) / 2.5) + 1\n    else:\n        steps_to_paddle = 0\n\n    predicted_x = ball_x + slope * steps_to_paddle\n    predicted_x = np.clip(predicted_x, 0, 160)\n\n    # Aim with a small deadband around predicted position\n    cushion = 8\n    if predicted_x < paddle_x - cushion:\n        return 3  # LEFT\n    elif predicted_x > paddle_x + cushion:\n        return 2  # RIGHT\n    return 0  # NOOP",
+        "objective": -9.3
+    },
+    {
+        "sample_order": 405,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 406,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 407,
+        "operator": "e2",
+        "algorithm": "Use an error-history\u2011driven asymmetric deadzone with a momentum term to smoothly accelerate the paddle toward the ball\u2019s predicted position, adding occasional random reversals to escape local minima.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    if obs[101] == 0:\n        return 1\n\n    ball_x = obs[99]\n    ball_y = obs[101]\n    paddle_x = obs[72]\n\n    if not hasattr(select_action, \"prev_ball_y\"):\n        select_action.prev_ball_y = ball_y\n        select_action.prev_ball_x = ball_x\n        select_action.error_sum = 0.0\n        select_action.last_action = 0\n        if ball_x < paddle_x:\n            return 3\n        elif ball_x > paddle_x:\n            return 2\n        return 0\n\n    dy = ball_y - select_action.prev_ball_y\n    dx = ball_x - select_action.prev_ball_x\n    select_action.prev_ball_y = ball_y\n    select_action.prev_ball_x = ball_x\n\n    # Predict landing x using simple linear extrapolation\n    paddle_y = 195\n    if ball_y < paddle_y and dy < 0:\n        frames = (paddle_y - ball_y) / (-dy) if dy != 0 else 0\n        predicted_x = ball_x + dx * frames\n    else:\n        predicted_x = ball_x\n\n    error = predicted_x - paddle_x\n    select_action.error_sum += error\n    select_action.error_sum = max(-200, min(200, select_action.error_sum))\n\n    # Asymmetric deadzone with momentum from error history\n    deadzone = 12 + 0.05 * abs(select_action.error_sum)\n    momentum = 0.3 * select_action.error_sum\n    corrected_error = error + momentum\n\n    if corrected_error < -deadzone:\n        action = 3\n    elif corrected_error > deadzone:\n        action = 2\n    else:\n        # Occasional random nudge to break stiction\n        if abs(error) < 5 and abs(select_action.error_sum) < 10:\n            import random\n            action = random.choice([0, 0, 2, 3])\n        else:\n            action = 0\n\n    select_action.last_action = action\n    return action",
+        "objective": -1.4
+    },
+    {
+        "sample_order": 408,
+        "operator": "e1",
+        "algorithm": "Use a \"look-ahead\" approach that predicts the ball's future x-coordinate when it reaches the paddle's y-level, then moves the paddle toward that predicted position with a proportional speed based on distance.",
+        "code": "import numpy as np\n\ndef select_action(obs: np.ndarray) -> int:\n    if obs[101] == 0:\n        return 1\n\n    ball_x = obs[99]\n    ball_y = obs[101]\n    paddle_x = obs[72]\n\n    # Persistent state for velocity\n    if not hasattr(select_action, \"prev_ball_y\"):\n        select_action.prev_ball_y = ball_y\n        select_action.prev_ball_x = ball_x\n        if ball_x < paddle_x:\n            return 3\n        elif ball_x > paddle_x:\n            return 2\n        return 0\n\n    dy = ball_y - select_action.prev_ball_y\n    dx = ball_x - select_action.prev_ball_x\n    select_action.prev_ball_y = ball_y\n    select_action.prev_ball_x = ball_x\n\n    # Predict ball x when it reaches paddle y level (approximately y=195)\n    target_y = 195\n    if dy < 0:  # ball moving up\n        # Direct chase with moderate deadzone\n        if ball_x < paddle_x - 10:\n            return 3\n        elif ball_x > paddle_x + 10:\n            return 2\n        return 0\n    else:  # ball moving down\n        if dy == 0:\n            dy = 1\n        steps_to_paddle = (target_y - ball_y) / dy\n        predicted_x = ball_x + dx * steps_to_paddle\n        predicted_x = max(55, min(191, predicted_x))\n\n        # Move toward predicted position with proportional speed\n        diff = predicted_x - paddle_x\n        if abs(diff) > 25:\n            if diff > 0:\n                return 2\n            else:\n                return 3\n        elif abs(diff) > 12:\n            if diff > 0:\n                return 2\n            else:\n                return 3\n        else:\n            if ball_y < 180:\n                return 0\n            if ball_x < paddle_x - 8:\n                return 3\n            elif ball_x > paddle_x + 8:\n                return 2\n            return 0",
+        "objective": -1.4
+    },
+    {
+        "sample_order": 409,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 410,
+        "operator": "m1",
+        "algorithm": "Use a predictive heuristic that anticipates the ball\u2019s landing position based on its current trajectory, adding a constant offset for paddle reaction time, and applies a tighter deadband only when the ball is near the paddle.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    if obs[101] == 0:\n        return 1\n\n    ball_x   = obs[99]\n    ball_y   = obs[101]\n    paddle_x = obs[72]\n\n    # Simple trajectory prediction: assume ball moves horizontally at constant speed\n    # and vertically downward at constant speed (since we only see current position,\n    # we use a heuristic: aim ahead by a fixed amount when ball is above paddle)\n    if ball_y > 150:\n        # Ball is near paddle level, use exact ball position\n        target_x = ball_x\n    else:\n        # Ball is higher up, anticipate where it will land (bias right by 8 pixels)\n        target_x = ball_x + 8\n        # Clamp to valid paddle range\n        target_x = max(55, min(191, target_x))\n\n    if abs(target_x - paddle_x) <= 4:\n        return 0  # small deadband to reduce jitter near target\n\n    if target_x < paddle_x:\n        return 3\n    elif target_x > paddle_x:\n        return 2\n    return 0",
+        "objective": -27.9
+    },
+    {
+        "sample_order": 411,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 412,
+        "operator": "m1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 413,
+        "operator": "m1",
+        "algorithm": "\"Use a state-based bucketing approach that divides the screen into vertical zones and selects the action based on the ball\u2019s current column relative to the paddle, with a small deadband to prevent jitter.\"",
+        "code": "import numpy as np\n\ndef select_action(obs: np.ndarray) -> int:\n    if obs[101] == 0:\n        return 1\n\n    ball_x = obs[99]\n    paddle_x = obs[72]\n\n    # Define three horizontal zones relative to paddle position\n    left_thresh = paddle_x - 10\n    right_thresh = paddle_x + 10\n\n    if ball_x < left_thresh:\n        return 3  # LEFT\n    elif ball_x > right_thresh:\n        return 2  # RIGHT\n    else:\n        return 0  # NOOP",
+        "objective": -10.8
+    },
+    {
+        "sample_order": 414,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a proportional tracking policy that moves the paddle toward the ball's current x-coordinate with a small dead zone to avoid jitter.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    if obs[101] == 0:\n        return 1\n\n    ball_x = obs[99]\n    paddle_x = obs[72]\n\n    # Use a larger dead zone to reduce oscillation\n    if ball_x < paddle_x - 5:\n        return 3\n    elif ball_x > paddle_x + 5:\n        return 2\n    return 0",
+        "objective": -15.2
+    },
+    {
+        "sample_order": 415,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 416,
+        "operator": "m1",
+        "algorithm": "\"Use a predictive alignment strategy that calculates a target intercept by iterating the ball's trajectory with a fixed vertical step until reaching the paddle height, then applies a bang-bang control with hysteresis to minimize paddle oscillations.\"",
+        "code": "import numpy as np\n\ndef select_action(obs: np.ndarray) -> int:\n    \"\"\"Select a Breakout action from the 128-byte RAM state.\n\n    The agent must bounce the ball off the paddle to break bricks above.\n    When the ball is not in play (obs[101] == 0), FIRE launches it.\n\n    Args:\n        obs: 128-element uint8 array (ALE RAM).\n            obs[99]:  ball x  (0-160, left to right)\n            obs[101]: ball y  (0-210, larger = lower; 0 = not in play)\n            obs[72]:  paddle x center (55-191, left to right)\n    Returns:\n        action: 0 (NOOP), 1 (FIRE), 2 (RIGHT), or 3 (LEFT)\n    \"\"\"\n    if obs[101] == 0:\n        return 1  # FIRE to launch the ball\n\n    ball_x = obs[99]\n    ball_y = obs[101]\n    paddle_x = obs[72]\n\n    # Persistent state for velocity estimation\n    if not hasattr(select_action, \"prev_ball_y\"):\n        select_action.prev_ball_y = ball_y\n        select_action.prev_ball_x = ball_x\n        select_action.hysteresis_dir = 0  # 0=none, -1=left, 1=right\n        if ball_x < paddle_x:\n            return 3\n        elif ball_x > paddle_x:\n            return 2\n        return 0\n\n    dy = ball_y - select_action.prev_ball_y\n    dx = ball_x - select_action.prev_ball_x\n    select_action.prev_ball_y = ball_y\n    select_action.prev_ball_x = ball_x\n\n    # Predictive intercept when ball moving upward\n    if dy < 0:\n        sim_x = float(ball_x)\n        sim_y = float(ball_y)\n        vx = float(dx) if dx != 0 else 0.5\n        vy = float(dy)\n        # Step until reaching paddle height (~192)\n        while sim_y < 192:\n            sim_y += 1.0  # fixed vertical step\n            sim_x += vx / abs(vy) if vy != 0 else vx\n            # Top wall reflection\n            if sim_y > 210:\n                sim_y = 210 - (sim_y - 210)\n                vy = -vy\n            # Side wall reflections\n            if sim_x < 0:\n                sim_x = -sim_x\n                vx = -vx\n            elif sim_x > 160:\n                sim_x = 320 - sim_x\n                vx = -vx\n        target_x = int(round(sim_x))\n    else:\n        target_x = ball_x\n\n    # Bang-bang control with hysteresis\n    diff = target_x - paddle_x\n    direction = 0\n    if diff < -8:\n        direction = -1\n    elif diff > 8:\n        direction = 1\n\n    # Apply hysteresis to avoid rapid switching\n    if direction != 0 and direction == select_action.hysteresis_dir:\n        pass  # maintain current direction\n    elif direction == 0:\n        select_action.hysteresis_dir = 0\n    else:\n        select_action.hysteresis_dir = direction\n\n    if select_action.hysteresis_dir == -1:\n        return 3  # LEFT\n    elif select_action.hysteresis_dir == 1:\n        return 2  # RIGHT\n    return 0  # NOOP",
+        "objective": -1.4
+    }
+]

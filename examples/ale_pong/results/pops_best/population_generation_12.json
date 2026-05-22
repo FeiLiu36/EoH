@@ -1,0 +1,6 @@
+{
+    "algorithm": "Use ball reflection simulation by tracking ball velocity via frame difference and predicting future paddle intercept with wall bounces using a target tracking approach with a small deadband.",
+    "code": "def select_action(obs: np.ndarray) -> int:\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    \n    # Simulate ball bouncing off top/bottom walls to predict intercept\n    target = ball_y\n    # Predict vertical direction based on simple heuristic (ball moves ~3 pixels per frame)\n    predicted_y = target + 3 * ((160 - obs[49]) // 4) if obs[49] < 160 else target\n    \n    # Handle wall bounces\n    while predicted_y < 17 or predicted_y > 194:\n        if predicted_y < 17:\n            predicted_y = 34 - predicted_y  # reflect off top\n        else:\n            predicted_y = 388 - predicted_y  # reflect off bottom\n    \n    # Clamp to valid paddle range\n    predicted_y = max(34, min(194, predicted_y))\n    \n    dead_zone = 5\n    if predicted_y < paddle_y - dead_zone:\n        return 2\n    elif predicted_y > paddle_y + dead_zone:\n        return 3\n    return 0",
+    "objective": 3.5,
+    "other_inf": null
+}

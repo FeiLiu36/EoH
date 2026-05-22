@@ -1,0 +1,20 @@
+[
+    {
+        "algorithm": "The algorithm follows a greedy nearest-neighbor approach, selecting the closest unvisited node to the current node at each step.",
+        "code": "import numpy as np\n\nclass TSPConstructor:\n    \"\"\"Constructive heuristic for the Travelling Salesman Problem.\"\"\"\n\n    def select_next_node(self, current_node: int, destination_node: int,\n                         unvisited_nodes: np.ndarray,\n                         distance_matrix: np.ndarray) -> int:\n        \"\"\"Select the next node to visit.\n\n        Args:\n            current_node:     index of the current node\n            destination_node: index of the final return node\n            unvisited_nodes:  array of candidate unvisited node indices\n            distance_matrix:  pairwise distances between all nodes\n        Returns:\n            Index of the next node to visit.\n        \"\"\"\n        return unvisited_nodes[np.argmin(distance_matrix[current_node][unvisited_nodes])]",
+        "objective": 6.60788,
+        "other_inf": null
+    },
+    {
+        "algorithm": "The algorithm extends the nearest neighbor heuristic by considering both the distance from the current node and a look-ahead that favors nodes closer to the final destination, using a weighted combination of the two distances.",
+        "code": "class TSPConstructor:\n    \"\"\"Constructive heuristic for the Travelling Salesman Problem.\"\"\"\n\n    def select_next_node(self, current_node: int, destination_node: int,\n                         unvisited_nodes: np.ndarray,\n                         distance_matrix: np.ndarray) -> int:\n        \"\"\"Select the next node to visit.\n\n        Args:\n            current_node:     index of the current node\n            destination_node: index of the final return node\n            unvisited_nodes:  array of candidate unvisited node indices\n            distance_matrix:  pairwise distances between all nodes\n        Returns:\n            Index of the next node to visit.\n        \"\"\"\n        # Weighted combination: distance from current + distance to destination\n        weights = (distance_matrix[current_node][unvisited_nodes] +\n                   0.5 * distance_matrix[destination_node][unvisited_nodes])\n        return unvisited_nodes[np.argmin(weights)]",
+        "objective": 7.19415,
+        "other_inf": null
+    },
+    {
+        "algorithm": "The algorithm selects the nearest unvisited node to the current node, then at each step also checks if returning directly to the destination from a candidate is beneficial, and chooses the node that minimizes a combined cost of immediate distance plus estimated remaining cost to the destination.",
+        "code": "import numpy as np\n\nclass TSPConstructor:\n    \"\"\"Constructive heuristic for the Travelling Salesman Problem.\"\"\"\n\n    def select_next_node(self, current_node: int, destination_node: int,\n                         unvisited_nodes: np.ndarray,\n                         distance_matrix: np.ndarray) -> int:\n        \"\"\"Select the next node to visit.\n\n        Args:\n            current_node:     index of the current node\n            destination_node: index of the final return node\n            unvisited_nodes:  array of candidate unvisited node indices\n            distance_matrix:  pairwise distances between all nodes\n        Returns:\n            Index of the next node to visit.\n        \"\"\"\n        best_node = None\n        best_cost = float('inf')\n        for candidate in unvisited_nodes:\n            # cost from current to candidate + heuristic: direct distance from candidate to destination\n            cost = distance_matrix[current_node][candidate] + distance_matrix[candidate][destination_node]\n            if cost < best_cost:\n                best_cost = cost\n                best_node = candidate\n        return best_node",
+        "objective": 7.6436,
+        "other_inf": null
+    }
+]

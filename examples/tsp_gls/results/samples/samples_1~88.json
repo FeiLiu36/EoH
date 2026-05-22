@@ -1,0 +1,618 @@
+[
+    {
+        "sample_order": 1,
+        "operator": "i1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 2,
+        "operator": "i1",
+        "algorithm": "The algorithm augments original edge distances by adding a penalty for each edge in the current local-optimal tour, scaled by a factor that grows sublinearly with the number of times the edge has been penalised, thereby discouraging reuse of common local-optimum edges and guiding 2-opt toward less explored connections.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    \"\"\"Modify the edge distance matrix to escape the current local optimum.\n\n    Args:\n        edge_distance:  n*n symmetric matrix of original pairwise distances\n        local_opt_tour: length-n array of node indices forming the current\n                        local-optimal tour (excludes the closing return edge)\n        edge_n_used:    n*n symmetric matrix counting how many times each\n                        edge has been penalised in previous iterations\n    Returns:\n        updated_edge_distance: modified n*n distance matrix to be used in\n                               the next 2-opt local search\n    \"\"\"\n    updated = edge_distance.copy()\n    n = len(local_opt_tour)\n    # Build the list of edges in the current local-optimal tour\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        # Penalty: original distance * 0.3 * (1 + sqrt(edge_n_used[u,v]))\n        # Using sqrt to sublinearly increase with reuse count\n        penalty = 0.3 * edge_distance[u, v] * (1 + np.sqrt(edge_n_used[u, v]))\n        updated[u, v] += penalty\n        updated[v, u] += penalty\n    return updated",
+        "objective": 5.82604
+    },
+    {
+        "sample_order": 3,
+        "operator": "i1",
+        "algorithm": "The algorithm penalizes edges from the current local optimum by increasing their effective distances proportional to their original length and usage count, while leaving unvisited edges unchanged, so that 2-opt is guided away from the current solution.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = edge_distance.shape[0]\n    updated = edge_distance.copy()\n    # Penalty factor: increase distance based on original distance and usage count\n    penalty_factor = 0.3\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        # Scale penalty by original edge length and number of times penalised\n        penalty = penalty_factor * edge_distance[u, v] * (1 + edge_n_used[u, v])\n        updated[u, v] += penalty\n        updated[v, u] += penalty\n    return updated",
+        "objective": 5.78769
+    },
+    {
+        "sample_order": 4,
+        "operator": "i1",
+        "algorithm": "\"The algorithm incrementally penalises edges that belong to the current local-optimal tour, with the penalty scaled by the number of times each such edge has already been penalised, and adds a small random perturbation to all edges to encourage exploration, then returns the sum of the original distances and these modifications.\"",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    \"\"\"Modify the edge distance matrix to escape the current local optimum.\n\n    Args:\n        edge_distance:  n*n symmetric matrix of original pairwise distances\n        local_opt_tour: length-n array of node indices forming the current\n                        local-optimal tour (excludes the closing return edge)\n        edge_n_used:    n*n symmetric matrix counting how many times each\n                        edge has been penalised in previous iterations\n    Returns:\n        updated_edge_distance: modified n*n distance matrix to be used in\n                               the next 2-opt local search\n    \"\"\"\n    updated = edge_distance.copy()\n    n = len(local_opt_tour)\n    \n    # Penalise edges in the current local-optimal tour\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        penalty = 1.0 + 0.5 * edge_n_used[u, v]  # increasing penalty with usage\n        updated[u, v] += penalty\n        updated[v, u] += penalty\n    \n    # Add small random perturbation to all edges to encourage exploration\n    np.random.seed(42)  # fixed seed for reproducibility\n    perturbation = np.random.uniform(0, 0.1, (n, n))\n    perturbation = (perturbation + perturbation.T) / 2  # ensure symmetry\n    np.fill_diagonal(perturbation, 0)\n    updated += perturbation\n    \n    return updated",
+        "objective": 5.90908
+    },
+    {
+        "sample_order": 5,
+        "operator": "i1",
+        "algorithm": "The algorithm penalizes edges that appear in the current local optimum proportionally to their original distance and usage count, and rewards edges not in the tour to encourage exploration, then applies a decay factor to prevent unbounded growth.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    \"\"\"Modify the edge distance matrix to escape the current local optimum.\n\n    Args:\n        edge_distance:  n*n symmetric matrix of original pairwise distances\n        local_opt_tour: length-n array of node indices forming the current\n                        local-optimal tour (excludes the closing return edge)\n        edge_n_used:    n*n symmetric matrix counting how many times each\n                        edge has been penalised in previous iterations\n    Returns:\n        updated_edge_distance: modified n*n distance matrix to be used in\n                               the next 2-opt local search\n    \"\"\"\n    n = edge_distance.shape[0]\n    updated = edge_distance.copy()\n    \n    # Build set of edges in the current tour (undirected)\n    tour_edges = set()\n    for i in range(n - 1):\n        u, v = local_opt_tour[i], local_opt_tour[i+1]\n        if u < v:\n            tour_edges.add((u, v))\n        else:\n            tour_edges.add((v, u))\n    # Add closing edge\n    u, v = local_opt_tour[-1], local_opt_tour[0]\n    if u < v:\n        tour_edges.add((u, v))\n    else:\n        tour_edges.add((v, u))\n    \n    # Parameters\n    alpha = 0.3          # penalty weight for tour edges\n    beta = 0.1           # reward factor for non-tour edges\n    gamma = 0.9          # decay factor for past penalties\n    \n    for i in range(n):\n        for j in range(i+1, n):\n            if (i, j) in tour_edges:\n                # Penalize: increase distance\n                updated[i, j] += alpha * (edge_distance[i, j] + 1) * (edge_n_used[i, j] + 1)\n            else:\n                # Reward: decrease distance slightly\n                updated[i, j] -= beta * edge_distance[i, j] / (edge_n_used[i, j] + 1)\n            # Keep symmetric and non-negative\n            updated[j, i] = updated[i, j]\n    \n    # Apply decay to all edges to avoid runaway values\n    updated = gamma * updated + (1 - gamma) * edge_distance\n    \n    # Ensure non-negative\n    updated = np.clip(updated, 0, None)\n    \n    return updated",
+        "objective": 5.90608
+    },
+    {
+        "sample_order": 6,
+        "operator": "i1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 7,
+        "operator": "i1",
+        "algorithm": "The algorithm penalizes edges in the current local optimum by adding a penalty proportional to their usage count and the number of nodes, then boosts short edges not in the tour to encourage exploration.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = edge_distance.shape[0]\n    updated = edge_distance.copy()\n    \n    # Identify edges in the current local optimum\n    tour_edges = set()\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        if u < v:\n            tour_edges.add((u, v))\n        else:\n            tour_edges.add((v, u))\n    \n    max_dist = edge_distance.max()\n    penalty_factor = 0.3 * max_dist / (n + 1)\n    reward_factor = 0.1 * max_dist / (n + 1)\n    \n    for i in range(n):\n        for j in range(i + 1, n):\n            if (i, j) in tour_edges:\n                # Penalize edges in the tour\n                penalty = penalty_factor * (1 + edge_n_used[i, j])\n                updated[i, j] += penalty\n                updated[j, i] += penalty\n            else:\n                # Reward short edges not in tour\n                if edge_distance[i, j] < max_dist * 0.5:\n                    reward = reward_factor * (1 + edge_n_used[i, j])\n                    updated[i, j] = max(0, updated[i, j] - reward)\n                    updated[j, i] = updated[i, j]\n    \n    return updated",
+        "objective": 5.80743
+    },
+    {
+        "sample_order": 8,
+        "operator": "i1",
+        "algorithm": "The algorithm penalizes edges belonging to the current local-opt tour proportionally to their usage count and inversely to their original distance, then adds a small random perturbation to encourage exploration, before returning the modified matrix.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    \"\"\"Modify the edge distance matrix to escape the current local optimum.\n\n    Args:\n        edge_distance:  n*n symmetric matrix of original pairwise distances\n        local_opt_tour: length-n array of node indices forming the current\n                        local-optimal tour (excludes the closing return edge)\n        edge_n_used:    n*n symmetric matrix counting how many times each\n                        edge has been penalised in previous iterations\n    Returns:\n        updated_edge_distance: modified n*n distance matrix to be used in\n                               the next 2-opt local search\n    \"\"\"\n    n = edge_distance.shape[0]\n    updated = edge_distance.copy()\n    \n    # Build adjacency from tour\n    tour_edges = set()\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        if u < v:\n            tour_edges.add((u, v))\n        else:\n            tour_edges.add((v, u))\n    \n    # Penalty factor: higher penalty for edges used many times, lower for long edges\n    avg_dist = np.mean(edge_distance[edge_distance > 0])\n    for (u, v) in tour_edges:\n        count = edge_n_used[u, v]\n        dist = edge_distance[u, v]\n        # penalty proportional to usage count and inversely proportional to original distance\n        penalty = (1 + count) * (avg_dist / max(dist, 1e-8))\n        updated[u, v] += penalty\n        updated[v, u] += penalty\n    \n    # Add small random perturbation to all edges (symmetric)\n    np.random.seed(42)  # for reproducibility, can be removed\n    noise = np.random.uniform(0, 0.01 * avg_dist, (n, n))\n    noise = (noise + noise.T) / 2\n    np.fill_diagonal(noise, 0.0)\n    updated += noise\n    \n    return updated",
+        "objective": 5.9286
+    },
+    {
+        "sample_order": 9,
+        "operator": "e2",
+        "algorithm": "Instead of penalizing edges in the current tour, we reward edges not in the tour by temporarily reducing their effective distances, making them more attractive for 2-opt moves and thus steering the search toward unexplored solutions.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = edge_distance.shape[0]\n    updated = edge_distance.copy()\n    reward_factor = 0.2\n    tour_edges = set()\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        tour_edges.add((u, v))\n        tour_edges.add((v, u))\n    for i in range(n):\n        for j in range(i + 1, n):\n            if (i, j) not in tour_edges:\n                reward = reward_factor * edge_distance[i, j] / (1 + edge_n_used[i, j])\n                updated[i, j] = max(0, edge_distance[i, j] - reward)\n                updated[j, i] = updated[i, j]\n    return updated",
+        "objective": 5.77955
+    },
+    {
+        "sample_order": 10,
+        "operator": "m1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 11,
+        "operator": "e2",
+        "algorithm": "The new algorithm applies a multiplicative decay to the original distance of each edge in the local optimum, reducing it based on the edge\u2019s usage frequency, while simultaneously increasing the distances of all non-tour edges by a small random perturbation scaled by the inverse of their usage count.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy()\n    n = len(local_opt_tour)\n    \n    # Build set of tour edges\n    tour_edges = set()\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        if u < v:\n            tour_edges.add((u, v))\n        else:\n            tour_edges.add((v, u))\n    \n    max_dist = edge_distance.max()\n    decay_base = 0.8\n    perturbation_scale = 0.05 * max_dist\n    \n    for i in range(n):\n        for j in range(i + 1, n):\n            if (i, j) in tour_edges:\n                # Multiplicative decay for tour edges\n                factor = decay_base ** (1 + edge_n_used[i, j])\n                updated[i, j] = edge_distance[i, j] * factor\n                updated[j, i] = updated[i, j]\n            else:\n                # Perturbation for non-tour edges, scaled inversely by usage\n                if edge_n_used[i, j] == 0:\n                    perturbation = perturbation_scale * np.random.uniform(0.5, 1.5)\n                else:\n                    perturbation = perturbation_scale / (1 + edge_n_used[i, j])\n                updated[i, j] = edge_distance[i, j] + perturbation\n                updated[j, i] = updated[i, j]\n    \n    return updated",
+        "objective": 5.93055
+    },
+    {
+        "sample_order": 12,
+        "operator": "m2",
+        "algorithm": "New algorithm uses adaptive penalties based on tour length rank and exponentially decaying rewards, with dynamic parameter scaling.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = edge_distance.shape[0]\n    updated = edge_distance.copy()\n    \n    tour_edges = set()\n    for i in range(n - 1):\n        u, v = local_opt_tour[i], local_opt_tour[i+1]\n        if u < v:\n            tour_edges.add((u, v))\n        else:\n            tour_edges.add((v, u))\n    u, v = local_opt_tour[-1], local_opt_tour[0]\n    if u < v:\n        tour_edges.add((u, v))\n    else:\n        tour_edges.add((v, u))\n    \n    alpha = 0.5          \n    beta = 0.2           \n    gamma = 0.85         \n    epsilon = 1e-6\n    \n    tour_len = sum(edge_distance[u, v] for u, v in tour_edges)\n    scale = tour_len / n\n    \n    for i in range(n):\n        for j in range(i+1, n):\n            base = edge_distance[i, j]\n            if (i, j) in tour_edges:\n                pen = alpha * scale * (1 + edge_n_used[i, j])\n                updated[i, j] += pen\n            else:\n                reward = beta * scale / (1 + edge_n_used[i, j] + epsilon)\n                updated[i, j] = max(base - reward, epsilon)\n            updated[j, i] = updated[i, j]\n    \n    updated = gamma * updated + (1 - gamma) * edge_distance\n    updated = np.clip(updated, epsilon, None)\n    \n    return updated",
+        "objective": 5.87958
+    },
+    {
+        "sample_order": 13,
+        "operator": "e2",
+        "algorithm": "The algorithm decays original distances of unvisited edges over time, making them artificially shorter and thus more attractive for 2-opt, while penalizing edges from the current local optimum by a fixed additive constant independent of original length.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = edge_distance.shape[0]\n    updated = edge_distance.copy()\n    # Decay factor for unvisited edges (make them more attractive)\n    decay = 0.9\n    # Penalty constant for edges in the current local optimum\n    penalty_const = 50.0\n    # Build set of edges in current tour\n    tour_edges = set()\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        tour_edges.add((u, v))\n        tour_edges.add((v, u))\n    # Apply decay to all edges not in current tour and not previously penalised\n    for i in range(n):\n        for j in range(i + 1, n):\n            if edge_n_used[i, j] == 0 and (i, j) not in tour_edges:\n                updated[i, j] *= decay\n                updated[j, i] *= decay\n    # Apply fixed penalty to edges in current tour\n    for (u, v) in tour_edges:\n        updated[u, v] += penalty_const\n        updated[v, u] += penalty_const\n    return updated",
+        "objective": 5.93055
+    },
+    {
+        "sample_order": 14,
+        "operator": "m1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 15,
+        "operator": "e2",
+        "algorithm": "Select a random subset of edges from the local-optimal tour and add a penalty proportional to the square of the original distance scaled by the logarithm of the usage count, while also slightly reducing the cost of a few random non-tour edges to actively promote exploration.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy()\n    n = len(local_opt_tour)\n    rng = np.random.default_rng()\n    \n    # Penalize a random subset of tour edges\n    tour_edges = [(local_opt_tour[i], local_opt_tour[(i + 1) % n]) for i in range(n)]\n    num_to_penalize = max(1, n // 3)\n    chosen_indices = rng.choice(n, size=num_to_penalize, replace=False)\n    for idx in chosen_indices:\n        u, v = tour_edges[idx]\n        penalty = 0.5 * (edge_distance[u, v] ** 2) * (1 + np.log(1 + edge_n_used[u, v]))\n        updated[u, v] += penalty\n        updated[v, u] += penalty\n    \n    # Reduce cost of a few random non-tour edges to encourage exploration\n    non_tour_pairs = []\n    for i in range(n):\n        for j in range(i+1, n):\n            if (i, j) not in tour_edges and (j, i) not in tour_edges:\n                non_tour_pairs.append((i, j))\n    if non_tour_pairs:\n        num_to_reduce = min(5, len(non_tour_pairs))\n        chosen_pairs = rng.choice(len(non_tour_pairs), size=num_to_reduce, replace=False)\n        for idx in chosen_pairs:\n            u, v = non_tour_pairs[idx]\n            reduction = 0.2 * edge_distance[u, v]\n            updated[u, v] = max(0.1, updated[u, v] - reduction)\n            updated[v, u] = max(0.1, updated[v, u] - reduction)\n    \n    return updated",
+        "objective": 5.72832
+    },
+    {
+        "sample_order": 16,
+        "operator": "e1",
+        "algorithm": "The algorithm penalizes edges not in the tour by adding a penalty that increases with their original length and usage count, while rewarding edges in the tour by decreasing their distance proportional to how frequently they appear in local optima, thereby forcing 2-opt to consider and break away from the current tour structure.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = edge_distance.shape[0]\n    updated = edge_distance.copy()\n    \n    tour_edges = set()\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        if u < v:\n            tour_edges.add((u, v))\n        else:\n            tour_edges.add((v, u))\n    \n    max_dist = edge_distance.max()\n    for i in range(n):\n        for j in range(i + 1, n):\n            if (i, j) in tour_edges:\n                reward = 0.2 * edge_distance[i, j] / (1 + edge_n_used[i, j])\n                updated[i, j] = max(0, updated[i, j] - reward)\n                updated[j, i] = updated[i, j]\n            else:\n                penalty = 0.4 * (max_dist - edge_distance[i, j]) * (1 + edge_n_used[i, j])\n                updated[i, j] += penalty\n                updated[j, i] += penalty\n    \n    return updated",
+        "objective": 5.93055
+    },
+    {
+        "sample_order": 17,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses an exponential penalty based on the product of the original edge length and a decay factor from usage count, with a higher base penalty factor and a minimum penalty floor to aggressively shift 2-opt away from frequently used edges.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = edge_distance.shape[0]\n    updated = edge_distance.copy()\n    penalty_factor = 0.8\n    decay = 0.9\n    min_penalty = 0.1 * np.max(edge_distance)\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        penalty = penalty_factor * edge_distance[u, v] * (decay ** edge_n_used[u, v])\n        penalty = max(penalty, min_penalty)\n        updated[u, v] += penalty\n        updated[v, u] += penalty\n    return updated",
+        "objective": 5.93055
+    },
+    {
+        "sample_order": 18,
+        "operator": "e2",
+        "algorithm": "Systematically decay the attractiveness of all edges in the current tour by adding a penalty that grows quadratically with usage count, while simultaneously boosting all edges incident to a randomly selected \"hub\" node by a decaying multiplicative factor to force a structural re-routing.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy()\n    n = len(local_opt_tour)\n    rng = np.random.default_rng()\n    \n    # Penalize all tour edges with quadratic usage penalty\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        penalty = 0.3 * (edge_distance[u, v] ** 1.5) * (1 + edge_n_used[u, v] ** 2)\n        updated[u, v] += penalty\n        updated[v, u] += penalty\n    \n    # Boost edges from a random hub node to encourage new connections\n    hub = rng.integers(0, n)\n    decay = 0.9 ** np.sum(edge_n_used[hub])\n    for j in range(n):\n        if j != hub:\n            boost = 0.15 * edge_distance[hub, j] * decay\n            updated[hub, j] = max(0.1, updated[hub, j] - boost)\n            updated[j, hub] = updated[hub, j]\n    \n    return updated",
+        "objective": 5.73015
+    },
+    {
+        "sample_order": 19,
+        "operator": "e2",
+        "algorithm": "Replace each edge distance with a weighted combination of its original distance and a penalty that grows exponentially with usage count for edges in the current tour, while also adding a small random perturbation to all edges.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = edge_distance.shape[0]\n    updated = edge_distance.copy()\n    \n    max_dist = edge_distance.max()\n    rng = np.random.default_rng(42)\n    \n    # Build set of tour edges\n    tour_edges = set()\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        if u < v:\n            tour_edges.add((u, v))\n        else:\n            tour_edges.add((v, u))\n    \n    for i in range(n):\n        for j in range(i + 1, n):\n            base = edge_distance[i, j]\n            if (i, j) in tour_edges:\n                # Exponential penalty based on usage count\n                penalty = base * (2 ** (edge_n_used[i, j] + 1) - 1)\n                updated[i, j] = base + penalty\n            else:\n                # Small random perturbation for non-tour edges\n                perturbation = rng.uniform(-0.05, 0.05) * max_dist\n                updated[i, j] = max(0, base + perturbation)\n            updated[j, i] = updated[i, j]\n    \n    return updated",
+        "objective": 5.9295
+    },
+    {
+        "sample_order": 20,
+        "operator": "m1",
+        "algorithm": "The new algorithm penalizes edges in the local optimum by applying a decaying exponential penalty scaled by usage count and inverses the original distances for all edges, while also rewarding rarely used edges by reducing their effective distance to encourage exploration.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = edge_distance.shape[0]\n    updated = edge_distance.copy()\n    max_dist = np.max(edge_distance)\n    penalty_base = 1.5\n    reward_factor = 0.2\n    \n    # Reward rarely used edges (fewer than 2 penalties) by reducing distance\n    for i in range(n):\n        for j in range(i+1, n):\n            if edge_n_used[i, j] < 2:\n                updated[i, j] *= (1 - reward_factor)\n                updated[j, i] = updated[i, j]\n    \n    # Penalize edges in current local optimum with exponential decay based on usage\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        usage = edge_n_used[u, v]\n        penalty = (max_dist - edge_distance[u, v]) * (1 - np.exp(-penalty_base * (1 + usage)))\n        updated[u, v] += penalty\n        updated[v, u] += penalty\n    \n    return updated",
+        "objective": 5.93055
+    },
+    {
+        "sample_order": 21,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 22,
+        "operator": "e2",
+        "algorithm": "For each edge in the current tour, add a penalty that is the product of its original distance and an exponentially decaying function of its rank by usage count among all tour edges, and simultaneously reduce the cost of every edge that connects nodes whose positions in the tour are far apart (gap \u2265 20% of n) by a fixed proportionate amount to force long-range reconnections.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy()\n    n = len(local_opt_tour)\n    rng = np.random.default_rng()\n    \n    # Penalize tour edges with usage-rank-based exponential decay\n    tour_edges = [(local_opt_tour[i], local_opt_tour[(i + 1) % n]) for i in range(n)]\n    usage_counts = [edge_n_used[u, v] for u, v in tour_edges]\n    rank = np.argsort(np.argsort(usage_counts))  # rank 0 = least used\n    for idx, (u, v) in enumerate(tour_edges):\n        penalty = 0.4 * edge_distance[u, v] * np.exp(-0.5 * rank[idx])\n        updated[u, v] += penalty\n        updated[v, u] += penalty\n    \n    # Reduce cost of edges connecting nodes with large tour index gap\n    gap_threshold = max(1, n // 5)\n    for i in range(n):\n        for j in range(i + 1, n):\n            idx_i = np.where(local_opt_tour == i)[0][0]\n            idx_j = np.where(local_opt_tour == j)[0][0]\n            gap = min(abs(idx_i - idx_j), n - abs(idx_i - idx_j))\n            if gap >= gap_threshold and (i, j) not in tour_edges and (j, i) not in tour_edges:\n                reduction = 0.25 * edge_distance[i, j]\n                updated[i, j] = max(0.1, updated[i, j] - reduction)\n                updated[j, i] = max(0.1, updated[j, i] - reduction)\n    \n    return updated",
+        "objective": 5.75116
+    },
+    {
+        "sample_order": 23,
+        "operator": "m1",
+        "algorithm": "Systematically penalize frequently used edges by an exponential decay of their length while randomly promoting a subset of edges from a \"reset node\" via a multiplicative discount that fades with global usage.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy()\n    n = len(local_opt_tour)\n    rng = np.random.default_rng()\n    \n    total_usage = np.sum(edge_n_used)\n    decay_factor = np.exp(-0.05 * total_usage)\n    \n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        penalty = updated[u, v] * (1.0 + 0.5 * (edge_n_used[u, v] ** 1.5)) * decay_factor\n        updated[u, v] = penalty\n        updated[v, u] = penalty\n    \n    reset_node = rng.integers(0, n)\n    for j in range(n):\n        if j != reset_node and edge_n_used[reset_node, j] == 0:\n            discount = 0.2 * edge_distance[reset_node, j] * decay_factor\n            updated[reset_node, j] = max(0.1, updated[reset_node, j] - discount)\n            updated[j, reset_node] = updated[reset_node, j]\n    \n    return updated",
+        "objective": 5.93055
+    },
+    {
+        "sample_order": 24,
+        "operator": "m1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 25,
+        "operator": "m1",
+        "algorithm": "Alter distances by applying a quadratic penalty to edges with above-average usage in the local-opt tour, while probabilistically decreasing the cost of edges that are far from both tour nodes and frequently used non-tour edges.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = len(local_opt_tour)\n    updated = edge_distance.copy()\n    rng = np.random.default_rng()\n    \n    # Compute average usage among tour edges\n    tour_usage = []\n    for i in range(n):\n        u, v = local_opt_tour[i], local_opt_tour[(i + 1) % n]\n        tour_usage.append(edge_n_used[u, v])\n    avg_usage = np.mean(tour_usage) if tour_usage else 0\n    \n    # Penalize tour edges with usage above average\n    for i in range(n):\n        u, v = local_opt_tour[i], local_opt_tour[(i + 1) % n]\n        if edge_n_used[u, v] > avg_usage:\n            penalty = 0.8 * (edge_distance[u, v] ** 1.5) * np.sqrt(edge_n_used[u, v])\n            updated[u, v] += penalty\n            updated[v, u] += penalty\n    \n    # Reduce cost of edges far from tour and with below-average non-tour usage\n    tour_set = set(local_opt_tour)\n    non_tour_usage_vals = []\n    for i in range(n):\n        for j in range(i+1, n):\n            if i not in tour_set or j not in tour_set:\n                non_tour_usage_vals.append(edge_n_used[i, j])\n    avg_non_tour_usage = np.mean(non_tour_usage_vals) if non_tour_usage_vals else 0\n    \n    for i in range(n):\n        for j in range(i+1, n):\n            if i not in local_opt_tour or j not in local_opt_tour:\n                continue\n            idx_i = np.where(local_opt_tour == i)[0][0]\n            idx_j = np.where(local_opt_tour == j)[0][0]\n            tour_dist = min(abs(idx_i - idx_j), n - abs(idx_i - idx_j))\n            if tour_dist > n // 2 and edge_n_used[i, j] < avg_non_tour_usage:\n                reduction = 0.3 * edge_distance[i, j]\n                updated[i, j] = max(0.1, updated[i, j] - reduction)\n                updated[j, i] = max(0.1, updated[j, i] - reduction)\n    \n    return updated",
+        "objective": 5.93055
+    },
+    {
+        "sample_order": 26,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 27,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 28,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 29,
+        "operator": "e2",
+        "algorithm": "Use a memory of recently broken edge pairs to simultaneously penalize the current tour edges and apply a temporary virtual barrier that increases the distance of edges whose endpoints have been frequently separated in past escapes.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy()\n    n = len(local_opt_tour)\n    rng = np.random.default_rng()\n    \n    # Penalize tour edges with exponential usage penalty\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        penalty = 0.5 * edge_distance[u, v] * (np.exp(edge_n_used[u, v]) - 1)\n        updated[u, v] += penalty\n        updated[v, u] += penalty\n    \n    # Compute separation frequency for each node pair (how many times they've been in different tours)\n    total_uses = np.sum(edge_n_used)\n    separation_count = np.zeros_like(edge_n_used)\n    for i in range(n):\n        for j in range(i+1, n):\n            separation_count[i,j] = edge_n_used[i,j] + rng.poisson(0.1 * total_uses / (n*n))\n            separation_count[j,i] = separation_count[i,j]\n    \n    # Add repulsion barrier to edges connecting frequently separated nodes\n    barrier_strength = 0.2 * np.max(edge_distance)\n    for i in range(n):\n        for j in range(i+1, n):\n            if separation_count[i,j] > np.mean(separation_count):\n                updated[i,j] += barrier_strength * (separation_count[i,j] / (1 + np.max(separation_count)))\n                updated[j,i] = updated[i,j]\n    \n    return updated",
+        "objective": 5.8852
+    },
+    {
+        "sample_order": 30,
+        "operator": "m1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 31,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 32,
+        "operator": "e1",
+        "algorithm": "Create a \"cluster\u2011avoidance\" penalty: Identify clusters of consecutive edges in the tour that have high average usage, then penalize all edges inside each cluster proportionally to the cluster\u2019s density, and simultaneously reduce costs of edges that jump between different clusters to encourage inter\u2011cluster reconnections.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy()\n    n = len(local_opt_tour)\n    rng = np.random.default_rng()\n    \n    # Build list of tour edges (with closing edge)\n    tour_edges = [(local_opt_tour[i], local_opt_tour[(i + 1) % n]) for i in range(n)]\n    \n    # Compute usage for each tour edge\n    tour_usage = np.array([edge_n_used[u, v] for u, v in tour_edges])\n    mean_usage = np.mean(tour_usage)\n    \n    # Identify clusters: contiguous segments where usage > mean_usage\n    clusters = []\n    i = 0\n    while i < n:\n        if tour_usage[i] > mean_usage:\n            start = i\n            while i < n and tour_usage[i] > mean_usage:\n                i += 1\n            clusters.append((start, i - 1))\n        else:\n            i += 1\n    \n    # Penalize edges inside clusters\n    for start, end in clusters:\n        cluster_size = end - start + 1\n        if cluster_size < 2:\n            continue\n        # Penalty factor: proportional to average usage density in cluster\n        cluster_usage_sum = np.sum(tour_usage[start:end+1])\n        penalty_factor = 0.3 * (cluster_usage_sum / cluster_size)\n        for idx in range(start, end + 1):\n            u, v = tour_edges[idx]\n            penalty = penalty_factor * edge_distance[u, v]\n            updated[u, v] += penalty\n            updated[v, u] += penalty\n    \n    # Reduce cost of edges that connect nodes from different clusters (inter-cluster jumps)\n    if len(clusters) >= 2:\n        # Collect nodes belonging to each cluster\n        cluster_nodes = []\n        for start, end in clusters:\n            nodes = set()\n            for idx in range(start, end + 1):\n                nodes.add(local_opt_tour[idx])\n            cluster_nodes.append(nodes)\n        \n        # Pick random inter-cluster node pairs that are not tour edges\n        for a in range(len(clusters)):\n            for b in range(a + 1, len(clusters)):\n                candidates = []\n                for u in cluster_nodes[a]:\n                    for v in cluster_nodes[b]:\n                        if (u, v) not in tour_edges and (v, u) not in tour_edges:\n                            candidates.append((u, v))\n                if candidates:\n                    num_to_reduce = min(2, len(candidates))\n                    chosen = rng.choice(len(candidates), size=num_to_reduce, replace=False)\n                    for idx in chosen:\n                        u, v = candidates[idx]\n                        reduction = 0.2 * edge_distance[u, v]\n                        updated[u, v] = max(0.1, updated[u, v] - reduction)\n                        updated[v, u] = max(0.1, updated[v, u] - reduction)\n    \n    return updated",
+        "objective": 5.93055
+    },
+    {
+        "sample_order": 33,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 34,
+        "operator": "e2",
+        "algorithm": "Systematically penalize tour edges by a combination of their original distance and an exponential penalty based on usage count, while simultaneously injecting a \"gravity\" distortion by reducing all edges emanating from a randomly rotated set of anchor nodes proportionally to their frequency of appearance in recent tours.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy()\n    n = len(local_opt_tour)\n    rng = np.random.default_rng()\n    \n    # Penalize all tour edges with exponential usage penalty\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        penalty = 0.4 * edge_distance[u, v] * (np.exp(edge_n_used[u, v] / 5.0) - 1.0)\n        updated[u, v] += penalty\n        updated[v, u] += penalty\n    \n    # Select a random rotation of 3 anchor nodes\n    anchor_nodes = rng.choice(n, size=3, replace=False)\n    for hub in anchor_nodes:\n        usage_factor = 1.0 / (1.0 + np.mean(edge_n_used[hub]))\n        for j in range(n):\n            if j != hub:\n                reduction = 0.25 * edge_distance[hub, j] * usage_factor\n                updated[hub, j] = max(0.1, updated[hub, j] - reduction)\n                updated[j, hub] = updated[hub, j]\n    \n    return updated",
+        "objective": 5.78227
+    },
+    {
+        "sample_order": 35,
+        "operator": "e1",
+        "algorithm": "Remove a random contiguous block of edges from the tour, effectively splitting it into two segments, then heavily penalize all edges inside each segment while reducing penalties on edges connecting the two segments, using a decaying factor based on how many times the removed block\u2019s start and end nodes have been used.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy()\n    n = len(local_opt_tour)\n    rng = np.random.default_rng()\n    \n    # Randomly select a contiguous block of edges to remove\n    start = rng.integers(0, n)\n    block_length = rng.integers(1, n // 2 + 1)\n    block_nodes = [local_opt_tour[(start + i) % n] for i in range(block_length + 1)]\n    \n    # Penalize edges inside the block\n    for i in range(len(block_nodes)):\n        for j in range(i + 1, len(block_nodes)):\n            u, v = block_nodes[i], block_nodes[j]\n            penalty = 0.5 * edge_distance[u, v] * (1 + edge_n_used[u, v])\n            updated[u, v] += penalty\n            updated[v, u] += penalty\n    \n    # Reduce penalties on edges connecting block ends to the rest\n    end1, end2 = block_nodes[0], block_nodes[-1]\n    decay = 0.85 ** (edge_n_used[end1, end2] + edge_n_used[end2, end1])\n    for other in range(n):\n        if other not in block_nodes:\n            updated[end1, other] *= decay\n            updated[other, end1] *= decay\n            updated[end2, other] *= decay\n            updated[other, end2] *= decay\n    \n    return updated",
+        "objective": 5.68769
+    },
+    {
+        "sample_order": 36,
+        "operator": "e2",
+        "algorithm": "Apply a sinusoidal perturbation to the distance matrix that amplifies differences between tour and non-tour edges proportionally to their inverse usage frequency, with a phase shift determined by the tour\u2019s average edge length to systematically alternate exploration patterns.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = edge_distance.shape[0]\n    updated = edge_distance.copy()\n    \n    # Compute average tour edge length\n    tour_len = 0.0\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        tour_len += edge_distance[u, v]\n    avg_tour_len = tour_len / n\n    \n    # Phase shift based on average tour length\n    phase = np.sin(avg_tour_len) * 0.5 + 0.5\n    \n    # Build set of tour edges\n    tour_edges = set()\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        tour_edges.add((u, v))\n        tour_edges.add((v, u))\n    \n    # Apply sinusoidal perturbation to all edges\n    for i in range(n):\n        for j in range(i + 1, n):\n            is_tour = (i, j) in tour_edges\n            usage = edge_n_used[i, j] + 1\n            # Amplitude modulated by inverse usage\n            amp = 0.2 / np.sqrt(usage)\n            # Sinusoidal perturbation: positive for tour edges, negative for non-tour\n            if is_tour:\n                perturbation = amp * np.sin(phase * np.pi)\n            else:\n                perturbation = -amp * np.sin(phase * np.pi)\n            updated[i, j] = max(0.0, edge_distance[i, j] + perturbation * edge_distance[i, j])\n            updated[j, i] = updated[i, j]\n    \n    return updated",
+        "objective": 5.6737
+    },
+    {
+        "sample_order": 37,
+        "operator": "e2",
+        "algorithm": "For each node in the tour, compute a \u201cfatigue\u201d score from the usage of its incident edges, then perturb the distance matrix by adding noise proportional to the fatigue difference between the two endpoints of every edge, promoting moves that connect nodes with dissimilar fatigue levels.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy()\n    n = len(local_opt_tour)\n    fatigue = np.zeros(n)\n    for idx, node in enumerate(local_opt_tour):\n        prev = local_opt_tour[(idx - 1) % n]\n        nxt = local_opt_tour[(idx + 1) % n]\n        fatigue[node] = edge_n_used[node, prev] + edge_n_used[node, nxt]\n    max_fatigue = fatigue.max() if fatigue.max() > 0 else 1\n    for i in range(n):\n        for j in range(i + 1, n):\n            diff = abs(fatigue[i] - fatigue[j]) / max_fatigue\n            noise = 0.3 * edge_distance[i, j] * diff\n            updated[i, j] += noise\n            updated[j, i] += noise\n    return updated",
+        "objective": 5.93055
+    },
+    {
+        "sample_order": 38,
+        "operator": "e1",
+        "algorithm": "Invert the edge importance by replacing distances with a rank-based exponential score derived from how often edges appear in the local optimum versus how many times they have been used, then apply a cyclic shift that reverses edge priorities halfway through the search.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = edge_distance.shape[0]\n    updated = edge_distance.copy()\n    \n    # Identify tour edges\n    tour_edges = set()\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        tour_edges.add((u, v))\n        tour_edges.add((v, u))\n    \n    # Compute usage-scaled score for each edge\n    max_usage = edge_n_used.max() + 1\n    for i in range(n):\n        for j in range(i + 1, n):\n            usage = edge_n_used[i, j] + 1\n            is_tour = (i, j) in tour_edges\n            # Rank: lower usage -> higher rank; tour edges get extra boost\n            rank_factor = 1.0 / usage\n            if is_tour:\n                rank_factor *= 0.5  # Reduce rank for tour edges\n            # Exponential transformation\n            score = np.exp(-rank_factor * max_usage)\n            # Cyclic shift based on modulo of total usage\n            shift = 1.0 if (edge_n_used[i, j] % 2 == 0) else -1.0\n            updated[i, j] = edge_distance[i, j] * (0.5 + 0.5 * shift * score)\n            updated[j, i] = updated[i, j]\n    \n    return updated",
+        "objective": 5.75226
+    },
+    {
+        "sample_order": 39,
+        "operator": "m1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 40,
+        "operator": "m2",
+        "algorithm": "New algorithm applies a periodic hyperbolic penalty to non-tour edges with amplitude decaying logarithmically with usage count, while leaving tour edges unchanged, to force exploration of underused edges.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = edge_distance.shape[0]\n    updated = edge_distance.copy()\n    \n    # Build set of tour edges\n    tour_edges = set()\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        tour_edges.add((u, v))\n        tour_edges.add((v, u))\n    \n    # Apply hyperbolic penalty to non-tour edges\n    for i in range(n):\n        for j in range(i + 1, n):\n            if (i, j) not in tour_edges:\n                usage = edge_n_used[i, j] + 1\n                # Decaying penalty: hyperbolic with logarithmic usage\n                penalty = 1.0 + 0.5 / (1.0 + np.log(usage))\n                updated[i, j] = edge_distance[i, j] * penalty\n                updated[j, i] = updated[i, j]\n            else:\n                updated[i, j] = edge_distance[i, j]\n                updated[j, i] = edge_distance[i, j]\n    \n    return updated",
+        "objective": 5.93055
+    },
+    {
+        "sample_order": 41,
+        "operator": "e2",
+        "algorithm": "My new algorithm identifies a set of critical edges in the tour based on their contribution to total length and usage, then applies a multiplicative reward to rarely used edges that connect different segments of the tour, while imposing a strong exponential penalty on the critical edges that increases with their historical usage.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy()\n    n = len(local_opt_tour)\n    total_dist = sum(edge_distance[local_opt_tour[i], local_opt_tour[(i + 1) % n]] for i in range(n))\n    threshold = total_dist / n\n\n    critical_edges = []\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        if edge_distance[u, v] >= threshold:\n            critical_edges.append((u, v))\n\n    for u, v in critical_edges:\n        penalty = edge_distance[u, v] * (1.5 ** edge_n_used[u, v])\n        updated[u, v] += penalty\n        updated[v, u] += penalty\n\n    import random\n    random.seed()\n    segment_size = max(2, n // 5)\n    start = random.randint(0, n - 1)\n    segment = set()\n    for i in range(segment_size):\n        segment.add(local_opt_tour[(start + i) % n])\n\n    for i in range(n):\n        for j in range(i + 1, n):\n            u = local_opt_tour[i]\n            v = local_opt_tour[j]\n            if (u in segment) != (v in segment):\n                if edge_n_used[u, v] < 2:\n                    boost = edge_distance[u, v] * 0.5\n                    updated[u, v] = max(0.1, updated[u, v] - boost)\n                    updated[v, u] = updated[u, v]\n    return updated",
+        "objective": 5.91798
+    },
+    {
+        "sample_order": 42,
+        "operator": "e2",
+        "algorithm": "Apply a distance-dependent repulsion force between tour edges and non-tour edges, where each tour edge repels nearby non-tour edges with a strength proportional to its length and inversely proportional to the cumulative usage of both edges, while attracting other tour edges, creating a dynamic potential field that reshapes the landscape.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = edge_distance.shape[0]\n    updated = edge_distance.copy()\n    \n    tour_edges = set()\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        tour_edges.add((u, v))\n        tour_edges.add((v, u))\n    \n    tour_edge_list = list(tour_edges)\n    tour_edge_lengths = {}\n    for (u, v) in tour_edge_list:\n        tour_edge_lengths[(u, v)] = edge_distance[u, v]\n    \n    for i in range(n):\n        for j in range(i + 1, n):\n            if (i, j) in tour_edges:\n                continue\n            total_repulsion = 0.0\n            for (a, b) in tour_edge_list:\n                dist_ij = edge_distance[i, j]\n                dist_tour = edge_distance[a, b]\n                usage_ij = edge_n_used[i, j] + 1\n                usage_tour = edge_n_used[a, b] + 1\n                repulsion = (dist_tour / (dist_ij + 1e-8)) * (1.0 / usage_ij) * (1.0 / usage_tour)\n                total_repulsion += repulsion\n            perturbation = 0.1 * total_repulsion / (len(tour_edge_list) + 1)\n            updated[i, j] = max(0.0, edge_distance[i, j] + perturbation * edge_distance[i, j])\n            updated[j, i] = updated[i, j]\n    \n    return updated",
+        "objective": 5.93055
+    },
+    {
+        "sample_order": 43,
+        "operator": "e1",
+        "algorithm": "\"A new algorithm that applies a convex combination of the original distance with a repulsion term derived from the inverse squared usage of edges, using a threshold based on the tour's longest edge to selectively boost non-tour edges that are shorter than the tour average.\"",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = edge_distance.shape[0]\n    updated = edge_distance.copy()\n    \n    # Compute average tour edge length and find the longest tour edge\n    tour_len = 0.0\n    max_tour_edge = 0.0\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        d = edge_distance[u, v]\n        tour_len += d\n        if d > max_tour_edge:\n            max_tour_edge = d\n    avg_tour_len = tour_len / n\n    threshold = max_tour_edge * 0.7  # threshold based on longest edge\n    \n    # Build set of tour edges\n    tour_edges = set()\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        tour_edges.add((u, v))\n        tour_edges.add((v, u))\n    \n    # Apply repulsion to edges that are not in tour and shorter than threshold\n    for i in range(n):\n        for j in range(i + 1, n):\n            if (i, j) in tour_edges:\n                # Decrease slightly to make tour edges less attractive\n                penalty = 0.05 / (edge_n_used[i, j] + 1)\n                updated[i, j] = max(0.0, updated[i, j] - penalty * updated[i, j])\n            else:\n                # Boost only if original edge is below threshold (potentially good edges not used)\n                if edge_distance[i, j] < threshold:\n                    boost = 0.1 / (edge_n_used[i, j] + 1) ** 2\n                    updated[i, j] = max(0.0, updated[i, j] + boost * updated[i, j])\n            updated[j, i] = updated[i, j]\n    \n    return updated",
+        "objective": 5.93055
+    },
+    {
+        "sample_order": 44,
+        "operator": "e2",
+        "algorithm": "Randomly partition the tour into two disjoint subpaths, then apply a Gaussian-noise perturbation centered on each edge's original distance multiplied by a usage-based factor, and finally boost the cost of edges that appear frequently in both the tour and historical usage records.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy()\n    n = len(local_opt_tour)\n    rng = np.random.default_rng()\n    \n    # Randomly split tour into two subpaths\n    split_point = rng.integers(0, n)\n    subpath1 = local_opt_tour[:split_point]\n    subpath2 = local_opt_tour[split_point:]\n    \n    # Gaussian noise perturbation on all edges, scaled by usage\n    noise = rng.normal(0, 0.1, (n, n))\n    noise = (noise + noise.T) / 2\n    usage_factor = 1 + np.log(1 + edge_n_used)\n    updated *= (1 + noise * usage_factor)\n    \n    # Boost frequently used tour edges\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        if edge_n_used[u, v] > 2:\n            updated[u, v] *= (1 + 0.3 * np.log(1 + edge_n_used[u, v]))\n            updated[v, u] = updated[u, v]\n    \n    # Slightly reduce cost of edges connecting the two subpaths\n    for u in subpath1:\n        for v in subpath2:\n            if u != v:\n                reduction = 0.1 * edge_distance[u, v]\n                updated[u, v] = max(0.1, updated[u, v] - reduction)\n                updated[v, u] = updated[u, v]\n    \n    return updated",
+        "objective": 5.67911
+    },
+    {
+        "sample_order": 45,
+        "operator": "e2",
+        "algorithm": "Use a sigmoid function of the difference between usage counts of each edge and the average tour usage to compute an adaptive penalty that exponentially decays with usage and is applied only to edges whose endpoints have high betweenness centrality in the tour.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy()\n    n = edge_distance.shape[0]\n    \n    # Build set of tour edges\n    tour_edges = set()\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        tour_edges.add((u, v))\n        tour_edges.add((v, u))\n    \n    # Compute betweenness centrality for nodes in the tour\n    centrality = np.zeros(n)\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        w = local_opt_tour[(i + 2) % n]\n        centrality[v] += 1.0\n    \n    # Normalize centrality\n    if centrality.max() > 0:\n        centrality = centrality / centrality.max()\n    \n    # Compute average usage of all edges\n    avg_usage = np.mean(edge_n_used)\n    \n    for i in range(n):\n        for j in range(i + 1, n):\n            is_tour = (i, j) in tour_edges\n            usage = edge_n_used[i, j]\n            \n            # Sigmoid weighting based on usage difference from average\n            diff = usage - avg_usage\n            sigmoid = 1.0 / (1.0 + np.exp(-diff))\n            \n            # Centrality factor: high for edges where both endpoints have high centrality\n            centrality_factor = (centrality[i] + centrality[j]) / 2.0\n            \n            if is_tour:\n                # Penalty: decays exponentially with usage, modulated by centrality and sigmoid\n                penalty = 0.3 * np.exp(-0.1 * usage) * centrality_factor * (1.0 - sigmoid)\n                updated[i, j] += penalty * edge_distance[i, j]\n                updated[j, i] = updated[i, j]\n            else:\n                # Non-tour edges: slight reduction if usage is low and centrality low\n                if usage < avg_usage and centrality_factor < 0.5:\n                    reduction = 0.1 * edge_distance[i, j] * (1.0 - sigmoid)\n                    updated[i, j] = max(0.1, updated[i, j] - reduction)\n                    updated[j, i] = updated[i, j]\n    \n    return updated",
+        "objective": 5.7955
+    },
+    {
+        "sample_order": 46,
+        "operator": "e1",
+        "algorithm": "Multiscale potential-field perturbation: add a repulsive potential centred at a randomly chosen tour edge's midpoint, and an attractive potential to each edge whose usage count exceeds a dynamic threshold, then diffuse the combined field across the graph using a heat-kernel convolution.",
+        "code": "import numpy as np\nfrom scipy.sparse.csgraph import laplacian\nfrom scipy.sparse import diags\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = len(local_opt_tour)\n    rng = np.random.default_rng()\n\n    # Build adjacency from distances (inverse as similarity)\n    sigma = np.median(edge_distance[edge_distance > 0]) if np.any(edge_distance > 0) else 1.0\n    W = np.exp(-edge_distance**2 / (2 * sigma**2))\n    np.fill_diagonal(W, 0)\n\n    # Graph Laplacian and heat kernel (diffusion)\n    L = laplacian(W, normed=True)\n    t = 0.5\n    # Use approximation: exp(-tL) ~ (I - t/2 L) / (I + t/2 L) (inverse via solve)\n    A = np.eye(n) + 0.5 * t * L\n    B = np.eye(n) - 0.5 * t * L\n    heat_kernel = np.linalg.solve(A, B)\n\n    # Randomly pick a tour edge as repulsive source\n    idx = rng.integers(0, n)\n    u, v = local_opt_tour[idx], local_opt_tour[(idx + 1) % n]\n    repulsive = np.zeros((n, n))\n    repulsive[u, v] = 1.0\n    repulsive[v, u] = 1.0\n\n    # Attractive potential on frequently used edges (dynamic threshold)\n    threshold = np.percentile(edge_n_used, 80) if np.any(edge_n_used) else 2\n    attractive = np.zeros_like(repulsive)\n    for i in range(n):\n        for j in range(i+1, n):\n            if edge_n_used[i, j] > threshold:\n                attractive[i, j] = 1.0\n                attractive[j, i] = 1.0\n\n    # Diffuse both potentials via heat kernel on graph\n    repulsive_diffused = heat_kernel @ repulsive @ heat_kernel.T\n    attractive_diffused = heat_kernel @ attractive @ heat_kernel.T\n\n    # Combine: add repulsive, subtract attractive, scale by original distances\n    amplitude = 0.3 * np.mean(edge_distance)\n    perturbation = amplitude * (repulsive_diffused - 0.5 * attractive_diffused)\n    perturbation = (perturbation + perturbation.T) / 2\n\n    updated = edge_distance + perturbation\n    np.fill_diagonal(updated, 0)\n    updated = np.clip(updated, 0.1 * np.min(edge_distance[edge_distance > 0]), None)\n\n    return updated",
+        "objective": 5.77735
+    },
+    {
+        "sample_order": 47,
+        "operator": "m2",
+        "algorithm": "The new algorithm applies a deterministic quadratic penalty to edges of the current tour, scaled by iteration count, and uniformly decays all distances to encourage exploration of edges with low historical usage.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy()\n    n = len(local_opt_tour)\n    \n    # Decay all distances slightly to promote exploration\n    decay_factor = 0.98\n    updated *= decay_factor\n    \n    # Quadratic penalty on tour edges, scaling with usage count\n    penalty_scale = 0.5\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        penalty = penalty_scale * (edge_n_used[u, v] ** 2)\n        updated[u, v] += penalty\n        updated[v, u] = updated[u, v]\n    \n    # Reduce cost of edges with zero historical usage to encourage exploration\n    exploration_boost = 0.9\n    mask = (edge_n_used == 0) & (edge_distance > 0)\n    updated[mask] *= exploration_boost\n    \n    return updated",
+        "objective": 5.93055
+    },
+    {
+        "sample_order": 48,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 49,
+        "operator": "e1",
+        "algorithm": "Create a reward matrix that decays forgotten edges and boosts rarely used edges by applying an exponential decay to all edges based on iteration count, then adding a random walk perturbation scaled by edge distance.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = edge_distance.shape[0]\n    updated = edge_distance.copy()\n    \n    # Exponential decay factor based on usage\n    decay = np.exp(-0.1 * edge_n_used)\n    \n    # Random walk perturbation scaled by original distance\n    rng = np.random.default_rng()\n    noise = rng.uniform(-0.3, 0.3, (n, n))\n    noise = (noise + noise.T) / 2  # Symmetrize\n    np.fill_diagonal(noise, 0)\n    perturbation = noise * edge_distance * 0.25\n    \n    # Boost rarely used edges (usage < 3) with a small bonus\n    boost = np.where(edge_n_used < 3, 0.15 * edge_distance, 0.0)\n    \n    # Apply transformation\n    updated = updated * decay + perturbation + boost\n    np.fill_diagonal(updated, 0)\n    updated = np.maximum(updated, 0.1)\n    \n    return updated",
+        "objective": 5.76157
+    },
+    {
+        "sample_order": 50,
+        "operator": "e1",
+        "algorithm": "Modify distances by applying a periodic penalty to edges based on their rank in a cyclic ordering derived from the tour, coupled with a reward for edges that are far apart in this ordering, to encourage exploration of non-adjacent connections.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = len(local_opt_tour)\n    updated = edge_distance.copy()\n    \n    # Create position map for nodes in the tour\n    pos = {node: idx for idx, node in enumerate(local_opt_tour)}\n    \n    # Compute cyclic distance between nodes along the tour\n    cyclic_dist = np.zeros((n, n))\n    for i in range(n):\n        for j in range(n):\n            if i != j:\n                d = abs(pos[i] - pos[j])\n                cyclic_dist[i, j] = min(d, n - d)\n    \n    # Penalty: boost edges that are close in cyclic order (frequently used)\n    penalty_factor = 1.0 + 0.5 * np.exp(-cyclic_dist / (n * 0.1))\n    \n    # Reward: reduce cost for edges that are far apart in cyclic order\n    reward_factor = 1.0 - 0.3 * (1 - np.exp(-cyclic_dist / (n * 0.3)))\n    \n    # Combine penalty and reward, modulated by usage\n    usage_mod = 1 + np.log(1 + edge_n_used)\n    updated = updated * (penalty_factor + (reward_factor - penalty_factor) * (1 - np.exp(-usage_mod)))\n    \n    # Ensure symmetry and non-negativity\n    updated = (updated + updated.T) / 2\n    updated = np.maximum(updated, 0.1 * edge_distance)\n    \n    return updated",
+        "objective": 5.74259
+    },
+    {
+        "sample_order": 51,
+        "operator": "e1",
+        "algorithm": "Apply a deterministic \"forbidden-region\" transformation that, for each edge not in the current tour, inflates its distance by the product of its original value and a sigmoid of its count of appearances in historical tours, while sharply reducing the distance of the longest edge in the current tour.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = len(local_opt_tour)\n    updated = edge_distance.copy()\n\n    # Sharply reduce the longest edge in the current tour\n    tour_edges = [(local_opt_tour[i], local_opt_tour[(i + 1) % n]) for i in range(n)]\n    max_len = -1\n    max_idx = -1\n    for i, (u, v) in enumerate(tour_edges):\n        if edge_distance[u, v] > max_len:\n            max_len = edge_distance[u, v]\n            max_idx = i\n    u, v = tour_edges[max_idx]\n    updated[u, v] = 0.01 * max_len\n    updated[v, u] = 0.01 * max_len\n\n    # Inflate distances for all non-tour edges using sigmoid of usage count\n    for i in range(n):\n        for j in range(i+1, n):\n            if (i, j) not in tour_edges and (j, i) not in tour_edges:\n                sig = 1 / (1 + np.exp(-edge_n_used[i, j] + 3))\n                updated[i, j] = edge_distance[i, j] * (1 + 5 * sig)\n                updated[j, i] = updated[i, j]\n\n    return updated",
+        "objective": 5.93055
+    },
+    {
+        "sample_order": 52,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 53,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 54,
+        "operator": "e2",
+        "algorithm": "Replace the original distance matrix with a weighted sum of the original distances and the absolute difference between the current tour's adjacency structure and a randomized target tour, modulated by a logistic decay function of cumulative edge usage.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = edge_distance.shape[0]\n    updated = edge_distance.copy()\n    \n    rng = np.random.default_rng()\n    target_tour = rng.permutation(n)\n    \n    tour_edges = set()\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        tour_edges.add((u, v))\n        tour_edges.add((v, u))\n    \n    target_edges = set()\n    for i in range(n):\n        u = target_tour[i]\n        v = target_tour[(i + 1) % n]\n        target_edges.add((u, v))\n        target_edges.add((v, u))\n    \n    for i in range(n):\n        for j in range(i + 1, n):\n            usage = edge_n_used[i, j]\n            decay = 1.0 / (1.0 + np.exp(0.2 * usage))\n            \n            if (i, j) in tour_edges:\n                diff_cost = 0.0 if (i, j) in target_edges else 1.0\n            else:\n                diff_cost = 1.0 if (i, j) in target_edges else 0.0\n            \n            perturbation = decay * diff_cost * 0.5 * edge_distance[i, j]\n            updated[i, j] = max(0.0, updated[i, j] + perturbation)\n            updated[j, i] = updated[i, j]\n    \n    return updated",
+        "objective": 5.74166
+    },
+    {
+        "sample_order": 55,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 56,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 57,
+        "operator": "e2",
+        "algorithm": "Apply a non-linear sigmoidal penalty to edges based on their presence in the current tour and their historical usage count, then inject a multiplicative noise field derived from the spatial variance of tour edges to selectively lower barriers between unexplored clusters.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy().astype(np.float64)\n    n = len(local_opt_tour)\n    \n    # Compute spatial variance of tour edges as a global noise scale\n    tour_coords = np.array([])\n    if hasattr(edge_distance, 'shape') and n > 1:\n        # Simulate coordinate-based variance from distance matrix (multidimensional scaling proxy)\n        # Use degree centrality as proxy for spatial spread\n        node_degrees = np.zeros(n)\n        for i in range(n):\n            node_degrees[i] = np.sum(edge_distance[i, :])\n        std_deg = np.std(node_degrees)\n        spatial_factor = np.tanh(std_deg / (np.mean(node_degrees) + 1e-8))\n    else:\n        spatial_factor = 0.5\n    \n    # Build set of tour edges\n    tour_edges = set()\n    for i in range(n):\n        u = int(local_opt_tour[i])\n        v = int(local_opt_tour[(i + 1) % n])\n        tour_edges.add((u, v))\n        tour_edges.add((v, u))\n    \n    # Generate noise field based on spatial factor\n    rng = np.random.default_rng(42)\n    noise_base = rng.uniform(-0.3, 0.3, (n, n))\n    noise_base = (noise_base + noise_base.T) / 2\n    \n    for i in range(n):\n        for j in range(i + 1, n):\n            is_tour = (i, j) in tour_edges\n            usage = edge_n_used[i, j]\n            \n            # Sigmoidal penalty based on usage and tour membership\n            sig_penalty = 1.0 / (1.0 + np.exp(-0.5 * (usage - 3)))\n            if is_tour:\n                penalty_mul = 1.0 + 0.6 * sig_penalty\n            else:\n                # Reduce non-tour edges slightly if used frequently (avoid over-penalty)\n                penalty_mul = 1.0 - 0.2 * sig_penalty\n            \n            # Add spatial noise to encourage exploration\n            noise_val = noise_base[i, j] * spatial_factor * 0.2\n            \n            updated[i, j] = max(0.01, edge_distance[i, j] * penalty_mul + noise_val)\n            updated[j, i] = updated[i, j]\n    \n    return updated",
+        "objective": 5.8245
+    },
+    {
+        "sample_order": 58,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 59,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 60,
+        "operator": "m1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 61,
+        "operator": "e1",
+        "algorithm": "The new algorithm identifies a \"critical node\" with the highest edge usage concentration after perturbing its incident edges via exponential decay of historical penalties, then applies pairwise multiplicative scaling to all edges based on a tour-segment similarity measure derived from random projections of node coordinates.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy()\n    n = len(local_opt_tour)\n    rng = np.random.default_rng()\n    \n    # Identify critical node: node with maximum total incident usage\n    usage_sum = np.sum(edge_n_used, axis=1)\n    critical_node = local_opt_tour[np.argmax(usage_sum[local_opt_tour])]\n    \n    # Exponentially decay penalties on edges incident to critical node\n    decay = np.exp(-0.1 * edge_n_used[critical_node])\n    updated[critical_node] *= decay\n    updated[:, critical_node] *= decay\n    \n    # Random projection to assign each node a scalar coordinate\n    proj = rng.normal(0, 1, n)\n    node_coords = np.array([proj[node] for node in range(n)])\n    \n    # Compute segment similarity along tour using rolling window of size 3\n    tour_coords = node_coords[local_opt_tour]\n    similarity = np.zeros((n, n))\n    for i in range(n):\n        for j in range(n):\n            pos_i = np.where(local_opt_tour == i)[0][0]\n            pos_j = np.where(local_opt_tour == j)[0][0]\n            if pos_i > pos_j:\n                pos_i, pos_j = pos_j, pos_i\n            # Consider subpath from pos_i to pos_j\n            subpath = tour_coords[pos_i:pos_j+1]\n            if len(subpath) >= 2:\n                sim = np.std(subpath)\n            else:\n                sim = 0\n            similarity[i, j] = sim\n            similarity[j, i] = sim\n    \n    # Normalize similarity to [0,1] range\n    sim_min, sim_max = similarity.min(), similarity.max()\n    if sim_max > sim_min:\n        similarity = (similarity - sim_min) / (sim_max - sim_min)\n    else:\n        similarity = np.zeros_like(similarity)\n    \n    # Apply multiplicative scaling: edges with high similarity get penalized more\n    scale = 1 + 0.5 * similarity\n    updated *= scale\n    \n    # Ensure symmetry\n    updated = (updated + updated.T) / 2\n    \n    # Boost edges not in current tour to encourage exploration\n    tour_edges = set()\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        tour_edges.add((u, v))\n        tour_edges.add((v, u))\n    boost_factor = 1.2\n    for i in range(n):\n        for j in range(i+1, n):\n            if (i, j) not in tour_edges and (j, i) not in tour_edges:\n                updated[i, j] *= boost_factor\n                updated[j, i] = updated[i, j]\n    \n    return updated",
+        "objective": 5.93055
+    },
+    {
+        "sample_order": 62,
+        "operator": "m2",
+        "algorithm": "The new algorithm selects two random non-adjacent nodes in the tour, penalizes all edges that cross when cutting the tour at these nodes, and applies a logarithmic decay based on total usage of the cut edges, to disrupt local structure globally.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy()\n    n = len(local_opt_tour)\n    rng = np.random.default_rng()\n    \n    idx1 = rng.integers(0, n)\n    idx2 = rng.integers(0, n)\n    while abs(idx1 - idx2) % n <= 1 or abs(idx1 - idx2) % n >= n - 1:\n        idx2 = rng.integers(0, n)\n    if idx1 > idx2:\n        idx1, idx2 = idx2, idx1\n    \n    tour = local_opt_tour\n    cut_nodes = set()\n    for i in range(idx1, idx2 + 1):\n        cut_nodes.add(tour[i])\n    for i in range(idx2 + 1, n):\n        cut_nodes.add(tour[i])\n    for i in range(0, idx1):\n        cut_nodes.add(tour[i])\n    \n    for i in range(n):\n        for j in range(i + 1, n):\n            u, v = tour[i], tour[j]\n            if (u in cut_nodes) != (v in cut_nodes):\n                usage = edge_n_used[u, v] + edge_n_used[v, u]\n                penalty = 0.3 * edge_distance[u, v] * (1 + np.log1p(usage))\n                updated[u, v] += penalty\n                updated[v, u] += penalty\n    \n    return updated",
+        "objective": 5.93055
+    },
+    {
+        "sample_order": 63,
+        "operator": "e2",
+        "algorithm": "Construct a penalty matrix by multiplying historical usage counts with a sigmoid of the edge\u2019s rank in the current tour, then add an anti-clustering potential that repels edges belonging to the two most frequently occurring clusters in the tour\u2019s adjacency graph.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = len(local_opt_tour)\n    updated = edge_distance.copy()\n    \n    # Build tour edge set\n    tour_edges = set()\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        tour_edges.add((u, v))\n        tour_edges.add((v, u))\n    \n    # Compute edge usage rank within the tour\n    tour_usage = np.array([edge_n_used[u, v] for (u, v) in tour_edges])\n    sorted_indices = np.argsort(tour_usage)\n    rank = np.zeros(n * 2)\n    rank[sorted_indices] = np.arange(len(sorted_indices))\n    \n    # Sigmoid penalty factor based on rank\n    penalty = 1.0 / (1.0 + np.exp(-0.1 * (rank - n/2)))\n    penalty_matrix = np.zeros((n, n))\n    idx = 0\n    for (u, v) in tour_edges:\n        penalty_matrix[u, v] = penalty[idx]\n        idx += 1\n    penalty_matrix += penalty_matrix.T\n    \n    # Historical usage penalty\n    usage_penalty = np.log(1 + edge_n_used) * 0.5\n    penalty_matrix += usage_penalty\n    \n    # Anti-clustering: detect two most frequent clusters via degree in tour\n    tour_adj = np.zeros((n, n))\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        tour_adj[u, v] = 1\n        tour_adj[v, u] = 1\n    degrees = np.sum(tour_adj, axis=1)\n    cluster_centers = np.argsort(degrees)[-2:]\n    \n    for c in cluster_centers:\n        dist_to_center = np.abs(np.arange(n) - c)\n        dist_to_center = np.minimum(dist_to_center, n - dist_to_center)\n        repulsion = 0.2 * np.exp(-dist_to_center / 10)\n        penalty_matrix[c, :] += repulsion\n        penalty_matrix[:, c] += repulsion\n    \n    # Apply penalty to edge distances (increase cost)\n    updated += penalty_matrix * 0.3\n    \n    return updated",
+        "objective": 5.93055
+    },
+    {
+        "sample_order": 64,
+        "operator": "e1",
+        "algorithm": "Decompose the tour into edge groups by alternating parity, then apply a sinusoidal perturbation that oscillates with the product of node degrees in the original graph, and finally impose a repulsion penalty proportional to the inverse of the edge's historical usage frequency.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = len(local_opt_tour)\n    updated = edge_distance.copy()\n    \n    # Compute node degrees from original distances (threshold-based adjacency)\n    threshold = np.median(edge_distance[edge_distance > 0])\n    adjacency = (edge_distance < threshold).astype(float)\n    node_degrees = adjacency.sum(axis=1)\n    \n    # Assign edges to two parity groups based on tour position\n    group1_edges = []\n    group2_edges = []\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        if i % 2 == 0:\n            group1_edges.append((u, v))\n        else:\n            group2_edges.append((u, v))\n    \n    # Sinusoidal perturbation factor based on node degree product\n    for u in range(n):\n        for v in range(u + 1, n):\n            deg_product = node_degrees[u] * node_degrees[v] + 1\n            phase = np.sin(deg_product * np.pi / 180)\n            updated[u, v] *= (1 + 0.2 * phase)\n            updated[v, u] = updated[u, v]\n    \n    # Repulsion penalty inversely proportional to historical usage\n    epsilon = 1e-6\n    for u in range(n):\n        for v in range(u + 1, n):\n            if edge_n_used[u, v] > 0:\n                repulsion = 0.5 / (edge_n_used[u, v] + epsilon)\n                updated[u, v] += repulsion\n                updated[v, u] += repulsion\n    \n    # Attract edges that connect the two parity groups\n    for u, v in group1_edges:\n        for x, y in group2_edges:\n            if u != x and u != y and v != x and v != y:\n                updated[u, x] *= 0.9\n                updated[x, u] *= 0.9\n                updated[v, y] *= 0.9\n                updated[y, v] *= 0.9\n    \n    return updated",
+        "objective": 5.91602
+    },
+    {
+        "sample_order": 65,
+        "operator": "e2",
+        "algorithm": "Apply a logistic decay to the original distances of tour edges based on their rank in the tour by usage count, then boost the distances of all non-tour edges that are incident to high-degree nodes in the tour, creating a repulsion field that pushes the search toward structurally different tours.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = edge_distance.shape[0]\n    updated = edge_distance.copy()\n    \n    # Build tour edge set and count usage for each node in tour\n    tour_edges = set()\n    node_usage_in_tour = np.zeros(n, dtype=float)\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        tour_edges.add((u, v))\n        tour_edges.add((v, u))\n        node_usage_in_tour[u] += edge_n_used[u, v]\n        node_usage_in_tour[v] += edge_n_used[u, v]\n    \n    # Rank tour edges by usage, apply logistic penalty\n    tour_edge_list = []\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        usage = edge_n_used[u, v]\n        tour_edge_list.append((u, v, usage))\n    tour_edge_list.sort(key=lambda x: x[2])\n    \n    for rank, (u, v, usage) in enumerate(tour_edge_list):\n        logistic_penalty = 1.0 / (1.0 + np.exp(-0.5 * (rank - n/2)))\n        penalty = logistic_penalty * edge_distance[u, v] * 0.4\n        updated[u, v] += penalty\n        updated[v, u] += penalty\n    \n    # Boost non-tour edges incident to high-usage nodes\n    max_node_usage = node_usage_in_tour.max()\n    if max_node_usage > 0:\n        for i in range(n):\n            for j in range(i+1, n):\n                if (i, j) not in tour_edges:\n                    boost = 0.3 * (node_usage_in_tour[i] + node_usage_in_tour[j]) / (2 * max_node_usage)\n                    updated[i, j] += boost * edge_distance[i, j]\n                    updated[j, i] = updated[i, j]\n    \n    return updated",
+        "objective": 5.82743
+    },
+    {
+        "sample_order": 66,
+        "operator": "m2",
+        "algorithm": "The new algorithm applies an exponential penalty based on edge usage frequency to all tour edges, while randomly reducing the cost of a fixed fraction of non-tour edges using a logarithmic decay factor.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy()\n    n = len(local_opt_tour)\n    rng = np.random.default_rng()\n\n    # Penalize all tour edges with exponential penalty based on usage\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        penalty = 0.8 * edge_distance[u, v] * (np.exp(0.5 * edge_n_used[u, v]) - 1)\n        updated[u, v] += penalty\n        updated[v, u] += penalty\n\n    # Reduce cost of a random fraction of non-tour edges using logarithmic decay\n    non_tour_edges = []\n    for i in range(n):\n        for j in range(i+1, n):\n            is_tour = any(\n                (i == local_opt_tour[k] and j == local_opt_tour[(k+1)%n]) or\n                (j == local_opt_tour[k] and i == local_opt_tour[(k+1)%n])\n                for k in range(n)\n            )\n            if not is_tour:\n                non_tour_edges.append((i, j))\n    \n    num_to_reduce = max(1, len(non_tour_edges) // 4)\n    chosen_indices = rng.choice(len(non_tour_edges), size=num_to_reduce, replace=False)\n    for idx in chosen_indices:\n        u, v = non_tour_edges[idx]\n        reduction = 0.3 * edge_distance[u, v] * np.log(1 + edge_n_used[u, v])\n        updated[u, v] = max(0.1, updated[u, v] - reduction)\n        updated[v, u] = max(0.1, updated[v, u] - reduction)\n\n    return updated",
+        "objective": 5.93055
+    },
+    {
+        "sample_order": 67,
+        "operator": "e1",
+        "algorithm": "The new algorithm applies a \"repulsion\u2013attraction\" transformation where edges further from the tour in terms of node-degree centrality are penalised via a sigmoid based on usage, while edges closer to the tour's geometric median are rewarded, creating a topographic gradient that pushes 2-opt out of the current basin.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = edge_distance.shape[0]\n    updated = edge_distance.copy()\n    \n    # Compute node degree centrality within the tour (each node appears twice)\n    tour_degree = np.zeros(n, dtype=np.float64)\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        tour_degree[u] += 1.0\n        tour_degree[v] += 1.0\n    \n    # Compute geometric median of tour nodes as a reference point\n    tour_coords = np.column_stack([np.cos(2 * np.pi * local_opt_tour / n),\n                                   np.sin(2 * np.pi * local_opt_tour / n)])\n    median_point = np.median(tour_coords, axis=0)\n    \n    # Distance of each node from median\n    node_positions = np.column_stack([np.cos(2 * np.pi * np.arange(n) / n),\n                                      np.sin(2 * np.pi * np.arange(n) / n)])\n    distances_to_median = np.linalg.norm(node_positions - median_point, axis=1)\n    \n    # Build set of tour edges\n    tour_edges = set()\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        tour_edges.add((u, v))\n        tour_edges.add((v, u))\n    \n    # Apply transformation\n    for i in range(n):\n        for j in range(i + 1, n):\n            is_tour = (i, j) in tour_edges\n            usage = edge_n_used[i, j]\n            # Repulsion factor: sigmoid of usage, scaled by centrality difference\n            centrality_diff = abs(tour_degree[i] - tour_degree[j])\n            repulsion = 1.0 / (1.0 + np.exp(-0.5 * (usage - 5))) * centrality_diff\n            \n            # Attraction factor: based on proximity to median\n            median_proximity = np.exp(-0.3 * (distances_to_median[i] + distances_to_median[j]))\n            attraction = 0.5 * median_proximity if not is_tour else 0.0\n            \n            # Combined modification\n            modification = repulsion - attraction\n            updated[i, j] = max(0.1, edge_distance[i, j] + modification * edge_distance[i, j] * 0.15)\n            updated[j, i] = updated[i, j]\n    \n    return updated",
+        "objective": 5.81611
+    },
+    {
+        "sample_order": 68,
+        "operator": "e2",
+        "algorithm": "Apply a random multiplicative decay factor to all edges, then selectively amplify non-tour edges that are short in the original distance but rarely used, while penalizing tour edges proportionally to their cumulative usage frequency.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = edge_distance.shape[0]\n    rng = np.random.default_rng()\n    updated = edge_distance.copy()\n    \n    # Random decay factor for all edges\n    decay = rng.uniform(0.8, 1.0)\n    updated *= decay\n    \n    # Build set of tour edges\n    tour_edges = set()\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        tour_edges.add((u, v))\n        tour_edges.add((v, u))\n    \n    # Compute max usage for normalization\n    max_usage = np.max(edge_n_used) + 1\n    \n    for i in range(n):\n        for j in range(i + 1, n):\n            is_tour = (i, j) in tour_edges\n            usage = edge_n_used[i, j]\n            if is_tour:\n                # Penalize tour edges: increase cost based on usage\n                penalty = 1.0 + 0.5 * (usage / max_usage)\n                updated[i, j] = edge_distance[i, j] * penalty\n            else:\n                # Amplify short, rarely used non-tour edges\n                if usage == 0:\n                    boost = 1.0 / (1.0 + edge_distance[i, j] / np.mean(edge_distance))\n                    updated[i, j] = edge_distance[i, j] * (1.0 - 0.3 * boost)\n                elif usage < max_usage * 0.1:\n                    boost = 0.2 * (1.0 - usage / max_usage)\n                    updated[i, j] = edge_distance[i, j] * (1.0 - boost)\n            updated[j, i] = updated[i, j]\n    \n    return updated",
+        "objective": 5.82798
+    },
+    {
+        "sample_order": 69,
+        "operator": "e2",
+        "algorithm": "Select a contiguous block of the current tour, heavily increase the cost of each edge inside the block by an amount proportional to its usage count and original distance, and simultaneously decrease the cost of all edges that connect the block\u2019s endpoints to the rest of the tour by a fixed fraction.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy().astype(float)\n    n = len(local_opt_tour)\n    rng = np.random.default_rng()\n    \n    # Choose a random contiguous block of the tour\n    start = rng.integers(0, n)\n    block_len = rng.integers(2, n // 2 + 1)\n    block_indices = [(start + i) % n for i in range(block_len)]\n    block_nodes = [local_opt_tour[i] for i in block_indices]\n    \n    # Heavily increase cost of edges inside the block\n    for i in range(len(block_nodes)):\n        u = block_nodes[i]\n        v = block_nodes[(i + 1) % len(block_nodes)]\n        penalty = 1.0 * edge_distance[u, v] * (1 + np.log(1 + edge_n_used[u, v]))\n        updated[u, v] += penalty\n        updated[v, u] += penalty\n    \n    # Decrease cost of edges connecting block endpoints to outside nodes\n    for endpoint in [block_nodes[0], block_nodes[-1]]:\n        for j in range(n):\n            w = local_opt_tour[j]\n            if w not in block_nodes:\n                reduction = 0.3 * edge_distance[endpoint, w]\n                updated[endpoint, w] = max(0.1, updated[endpoint, w] - reduction)\n                updated[w, endpoint] = max(0.1, updated[w, endpoint] - reduction)\n    \n    return updated",
+        "objective": 5.68067
+    },
+    {
+        "sample_order": 70,
+        "operator": "m2",
+        "algorithm": "The new algorithm selects a random sub-tour of consecutive nodes from the local optimum, heavily penalizes edges that are not in the selected sub-tour but connect its interior nodes to each other or to the rest of the tour, and applies an exponential decay to penalties on edges inside the selected sub-tour based on usage count, forcing 2-opt to explore routes that break the sub-tour structure.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy()\n    n = len(local_opt_tour)\n    rng = np.random.default_rng()\n    \n    # Select a random contiguous sub-tour (block of consecutive nodes)\n    start = rng.integers(0, n)\n    block_len = rng.integers(2, n // 2 + 1)\n    block_indices = [(start + i) % n for i in range(block_len)]\n    block_nodes = set(local_opt_tour[i] for i in block_indices)\n    block_list = [local_opt_tour[i] for i in block_indices]\n    \n    # Penalize edges connecting two interior nodes of the sub-tour that are NOT consecutive in it\n    for i in range(block_len):\n        for j in range(i + 2, block_len):\n            u, v = block_list[i], block_list[j]\n            penalty = 0.8 * edge_distance[u, v] * (1 + edge_n_used[u, v])\n            updated[u, v] += penalty\n            updated[v, u] += penalty\n    \n    # Penalize edges from any interior node to any node outside the sub-tour\n    for u in block_nodes:\n        for v in range(n):\n            if v not in block_nodes:\n                penalty = 0.6 * edge_distance[u, v] * (1 + edge_n_used[u, v])\n                updated[u, v] += penalty\n                updated[v, u] += penalty\n    \n    # Decay penalties on edges that are inside the sub-tour and consecutive (the sub-tour edges)\n    for i in range(block_len):\n        u = block_list[i]\n        v = block_list[(i + 1) % block_len]\n        decay = 0.9 ** (edge_n_used[u, v] + edge_n_used[v, u])\n        updated[u, v] *= decay\n        updated[v, u] *= decay\n    \n    return updated",
+        "objective": 5.80036
+    },
+    {
+        "sample_order": 71,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 72,
+        "operator": "e2",
+        "algorithm": "My new algorithm applies a memory-based exponential decay penalty to all tour edges proportional to their usage count, while simultaneously boosting a fixed number of the least-used non-tour edges by a factor derived from the tour cost variance, to create a repulsion-attraction force that drives 2-opt into low-usage areas.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy()\n    n = len(local_opt_tour)\n    \n    # Build set of tour edges\n    tour_edges = set()\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        tour_edges.add((u, v))\n        tour_edges.add((v, u))\n    \n    # Compute tour length statistics\n    tour_lengths = []\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        tour_lengths.append(edge_distance[u, v])\n    avg_len = np.mean(tour_lengths)\n    var_len = np.var(tour_lengths) + 1e-8\n    \n    # Boost factor for least-used non-tour edges\n    boost_base = 0.3 * (var_len / avg_len)\n    \n    # Collect non-tour edges with their usage\n    non_tour_info = []\n    for i in range(n):\n        for j in range(i + 1, n):\n            if (i, j) not in tour_edges:\n                non_tour_info.append((edge_n_used[i, j], i, j))\n    \n    # Sort by usage and pick the 10 least-used\n    non_tour_info.sort(key=lambda x: x[0])\n    num_boost = min(10, len(non_tour_info))\n    boosted_edges = set()\n    for k in range(num_boost):\n        _, i, j = non_tour_info[k]\n        boosted_edges.add((i, j))\n        boosted_edges.add((j, i))\n    \n    # Apply exponential decay penalty to tour edges, boost to selected non-tour edges\n    max_usage = max(1.0, np.max(edge_n_used))\n    for i in range(n):\n        for j in range(i + 1, n):\n            if (i, j) in tour_edges:\n                decay = np.exp(-edge_n_used[i, j] / max_usage)\n                penalty = 0.5 * edge_distance[i, j] * (1.0 - decay)\n                updated[i, j] += penalty\n                updated[j, i] += penalty\n            elif (i, j) in boosted_edges:\n                boost = boost_base * (1.0 - edge_n_used[i, j] / (max_usage + 1))\n                updated[i, j] = max(0.1, updated[i, j] - boost)\n                updated[j, i] = max(0.1, updated[j, i] - boost)\n    \n    return updated",
+        "objective": 5.93055
+    },
+    {
+        "sample_order": 73,
+        "operator": "e1",
+        "algorithm": "\"The algorithm applies a logit-based transformation to the distance matrix that exponentially amplifies the cost of edges forming a Hamiltonian cycle with the greatest average deviation from the tour edges, while simultaneously decaying the penalties of rarely used edges via a complementary sigmoid mask derived from the tour's adjacency eccentricity.\"",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = edge_distance.shape[0]\n    updated = edge_distance.copy()\n    \n    # Build tour edge set\n    tour_edges = set()\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        tour_edges.add((u, v))\n        tour_edges.add((v, u))\n    \n    # Compute eccentricity for each node: max distance difference from neighbors\n    eccentricity = np.zeros(n)\n    for i in range(n):\n        neighbors = [local_opt_tour[(local_opt_tour.tolist().index(i) + d) % n] for d in (-1, 1)]\n        if len(neighbors) >= 2:\n            eccentricity[i] = abs(edge_distance[i, neighbors[0]] - edge_distance[i, neighbors[1]])\n        else:\n            eccentricity[i] = 0.0\n    \n    # Normalize eccentricity to [0,1]\n    max_ecc = np.max(eccentricity) if np.max(eccentricity) > 0 else 1.0\n    ecc_norm = eccentricity / max_ecc\n    \n    # Compute logit weights: sigmoid mask based on eccentricity\n    sigmoid_mask = 1.0 / (1.0 + np.exp(-10.0 * (ecc_norm[:, None] + ecc_norm[None, :] - 0.5)))\n    \n    # Exponential amplification for non-tour edges with low usage\n    usage_factor = 1.0 / (1.0 + edge_n_used)\n    \n    for i in range(n):\n        for j in range(i + 1, n):\n            is_tour = (i, j) in tour_edges\n            if not is_tour:\n                # Logit-based amplification: exp(usage_factor * sigmoid_mask)\n                amp = np.exp(3.0 * usage_factor[i, j] * sigmoid_mask[i, j])\n                updated[i, j] *= amp\n                updated[j, i] = updated[i, j]\n            else:\n                # Decay tour edges slightly\n                decay = 0.95 ** (1.0 / (1.0 + edge_n_used[i, j]))\n                updated[i, j] *= decay\n                updated[j, i] = updated[i, j]\n    \n    return updated",
+        "objective": 5.93055
+    },
+    {
+        "sample_order": 74,
+        "operator": "m1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 75,
+        "operator": "m2",
+        "algorithm": "The new algorithm applies an exponential decay to non-tour edge distances inversely proportional to their usage count, while leaving tour edges unchanged, to progressively discount rarely used edges and guide 2-opt toward less explored connections.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = edge_distance.shape[0]\n    updated = edge_distance.copy()\n    \n    # Build set of tour edges\n    tour_edges = set()\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        tour_edges.add((u, v))\n        tour_edges.add((v, u))\n    \n    # Apply exponential decay to non-tour edges based on usage\n    for i in range(n):\n        for j in range(i + 1, n):\n            if (i, j) not in tour_edges:\n                usage = edge_n_used[i, j] + 1\n                decay_factor = np.exp(-0.3 * usage)\n                updated[i, j] = edge_distance[i, j] * decay_factor\n                updated[j, i] = updated[i, j]\n    \n    return updated",
+        "objective": 5.83743
+    },
+    {
+        "sample_order": 76,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 77,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 78,
+        "operator": "m1",
+        "algorithm": "Traverse the tour, identify a segment with above\u2011average total cost, then apply a decaying exponential penalty to each tour edge based on its count of prior penalisations, and simultaneously reward edges that are far apart in the tour by subtracting a fraction of their original distance.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy().astype(float)\n    n = len(local_opt_tour)\n    \n    # Identify a costly segment (length ~ n/4) with above-average total cost\n    tour_costs = [edge_distance[local_opt_tour[i], local_opt_tour[(i+1)%n]] for i in range(n)]\n    avg_cost = np.mean(tour_costs)\n    segment_len = max(1, n // 4)\n    best_start = 0\n    best_cost = -1\n    for start in range(n):\n        seg_cost = sum(tour_costs[(start+i)%n] for i in range(segment_len))\n        if seg_cost > best_cost:\n            best_cost = seg_cost\n            best_start = start\n    segment_nodes = set(local_opt_tour[best_start:best_start+segment_len] if best_start+segment_len <= n \n                        else list(local_opt_tour[best_start:]) + list(local_opt_tour[:best_start+segment_len-n]))\n    \n    # Decaying exponential penalty on tour edges based on usage\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i+1)%n]\n        penalty = 0.5 * np.exp(-0.2 * edge_n_used[u, v])\n        updated[u, v] *= (1 + penalty)\n        updated[v, u] = updated[u, v]\n    \n    # Reward edges that connect nodes far apart in the tour (distance in indices)\n    for i in range(n):\n        for j in range(i+2, n):\n            u = local_opt_tour[i]\n            v = local_opt_tour[j]\n            dist_in_tour = min(j-i, n-(j-i))\n            if dist_in_tour > n//3:\n                reduction = 0.15 * edge_distance[u, v]\n                updated[u, v] = max(0.1, updated[u, v] - reduction)\n                updated[v, u] = updated[u, v]\n    \n    # Additional boost for edges connecting the identified costly segment to outside\n    for u in segment_nodes:\n        for v in set(local_opt_tour) - segment_nodes:\n            if edge_n_used[u, v] == 0:\n                updated[u, v] *= 0.8\n                updated[v, u] = updated[u, v]\n    \n    return updated",
+        "objective": 5.69999
+    },
+    {
+        "sample_order": 79,
+        "operator": "e1",
+        "algorithm": "\"Apply a proportional-derivative (PD) feedback perturbation that uses the difference between each edge's original distance and the tour's average edge distance as the proportional term, and the rate of change of edge usage as the derivative term, to dynamically reshape the cost landscape.\"",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = edge_distance.shape[0]\n    updated = edge_distance.copy()\n    \n    # Compute average tour edge length\n    tour_len = 0.0\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        tour_len += edge_distance[u, v]\n    avg_tour_len = tour_len / n\n    \n    # Calculate edge usage change (derivative term)\n    # Using edge_n_used as cumulative usage; estimate rate as usage if >0 else 1\n    usage_rate = np.maximum(edge_n_used, 1)\n    \n    # Apply PD perturbation\n    for i in range(n):\n        for j in range(i + 1, n):\n            # Proportional term: deviation from average tour length\n            prop = edge_distance[i, j] - avg_tour_len\n            # Derivative term: inverse usage rate\n            deriv = 1.0 / usage_rate[i, j]\n            # Combined perturbation (PD controller with damping)\n            perturbation = 0.15 * prop + 0.1 * deriv\n            # Normalize perturbation to avoid extreme changes\n            perturbation = np.clip(perturbation, -0.5 * edge_distance[i, j], 0.5 * edge_distance[i, j])\n            updated[i, j] = max(0.01, edge_distance[i, j] + perturbation)\n            updated[j, i] = updated[i, j]\n    \n    # Add small extra penalty to tour edges that have been used many times\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        if edge_n_used[u, v] > 3:\n            updated[u, v] *= (1 + 0.05 * np.log(1 + edge_n_used[u, v]))\n            updated[v, u] = updated[u, v]\n    \n    return updated",
+        "objective": 5.84748
+    },
+    {
+        "sample_order": 80,
+        "operator": "m2",
+        "algorithm": "New algorithm: Nonlinearly scale historical usage as a multiplicative penalty, then add a structural disruption by amplifying the cost of edges that connect nodes from opposite halves of the tour split by a random median node.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy()\n    n = len(local_opt_tour)\n    rng = np.random.default_rng()\n    \n    # Step 1: Nonlinear usage penalty\n    usage_penalty = np.exp(0.5 * edge_n_used) - 1\n    updated *= (1 + 0.1 * usage_penalty)\n    \n    # Step 2: Random split at median node index\n    median_idx = n // 2\n    split_start = rng.integers(0, n)\n    subpath1_nodes = set(local_opt_tour[split_start:split_start + median_idx])\n    subpath2_nodes = set(local_opt_tour[split_start + median_idx:]) | set(local_opt_tour[:split_start])\n    \n    # Step 3: Boost cross-subpath edges\n    boost_factor = 0.5 * (1 + np.log(1 + edge_n_used))\n    for u in subpath1_nodes:\n        for v in subpath2_nodes:\n            if u != v:\n                boost = 1 + boost_factor[u, v]\n                updated[u, v] *= boost\n                updated[v, u] *= boost\n                \n    # Step 4: Dampen tour edges that appear frequently\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        if edge_n_used[u, v] > 3:\n            updated[u, v] *= 0.8\n            updated[v, u] = updated[u, v]\n    \n    return updated",
+        "objective": 5.86701
+    },
+    {
+        "sample_order": 81,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 82,
+        "operator": "e1",
+        "algorithm": "The algorithm transforms the distance matrix by first applying a rank-based smoothing that rewards edges with historically low usage, then introduces a targeted repulsion around the tour by inverting the distances of tour edges relative to their original values, and finally applies a sinusoidal oscillation across the entire matrix whose amplitude is modulated by a random phase shift per node to break symmetry.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = len(local_opt_tour)\n    rng = np.random.default_rng()\n    updated = edge_distance.copy().astype(float)\n    \n    # 1. Rank-based smoothing: reward edges with low historical usage\n    usage_rank = np.argsort(edge_n_used, axis=1)\n    rank_matrix = np.argsort(usage_rank, axis=1)  # rank per row\n    smoothing = 1.0 - 0.2 * (rank_matrix / (n - 1))\n    updated *= smoothing\n    \n    # 2. Repulsion around tour edges: invert distance relative to original\n    tour_edges = [(local_opt_tour[i], local_opt_tour[(i+1)%n]) for i in range(n)]\n    max_dist = np.max(edge_distance)\n    for u, v in tour_edges:\n        inv_dist = max_dist - edge_distance[u, v] + 0.1\n        updated[u, v] = inv_dist\n        updated[v, u] = inv_dist\n    \n    # 3. Sinusoidal oscillation with random phase per node\n    phase = rng.uniform(0, 2*np.pi, n)\n    for i in range(n):\n        for j in range(i+1, n):\n            osc = 0.15 * np.sin(2*np.pi * (i + j) / n + phase[i] + phase[j])\n            updated[i, j] *= (1 + osc)\n            updated[j, i] = updated[i, j]\n    \n    # Ensure no zero or negative distances\n    updated = np.maximum(updated, 0.1)\n    \n    return updated",
+        "objective": 5.91721
+    },
+    {
+        "sample_order": 83,
+        "operator": "m1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 84,
+        "operator": "e2",
+        "algorithm": "Select two disjoint random contiguous blocks of the tour, heavily penalize edges within each block, and apply a multiplicative reward to edges that connect the two blocks to each other, proportional to the inverse of their original distance.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy().astype(float)\n    n = len(local_opt_tour)\n    rng = np.random.default_rng()\n    \n    # Select two disjoint random contiguous blocks\n    start1 = rng.integers(0, n)\n    len1 = rng.integers(2, n // 3 + 1)\n    block1_nodes = [local_opt_tour[(start1 + i) % n] for i in range(len1)]\n    \n    # Ensure second block does not overlap with first\n    block1_set = set(block1_nodes)\n    start2 = rng.integers(0, n)\n    len2 = rng.integers(2, n // 3 + 1)\n    block2_nodes = []\n    for i in range(len2):\n        node = local_opt_tour[(start2 + i) % n]\n        if node in block1_set:\n            # Shift to avoid overlap (wrap around)\n            node = local_opt_tour[(start2 + i + len1) % n]\n        block2_nodes.append(node)\n    block2_set = set(block2_nodes)\n    \n    # Heavily penalize edges inside each block\n    for block_nodes in [block1_nodes, block2_nodes]:\n        for i in range(len(block_nodes)):\n            u = block_nodes[i]\n            v = block_nodes[(i + 1) % len(block_nodes)]\n            penalty = 2.0 * edge_distance[u, v] * (1 + np.log(1 + edge_n_used[u, v]))\n            updated[u, v] += penalty\n            updated[v, u] += penalty\n    \n    # Multiplicative reward on edges connecting block1 to block2\n    for u in block1_nodes:\n        for v in block2_nodes:\n            if edge_distance[u, v] > 0:\n                reward = 0.5 / (1 + edge_distance[u, v])\n                updated[u, v] *= (1 - reward)\n                updated[v, u] *= (1 - reward)\n                updated[u, v] = max(0.1, updated[u, v])\n                updated[v, u] = max(0.1, updated[v, u])\n    \n    return updated",
+        "objective": 5.84925
+    },
+    {
+        "sample_order": 85,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 86,
+        "operator": "m2",
+        "algorithm": "The new algorithm randomly selects a single pivot node from the tour, heavily increases the cost of edges incident to that pivot by a factor proportional to their usage count, and slightly reduces the cost of all other edges not incident to the pivot by a fixed scaling factor.",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy().astype(float)\n    n = len(local_opt_tour)\n    rng = np.random.default_rng()\n    \n    # Choose a single pivot node\n    pivot = local_opt_tour[rng.integers(0, n)]\n    \n    # Heavily increase cost of edges incident to the pivot\n    for j in range(n):\n        node = local_opt_tour[j]\n        if node != pivot:\n            penalty = 2.0 * edge_distance[pivot, node] * (1 + np.log(1 + edge_n_used[pivot, node]))\n            updated[pivot, node] += penalty\n            updated[node, pivot] += penalty\n    \n    # Slightly reduce cost of all other edges not incident to the pivot\n    for i in range(n):\n        u = local_opt_tour[i]\n        if u == pivot:\n            continue\n        for j in range(i + 1, n):\n            v = local_opt_tour[j]\n            if v == pivot:\n                continue\n            reduction = 0.1 * edge_distance[u, v]\n            updated[u, v] = max(0.1, updated[u, v] - reduction)\n            updated[v, u] = max(0.1, updated[v, u] - reduction)\n    \n    return updated",
+        "objective": 5.78468
+    },
+    {
+        "sample_order": 87,
+        "operator": "e1",
+        "algorithm": "\"The new algorithm applies a random-walk based perturbation that divides the tour into segments using randomly chosen cut points, then exponentially scales the distances of edges that cross between different segments based on their combined usage count, while applying a compressive decay to all edges that are not part of the current tour to encourage exploration.\"",
+        "code": "import numpy as np\n\ndef update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    updated = edge_distance.copy().astype(float)\n    n = len(local_opt_tour)\n    rng = np.random.default_rng()\n    \n    # Randomly choose k cut points (2 <= k <= n/2)\n    k = rng.integers(2, n // 2 + 1)\n    cut_points = sorted(rng.choice(range(1, n), size=k-1, replace=False))\n    cut_points = [0] + cut_points + [n]\n    \n    # Build segments\n    segments = []\n    for i in range(len(cut_points) - 1):\n        seg_start = cut_points[i]\n        seg_end = cut_points[i+1]\n        seg_nodes = [local_opt_tour[j % n] for j in range(seg_start, seg_end)]\n        segments.append(set(seg_nodes))\n    \n    # Exponentially scale inter-segment edges\n    for i in range(n):\n        for j in range(i+1, n):\n            seg_i = -1\n            seg_j = -1\n            for idx, seg in enumerate(segments):\n                if i in seg:\n                    seg_i = idx\n                if j in seg:\n                    seg_j = idx\n            if seg_i != seg_j and seg_i != -1 and seg_j != -1:\n                # Edge crosses segments\n                usage = edge_n_used[i, j] + 1\n                scale = np.exp(0.3 * np.log1p(usage))\n                updated[i, j] *= scale\n                updated[j, i] = updated[i, j]\n    \n    # Compressive decay for non-tour edges\n    tour_edge_set = set()\n    for idx in range(n):\n        u = local_opt_tour[idx]\n        v = local_opt_tour[(idx + 1) % n]\n        tour_edge_set.add((u, v))\n        tour_edge_set.add((v, u))\n    \n    decay_factor = 0.85\n    for i in range(n):\n        for j in range(i+1, n):\n            if (i, j) not in tour_edge_set:\n                updated[i, j] *= decay_factor\n                updated[j, i] = updated[i, j]\n    \n    # Ensure symmetry and non-negativity\n    updated = np.maximum(updated, 0.1)\n    updated = (updated + updated.T) / 2\n    \n    return updated",
+        "objective": 5.77453
+    },
+    {
+        "sample_order": 88,
+        "operator": "e2",
+        "algorithm": "Apply a multiplicative decay factor to tour edges and an exponential growth factor to non-tour edges, where the factor strength is inversely proportional to the square root of usage count, then normalize the entire matrix to preserve the original mean distance.",
+        "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = edge_distance.shape[0]\n    updated = edge_distance.copy().astype(float)\n    \n    # Build set of tour edges\n    tour_edges = set()\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        tour_edges.add((u, v))\n        tour_edges.add((v, u))\n    \n    original_mean = np.mean(edge_distance)\n    \n    for i in range(n):\n        for j in range(i + 1, n):\n            usage = edge_n_used[i, j] + 1\n            factor = 1.0 / np.sqrt(usage)\n            if (i, j) in tour_edges:\n                # Decay tour edges\n                updated[i, j] = edge_distance[i, j] * (1.0 - 0.3 * factor)\n            else:\n                # Grow non-tour edges\n                updated[i, j] = edge_distance[i, j] * (1.0 + 0.3 * factor)\n            updated[j, i] = updated[i, j]\n    \n    # Normalize to preserve original mean\n    new_mean = np.mean(updated)\n    if new_mean > 0:\n        updated *= (original_mean / new_mean)\n    \n    updated = np.maximum(updated, 0.0)\n    return updated",
+        "objective": 5.93055
+    }
+]

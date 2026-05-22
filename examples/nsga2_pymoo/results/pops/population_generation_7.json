@@ -1,0 +1,26 @@
+[
+    {
+        "algorithm": "The new crossover operator uses a parent-distance-adaptive aggressive blending factor and a higher base crossover probability to increase initial exploration while retaining exploitation via a dynamic alpha range that shrinks as parents become more similar.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    dist = np.linalg.norm(x1 - x2) / np.sqrt(len(x1))\n    p_cross = 0.7 + 0.3 * (1 - dist)\n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(len(x1)):\n        if np.random.random() < p_cross:\n            alpha = np.random.uniform(-0.8, 1.8)\n            c1[i] = (1 - alpha) * x1[i] + alpha * x2[i]\n            c2[i] = (1 - alpha) * x2[i] + alpha * x1[i]\n    return c1, c2",
+        "objective": -0.70129,
+        "other_inf": null
+    },
+    {
+        "algorithm": "The new crossover operator uses a parent-difference driven probabilistic segment swap with Gaussian perturbation, where crossover probability and perturbation magnitude adapt based on parent dissimilarity.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    dist = np.linalg.norm(x1 - x2) / np.sqrt(len(x1))\n    p_cross = 0.5 + 0.4 * (1 - dist)\n    sigma = 0.1 + 0.4 * (1 - dist)\n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(len(x1)):\n        if np.random.random() < p_cross:\n            gamma = np.random.normal(0, sigma)\n            if np.random.random() < 0.5:\n                c1[i] = x1[i] + gamma * abs(x1[i] - x2[i])\n                c2[i] = x2[i] - gamma * abs(x1[i] - x2[i])\n            else:\n                c1[i] = x2[i] + gamma * abs(x1[i] - x2[i])\n                c2[i] = x1[i] - gamma * abs(x1[i] - x2[i])\n    return c1, c2",
+        "objective": -0.69894,
+        "other_inf": null
+    },
+    {
+        "algorithm": "The proposed crossover operator adaptively blends parent differences using a dynamic crossover probability based on the Euclidean distance between parents, favoring exploration when parents are far apart and exploitation when close, combined with a weighted average scheme.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    dist = np.linalg.norm(x1 - x2) / np.sqrt(len(x1))\n    p_cross = 0.5 + 0.4 * (1 - dist)\n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(len(x1)):\n        if np.random.random() < p_cross:\n            alpha = np.random.uniform(-0.5, 1.5)\n            c1[i] = (1 - alpha) * x1[i] + alpha * x2[i]\n            c2[i] = (1 - alpha) * x2[i] + alpha * x1[i]\n    return c1, c2",
+        "objective": -0.69751,
+        "other_inf": null
+    },
+    {
+        "algorithm": "The new crossover operator uses a fitness-proportional blend crossover with a dynamic blending factor based on parent objective rank differences, combined with a self-adaptive crossover probability that increases when fitness diversity is low.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n_var = len(x1)\n    # Compute Euclidean distance ratio (0=same, 1=far)\n    dist_ratio = np.linalg.norm(x1 - x2) / np.sqrt(n_var)\n    \n    # Adaptive crossover probability: higher when parents are similar (to increase exploration)\n    p_cross = 0.5 + 0.5 * (1.0 - dist_ratio)\n    \n    # Dynamic alpha range: wider when parents are distant (exploration), narrower when similar (exploitation)\n    alpha_low = -0.5 * (1.0 - dist_ratio)\n    alpha_high = 1.5 - 0.5 * dist_ratio\n    \n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(n_var):\n        if np.random.random() < p_cross:\n            alpha = np.random.uniform(alpha_low, alpha_high)\n            c1[i] = (1 - alpha) * x1[i] + alpha * x2[i]\n            c2[i] = (1 - alpha) * x2[i] + alpha * x1[i]\n        else:\n            # Small mutation noise when no crossover occurs\n            c1[i] = x1[i] + np.random.uniform(-0.05, 0.05)\n            c2[i] = x2[i] + np.random.uniform(-0.05, 0.05)\n    return c1, c2",
+        "objective": -0.6926,
+        "other_inf": null
+    }
+]

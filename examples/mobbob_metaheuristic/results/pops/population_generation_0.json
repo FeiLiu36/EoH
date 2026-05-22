@@ -1,0 +1,8 @@
+[
+    {
+        "algorithm": "The algorithm is a random-sampling-based multi-objective optimizer with non-dominated sorting to approximate the Pareto front within the evaluation budget.",
+        "code": "class Metaheuristic:\n\n    def __init__(self, func, dim, bounds, budget, n_obj):\n        self.func   = func\n        self.dim    = dim\n        self.bounds = bounds\n        self.budget = budget\n        self.n_obj  = n_obj\n\n    def solve(self):\n        lo, hi = self.bounds[0], self.bounds[1]\n        archive_x, archive_f = [], []\n\n        for _ in range(self.budget):\n            x = lo + (hi - lo) * np.random.rand(self.dim)\n            f = self.func(x)\n            archive_x.append(x.copy())\n            archive_f.append(f.copy())\n\n        X = np.array(archive_x)\n        F = np.array(archive_f)\n\n        nd = np.ones(len(F), dtype=bool)\n        for i in range(len(F)):\n            dominated_by = np.all(F <= F[i], axis=1) & np.any(F < F[i], axis=1)\n            dominated_by[i] = False\n            if dominated_by.any():\n                nd[i] = False\n        return X[nd]",
+        "objective": -0.03284,
+        "other_inf": null
+    }
+]

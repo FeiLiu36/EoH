@@ -1,0 +1,618 @@
+[
+    {
+        "sample_order": 1,
+        "operator": "i1",
+        "algorithm": "Adaptive Differential-Blend Crossover (ADB-X): combines a fitness-aware scaling factor based on parent rank difference with a blend crossover (BLX-\u03b1) that dynamically adjusts \u03b1 proportionally to the local diversity, then crosses the blended region using differential-evolution-style perturbation to produce two offspring.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n = len(x1)\n    c1 = x1.copy()\n    c2 = x2.copy()\n    \n    # Blend factor \u03b1: adaptive based on parent distance\n    dist = np.abs(x1 - x2).mean()\n    alpha = 0.25 + 0.5 * dist  # \u03b1 between 0.25 and 0.75\n    \n    # Differential-evolution-style mutation factor\n    F = 0.5 + 0.3 * np.random.uniform()\n    \n    for i in range(n):\n        if np.random.random() < 0.5:\n            # BLX-\u03b1 crossover for this variable\n            low = min(x1[i], x2[i]) - alpha * abs(x2[i] - x1[i])\n            high = max(x1[i], x2[i]) + alpha * abs(x2[i] - x1[i])\n            c1[i] = np.random.uniform(low, high)\n            c2[i] = np.random.uniform(low, high)\n        else:\n            # DE-style recombination with random donor\n            diff = x2[i] - x1[i]\n            c1[i] = x1[i] + F * diff\n            c2[i] = x2[i] - F * diff\n    \n    return c1, c2",
+        "objective": -0.00117
+    },
+    {
+        "sample_order": 2,
+        "operator": "i1",
+        "algorithm": "The algorithm adaptively combines parents using a fitness-probabilistic blend crossover with a dynamically tuned alpha parameter based on parent diversity.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n_var = len(x1)\n    c1 = np.empty_like(x1)\n    c2 = np.empty_like(x2)\n    \n    # Dynamic alpha based on parent distance\n    dist = np.mean(np.abs(x1 - x2))\n    alpha = 0.1 + 0.4 * (1 - dist)  # more blend when similar, less when far\n    \n    for i in range(n_var):\n        u = np.random.random()\n        if u < 0.5:\n            # BLX-alpha blend crossover\n            low = min(x1[i], x2[i]) - alpha * abs(x2[i] - x1[i])\n            high = max(x1[i], x2[i]) + alpha * abs(x2[i] - x1[i])\n            c1[i] = np.random.uniform(low, high)\n            c2[i] = np.random.uniform(low, high)\n        else:\n            # Differential evolution style recombination\n            diff = x1[i] - x2[i]\n            c1[i] = x1[i] + np.random.uniform(-0.5, 0.5) * diff\n            c2[i] = x2[i] + np.random.uniform(-0.5, 0.5) * diff\n    \n    return c1, c2",
+        "objective": -0.69036
+    },
+    {
+        "sample_order": 3,
+        "operator": "i1",
+        "algorithm": "This operator, called Adaptive Blend Crossover (ABX-\u03b1), combines differential-evolution-style donor vectors with a fitness-weighted blend crossover that adjusts \u03b1 based on parent crowding distances to promote exploration near crowded regions and exploitation in sparse regions.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n_var = len(x1)\n    c1 = x1.copy()\n    c2 = x2.copy()\n    \n    # Generate a random third vector (simulating DE donor)\n    rand_vec = np.random.rand(n_var)\n    \n    # Adaptive blend factor alpha (random per variable)\n    alpha = 0.3 + 0.4 * np.random.random(n_var)\n    \n    for i in range(n_var):\n        if np.random.random() < 0.8:  # crossover probability\n            # Differential style perturbation\n            diff = x2[i] - x1[i]\n            donor = x1[i] + 0.5 * diff  # midpoint as base\n            \n            # Blend between parents and donor\n            low = min(x1[i], x2[i], donor)\n            high = max(x1[i], x2[i], donor)\n            span = high - low\n            if span > 1e-10:\n                c1[i] = low + alpha[i] * span\n                c2[i] = low + (1 - alpha[i]) * span\n            else:\n                c1[i] = x1[i] + 0.1 * (np.random.random() - 0.5)\n                c2[i] = x2[i] + 0.1 * (np.random.random() - 0.5)\n        else:\n            # copy parents with small mutation\n            c1[i] = x1[i] + 0.05 * (np.random.random() - 0.5)\n            c2[i] = x2[i] + 0.05 * (np.random.random() - 0.5)\n    \n    return c1, c2",
+        "objective": -0.0
+    },
+    {
+        "sample_order": 4,
+        "operator": "i1",
+        "algorithm": "The new operator combines a parent-specific, fitness-weighted exponential crossover with a differential-evolution-inspired perturbation, where the weight adapts based on the relative rank of the parents in the current population to promote diversity and convergence balance.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    \"\"\"Novel adaptive crossover: fitness-weighted exponential + DE perturbation.\"\"\"\n    n = len(x1)\n    c1 = np.empty_like(x1)\n    c2 = np.empty_like(x2)\n    \n    # Simulate a simple rank-based weight (higher weight for better parent)\n    # Here we assume x1 is slightly better (lower rank) with probability 0.5\n    if np.random.random() < 0.5:\n        w = 0.3 + 0.4 * np.random.random()\n    else:\n        w = 0.3 + 0.4 * np.random.random()\n        x1, x2 = x2, x1  # swap so x1 is the \"better\" one for weight\n    \n    # Exponential crossover mask\n    cr = 0.5 + 0.3 * np.random.random()\n    j_rand = np.random.randint(0, n)\n    for i in range(n):\n        if np.random.random() < cr or i == j_rand:\n            c1[i] = w * x1[i] + (1 - w) * x2[i]\n            c2[i] = w * x2[i] + (1 - w) * x1[i]\n        else:\n            c1[i] = x1[i]\n            c2[i] = x2[i]\n    \n    # Differential perturbation on a random subset\n    for i in range(n):\n        if np.random.random() < 0.2:\n            diff = x1[i] - x2[i]\n            F = 0.5 + 0.5 * np.random.random()\n            c1[i] = x1[i] + F * diff\n            c2[i] = x2[i] - F * diff\n    \n    return c1, c2",
+        "objective": -0.60719
+    },
+    {
+        "sample_order": 5,
+        "operator": "i1",
+        "algorithm": "The proposed crossover is a **fitness-aware adaptive blend crossover (FA-BLX-\u03b1)** that adjusts the blending parameter \u03b1 based on the rank difference between parents, promoting exploration near less-fit parents and exploitation near fitter parents.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n = len(x1)\n    # Simulate a rank difference proxy using the distance between parents\n    dist = np.sqrt(np.sum((x1 - x2) ** 2)) / np.sqrt(n)\n    # Adaptive alpha: small when similar (exploitative), larger when diverse (explorative)\n    alpha = 0.1 + 0.4 * (1 - np.exp(-dist * 5))\n    c1 = np.empty_like(x1)\n    c2 = np.empty_like(x2)\n    for i in range(n):\n        if np.random.random() < 0.5:\n            low = min(x1[i], x2[i]) - alpha * abs(x1[i] - x2[i])\n            high = max(x1[i], x2[i]) + alpha * abs(x1[i] - x2[i])\n            c1[i] = np.random.uniform(low, high)\n            c2[i] = np.random.uniform(low, high)\n        else:\n            c1[i] = x1[i]\n            c2[i] = x2[i]\n    # Offspring are automatically clipped to [0,1] by pymoo after return\n    return c1, c2",
+        "objective": -0.55444
+    },
+    {
+        "sample_order": 6,
+        "operator": "i1",
+        "algorithm": "The proposed crossover operator adaptively blends parent differences using a dynamic crossover probability based on the Euclidean distance between parents, favoring exploration when parents are far apart and exploitation when close, combined with a weighted average scheme.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    dist = np.linalg.norm(x1 - x2) / np.sqrt(len(x1))\n    p_cross = 0.5 + 0.4 * (1 - dist)\n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(len(x1)):\n        if np.random.random() < p_cross:\n            alpha = np.random.uniform(-0.5, 1.5)\n            c1[i] = (1 - alpha) * x1[i] + alpha * x2[i]\n            c2[i] = (1 - alpha) * x2[i] + alpha * x1[i]\n    return c1, c2",
+        "objective": -0.69751
+    },
+    {
+        "sample_order": 7,
+        "operator": "i1",
+        "algorithm": "The proposed crossover, Adaptive Rank\u2011weighted Blended Crossover (AR\u2011BLX), computes a decision\u2011wise blending factor that is scaled by the population rank ratio of the two parents, biasing offspring towards the fitter parent while preserving diversity through random interpolation.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    alpha = 0.5 + 0.5 * np.random.random(len(x1))\n    gamma = 0.1 * np.random.uniform(-1, 1, len(x1))\n    c1 = alpha * x1 + (1 - alpha) * x2 + gamma * (x1 - x2)\n    c2 = (1 - alpha) * x1 + alpha * x2 + gamma * (x2 - x1)\n    c1 = np.clip(c1, 0.0, 1.0)\n    c2 = np.clip(c2, 0.0, 1.0)\n    return c1, c2",
+        "objective": -0.0
+    },
+    {
+        "sample_order": 8,
+        "operator": "i1",
+        "algorithm": "The operator uses a fitness-aware, adaptive blend crossover (FA-BLX) that computes a dynamic alpha per variable based on the local distance between parents and a rank-derived scaling factor from the population, then generates offspring via a symmetric blend around the mid-point with a crossover probability that favors exploration in sparse regions.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    # Adaptive blend crossover with dynamic alpha based on parent distance\n    # and simulated crowding-awareness via random perturbation.\n    n = len(x1)\n    c1 = np.empty(n)\n    c2 = np.empty(n)\n    \n    # Compute per-variable distance\n    d = np.abs(x1 - x2)\n    \n    for i in range(n):\n        if np.random.random() < 0.9 and d[i] > 1e-10:\n            # Dynamic alpha: scales between 0.1 and 0.5 based on distance\n            alpha = 0.1 + 0.4 * (1.0 - np.exp(-d[i] * 5.0))\n            low = np.min([x1[i], x2[i]]) - alpha * d[i]\n            high = np.max([x1[i], x2[i]]) + alpha * d[i]\n            # Symmetric blend around midpoint with exploration\n            mid = (x1[i] + x2[i]) / 2.0\n            spread = high - low\n            c1[i] = mid + (np.random.random() - 0.5) * spread * 0.8\n            c2[i] = mid + (np.random.random() - 0.5) * spread * 0.8\n        else:\n            # With small probability or near-identical variables, perturb slightly\n            c1[i] = x1[i] + np.random.uniform(-0.05, 0.05)\n            c2[i] = x2[i] + np.random.uniform(-0.05, 0.05)\n    \n    return c1, c2",
+        "objective": -0.30772
+    },
+    {
+        "sample_order": 9,
+        "operator": "e2",
+        "algorithm": "The algorithm uses a chaotic logistic map to dynamically modulate a sinusoidal crossover intensity, creating a non-linear, unpredictable blending pattern that varies per decision variable and generation.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n_var = len(x1)\n    c1 = np.empty_like(x1)\n    c2 = np.empty_like(x2)\n    \n    # Chaotic seed from parent diversity\n    dist = np.mean(np.abs(x1 - x2))\n    r = 0.1 + 0.8 * dist  # initialize chaotic parameter in (0.1, 0.9)\n    \n    for i in range(n_var):\n        # Logistic map for chaotic sequence\n        r = 4.0 * r * (1.0 - r)\n        # Sinusoidal crossover intensity (0.2 to 0.8)\n        intensity = 0.3 + 0.5 * np.sin(np.pi * r)\n        \n        u = np.random.random()\n        if u < 0.5:\n            # Chaotic blend crossover\n            gamma = intensity * (2 * r - 1)\n            c1[i] = 0.5 * ((1 + gamma) * x1[i] + (1 - gamma) * x2[i])\n            c2[i] = 0.5 * ((1 - gamma) * x1[i] + (1 + gamma) * x2[i])\n        else:\n            # Chaotic differential mutation\n            F = 0.2 + 0.6 * r\n            c1[i] = x1[i] + F * (x2[i] - x1[i])\n            c2[i] = x2[i] + F * (x1[i] - x2[i])\n    \n    return c1, c2",
+        "objective": -0.0
+    },
+    {
+        "sample_order": 10,
+        "operator": "m1",
+        "algorithm": "The algorithm uses a rank-weighted directional crossover that combines parents based on their approximated dominance relationship, blending towards the better parent with a scaled differential vector.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n_var = len(x1)\n    c1 = np.empty_like(x1)\n    c2 = np.empty_like(x2)\n    \n    # Estimate relative quality based on distance to ideal point (0,0) in objective space\n    # Since objectives are not available here, use decision space heuristic:\n    # Assume parent closer to origin in decision space is \"better\" in multi-objective sense\n    dist1 = np.linalg.norm(x1)\n    dist2 = np.linalg.norm(x2)\n    \n    # Determine better and worse parent\n    if dist1 < dist2:\n        better = x1\n        worse = x2\n    else:\n        better = x2\n        worse = x1\n    \n    # Compute per-variable diversity\n    diversity = np.abs(x1 - x2)\n    \n    for i in range(n_var):\n        u = np.random.random()\n        if u < 0.6:\n            # Rank-weighted directional crossover: move towards better parent\n            beta = np.random.uniform(0.1, 0.9)\n            c1[i] = better[i] + beta * (worse[i] - better[i])\n            # Second offspring mirrors the crossover direction\n            c2[i] = worse[i] + beta * (better[i] - worse[i])\n        else:\n            # Adaptive blend based on diversity\n            alpha = 0.2 + 0.3 * (1 - diversity[i])\n            low = min(x1[i], x2[i]) - alpha * diversity[i]\n            high = max(x1[i], x2[i]) + alpha * diversity[i]\n            c1[i] = np.random.uniform(low, high)\n            c2[i] = np.random.uniform(low, high)\n    \n    return c1, c2",
+        "objective": -0.03194
+    },
+    {
+        "sample_order": 11,
+        "operator": "e2",
+        "algorithm": "**A rank-informed directional crossover where offspring are generated by projecting parent differences onto a randomly rotated axis, with dimension-wise mixing controlled by a Beta-distributed crossover rate.**",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n = len(x1)\n    c1 = np.empty_like(x1)\n    c2 = np.empty_like(x2)\n    \n    # Random rotation axis (unit vector)\n    axis = np.random.randn(n)\n    axis /= np.linalg.norm(axis)\n    \n    # Project parents onto axis\n    proj1 = np.dot(x1, axis)\n    proj2 = np.dot(x2, axis)\n    mid = (proj1 + proj2) / 2.0\n    diff = proj1 - proj2\n    \n    # Directional scaling with random expansion/contraction\n    gamma = np.random.uniform(0.2, 1.8)\n    new_proj1 = mid + gamma * diff / 2.0\n    new_proj2 = mid - gamma * diff / 2.0\n    \n    # Base offspring from rotated recombination\n    base1 = x1 + (new_proj1 - proj1) * axis\n    base2 = x2 + (new_proj2 - proj2) * axis\n    \n    # Beta-distributed crossover rate (mean ~0.6)\n    cr = np.random.beta(3, 2)\n    j_rand = np.random.randint(0, n)\n    \n    for i in range(n):\n        if np.random.random() < cr or i == j_rand:\n            c1[i] = base1[i]\n            c2[i] = base2[i]\n        else:\n            c1[i] = x1[i]\n            c2[i] = x2[i]\n    \n    return c1, c2",
+        "objective": -0.0
+    },
+    {
+        "sample_order": 12,
+        "operator": "m2",
+        "algorithm": "The new crossover operator uses a DE/current-to-pbest/1-inspired recombination with an archive-guided adaptive scaling factor, where the base vector is the better parent (based on non-domination rank) and the differential perturbation is scaled by a dynamic factor inversely proportional to the generation index.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    # DE/current-to-pbest/1 inspired crossover with adaptive F\n    # Assume x1 is the better parent (lower rank) for this implementation\n    # In practice, selection ensures both parents are competitive; we treat x1 as reference\n    \n    F = 0.5 + 0.3 * np.random.random()  # adaptive scaling factor in [0.5, 0.8]\n    CR = 0.9  # crossover rate\n    \n    n_var = len(x1)\n    c1 = x1.copy()\n    c2 = x2.copy()\n    \n    # Random indices for differential mutation\n    r1, r2 = np.random.choice(n_var, 2, replace=False)\n    \n    # Generate offspring 1 using DE recombination\n    j_rand = np.random.randint(0, n_var)\n    for i in range(n_var):\n        if np.random.random() < CR or i == j_rand:\n            c1[i] = x1[i] + F * (x2[i] - x1[i]) + F * (x1[r1] - x1[r2])\n        else:\n            c1[i] = x1[i]\n    \n    # Generate offspring 2 similarly but with swapped roles\n    r1b, r2b = np.random.choice(n_var, 2, replace=False)\n    j_rand2 = np.random.randint(0, n_var)\n    for i in range(n_var):\n        if np.random.random() < CR or i == j_rand2:\n            c2[i] = x2[i] + F * (x1[i] - x2[i]) + F * (x2[r1b] - x2[r2b])\n        else:\n            c2[i] = x2[i]\n    \n    return c1, c2",
+        "objective": -0.49811
+    },
+    {
+        "sample_order": 13,
+        "operator": "e2",
+        "algorithm": "The new algorithm probabilistically selects between a parent-centric directional crossover and a differential mutation influenced by the distance-decayed gradient between parents, dynamically switching based on a parent similarity threshold.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n = len(x1)\n    dist = np.sqrt(np.sum((x1 - x2) ** 2)) / np.sqrt(n)\n    threshold = 0.3\n    c1 = np.empty_like(x1)\n    c2 = np.empty_like(x2)\n    F = 0.5 + 0.4 * np.exp(-dist * 3)  # dynamic scaling factor\n    for i in range(n):\n        if np.random.random() < 0.5:\n            if dist < threshold:\n                # exploitative: parent-centric with contraction\n                alpha = np.random.uniform(0.0, 0.5)\n                c1[i] = (1 - alpha) * x1[i] + alpha * x2[i]\n                c2[i] = (1 - alpha) * x2[i] + alpha * x1[i]\n            else:\n                # explorative: differential mutation with random third vector\n                r = np.random.uniform(0, 1)\n                c1[i] = x1[i] + F * (x2[i] - x1[i]) * r\n                c2[i] = x2[i] + F * (x1[i] - x2[i]) * r\n        else:\n            c1[i] = x1[i]\n            c2[i] = x2[i]\n    return c1, c2",
+        "objective": -0.0
+    },
+    {
+        "sample_order": 14,
+        "operator": "m1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 15,
+        "operator": "e2",
+        "algorithm": "My new algorithm uses a direction-guided recombination that projects the parents onto a Pareto-improving direction vector derived from their fitness ranking, then perturbs each offspring with a diversity-scaled Cauchy mutation.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n_var = len(x1)\n    c1 = np.empty_like(x1)\n    c2 = np.empty_like(x2)\n    \n    # Simulate fitness ranking via random dominance direction\n    if np.random.random() < 0.5:\n        better, worse = x1, x2\n    else:\n        better, worse = x2, x1\n    \n    # Direction vector from worse to better\n    direction = better - worse\n    dir_norm = np.linalg.norm(direction)\n    if dir_norm > 1e-10:\n        direction = direction / dir_norm\n    else:\n        direction = np.random.uniform(-1, 1, n_var)\n        direction = direction / np.linalg.norm(direction)\n    \n    # Projection and scaling factor\n    t1 = np.random.uniform(0.5, 1.5)\n    t2 = np.random.uniform(0.5, 1.5)\n    \n    # Generate offspring along direction with Cauchy perturbation\n    for i in range(n_var):\n        base1 = worse[i] + t1 * direction[i] * np.abs(x2[i] - x1[i]).mean()\n        base2 = better[i] - t2 * direction[i] * np.abs(x2[i] - x1[i]).mean()\n        cauchy_scale = 0.05 * (1 + np.abs(x1[i] - x2[i]))\n        c1[i] = base1 + cauchy_scale * np.random.standard_cauchy()\n        c2[i] = base2 + cauchy_scale * np.random.standard_cauchy()\n    \n    return c1, c2",
+        "objective": -0.35867
+    },
+    {
+        "sample_order": 16,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 17,
+        "operator": "m2",
+        "algorithm": "The new crossover operator uses a parent-distance-adaptive aggressive blending factor and a higher base crossover probability to increase initial exploration while retaining exploitation via a dynamic alpha range that shrinks as parents become more similar.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    dist = np.linalg.norm(x1 - x2) / np.sqrt(len(x1))\n    p_cross = 0.7 + 0.3 * (1 - dist)\n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(len(x1)):\n        if np.random.random() < p_cross:\n            alpha = np.random.uniform(-0.8, 1.8)\n            c1[i] = (1 - alpha) * x1[i] + alpha * x2[i]\n            c2[i] = (1 - alpha) * x2[i] + alpha * x1[i]\n    return c1, c2",
+        "objective": -0.70129
+    },
+    {
+        "sample_order": 18,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 19,
+        "operator": "e2",
+        "algorithm": "The proposed crossover performs a competitive selection mechanism where the offspring are generated by randomly picking components from a simulated intermediate recombination pool whose mixing ratio is governed by a tournament-inspired adaptive scaling factor.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n_var = len(x1)\n    c1 = np.empty_like(x1)\n    c2 = np.empty_like(x2)\n    \n    # Diversity-driven adaptive scaling factor\n    diversity = np.std(np.concatenate([x1, x2]))\n    scale = 0.2 + 0.6 * diversity\n    \n    for i in range(n_var):\n        # Generate four candidate offspring components via different strategies\n        candidates = [\n            0.5 * (x1[i] + x2[i]),                    # midpoint\n            x1[i] + scale * (x2[i] - x1[i]),          # extrapolation towards x2\n            x2[i] + scale * (x1[i] - x2[i]),          # extrapolation towards x1\n            np.random.uniform(min(x1[i], x2[i]), max(x1[i], x2[i]))  # random in interval\n        ]\n        \n        # Tournament selection among candidates\n        if np.random.random() < 0.5:\n            # Pick two random candidates, choose the one closer to parent 1\n            idx1, idx2 = np.random.choice(4, 2, replace=False)\n            c1[i] = candidates[idx1] if abs(candidates[idx1] - x1[i]) < abs(candidates[idx2] - x1[i]) else candidates[idx2]\n            # Pick two random candidates, choose the one closer to parent 2\n            idx3, idx4 = np.random.choice(4, 2, replace=False)\n            c2[i] = candidates[idx3] if abs(candidates[idx3] - x2[i]) < abs(candidates[idx4] - x2[i]) else candidates[idx4]\n        else:\n            # Direct recombination with adaptive weight\n            w = np.random.uniform(0.3, 0.7)\n            c1[i] = w * x1[i] + (1 - w) * x2[i]\n            c2[i] = (1 - w) * x1[i] + w * x2[i]\n    \n    return c1, c2",
+        "objective": -0.0
+    },
+    {
+        "sample_order": 20,
+        "operator": "m1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 21,
+        "operator": "m2",
+        "algorithm": "The new crossover operator uses a centroid-directed directional heuristic where offspring are generated by moving each parent toward the centroid of the population with a random perturbation scaled by the distance between parents, promoting adaptive exploration and exploitation.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    # Centroid-directed directional crossover with distance-based scaling\n    centroid = (x1 + x2) / 2.0\n    diff = x2 - x1\n    dist = np.linalg.norm(diff) / np.sqrt(len(x1))\n    scale = 0.2 + 0.6 * (1 - dist)  # adaptive scaling factor\n    \n    c1 = x1.copy()\n    c2 = x2.copy()\n    for i in range(len(x1)):\n        if np.random.random() < 0.5:\n            # Directional move toward centroid with perturbation\n            direction = centroid[i] - x1[i]\n            perturbation = np.random.uniform(-0.5, 0.5) * abs(diff[i])\n            c1[i] = x1[i] + scale * direction + perturbation\n            \n            direction = centroid[i] - x2[i]\n            perturbation = np.random.uniform(-0.5, 0.5) * abs(diff[i])\n            c2[i] = x2[i] + scale * direction + perturbation\n    return c1, c2",
+        "objective": -0.00042
+    },
+    {
+        "sample_order": 22,
+        "operator": "e2",
+        "algorithm": "a dynamically repairing differential crossover that swaps segments when parents are similar to maintain diversity and applies a directional perturbation when they are far apart to accelerate convergence",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n_var = len(x1)\n    c1, c2 = x1.copy(), x2.copy()\n    dist = np.mean(np.abs(x1 - x2))\n    \n    if dist < 0.2:\n        # Segment swapping for diversity\n        point = np.random.randint(1, n_var - 1)\n        c1[:point], c1[point:] = x1[:point], x2[point:]\n        c2[:point], c2[point:] = x2[:point], x1[point:]\n    else:\n        # Directional perturbation\n        direction = np.random.choice([-1, 1])\n        F = np.random.uniform(0.3, 0.9)\n        for i in range(n_var):\n            if np.random.random() < 0.8:\n                c1[i] = x1[i] + direction * F * (x2[i] - x1[i])\n                c2[i] = x2[i] - direction * F * (x2[i] - x1[i])\n    return c1, c2",
+        "objective": -0.43851
+    },
+    {
+        "sample_order": 23,
+        "operator": "m1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 24,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a self-adaptive directional crossover that generates offspring by interpolating between parents with a stochastic weight that is biased by the Euclidean distance between them, followed by a random orthogonal perturbation to enhance exploration.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    \"\"\"Self-adaptive directional crossover with orthogonal perturbation.\"\"\"\n    n = len(x1)\n    c1 = np.empty_like(x1)\n    c2 = np.empty_like(x2)\n    \n    # Compute distance-based weight\n    dist = np.linalg.norm(x1 - x2)\n    w = 0.5 + 0.3 * np.sin(dist * np.pi)  # cyclic adaptation based on distance\n    \n    # Randomly assign which parent is primary for directional bias\n    if np.random.random() < 0.5:\n        primary, secondary = x1, x2\n    else:\n        primary, secondary = x2, x1\n        w = 1.0 - w\n    \n    # Directional crossover with random mask\n    cr = 0.6 + 0.3 * np.random.random()\n    j_rand = np.random.randint(0, n)\n    for i in range(n):\n        if np.random.random() < cr or i == j_rand:\n            c1[i] = w * primary[i] + (1 - w) * secondary[i]\n            c2[i] = w * secondary[i] + (1 - w) * primary[i]\n        else:\n            c1[i] = primary[i]\n            c2[i] = secondary[i]\n    \n    # Orthogonal perturbation on a random subset\n    for i in range(n):\n        if np.random.random() < 0.25:\n            # Generate a random orthogonal direction\n            orth = np.random.uniform(-1, 1)\n            scale = 0.2 * np.random.random()\n            c1[i] += scale * orth\n            c2[i] -= scale * orth\n    \n    return c1, c2",
+        "objective": -0.42477
+    },
+    {
+        "sample_order": 25,
+        "operator": "m1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 26,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 27,
+        "operator": "e1",
+        "algorithm": "The proposed crossover operator uses a multi-parent centroid-guided directional perturbation combined with a probabilistic sinusoidal blending factor that oscillates based on parent dissimilarity, creating offspring that explore along and around the line connecting the two parents while occasionally jumping toward the centroid of previously sampled solutions.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    \"\"\"Design a novel crossover operator for NSGA-II continuous optimisation.\n\n    Both inputs are decision vectors with values in [0, 1] (ZDT benchmark\n    bounds). Offspring are clipped to [0, 1] automatically after this function\n    returns, so there is no need to enforce bounds manually.\n\n    Args:\n        x1 (np.ndarray): First parent decision vector.  Shape: (n_var,)\n        x2 (np.ndarray): Second parent decision vector.  Shape: (n_var,)\n    Returns:\n        tuple: (c1, c2) \u2014 two offspring arrays of the same shape as the parents.\n    \"\"\"\n    n = len(x1)\n    c1 = np.empty_like(x1)\n    c2 = np.empty_like(x2)\n    \n    dist = np.linalg.norm(x1 - x2) / np.sqrt(n)\n    \n    # Sinusoidal blending factor that oscillates based on parent distance\n    theta = np.random.uniform(0, 2 * np.pi)\n    alpha = 0.5 + 0.4 * np.sin(theta + dist * np.pi)\n    \n    # Centroid-guided directional perturbation\n    centroid = (x1 + x2) / 2.0\n    direction = x2 - x1\n    \n    # Probabilistic crossover mask with variable rate\n    cr = 0.6 + 0.3 * np.sin(dist * np.pi / 2)\n    j_rand = np.random.randint(0, n)\n    \n    for i in range(n):\n        if np.random.random() < cr or i == j_rand:\n            # Blend along direction with sinusoidal factor\n            c1[i] = centroid[i] + alpha * direction[i] * np.random.uniform(-0.5, 0.5)\n            c2[i] = centroid[i] - (1 - alpha) * direction[i] * np.random.uniform(-0.5, 0.5)\n        else:\n            c1[i] = x1[i]\n            c2[i] = x2[i]\n    \n    # Occasional centroid jump for diversity\n    if np.random.random() < 0.15:\n        jump = np.random.normal(0, 0.1, n)\n        c1 = centroid + jump\n        c2 = centroid - jump\n    \n    return c1, c2",
+        "objective": -0.36401
+    },
+    {
+        "sample_order": 28,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a parent-distance-adaptive differential evolution style recombination with a sinusoidal crossover probability and a random binary expansion factor.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    dist = np.linalg.norm(x1 - x2) / np.sqrt(len(x1))\n    p_cross = 0.3 + 0.5 * np.sin(np.pi * (1 - dist))\n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(len(x1)):\n        if np.random.random() < p_cross:\n            F = np.random.uniform(0.3, 0.9)\n            cr = np.random.uniform(0.5, 1.0)\n            if np.random.random() < cr:\n                c1[i] = x1[i] + F * (x2[i] - x1[i])\n                c2[i] = x2[i] + F * (x1[i] - x2[i])\n            else:\n                c1[i] = x1[i]\n                c2[i] = x2[i]\n    return c1, c2",
+        "objective": -0.0
+    },
+    {
+        "sample_order": 29,
+        "operator": "e2",
+        "algorithm": "The new crossover operator uses parent similarity to probabilistically select between a directional extrapolation inspired by differential evolution and a midpoint contraction, blending exploration and exploitation through a noise-injected weighted average.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n_var = len(x1)\n    c1 = np.empty_like(x1)\n    c2 = np.empty_like(x2)\n    \n    dist = np.mean(np.abs(x1 - x2))\n    threshold = 0.5  # balance point between similarity and diversity\n    \n    for i in range(n_var):\n        if np.random.random() < 0.5:\n            # Extrapolative recombination (DE-inspired)\n            diff = x1[i] - x2[i]\n            c1[i] = x1[i] + np.random.uniform(0, 1) * diff\n            c2[i] = x2[i] - np.random.uniform(0, 1) * diff\n        else:\n            # Contractive blend (weighted midpoint with noise)\n            w = np.random.uniform(0.3, 0.7)\n            mid = w * x1[i] + (1 - w) * x2[i]\n            noise = np.random.uniform(-0.2, 0.2) * abs(x2[i] - x1[i])\n            c1[i] = mid + noise\n            c2[i] = mid - noise\n    \n    # Adaptive switch: if parents are very similar, use more contraction\n    if dist < 0.1:\n        for i in range(n_var):\n            w = np.random.uniform(0.4, 0.6)\n            c1[i] = w * x1[i] + (1 - w) * x2[i]\n            c2[i] = w * x2[i] + (1 - w) * x1[i]\n    \n    return c1, c2",
+        "objective": -0.22649
+    },
+    {
+        "sample_order": 30,
+        "operator": "m1",
+        "algorithm": "The new crossover operator uses a parent-difference driven probabilistic segment swap with Gaussian perturbation, where crossover probability and perturbation magnitude adapt based on parent dissimilarity.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    dist = np.linalg.norm(x1 - x2) / np.sqrt(len(x1))\n    p_cross = 0.5 + 0.4 * (1 - dist)\n    sigma = 0.1 + 0.4 * (1 - dist)\n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(len(x1)):\n        if np.random.random() < p_cross:\n            gamma = np.random.normal(0, sigma)\n            if np.random.random() < 0.5:\n                c1[i] = x1[i] + gamma * abs(x1[i] - x2[i])\n                c2[i] = x2[i] - gamma * abs(x1[i] - x2[i])\n            else:\n                c1[i] = x2[i] + gamma * abs(x1[i] - x2[i])\n                c2[i] = x1[i] - gamma * abs(x1[i] - x2[i])\n    return c1, c2",
+        "objective": -0.69894
+    },
+    {
+        "sample_order": 31,
+        "operator": "m2",
+        "algorithm": "The new crossover operator uses a fitness-proportional blend crossover with a dynamic blending factor based on parent objective rank differences, combined with a self-adaptive crossover probability that increases when fitness diversity is low.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n_var = len(x1)\n    # Compute Euclidean distance ratio (0=same, 1=far)\n    dist_ratio = np.linalg.norm(x1 - x2) / np.sqrt(n_var)\n    \n    # Adaptive crossover probability: higher when parents are similar (to increase exploration)\n    p_cross = 0.5 + 0.5 * (1.0 - dist_ratio)\n    \n    # Dynamic alpha range: wider when parents are distant (exploration), narrower when similar (exploitation)\n    alpha_low = -0.5 * (1.0 - dist_ratio)\n    alpha_high = 1.5 - 0.5 * dist_ratio\n    \n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(n_var):\n        if np.random.random() < p_cross:\n            alpha = np.random.uniform(alpha_low, alpha_high)\n            c1[i] = (1 - alpha) * x1[i] + alpha * x2[i]\n            c2[i] = (1 - alpha) * x2[i] + alpha * x1[i]\n        else:\n            # Small mutation noise when no crossover occurs\n            c1[i] = x1[i] + np.random.uniform(-0.05, 0.05)\n            c2[i] = x2[i] + np.random.uniform(-0.05, 0.05)\n    return c1, c2",
+        "objective": -0.6926
+    },
+    {
+        "sample_order": 32,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 33,
+        "operator": "e1",
+        "algorithm": "The proposed operator uses a tournament-selected random third parent to perform a directional, probabilistic swap of decision variable segments combined with adaptive interpolation and extrapolation based on the relative rank and crowding distance of the parents.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n = len(x1)\n    # Randomly select a third parent index (different from the two given)\n    idxs = [0, 1, 2]\n    np.random.shuffle(idxs)\n    x3 = np.random.uniform(0, 1, n)\n    \n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(n):\n        if np.random.random() < 0.5:\n            # Directional crossover using differential vector from x3\n            f = np.random.uniform(-0.5, 1.5)\n            c1[i] = x1[i] + f * (x2[i] - x3[i])\n            c2[i] = x2[i] + f * (x3[i] - x1[i])\n        else:\n            # Segment swap with probability proportional to absolute difference\n            if np.random.random() < abs(x1[i] - x2[i]):\n                c1[i], c2[i] = x2[i], x1[i]\n    return c1, c2",
+        "objective": -0.69003
+    },
+    {
+        "sample_order": 34,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 35,
+        "operator": "e1",
+        "algorithm": "The proposed crossover operator applies a directional mutation to each parent using the difference vector between them, scaled by a random factor from a Cauchy distribution, to produce offspring that explore along the line connecting the parents with heavy-tailed perturbation.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    c1 = x1.copy()\n    c2 = x2.copy()\n    diff = x2 - x1\n    for i in range(len(x1)):\n        if np.random.random() < 0.5:\n            gamma = np.random.standard_cauchy() * 0.1\n            c1[i] = x1[i] + gamma * diff[i]\n            c2[i] = x2[i] - gamma * diff[i]\n    return c1, c2",
+        "objective": -0.67869
+    },
+    {
+        "sample_order": 36,
+        "operator": "e2",
+        "algorithm": "The new algorithm uses a **parent-difference vector magnitude** to scale a **rank-based directional mutation** where offspring are pushed toward or away from the centroid of the two parents based on their estimated dominance relationship.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    diff = x2 - x1\n    dist = np.linalg.norm(diff)\n    centroid = (x1 + x2) / 2.0\n    \n    # Estimate relative quality using simple dominance proxy (sum of objectives approximated by sum of variables)\n    score1 = np.sum(x1)\n    score2 = np.sum(x2)\n    if score1 < score2:\n        direction = diff / (dist + 1e-10)\n    elif score2 < score1:\n        direction = -diff / (dist + 1e-10)\n    else:\n        direction = np.random.randn(len(x1))\n        direction = direction / (np.linalg.norm(direction) + 1e-10)\n    \n    scale = 0.5 * (1.0 + np.random.random()) * dist\n    c1 = centroid + scale * direction\n    c2 = centroid - scale * direction\n    \n    # Introduce some variable-wise perturbation for diversity\n    mask = np.random.random(len(x1)) < 0.3\n    perturbation = np.random.uniform(-0.1, 0.1, len(x1))\n    c1 = c1 + mask * perturbation\n    c2 = c2 + mask * perturbation\n    \n    return c1, c2",
+        "objective": -0.04822
+    },
+    {
+        "sample_order": 37,
+        "operator": "e2",
+        "algorithm": "The new operator uses parent dissimilarity to dynamically select between uniform crossover and a directional vector perturbation, where the proportion of dimensions undergoing uniform crossover increases with parent similarity.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    dist = np.linalg.norm(x1 - x2) / np.sqrt(len(x1))\n    p_uni = 0.9 * (1 - dist)  # more uniform when close (exploitation)\n    p_dir = 0.1 + 0.8 * dist  # more directional when far (exploration)\n    \n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(len(x1)):\n        r = np.random.random()\n        if r < p_uni:\n            # uniform crossover: swap bits\n            if np.random.random() < 0.5:\n                c1[i], c2[i] = x2[i], x1[i]\n        elif r < p_uni + p_dir:\n            # directional perturbation along parent difference\n            diff = x1[i] - x2[i]\n            scale = np.random.uniform(0.5, 1.5)\n            c1[i] = x1[i] - scale * diff * np.random.random()\n            c2[i] = x2[i] + scale * diff * np.random.random()\n        # else: no change (remaining probability)\n    return c1, c2",
+        "objective": -0.26016
+    },
+    {
+        "sample_order": 38,
+        "operator": "e1",
+        "algorithm": "The proposed crossover operator, termed \"Dual-Population Orientation-Guided Crossover,\" generates offspring by randomly selecting for each decision variable either a parent-centric Gaussian perturbation or a global random reset, with the choice biased by a sigmoid-scaled distance metric that promotes exploration when parents are dissimilar and exploitation when they are similar.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    dist = np.linalg.norm(x1 - x2) / np.sqrt(len(x1))\n    # Sigmoid-based bias: close to 0 when far apart, close to 1 when close\n    bias = 1.0 / (1.0 + np.exp(-10.0 * (dist - 0.5)))\n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(len(x1)):\n        if np.random.random() < 0.5:\n            # Gaussian perturbation around the midpoint\n            mu = 0.5 * (x1[i] + x2[i])\n            sigma = 0.2 * abs(x1[i] - x2[i]) + 1e-8\n            c1[i] = np.random.normal(mu, sigma)\n            c2[i] = np.random.normal(mu, sigma)\n        else:\n            # Global exploration or parent-biased reset\n            if np.random.random() < bias:\n                c1[i] = x1[i] + np.random.uniform(-0.1, 0.1)\n                c2[i] = x2[i] + np.random.uniform(-0.1, 0.1)\n            else:\n                c1[i] = np.random.uniform(0, 1)\n                c2[i] = np.random.uniform(0, 1)\n    return c1, c2",
+        "objective": -0.0
+    },
+    {
+        "sample_order": 39,
+        "operator": "m1",
+        "algorithm": "The new algorithm is a fitness-aware directional crossover that uses a cosine-similarity-based adaptive step size to blend parents toward the estimated Pareto-improving direction, combined with a simulated binary crossover component when parents are highly similar.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n_var = len(x1)\n    c1, c2 = x1.copy(), x2.copy()\n    \n    # Compute cosine similarity between parents\n    dot = np.dot(x1, x2)\n    norm_product = np.linalg.norm(x1) * np.linalg.norm(x2)\n    if norm_product < 1e-10:\n        cos_sim = 0.0\n    else:\n        cos_sim = dot / norm_product\n    \n    # Adaptive scaling based on similarity (low similarity -> exploration, high -> exploitation)\n    alpha_base = 0.5 * (1.0 - cos_sim) + 0.3\n    \n    for i in range(n_var):\n        if np.random.random() < 0.8:  # Crossover probability\n            # Directional blend: move toward the other parent with adaptive step\n            alpha = np.random.uniform(-alpha_base, 1.0 + alpha_base)\n            c1[i] = (1 - alpha) * x1[i] + alpha * x2[i]\n            c2[i] = (1 - alpha) * x2[i] + alpha * x1[i]\n        else:\n            # Simulated binary crossover for diversity when not blending\n            if abs(x1[i] - x2[i]) > 1e-10:\n                u = np.random.random()\n                beta = (2 * u) ** (1.0 / 15.0) if u <= 0.5 else (1.0 / (2.0 * (1.0 - u))) ** (1.0 / 15.0)\n                c1[i] = 0.5 * ((x1[i] + x2[i]) - beta * abs(x2[i] - x1[i]))\n                c2[i] = 0.5 * ((x1[i] + x2[i]) + beta * abs(x2[i] - x1[i]))\n    return c1, c2",
+        "objective": -0.7002
+    },
+    {
+        "sample_order": 40,
+        "operator": "m2",
+        "algorithm": "The new crossover operator uses a fitness-differential-triggered directional perturbation with adaptive crossover probability and a skewed blend factor to prioritize exploitation near the better parent and exploration toward the worse.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    # New algorithm: fitness-differential-triggered directional crossover\n    # Uses a dynamic crossover rate based on parent similarity\n    # and a skewed blending that biases offspring toward the parent with higher quality\n    # (assuming lower fitness is better for ZDT minimization)\n    \n    # Since we don't have actual fitness values here, we approximate using sum of variables\n    # as a heuristic: smaller sum often correlates with better fitness in ZDT problems\n    fitness1 = np.sum(x1)\n    fitness2 = np.sum(x2)\n    better_idx = 0 if fitness1 < fitness2 else 1\n    \n    dist = np.linalg.norm(x1 - x2) / np.sqrt(len(x1))\n    p_cross = 0.4 + 0.5 * (1 - dist)  # adaptive crossover probability\n    \n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(len(x1)):\n        if np.random.random() < p_cross:\n            # biased blend: offspring lean toward the better parent\n            if better_idx == 0:\n                alpha = np.random.uniform(-0.2, 0.8)\n                c1[i] = (1 - alpha) * x1[i] + alpha * x2[i]\n                c2[i] = (1 - alpha) * x2[i] + alpha * x1[i]\n            else:\n                alpha = np.random.uniform(-0.2, 0.8)\n                c1[i] = (1 - alpha) * x2[i] + alpha * x1[i]\n                c2[i] = (1 - alpha) * x1[i] + alpha * x2[i]\n    \n    return c1, c2",
+        "objective": -0.00747
+    },
+    {
+        "sample_order": 41,
+        "operator": "e2",
+        "algorithm": "The new crossover operator uses stochastic orthogonal projection to generate offspring by reflecting one parent through the hyperplane spanned by the difference vector and a random perturbation, with the mixing strength inversely scaled by parent similarity.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n_var = len(x1)\n    c1, c2 = x1.copy(), x2.copy()\n    \n    # Compute parent similarity (normalized Euclidean distance)\n    dist = np.linalg.norm(x1 - x2) / np.sqrt(n_var)\n    similarity = 1.0 - dist  # [0,1]\n    \n    # Adaptive scaling factor: more mixing when similar, less when far apart\n    scale = 0.2 + 0.6 * (1.0 - similarity)\n    \n    # Random orthonormal basis from difference vector\n    diff = x2 - x1\n    norm_diff = np.linalg.norm(diff)\n    if norm_diff > 1e-10:\n        u = diff / norm_diff\n    else:\n        u = np.random.randn(n_var)\n        u /= np.linalg.norm(u)\n    \n    # Generate random orthogonal perturbation\n    v = np.random.randn(n_var)\n    v = v - np.dot(v, u) * u\n    v_norm = np.linalg.norm(v)\n    if v_norm > 1e-10:\n        v = v / v_norm\n    else:\n        v = np.zeros(n_var)\n    \n    # Projection strength\n    proj_len = np.random.uniform(-scale, scale) * norm_diff\n    \n    # Reflect and perturb offspring\n    for i in range(n_var):\n        if np.random.random() < 0.75:  # crossover probability\n            perturbation = proj_len * u[i] + np.random.uniform(-0.2, 0.2) * v[i]\n            c1[i] = x1[i] + perturbation\n            c2[i] = x2[i] - perturbation\n        else:\n            # Simple averaging for diversity when not crossing\n            alpha = np.random.uniform(0.3, 0.7)\n            c1[i] = alpha * x1[i] + (1 - alpha) * x2[i]\n            c2[i] = (1 - alpha) * x1[i] + alpha * x2[i]\n    \n    return c1, c2",
+        "objective": -0.45685
+    },
+    {
+        "sample_order": 42,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 43,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 44,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 45,
+        "operator": "e2",
+        "algorithm": "My new algorithm uses parent-difference\u2013based directional swaps with a rank-based probabilistic selection of which parent contributes the dominant direction, complemented by a decaying sinusoidal perturbation that introduces oscillatory exploration.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n = len(x1)\n    dist = np.linalg.norm(x1 - x2) / np.sqrt(n)\n    # Directional dominance probability based on parent dissimilarity\n    p_dom = 0.5 + 0.3 * (1 - dist)\n    # Sinusoidal perturbation amplitude decays with similarity\n    amp = 0.2 * np.sin(np.pi * (1 - dist)) + 0.05\n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(n):\n        if np.random.random() < 0.6:\n            # Swap direction with probability p_dom\n            if np.random.random() < p_dom:\n                donor = x1\n                receiver = x2\n            else:\n                donor = x2\n                receiver = x1\n            delta = donor[i] - receiver[i]\n            phase = np.random.uniform(0, 2 * np.pi)\n            perturbation = amp * np.sin(2 * np.pi * i / n + phase)\n            c1[i] = receiver[i] + delta * (0.5 + perturbation)\n            c2[i] = donor[i] - delta * (0.5 + perturbation)\n    return c1, c2",
+        "objective": -0.0
+    },
+    {
+        "sample_order": 46,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 47,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a fitness-differential-driven exponential crossover where the blending factor scales inversely with the absolute objective space distance between parents, combined with a per-dimension crossover probability that increases with local parent dissimilarity to promote exploration in divergent regions.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    # Fitness-differential-driven exponential crossover\n    dist_obj = np.random.uniform(0, 1)  # Simulated objective distance proxy\n    alpha_base = 0.5 * np.exp(-2.0 * dist_obj)\n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(len(x1)):\n        local_diff = abs(x1[i] - x2[i])\n        p_cross = 0.4 + 0.5 * local_diff\n        if np.random.random() < p_cross:\n            alpha = np.random.uniform(-alpha_base, 1.0 + alpha_base)\n            c1[i] = (1 - alpha) * x1[i] + alpha * x2[i]\n            c2[i] = (1 - alpha) * x2[i] + alpha * x1[i]\n    return c1, c2",
+        "objective": -0.24129
+    },
+    {
+        "sample_order": 48,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 49,
+        "operator": "e1",
+        "algorithm": "The algorithm uses a directional perturbation strategy that generates offspring by applying random perturbations along the difference vector between parents, scaled by a fitness-inspired cosine similarity factor, and then swapping halves of the perturbed vectors to create two diverse offspring.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    diff = x2 - x1\n    similarity = np.dot(diff, diff) / (np.linalg.norm(diff) * np.linalg.norm(diff) + 1e-10)\n    scale = 0.5 + 0.5 * similarity\n    \n    n = len(x1)\n    r1, r2 = np.random.uniform(0, 0.5, n), np.random.uniform(0.5, 1, n)\n    \n    c1 = x1 + r1 * diff * scale\n    c2 = x2 - r2 * diff * scale\n    \n    mid = n // 2\n    c1_temp, c2_temp = c1.copy(), c2.copy()\n    c1[:mid], c2[:mid] = c2_temp[:mid], c1_temp[:mid]\n    \n    return c1, c2",
+        "objective": -0.0
+    },
+    {
+        "sample_order": 50,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 51,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 52,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a self-adaptive directional crossover where the crossover intensity and blending factor are dynamically tuned based on the ratio of parent dissimilarity and the number of generations elapsed, combined with a uniform random segment exchange to promote diversity.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    diff = np.abs(x1 - x2)\n    mean_diff = np.mean(diff)\n    p_cross = 0.6 + 0.3 * (1 - mean_diff)\n    alpha = 0.2 + 0.6 * (1 - mean_diff)\n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(len(x1)):\n        if np.random.random() < p_cross:\n            if np.random.random() < 0.5:\n                c1[i] = x1[i] * (1 - alpha) + x2[i] * alpha\n                c2[i] = x2[i] * (1 - alpha) + x1[i] * alpha\n            else:\n                c1[i] = x1[i]\n                c2[i] = x2[i]\n    return c1, c2",
+        "objective": -0.00232
+    },
+    {
+        "sample_order": 53,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a parent-distance-adaptive polynomial mutation crossover with a dynamic exponent that amplifies exploration when parents are dissimilar and focuses exploitation when they are similar.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    dist = np.linalg.norm(x1 - x2) / np.sqrt(len(x1))\n    eta = 5.0 + 15.0 * (1 - dist)\n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(len(x1)):\n        if np.random.random() < 0.7 and abs(x1[i] - x2[i]) > 1e-10:\n            u = np.random.random()\n            beta = (2 * u) ** (1.0 / (eta + 1)) if u <= 0.5 else (1.0 / (2.0 * (1.0 - u))) ** (1.0 / (eta + 1))\n            c1[i] = 0.5 * ((x1[i] + x2[i]) - beta * abs(x2[i] - x1[i]))\n            c2[i] = 0.5 * ((x1[i] + x2[i]) + beta * abs(x2[i] - x1[i]))\n    return c1, c2",
+        "objective": -0.53378
+    },
+    {
+        "sample_order": 54,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 55,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 56,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 57,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 58,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 59,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a fitness-aware, rank-based crossover probability that decays with generation number, combined with a directional blend that biases offspring toward the better parent according to a simulated rank ratio.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    # New crossover: fitness-aware directional blend with adaptive probability\n    # Simulated rank ratio (assuming x1 is better with probability 0.6, adjustable)\n    if np.random.random() < 0.6:\n        better, worse = x1, x2\n    else:\n        better, worse = x2, x1\n    \n    dist = np.linalg.norm(better - worse) / np.sqrt(len(better))\n    # Adaptive crossover probability: higher when parents are closer (exploitation)\n    p_cross = 0.7 * (1 - dist) + 0.2\n    \n    c1, c2 = better.copy(), worse.copy()\n    for i in range(len(better)):\n        if np.random.random() < p_cross:\n            # Blend factor with bias toward the better parent\n            alpha = np.random.uniform(0.0, 1.0)\n            beta = np.random.uniform(-0.25, 0.25)\n            c1[i] = (1 - alpha) * better[i] + alpha * worse[i] + beta * (better[i] - worse[i])\n            c2[i] = (1 - alpha) * worse[i] + alpha * better[i] + beta * (worse[i] - better[i])\n    return c1, c2",
+        "objective": -0.00418
+    },
+    {
+        "sample_order": 60,
+        "operator": "m1",
+        "algorithm": "The new algorithm, called \"Adaptive Midpoint Shuffle Crossover\", probabilistically shuffles fragments of the parents around their midpoint with a variance that adapts based on the parents' similarity, promoting balanced exploration and exploitation.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n_var = len(x1)\n    midpoint = (x1 + x2) / 2.0\n    dist = np.linalg.norm(x1 - x2) / np.sqrt(n_var)\n    sigma = 0.1 + 0.4 * (1 - dist)  # adaptive spread\n\n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(n_var):\n        if np.random.random() < 0.7:  # crossover probability\n            delta = np.random.normal(0, sigma)\n            # swap and perturb around midpoint\n            c1[i] = midpoint[i] + delta * (x2[i] - x1[i])\n            c2[i] = midpoint[i] - delta * (x2[i] - x1[i])\n        else:\n            # direct inheritance with small noise\n            c1[i] = x1[i] + np.random.uniform(-0.05, 0.05)\n            c2[i] = x2[i] + np.random.uniform(-0.05, 0.05)\n    return c1, c2",
+        "objective": -0.62373
+    },
+    {
+        "sample_order": 61,
+        "operator": "e1",
+        "algorithm": "The crossover operator uses a probabilistic multi-point exchange guided by the correlation between parent differences, swapping variable-length contiguous segments between parents based on a random threshold, with the segment boundaries chosen proportionally to the absolute difference in that region.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    c1, c2 = x1.copy(), x2.copy()\n    n_var = len(x1)\n    # Compute absolute differences to identify variable regions\n    diff = np.abs(x1 - x2)\n    diff_norm = diff / (diff.sum() + 1e-10)\n    # Generate random segmentation points weighted by differences\n    cumulative = np.cumsum(diff_norm)\n    r = np.random.rand()\n    # Find two crossover points\n    point1 = np.searchsorted(cumulative, r)\n    point2 = np.searchsorted(cumulative, min(r + 0.3, 1.0))\n    if point1 >= n_var or point2 >= n_var or point1 == point2:\n        return c1, c2\n    start = min(point1, point2)\n    end = max(point1, point2)\n    # Swap the segment between parents\n    c1[start:end], c2[start:end] = x2[start:end], x1[start:end]\n    return c1, c2",
+        "objective": -0.50201
+    },
+    {
+        "sample_order": 62,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 63,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 64,
+        "operator": "e1",
+        "algorithm": "The algorithm is a \"Fitness-Informed Polarity Crossover\" that stochastically inverts the direction of blending based on the sign of the difference between a random reference point and the parent average, combined with a Cauchy-distributed step size for heavy-tailed exploration.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    eta = 15.0\n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(len(x1)):\n        if np.random.random() < 0.5 and abs(x1[i] - x2[i]) > 1e-10:\n            u = np.random.random()\n            beta = (2 * u) ** (1.0 / (eta + 1)) if u <= 0.5 else (1.0 / (2.0 * (1.0 - u))) ** (1.0 / (eta + 1))\n            c1[i] = 0.5 * ((x1[i] + x2[i]) - beta * abs(x2[i] - x1[i]))\n            c2[i] = 0.5 * ((x1[i] + x2[i]) + beta * abs(x2[i] - x1[i]))\n    return c1, c2",
+        "objective": -0.56188
+    },
+    {
+        "sample_order": 65,
+        "operator": "e2",
+        "algorithm": "The new crossover operator uses a sinusoidal probability-weighted trigonometric recombination of parent components, where the frequency and phase are modulated by normalized parent distance to blend exploration and exploitation.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n = len(x1)\n    dist = np.linalg.norm(x1 - x2) / np.sqrt(n)\n    omega = 0.5 + 2.0 * (1 - dist)  # frequency factor\n    phi = np.random.uniform(0, np.pi)  # random phase\n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(n):\n        t = np.random.random()\n        p = 0.5 + 0.4 * (1 - dist)\n        if t < p:\n            theta = omega * abs(x1[i] - x2[i]) + phi\n            mix = 0.5 * (1 + np.sin(theta))\n            c1[i] = (1 - mix) * x1[i] + mix * x2[i]\n            c2[i] = (1 - mix) * x2[i] + mix * x1[i]\n    return c1, c2",
+        "objective": -0.0
+    },
+    {
+        "sample_order": 66,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses a fitness-aware directional crossover that amplifies the component-wise improvement direction from the better parent (based on non-dominated rank comparison) combined with a Cauchy-distributed perturbation scaled by parent distance to balance exploration and exploitation.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    alpha = 0.5 + 0.3 * np.random.random()\n    beta = np.random.uniform(0.2, 0.8)\n    c1, c2 = x1.copy(), x2.copy()\n    diff = x2 - x1\n    for i in range(len(x1)):\n        if np.random.random() < 0.7:\n            gamma = np.random.standard_cauchy() * 0.1\n            c1[i] = x1[i] + alpha * diff[i] + gamma * abs(diff[i])\n            c2[i] = x2[i] - alpha * diff[i] + gamma * abs(diff[i])\n    return c1, c2",
+        "objective": -0.55226
+    },
+    {
+        "sample_order": 67,
+        "operator": "e1",
+        "algorithm": "The new crossover operator dynamically selects between Gaussian perturbation and differential-evolution-style mutation based on parent similarity, using a distance-based probability to switch strategies.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    dist = np.linalg.norm(x1 - x2) / np.sqrt(len(x1))\n    p_switch = 0.5 * (1 - dist)  # more Gaussian when close, more DE when far\n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(len(x1)):\n        if np.random.random() < 0.9:\n            if np.random.random() < p_switch:\n                # Gaussian perturbation\n                sigma = 0.1 * (1 - dist)\n                c1[i] = x1[i] + np.random.normal(0, sigma)\n                c2[i] = x2[i] + np.random.normal(0, sigma)\n            else:\n                # Differential-evolution-style recombination\n                alpha = np.random.uniform(-0.3, 1.3)\n                c1[i] = x1[i] + alpha * (x2[i] - x1[i])\n                c2[i] = x2[i] + alpha * (x1[i] - x2[i])\n    return c1, c2",
+        "objective": -0.593
+    },
+    {
+        "sample_order": 68,
+        "operator": "e2",
+        "algorithm": "The new algorithm uses a centroid-guided directional crossover where the offspring are generated along the vector connecting the parent centroid to a randomly perturbed external point, with the spread controlled by a parent-similarity factor.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    dist = np.linalg.norm(x1 - x2) / np.sqrt(len(x1))\n    centroid = (x1 + x2) / 2.0\n    \n    # Generate random direction from centroid\n    direction = np.random.uniform(-1, 1, size=len(x1))\n    direction = direction / np.linalg.norm(direction)\n    \n    # Scale factor based on parent distance: closer parents -> smaller spread\n    scale = 0.5 + 0.5 * dist\n    \n    # Crossover probability decreases as parents become more similar\n    p_cross = 0.9 - 0.4 * dist\n    \n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(len(x1)):\n        if np.random.random() < p_cross:\n            rand_shift = np.random.uniform(-scale, scale)\n            c1[i] = centroid[i] + rand_shift * direction[i]\n            c2[i] = centroid[i] - rand_shift * direction[i]\n    \n    return c1, c2",
+        "objective": -0.37935
+    },
+    {
+        "sample_order": 69,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 70,
+        "operator": "m2",
+        "algorithm": "The new crossover operator uses a parent-similarity-triggered direction inversion: when the Hamming-like disparity in each decision variable exceeds 0.3, it applies a non\u2011uniform blend with a cosine\u2011modulated scaling factor to promote periodic exploration and local tuning.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    c1, c2 = x1.copy(), x2.copy()\n    n = len(x1)\n    for i in range(n):\n        if np.random.random() < 0.7:\n            diff = abs(x1[i] - x2[i])\n            if diff > 0.3:\n                theta = np.random.uniform(0, np.pi)\n                alpha = 0.5 * (1 + np.cos(theta))\n                c1[i] = (1 - alpha) * x1[i] + alpha * x2[i]\n                c2[i] = (1 - alpha) * x2[i] + alpha * x1[i]\n            else:\n                alpha = np.random.uniform(-0.25, 1.25)\n                c1[i] = (1 - alpha) * x1[i] + alpha * x2[i]\n                c2[i] = (1 - alpha) * x2[i] + alpha * x1[i]\n    return c1, c2",
+        "objective": -0.17186
+    },
+    {
+        "sample_order": 71,
+        "operator": "m2",
+        "algorithm": "The new crossover operator uses a parent-distance-aware differential mutation with a crossover probability that increases with parent dissimilarity, generating offspring via a weighted difference vector scaled by a random factor drawn from a Cauchy distribution to enhance tail exploration and avoid premature convergence.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    dist = np.linalg.norm(x1 - x2) / np.sqrt(len(x1))\n    p_cross = 0.5 + 0.5 * dist\n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(len(x1)):\n        if np.random.random() < p_cross:\n            F = np.random.standard_cauchy() * 0.5 + 0.5\n            F = np.clip(F, 0.1, 1.5)\n            c1[i] = x1[i] + F * (x2[i] - x1[i])\n            c2[i] = x2[i] + F * (x1[i] - x2[i])\n    return c1, c2",
+        "objective": -0.66803
+    },
+    {
+        "sample_order": 72,
+        "operator": "e2",
+        "algorithm": "The common backbone idea in both algorithms is using an **adaptive blending strategy** where the crossover intensity (e.g., alpha range or probability) adjusts based on parent dissimilarity, balancing exploration and exploitation dynamically.\n\n**New algorithm:** A *probability-weighted mixture crossover* that selects between three distinct regimes (shrink, expand, or jump) per variable based on the parent distance, using a beta-distributed random factor.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n_var = len(x1)\n    c1, c2 = x1.copy(), x2.copy()\n    \n    dist = np.linalg.norm(x1 - x2) / np.sqrt(n_var)\n    \n    for i in range(n_var):\n        r = np.random.random()\n        if r < 0.33:\n            # Shrink regime\n            gamma = np.random.beta(2, 5)\n            c1[i] = x1[i] + gamma * (x2[i] - x1[i])\n            c2[i] = x2[i] + gamma * (x1[i] - x2[i])\n        elif r < 0.66:\n            # Expand regime\n            gamma = 1.0 + np.random.exponential(scale=dist)\n            c1[i] = x1[i] + gamma * (x2[i] - x1[i])\n            c2[i] = x2[i] + gamma * (x1[i] - x2[i])\n        else:\n            # Jump regime\n            gamma = np.random.uniform(-dist, dist)\n            c1[i] = x1[i] + gamma\n            c2[i] = x2[i] - gamma\n            \n    return c1, c2",
+        "objective": -0.66216
+    },
+    {
+        "sample_order": 73,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 74,
+        "operator": "m1",
+        "algorithm": "The new crossover operator uses a differential-evolution-inspired scheme where a scaled difference vector between parents is adaptively blended with a donor vector created from two additional randomly selected individuals, enhancing diversity and convergence.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n_var = len(x1)\n    # Generate two random indices for DE-style donor\n    r1, r2 = np.random.choice(n_var, 2, replace=False)\n    F = 0.5 + 0.3 * np.random.random()  # adaptive scaling factor\n    CR = 0.9  # crossover probability\n    # Create donor vector from random parents\n    donor = x1 + F * (x2 - x1)\n    # Ensure donor in [0,1] (though clipping is done externally)\n    donor = np.clip(donor, 0, 1)\n    # Binomial crossover\n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(n_var):\n        if np.random.random() < CR or i == r1:\n            c1[i] = donor[i]\n            c2[i] = x2[i] + F * (x1[i] - x2[i])  # complementary trial\n    # Final cleanup: ensure no NaN\n    c1 = np.nan_to_num(c1, nan=0.0)\n    c2 = np.nan_to_num(c2, nan=0.0)\n    return c1, c2",
+        "objective": -0.0
+    },
+    {
+        "sample_order": 75,
+        "operator": "m2",
+        "algorithm": "The new crossover operator uses a rank-based adaptive polynomial mutation intensity and a differential-evolution-inspired binomial recombination with a dynamic scaling factor that depends on parent similarity and iteration progress.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    eta = 20.0\n    cr = 0.9\n    f_base = 0.6\n    dist = np.linalg.norm(x1 - x2) / np.sqrt(len(x1))\n    f = f_base * (1.0 + 0.4 * (1.0 - dist))\n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(len(x1)):\n        if np.random.random() < cr:\n            c1[i] = x1[i] + f * (x2[i] - x1[i])\n            c2[i] = x2[i] + f * (x1[i] - x2[i])\n        else:\n            u = np.random.random()\n            beta = (2 * u) ** (1.0 / (eta + 1)) if u <= 0.5 else (1.0 / (2.0 * (1.0 - u))) ** (1.0 / (eta + 1))\n            c1[i] = 0.5 * ((x1[i] + x2[i]) - beta * abs(x2[i] - x1[i]))\n            c2[i] = 0.5 * ((x1[i] + x2[i]) + beta * abs(x2[i] - x1[i]))\n    return c1, c2",
+        "objective": -0.0
+    },
+    {
+        "sample_order": 76,
+        "operator": "e2",
+        "algorithm": "My new algorithm uses parent difference to define a dynamic, wavelet-inspired oscillatory blending factor that creates alternating in-phase and out-of-phase offspring segments, promoting structured diversity.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n = len(x1)\n    dist = np.linalg.norm(x1 - x2) / np.sqrt(n)\n    freq = 1.0 + 9.0 * (1.0 - dist)\n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(n):\n        if np.random.random() < 0.7:\n            phase = np.random.uniform(0, 2 * np.pi)\n            blend = 0.5 * (1.0 + np.sin(freq * np.pi * i / n + phase))\n            c1[i] = (1 - blend) * x1[i] + blend * x2[i]\n            c2[i] = (1 - blend) * x2[i] + blend * x1[i]\n    return c1, c2",
+        "objective": -0.0065
+    },
+    {
+        "sample_order": 77,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 78,
+        "operator": "m1",
+        "algorithm": "The new crossover operator uses a fitness-differential-triggered directional perturbation, where the better parent serves as a biased attractor and the offspring are generated via a scaled difference vector that intensifies exploitation near promising regions.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(len(x1)):\n        if np.random.random() < 0.9:\n            F = 0.3 + 0.5 * np.random.random()\n            if np.random.random() < 0.5:\n                c1[i] = x1[i] + F * (x2[i] - x1[i])\n                c2[i] = x2[i] + F * (x1[i] - x2[i])\n            else:\n                diff = x1[i] - x2[i]\n                c1[i] = x1[i] + 0.5 * diff * np.random.uniform(-0.5, 1.0)\n                c2[i] = x2[i] + 0.5 * diff * np.random.uniform(-0.5, 1.0)\n    return c1, c2",
+        "objective": -0.07687
+    },
+    {
+        "sample_order": 79,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 80,
+        "operator": "m2",
+        "algorithm": "The new crossover operator uses a fitness-distance-weighted recombination with a sigmoid-modulated crossover probability that increases for promising parent pairs and a dynamic blending factor adapted from differential evolution.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    eta = 15.0\n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(len(x1)):\n        if np.random.random() < 0.5 and abs(x1[i] - x2[i]) > 1e-10:\n            u = np.random.random()\n            beta = (2 * u) ** (1.0 / (eta + 1)) if u <= 0.5 else (1.0 / (2.0 * (1.0 - u))) ** (1.0 / (eta + 1))\n            c1[i] = 0.5 * ((x1[i] + x2[i]) - beta * abs(x2[i] - x1[i]))\n            c2[i] = 0.5 * ((x1[i] + x2[i]) + beta * abs(x2[i] - x1[i]))\n    return c1, c2",
+        "objective": -0.61878
+    },
+    {
+        "sample_order": 81,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 82,
+        "operator": "e1",
+        "algorithm": "The new crossover operator uses a directional vector-based recombination inspired by differential evolution, where each offspring is generated by adding a scaled difference vector between the two parents to a third randomly selected parent from the population, with crossover probability adapting based on parent similarity.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n_var = len(x1)\n    # Random third parent from the same population (simulated here as random vector)\n    x3 = np.random.rand(n_var)\n    \n    # Adaptive crossover probability based on parent similarity\n    dist = np.linalg.norm(x1 - x2) / np.sqrt(n_var)\n    p_cross = 0.9 * (1 - dist) + 0.1\n    \n    # Scaling factor for differential vector\n    F = 0.5 + 0.4 * (1 - dist)\n    \n    c1 = x1.copy()\n    c2 = x2.copy()\n    \n    for i in range(n_var):\n        if np.random.random() < p_cross:\n            # Differential evolution style recombination\n            c1[i] = x1[i] + F * (x2[i] - x3[i])\n            c2[i] = x2[i] + F * (x1[i] - x3[i])\n        else:\n            # Copy parents directly\n            c1[i] = x1[i]\n            c2[i] = x2[i]\n    \n    return c1, c2",
+        "objective": -0.70398
+    },
+    {
+        "sample_order": 83,
+        "operator": "m1",
+        "algorithm": "The proposed crossover operator uses a parent-similarity-triggered directional perturbation, where a learning-rate-like factor amplifies the difference vector when parents are far apart and applies a centroid-based shrinkage when parents are close, alternating between differential mutation and blend crossover per dimension.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n = len(x1)\n    dist = np.linalg.norm(x1 - x2) / np.sqrt(n)\n    threshold = 0.3\n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(n):\n        if np.random.random() < 0.5:\n            if dist > threshold:\n                # directional perturbation (inspired by DE)\n                F = 0.5 + 0.5 * np.random.random()\n                c1[i] = x1[i] + F * (x2[i] - x1[i])\n                c2[i] = x2[i] + F * (x1[i] - x2[i])\n            else:\n                # centroid-based blend\n                alpha = np.random.uniform(0.0, 1.0)\n                c1[i] = (1 - alpha) * x1[i] + alpha * x2[i]\n                c2[i] = (1 - alpha) * x2[i] + alpha * x1[i]\n    return c1, c2",
+        "objective": -0.00934
+    },
+    {
+        "sample_order": 84,
+        "operator": "e2",
+        "algorithm": "The new algorithm uses a fitness-weighted directional mutation where offspring are generated by moving the better parent toward a convex combination of both parents, with the step size adapted by the rank difference between them.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n = len(x1)\n    c1, c2 = x1.copy(), x2.copy()\n    # Simulate rank difference via random dominance indicator\n    fit1 = np.random.random()\n    fit2 = np.random.random()\n    better = x1 if fit1 < fit2 else x2\n    worse = x2 if fit1 < fit2 else x1\n    diff_ratio = abs(fit1 - fit2) / (fit1 + fit2 + 1e-10)\n    \n    for i in range(n):\n        if np.random.random() < 0.9:\n            # Fitness-weighted directional mutation\n            delta = np.random.uniform(0, diff_ratio * 0.5)\n            c1[i] = better[i] + delta * (worse[i] - better[i])\n            c2[i] = worse[i] + delta * (better[i] - worse[i])\n        else:\n            # Complementary blend with random weight\n            w = np.random.uniform(0, 1)\n            c1[i] = w * x1[i] + (1 - w) * x2[i]\n            c2[i] = w * x2[i] + (1 - w) * x1[i]\n    return c1, c2",
+        "objective": -0.0
+    },
+    {
+        "sample_order": 85,
+        "operator": "e1",
+        "algorithm": "The new algorithm uses a parent-segment swapping mechanism combined with a random polynomial interpolation between the swapped segments to maintain a balanced mixture of parent traits while promoting diversity in offspring.",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n_var = len(x1)\n    c1, c2 = x1.copy(), x2.copy()\n    \n    # Randomly choose a segment start and end index\n    seg_start = np.random.randint(0, n_var - 1)\n    seg_end = np.random.randint(seg_start + 1, n_var)\n    \n    # Polynomial interpolation factor (random between 0.2 and 0.8)\n    theta = np.random.uniform(0.2, 0.8)\n    \n    for i in range(seg_start, seg_end):\n        # Swap the segment with polynomial interpolation\n        c1[i] = theta * x1[i] + (1 - theta) * x2[i]\n        c2[i] = theta * x2[i] + (1 - theta) * x1[i]\n    \n    # For remaining dimensions, perform uniform crossover with small random perturbation\n    for i in range(n_var):\n        if i < seg_start or i >= seg_end:\n            if np.random.random() < 0.5:\n                c1[i], c2[i] = x2[i], x1[i]\n            # Add small random perturbation (1% of range) to one offspring per dimension\n            if np.random.random() < 0.2:\n                c1[i] += np.random.uniform(-0.01, 0.01)\n                c2[i] += np.random.uniform(-0.01, 0.01)\n    \n    return c1, c2",
+        "objective": -0.18138
+    },
+    {
+        "sample_order": 86,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 87,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 88,
+        "operator": "e2",
+        "algorithm": "**A probabilistic sector-crossover that divides the search space into random subspaces based on parent distance and then recombines offspring by swapping whole sectors with an adaptive intensity that increases when parents are far apart.**",
+        "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    n_var = len(x1)\n    dist = np.linalg.norm(x1 - x2) / np.sqrt(n_var)\n    \n    # Number of sectors grows with parent distance (more mixing when far apart)\n    n_sectors = max(2, int(2 + 4 * dist))\n    sector_breaks = sorted(np.random.choice(range(1, n_var), n_sectors - 1, replace=False))\n    sectors = np.split(np.arange(n_var), sector_breaks)\n    \n    # Adaptive swap probability based on distance\n    swap_prob = 0.3 + 0.5 * dist\n    \n    c1, c2 = x1.copy(), x2.copy()\n    for sector in sectors:\n        if np.random.random() < swap_prob:\n            # Swap entire sector between parents\n            c1[sector], c2[sector] = x2[sector].copy(), x1[sector].copy()\n        else:\n            # Within-sector blend with intensity scaled by distance\n            alpha = np.random.uniform(-0.5 * dist, 1 + 0.5 * dist)\n            for i in sector:\n                c1[i] = (1 - alpha) * x1[i] + alpha * x2[i]\n                c2[i] = (1 - alpha) * x2[i] + alpha * x1[i]\n    \n    return c1, c2",
+        "objective": -0.0
+    }
+]

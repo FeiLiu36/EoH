@@ -1,0 +1,338 @@
+[
+    {
+        "sample_order": 1,
+        "operator": "i1",
+        "algorithm": "The algorithm uses rank-based sigmoid weights that assign gradually higher influence to better observations, with an adaptive steepness that increases with group size to balance exploration and exploitation.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Rank from 0 (worst) to n-1 (best)\n    ranks = np.arange(n)\n    # Steepness grows with n: steeper for larger n (more exploitation)\n    steepness = 0.1 + 0.02 * np.sqrt(n)\n    # Sigmoid centered at mid-rank, scaled to [0.1, 1]\n    sigmoid = 1 / (1 + np.exp(-steepness * (ranks - n / 2)))\n    weights = 0.1 + 0.9 * (sigmoid - sigmoid.min()) / (sigmoid.max() - sigmoid.min() + 1e-10)\n    return weights",
+        "objective": 0.09043
+    },
+    {
+        "sample_order": 2,
+        "operator": "i1",
+        "algorithm": "The algorithm uses exponential decay weighting inversely proportional to rank within the good group, with a minimum weight floor, to strongly emphasize the best observations while maintaining smooth influence from worse ones for balanced exploitation.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Exponential decay: weight = exp(-alpha * (n - 1 - i)), normalized to avoid zero\n    alpha = 2.0 / n if n > 0 else 1.0\n    indices = np.arange(n)\n    weights = np.exp(-alpha * (n - 1 - indices))\n    # Ensure minimum weight of 0.01 to retain some exploration\n    weights = np.maximum(weights, 0.01)\n    return weights",
+        "objective": 0.25604
+    },
+    {
+        "sample_order": 3,
+        "operator": "i1",
+        "algorithm": "Use a rank-based inverse exponential weighting scheme that assigns higher weights to the best observations, with a temperature parameter that adapts to the group size to balance exploration and exploitation.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Rank from 0 (worst) to n-1 (best)\n    ranks = np.arange(n)\n    # Temperature decreases with n, tightening focus on best points as group grows\n    temperature = max(1.0, n / 5.0)\n    weights = np.exp(ranks / temperature)\n    return weights",
+        "objective": 0.23336
+    },
+    {
+        "sample_order": 4,
+        "operator": "i1",
+        "algorithm": "This algorithm uses an exponential decay weighting scheme that assigns higher weights to the best observations (highest indices) and lower weights to worse ones, with the decay rate adaptively tightening as the good-group size n increases to promote exploitation when more data is available.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Exponential decay: weight = exp(alpha * (index - (n-1)) / (n-1))\n    # alpha increases with n to sharpen exploitation: alpha = 2 + 0.5 * log(n)\n    alpha = 2.0 + 0.5 * np.log(max(n, 1))\n    indices = np.arange(n)\n    weights = np.exp(alpha * (indices - (n - 1)) / max(n - 1, 1))\n    return weights",
+        "objective": 0.36938
+    },
+    {
+        "sample_order": 5,
+        "operator": "i1",
+        "algorithm": "Use exponential weighting emphasizing the best observations with a temperature that adapts to the group size, decaying smoothly toward worse trials.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Temperature inversely proportional to sqrt(n) for adaptive sharpness\n    temperature = max(0.1, n ** 0.5)\n    # Indices from worst (0) to best (n-1)\n    indices = np.arange(n)\n    # Exponential weighting: highest weight on best (largest index)\n    weights = np.exp((indices - (n - 1)) / temperature)\n    return weights",
+        "objective": 0.28833
+    },
+    {
+        "sample_order": 6,
+        "operator": "i1",
+        "algorithm": "Use exponential decay weighting where each observation gets weight exp(-alpha * (n-1-i)), with alpha adaptively set to 0.1 * sqrt(n) to increasingly concentrate density on the best trials as the good group grows, promoting exploitation while retaining smoothness.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Adaptive exponential decay: alpha grows with sqrt(n) for tighter focus on best trials\n    alpha = 0.1 * np.sqrt(n)\n    indices = np.arange(n)\n    # Reverse so worst (index 0) gets smallest weight, best (index n-1) gets largest\n    weights = np.exp(-alpha * (n - 1 - indices))\n    return weights",
+        "objective": 0.40051
+    },
+    {
+        "sample_order": 7,
+        "operator": "i1",
+        "algorithm": "Design an adaptive exponential-decay weighting scheme that assigns sharply higher weights to the best observations in the 'good' group, with the decay rate increasing as the group size grows, to intensify exploitation on harder problems.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Exponential decay: weight ~ exp(-alpha * (n-1-i)) for i from 0 (worst) to n-1 (best)\n    # alpha increases with n to focus more on top performers as more data accumulates\n    alpha = 0.5 + 0.2 * np.log(n + 1)\n    indices = np.arange(n)\n    weights = np.exp(-alpha * (n - 1 - indices))\n    return weights",
+        "objective": 0.23547
+    },
+    {
+        "sample_order": 8,
+        "operator": "i1",
+        "algorithm": "Use exponential decay weights that assign exponentially higher weight to better (later) observations, with decay rate scaled by the square root of the group size.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Exponential decay from best (last) to worst (first)\n    # decay rate increases with n for more aggressive exploitation as more trials accumulate\n    decay = 0.5 / np.sqrt(max(n, 1))\n    indices = np.arange(n)\n    # exponent: higher for better (later) indices, lower for worse (earlier)\n    weights = np.exp(decay * (indices - (n - 1)))\n    return weights",
+        "objective": 0.27692
+    },
+    {
+        "sample_order": 9,
+        "operator": "e2",
+        "algorithm": "My new algorithm uses a piecewise-linear \"broken stick\" scheme that places maximum weight on the single best observation and linearly decays to zero at the worst, with the breakpoint adaptively shifted toward the best as `n` grows.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Breakpoint shifts from 0.5*n toward 0.2*n as n grows\n    break_point = max(1, int(n * (0.5 - 0.02 * np.sqrt(n))))\n    weights = np.zeros(n)\n    # Linear ramp from break_point to best (n-1)\n    weights[break_point:] = np.linspace(0.2, 1.0, n - break_point)\n    # Linear ramp from worst (0) to break_point\n    if break_point > 0:\n        weights[:break_point] = np.linspace(0.0, 0.2, break_point)\n    return weights",
+        "objective": null
+    },
+    {
+        "sample_order": 10,
+        "operator": "m1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 11,
+        "operator": "e2",
+        "algorithm": "My new algorithm uses a sigmoid function centered on the top-ranked observations, with the steepness increasing proportionally to the group size to create a sharp distinction between the best and worst points while maintaining a smooth transition.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Sigmoid weighting: steepness grows with n, centered on the top 40% of ranks\n    steepness = n / 10.0\n    center = 0.6 * n  # sigmoid midpoint shifted toward the best\n    ranks = np.arange(n)\n    weights = 1 / (1 + np.exp(-steepness * (ranks - center) / n))\n    # Ensure positive weights even for the worst points\n    weights = np.maximum(weights, 1e-3)\n    return weights",
+        "objective": 0.34792
+    },
+    {
+        "sample_order": 12,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 13,
+        "operator": "e2",
+        "algorithm": "My new algorithm uses a cumulative probability weighting from a Beta distribution, where the shape parameter grows with \\( n \\) to shift probability mass exponentially toward the best observations.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Beta distribution CDF: shape a grows with n, b fixed to 1\n    a = 1.5 + 0.3 * np.sqrt(n)\n    b = 1.0\n    # positions from 0 (worst) to 1 (best)\n    x = np.linspace(0, 1, n)\n    # regularized incomplete beta (cumulative distribution)\n    from scipy.special import betainc\n    weights = betainc(a, b, x)\n    return weights",
+        "objective": null
+    },
+    {
+        "sample_order": 14,
+        "operator": "m1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 15,
+        "operator": "e2",
+        "algorithm": "Use inverse-rank power-law weighting where the exponent grows with `n`, giving the top observation exponentially more influence than the worst while maintaining a smooth transition.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Power-law: weight = (rank + 1)^(-exponent) where rank 0 = best\n    # exponent increases with n to concentrate more on top observations\n    exponent = 1.0 + 0.3 * np.log(n + 1)\n    ranks = np.arange(n)[::-1]  # 0 for best, n-1 for worst\n    weights = (ranks + 1) ** (-exponent)\n    return weights",
+        "objective": 0.3491
+    },
+    {
+        "sample_order": 16,
+        "operator": "e1",
+        "algorithm": "The algorithm uses a geometric progression of weights that grow quadratically with rank, then normalizes via a softmin-based temperature that shrinks with n to concentrate density on top observations.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    ranks = np.arange(n)\n    # Base weights grow quadratically with rank\n    base = (ranks + 1) ** 2\n    # Softmin temperature decreases with n to sharpen focus on best points\n    T = max(0.1, n / 10.0)\n    # Apply softmin-like scaling: lower ranks get suppressed exponentially more\n    # shifted so the best rank has weight 1, worst tends to 0\n    scaled = np.exp(-(n - 1 - ranks) / T)\n    weights = base * scaled\n    return weights",
+        "objective": 0.28705
+    },
+    {
+        "sample_order": 17,
+        "operator": "m2",
+        "algorithm": "The new algorithm uses rank-based inverse linear weighting with a quadratic scaling factor that progressively emphasizes the best observations as the good group grows, shifting from near-uniform to strongly exploitative weighting.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    \n    # Rank from 0 (worst) to n-1 (best)\n    ranks = np.arange(n)\n    # Inverse linear weighting: best gets weight 1, worst gets weight 1/n\n    weights = 1.0 / (n - ranks)  \n    # Quadratic scaling factor that increases exploitation as n grows\n    scale = 1.0 + 0.5 * np.log2(n + 1) / np.log2(25) if n > 1 else 1.0\n    weights = weights ** scale\n    # Ensure minimum weight floor to retain exploration\n    weights = np.maximum(weights, 0.05)\n    return weights",
+        "objective": 0.30188
+    },
+    {
+        "sample_order": 18,
+        "operator": "e2",
+        "algorithm": "Use a **logarithmic percentile-based weighting** that assigns weights proportional to the log of the inverse rank from the best, then applies a sigmoid gating to smoothly prioritize only the top 20% when the group is large.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Percentile rank from 0 (worst) to 1 (best)\n    ranks = np.arange(1, n + 1) / n\n    # Logarithmic inverse-rank weighting: high for best, low for worst\n    log_weights = np.log(1 + 1 / (1 - ranks + 1e-10))\n    # Sigmoid gate to focus on top proportion when n is large\n    gate = 1 / (1 + np.exp(-10 * (ranks - 0.8)))\n    weights = log_weights * gate\n    return weights",
+        "objective": 0.24297
+    },
+    {
+        "sample_order": 19,
+        "operator": "e2",
+        "algorithm": "**Common backbone idea:** Both algorithms assign higher weight to better observations (higher indices) using exponential decay based on rank order within the good group.\n\n**New algorithm:** Use a **sigmoid-shaped weighting** that gives near-zero weight to the worst observations, then a sharp transition to near-maximum weight for the best observations, with the transition midpoint shifting toward better observations as the group size grows.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    \"\"\"Design the observation-weighting scheme for Optuna's TPE 'good' group.\n\n    This function is passed directly as `weights=compute_weights` to\n    `optuna.samplers.TPESampler`. It is called once per TPE iteration with\n    the size of the 'good' (below-threshold) group and must return a\n    non-negative weight array that Optuna uses to build the Parzen estimator.\n\n    Args:\n        n: Number of observations in the 'good' group (gamma(n_total) trials\n           with the lowest objective values). May be 0 if no trials exist yet.\n           Observations are ordered ascending by objective value, so index 0 is\n           the worst and index n-1 is the best in the 'good' group.\n\n    Returns:\n        weights: non-negative array of shape (n,). Larger values give that\n                 observation more influence on the Parzen estimator density.\n                 Optuna normalises the weights internally, so only relative\n                 magnitudes matter. Return an empty array when n == 0.\n    \"\"\"\n    if n == 0:\n        return np.array([])\n    \n    # Sigmoid weighting: mid point shifts toward better observations as n grows\n    indices = np.arange(n)\n    midpoint = 0.6 * n  # shift toward good observations\n    steepness = 8.0 / n  # sharper transition for larger n\n    weights = 1.0 / (1.0 + np.exp(-steepness * (indices - midpoint)))\n    # Shift so worst observations get near-zero weight\n    weights = weights - weights[0]\n    # Ensure non-negative\n    weights = np.maximum(weights, 0.0)\n    return weights",
+        "objective": null
+    },
+    {
+        "sample_order": 20,
+        "operator": "m1",
+        "algorithm": "{New algorithm: A rank\u2011based inverse quadratic weighting scheme that assigns weights proportional to \\(1/(1 + \\text{rank}^2 / k)\\) with \\(k\\) increasing linearly with group size, strongly prioritizing the very best trials while still softly including medium\u2011good ones.}",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Rank from 0 (worst) to n-1 (best)\n    rank = np.arange(n)\n    # Inverse quadratic weighting: weight = 1 / (1 + (rank / k)^2)\n    # k grows with n to gradually tighten focus on top trials\n    k = max(1, n / 4)\n    weights = 1.0 / (1.0 + (rank / k) ** 2)\n    return weights",
+        "objective": 0.35888
+    },
+    {
+        "sample_order": 21,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 22,
+        "operator": "e2",
+        "algorithm": "Use a triangular weighting scheme where weights increase linearly from the worst to the best observation, with the slope steepening as the group size grows to concentrate more density on the best points.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Linear ramp from 1 (worst) to n (best); slope increases with n for sharper focus\n    weights = np.arange(1, n + 1, dtype=float)\n    # Steepen the slope as n grows to exploit more when more data is available\n    slope_factor = 1.0 + 0.1 * np.sqrt(n)\n    weights = weights ** slope_factor\n    return weights",
+        "objective": 0.33091
+    },
+    {
+        "sample_order": 23,
+        "operator": "m1",
+        "algorithm": "\"Use a **softmin temperature schedule** that assigns exponentially decaying weights from the best observation, with the decay rate dynamically increasing as the group size grows, to progressively tighten focus on the very best trials.\"",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Temperature decreases with group size to sharpen focus\n    temp = 1.0 / max(1, np.sqrt(n))\n    # Positions from 0 (worst) to n-1 (best)\n    positions = np.arange(n)\n    # Softmin: exp(-position / temp) gives highest weight to best (last index)\n    weights = np.exp(-(n - 1 - positions) / temp)\n    return weights",
+        "objective": 0.25659
+    },
+    {
+        "sample_order": 24,
+        "operator": "m1",
+        "algorithm": "Use a **softmin-normalized inverse quadratic weight** that sharply peaks at the best observation and decays polynomially toward the worst, with a temperature schedule that increases focus as the group grows.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Inverse quadratic rank: distance from best (index n-1)\n    distances = np.arange(n - 1, -1, -1, dtype=float)  # [n-1, n-2, ..., 0]\n    # Temperature decreases with n to increase focus on best\n    temperature = 1.0 + 10.0 / np.sqrt(n)\n    # Inverse quadratic weighting, avoid division by zero for best point\n    weights = 1.0 / (1.0 + (distances / temperature) ** 2)\n    # Softmin normalization to preserve relative magnitudes\n    weights = weights / np.sum(weights)\n    return weights",
+        "objective": 0.18303
+    },
+    {
+        "sample_order": 25,
+        "operator": "m1",
+        "algorithm": "Algorithm: Use rank-based inverse weighting where each weight is proportional to 1/(rank + k), with rank 0 being the worst, and k decreasing as n grows to sharpen focus on the best observations.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Rank from 0 (worst) to n-1 (best)\n    ranks = np.arange(n)\n    # k decreases with n to intensify exploitation: k = max(1, n // 10)\n    k = max(1, n // 10)\n    weights = 1.0 / (ranks + k)\n    return weights",
+        "objective": 0.35931
+    },
+    {
+        "sample_order": 26,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 27,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 28,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 29,
+        "operator": "e2",
+        "algorithm": "The algorithm uses a harmonic-series-based weight assignment that decays from the best to the worst observation, with the harmonic order scaled by the log of group size to control exploration-exploitation trade-off.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Harmonic order: larger for larger n (more focus on best)\n    order = 1.0 + 0.5 * np.log1p(n)\n    # Positions from best (index 0 after reversal) to worst\n    positions = np.arange(1, n + 1)\n    # Harmonic weights: 1 / (position ^ order)\n    weights = 1.0 / (positions ** order)\n    # Reverse so that best (index n-1) gets highest weight\n    weights = weights[::-1]\n    return weights",
+        "objective": 0.32122
+    },
+    {
+        "sample_order": 30,
+        "operator": "m1",
+        "algorithm": "\"The algorithm uses a rank-based sigmoid weighting scheme that assigns higher weights to the best observations, with a steepness parameter that increases with group size to gradually sharpen exploitation.\"",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Rank from 0 (worst) to n-1 (best)\n    ranks = np.arange(n)\n    # Sigmoid steepness increases with n, shifting from exploration to exploitation\n    steepness = max(0.5, n / 10.0)\n    midpoint = n / 2.0\n    weights = 1 / (1 + np.exp(-steepness * (ranks - midpoint)))\n    return weights",
+        "objective": 0.27041
+    },
+    {
+        "sample_order": 31,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 32,
+        "operator": "e1",
+        "algorithm": "New algorithm: A periodic-sinusoidal weighting scheme that assigns oscillating weights with a phase shift so that later (better) observations receive progressively higher peaks, with amplitude modulation increasing with group size to enhance exploitation.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    indices = np.arange(n)\n    # Phase shift so peak aligns with best observation; frequency gives 2.5 cycles over n\n    phase = np.pi * (1 - indices / n)\n    # Amplitude grows with n to increase differentiation\n    amplitude = 0.5 + 0.1 * np.sqrt(n)\n    # Sinusoidal weights: positive bias ensures non-negative, scaled to [0.2, 1]\n    weights = 0.4 + 0.6 * (1 + np.sin(amplitude * phase)) / 2\n    return weights",
+        "objective": 0.30168
+    },
+    {
+        "sample_order": 33,
+        "operator": "e1",
+        "algorithm": "The algorithm uses a **harmonic-decay cumulative activation** where weights are computed as the logarithm of increasing block sums of a geometric series, creating a convex weighting profile that smoothly amplifies the best observations with a diminishing-returns effect as the group grows.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Generate a geometric sequence: higher values for later (better) indices\n    base = 1.0 + 2.0 / np.sqrt(n + 1)\n    raw = base ** np.arange(n)\n    # Logarithmic cumulative activation: cumulative sum then log-scale\n    cumsum = np.cumsum(raw)\n    weights = np.log(1.0 + cumsum)\n    # Normalize to sum to 1 for numerical stability (relative magnitudes preserved)\n    weights = weights / np.sum(weights)\n    return weights",
+        "objective": 0.26719
+    },
+    {
+        "sample_order": 34,
+        "operator": "e2",
+        "algorithm": "Use a **complementary sigmoid weight** that transitions from near-uniform at small n to a step-like threshold at large n, where only observations above a rank-dependent quantile receive significant mass, using a sigmoid steepness that grows with n.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Rank from 0 (worst) to 1 (best)\n    rank_fraction = np.arange(n) / (n - 1) if n > 1 else np.array([1.0])\n    # Sigmoid steepness grows with n to sharpen focus on best points\n    steepness = 2.0 * np.sqrt(n)\n    # Sigmoid centered at 0.5 (middle rank), shifted so positive slope favors high ranks\n    weights = 1.0 / (1.0 + np.exp(-steepness * (rank_fraction - 0.5)))\n    return weights",
+        "objective": 0.34495
+    },
+    {
+        "sample_order": 35,
+        "operator": "e1",
+        "algorithm": "Algorithm: Assign weights that increase linearly with the logarithm of the rank from the worst observation, then apply a convex transformation using a power exponent that adapts based on the group size to smoothly emphasize the best trials.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Rank from 0 (worst) to n-1 (best)\n    ranks = np.arange(n)\n    # Logarithmic scaling on reversed rank (distance from worst)\n    log_weights = np.log(1 + ranks + 1e-10)\n    # Power exponent that increases with n to sharpen focus on top trials\n    exponent = 1.0 + 0.5 * np.log(1 + n)\n    weights = log_weights ** exponent\n    return weights",
+        "objective": 0.28402
+    },
+    {
+        "sample_order": 36,
+        "operator": "e2",
+        "algorithm": "Use a Gaussian function whose width decays with group size, assigning exponentially decaying weight based on the observation's rank in the sorted good group.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Ranks from 0 (worst) to n-1 (best)\n    ranks = np.arange(n)\n    # Standard deviation decreases with n to focus more on the best\n    sigma = max(1.0, n / 4.0)\n    # Gaussian centered at the best observation (rank = n-1)\n    weights = np.exp(-((ranks - (n - 1)) ** 2) / (2 * sigma ** 2))\n    return weights",
+        "objective": 0.39555
+    },
+    {
+        "sample_order": 37,
+        "operator": "e2",
+        "algorithm": "Use a **cosine-shaped adaptive weighting** that applies a smooth *inverse-logistic* decay from the best to worst observations, with the decay midpoint shifting toward better observations proportionally to log(n) and the steepness adjusted by n to maintain a balance between exploration and exploitation.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Rank from 0 (worst) to n-1 (best)\n    ranks = np.arange(n)\n    # Midpoint shifts toward best as n grows (more exploitation for larger groups)\n    midpoint = n - 1 - max(1, int(np.log2(n + 1)))\n    # Steepness increases moderately with n\n    steepness = 1.5 + 0.5 * np.sqrt(n)\n    # Inverse logistic: high weight for best, sharp drop near midpoint\n    logistic = 1 / (1 + np.exp(steepness * (ranks - midpoint)))\n    # Cosinusoidal modulation to smooth the transition\n    cos_mod = 0.5 * (1 + np.cos(np.pi * (ranks - midpoint) / max(1, n - midpoint)))\n    weights = logistic * cos_mod\n    # Ensure non-negative and normalise relative scale (maintain shape)\n    weights = np.clip(weights, 1e-10, None)\n    return weights",
+        "objective": 0.43439
+    },
+    {
+        "sample_order": 38,
+        "operator": "e1",
+        "algorithm": "Adaptive sigmoid-based weighting that smoothly transitions from near-uniform for small groups to a sharp logistic cutoff favoring only the top fraction for large groups.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Sigmoid centered at a position that shifts toward the best as n grows\n    # steepness increases with n to sharpen the cutoff\n    center = 0.7 * n  # focus on top 30% on average, shifts toward best with n\n    steepness = 2.0 + 0.5 * np.sqrt(n)\n    indices = np.arange(n)\n    # Sigmoid: high weight for indices above center (better observations)\n    weights = 1.0 / (1.0 + np.exp(-steepness * (indices - center) / n))\n    return weights",
+        "objective": 0.34779
+    },
+    {
+        "sample_order": 39,
+        "operator": "m1",
+        "algorithm": "'Use a **logistic softplus weight** that combines an inverse-quadratic decay from the best observation with a sigmoid-like ramp that flattens for the top 10% of points, using a temperature that cools inversely with the square root of n to sharpen focus as the group grows.'",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    distances = np.arange(n - 1, -1, -1, dtype=float)\n    temperature = 1.0 + 10.0 / np.sqrt(n)\n    inv_quad = 1.0 / (1.0 + (distances / temperature) ** 2)\n    # Logistic softplus: flat for top 10%, then sigmoid decay\n    top_k = max(1, n // 10)\n    sigmoid_scale = 5.0 / np.sqrt(n)\n    logistic = 1.0 - 1.0 / (1.0 + np.exp(-(distances - (n - top_k)) / sigmoid_scale))\n    weights = inv_quad * logistic\n    # ensure non-negative and avoid zero for best point\n    weights = np.maximum(weights, 1e-10)\n    weights = weights / np.sum(weights)\n    return weights",
+        "objective": 0.12039
+    },
+    {
+        "sample_order": 40,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 41,
+        "operator": "e2",
+        "algorithm": "Use a **sigmoid-shaped weight** that transitions from nearly uniform for small groups to sharply focused on the top few observations for large groups, with the sigmoid midpoint shifting toward the best observations as `n` increases.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Rank from 0 (worst) to n-1 (best)\n    ranks = np.arange(n, dtype=float)\n    # Midpoint shifts toward best as n grows: start at center, move to 0.8*n\n    midpoint = 0.5 * n + 0.3 * min(n, 50)\n    # Steepness increases with n to sharpen focus\n    steepness = 0.2 + 0.02 * n\n    # Sigmoid: high weight near best, low near worst\n    weights = 1.0 / (1.0 + np.exp(-steepness * (ranks - midpoint)))\n    return weights",
+        "objective": 0.32228
+    },
+    {
+        "sample_order": 42,
+        "operator": "e2",
+        "algorithm": "The algorithm applies a rank-scaled Cauchy kernel where the scale decays with \\( n \\) and the weights are normalized by softmax with a temperature proportional to the entropy of the current weight distribution.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    ranks = np.arange(n, dtype=float)\n    # Cauchy kernel centered at best (rank n-1), scale decays with n\n    scale = max(1.0, 0.5 * n ** 0.4)\n    raw = 1.0 / (1.0 + ((ranks - (n - 1)) / scale) ** 2)\n    # Adaptive temperature using entropy\n    p = raw / (raw.sum() + 1e-10)\n    entropy = -np.sum(p * np.log(p + 1e-10)) / np.log(n)\n    temperature = 0.5 + 0.5 * entropy\n    weights = np.exp(raw / temperature)\n    return weights",
+        "objective": null
+    },
+    {
+        "sample_order": 43,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 44,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 45,
+        "operator": "e2",
+        "algorithm": "My new algorithm uses a piecewise linear weighting scheme with a dynamic knee point that shifts toward the best observations as the group size grows, combined with an inverse-quadratic decay from the best observation to penalize worse ones more aggressively.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Rank from 0 (worst) to n-1 (best)\n    ranks = np.arange(n)\n    # Dynamic knee point: shifts toward best as n grows (more exploitation)\n    knee = n - 1 - max(1, int(np.sqrt(n)))\n    # Inverse-quadratic decay from best to worst, scaled by distance to knee\n    dist_to_best = n - 1 - ranks\n    weights = 1.0 / (1.0 + (dist_to_best / (n - knee + 1e-10)) ** 2)\n    return weights",
+        "objective": 0.33732
+    },
+    {
+        "sample_order": 46,
+        "operator": "e1",
+        "algorithm": "Adaptive inverse power-law weights with a dynamic exponent that increases logarithmically with group size, emphasizing the top few observations while maintaining a heavy-tailed influence for the remainder.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Rank from 0 (worst) to n-1 (best)\n    ranks = np.arange(n, dtype=float)\n    # Exponent grows logarithmically with n: slower for small n, faster for large n\n    exponent = 0.5 + 0.5 * np.log1p(n)\n    # Inverse power-law: weight decays as (n - rank)^(-exponent), with highest weight at best (rank=n-1)\n    order = n - 1 - ranks  # 0 for best, n-1 for worst\n    weights = 1.0 / (1.0 + order) ** exponent\n    # Ensure non-negative\n    weights = np.maximum(weights, 1e-10)\n    return weights",
+        "objective": 0.29521
+    },
+    {
+        "sample_order": 47,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 48,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    }
+]

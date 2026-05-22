@@ -1,0 +1,43 @@
+SA Acceptance Probability - Evaluation Results
+max_iter=5000  sigma_ratio=0.02  T_ratio=1e-3  n_runs=10
+-------------------------------------------------------------------------------------------
+  Heuristic                        | Function     Dim |      Mean best           Std  log1p
+-------------------------------------------------------------------------------------------
+  Baseline (Boltzmann)             | sphere        10D | mean:       0.0749  std:     0.0150  log1p: 0.0722
+  Baseline (Boltzmann)             | sphere        20D | mean:       0.3580  std:     0.0934  log1p: 0.3060
+  Baseline (Boltzmann)             | rastrigin     10D | mean:      60.6408  std:    18.4770  log1p: 4.1213
+  Baseline (Boltzmann)             | rastrigin     20D | mean:     164.2674  std:    23.7620  log1p: 5.1076
+  Baseline (Boltzmann)             | ackley        10D | mean:       8.1639  std:     7.5487  log1p: 2.2153
+  Baseline (Boltzmann)             | ackley        20D | mean:      10.8534  std:     7.5072  log1p: 2.4726
+  Baseline (Boltzmann)             | rosenbrock    10D | mean:       7.6246  std:     1.3351  log1p: 2.1546
+  Baseline (Boltzmann)             | rosenbrock    20D | mean:      30.3423  std:    16.7401  log1p: 3.4450
+  Baseline (Boltzmann)             | griewank      10D | mean:       1.1705  std:     0.0757  log1p: 0.7750
+  Baseline (Boltzmann)             | griewank      20D | mean:       2.2199  std:     0.3103  log1p: 1.1694
+  OVERALL Baseline (Boltzmann)     | mean log1p score: 2.1839
+-------------------------------------------------------------------------------------------
+  EoH heuristic                    | sphere        10D | mean:       0.0645  std:     0.0141  log1p: 0.0625
+  EoH heuristic                    | sphere        20D | mean:       0.3803  std:     0.0457  log1p: 0.3223
+  EoH heuristic                    | rastrigin     10D | mean:      52.4112  std:    15.9328  log1p: 3.9780
+  EoH heuristic                    | rastrigin     20D | mean:     149.1523  std:    23.2073  log1p: 5.0117
+  EoH heuristic                    | ackley        10D | mean:       8.0261  std:     7.7075  log1p: 2.2001
+  EoH heuristic                    | ackley        20D | mean:      12.4959  std:     7.7153  log1p: 2.6024
+  EoH heuristic                    | rosenbrock    10D | mean:       7.4348  std:     1.7181  log1p: 2.1324
+  EoH heuristic                    | rosenbrock    20D | mean:      25.2026  std:     1.5362  log1p: 3.2659
+  EoH heuristic                    | griewank      10D | mean:       1.1499  std:     0.0428  log1p: 0.7654
+  EoH heuristic                    | griewank      20D | mean:       2.3059  std:     0.1575  log1p: 1.1957
+  OVERALL EoH heuristic            | mean log1p score: 2.1536
+-------------------------------------------------------------------------------------------
+
+  Per-benchmark improvement (EoH vs Boltzmann, lower log1p = better):
+  BETTER  sphere        10D  gain: +0.0097  (0.0749 → 0.0645)
+  WORSE   sphere        20D  gain: -0.0163  (0.3580 → 0.3803)
+  BETTER  rastrigin     10D  gain: +0.1433  (60.6408 → 52.4112)
+  BETTER  rastrigin     20D  gain: +0.0959  (164.2674 → 149.1523)
+  BETTER  ackley        10D  gain: +0.0151  (8.1639 → 8.0261)
+  WORSE   ackley        20D  gain: -0.1298  (10.8534 → 12.4959)
+  BETTER  rosenbrock    10D  gain: +0.0223  (7.6246 → 7.4348)
+  BETTER  rosenbrock    20D  gain: +0.1791  (30.3423 → 25.2026)
+  BETTER  griewank      10D  gain: +0.0096  (1.1705 → 1.1499)
+  WORSE   griewank      20D  gain: -0.0263  (2.2199 → 2.3059)
+
+  Overall log1p score: baseline 2.1839  →  EoH 2.1536  (Δ -0.0303)

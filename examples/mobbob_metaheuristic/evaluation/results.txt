@@ -1,0 +1,28 @@
+Multi-Objective BBOB Metaheuristic — Evaluation Results
+dim=10  budget=5000  n_instances=6  n_runs=5  ref_pt=(1.1, 1.1)
+------------------------------------------------------------------------------------------------------
+  Heuristic                                | Instance               |        HV (mean ± std)   PF size
+------------------------------------------------------------------------------------------------------
+  Baseline (scalarized ES)                 | sphere+rastrigin       | HV: 1.0717 ± 0.0294  PF size:   99.7
+  Baseline (scalarized ES)                 | rastrigin+ackley       | HV: 0.8889 ± 0.0017  PF size:   99.7
+  Baseline (scalarized ES)                 | ackley+sphere          | HV: 0.8249 ± 0.0081  PF size:  100.0
+  Baseline (scalarized ES)                 | sphere+ackley          | HV: 0.8432 ± 0.0132  PF size:  100.0
+  Baseline (scalarized ES)                 | rastrigin+sphere       | HV: 1.0942 ± 0.0091  PF size:  100.0
+  OVERALL Baseline (scalarized ES)         | mean HV: 0.9446
+------------------------------------------------------------------------------------------------------
+  EoH metaheuristic                        | sphere+rastrigin       | HV: 1.0603 ± 0.0354  PF size:  200.0
+  EoH metaheuristic                        | rastrigin+ackley       | HV: 0.8155 ± 0.0369  PF size:  130.0
+  EoH metaheuristic                        | ackley+sphere          | HV: 0.7404 ± 0.0799  PF size:  217.7
+  EoH metaheuristic                        | sphere+ackley          | HV: 0.8339 ± 0.0144  PF size:  261.3
+  EoH metaheuristic                        | rastrigin+sphere       | HV: 1.0392 ± 0.0377  PF size:  186.3
+  OVERALL EoH metaheuristic                | mean HV: 0.8979
+------------------------------------------------------------------------------------------------------
+
+  Per-instance HV improvement (EoH vs baseline, higher HV = better):
+  WORSE   sphere+rastrigin        ΔHV: -0.0113 (-1.06%)  (1.0717 → 1.0603)
+  WORSE   rastrigin+ackley        ΔHV: -0.0734 (-8.26%)  (0.8889 → 0.8155)
+  WORSE   ackley+sphere           ΔHV: -0.0845 (-10.24%)  (0.8249 → 0.7404)
+  WORSE   sphere+ackley           ΔHV: -0.0093 (-1.10%)  (0.8432 → 0.8339)
+  WORSE   rastrigin+sphere        ΔHV: -0.0550 (-5.03%)  (1.0942 → 1.0392)
+
+  Overall HV gain vs baseline: -4.95%  (0.9446 → 0.8979)

@@ -1,0 +1,19 @@
+Tabu Search TSP — Move Scoring Function Evaluation
+n_iter=500  tabu_tenure=7  n_runs=10  instances: 10×20-node + 10×30-node
+---------------------------------------------------------------------------------------
+  Heuristic                            | Size    |    Mean cost         Std    Per-node
+---------------------------------------------------------------------------------------
+  Baseline (best non-tabu)             | 20-node | mean:    411.127  std:   27.689  per-node: 20.556
+  Baseline (best non-tabu)             | 30-node | mean:    474.745  std:   20.247  per-node: 15.825
+  OVERALL Baseline (best non-tabu)     | mean per-node cost: 18.191
+---------------------------------------------------------------------------------------
+  EoH heuristic                        | 20-node | mean:    405.231  std:   20.989  per-node: 20.262
+  EoH heuristic                        | 30-node | mean:    466.672  std:   16.990  per-node: 15.556
+  OVERALL EoH heuristic                | mean per-node cost: 17.909
+---------------------------------------------------------------------------------------
+
+  Per-group improvement (EoH vs Baseline, lower per-node cost = better):
+  BETTER  20-node  gain: +0.295  (20.556 → 20.262)
+  BETTER  30-node  gain: +0.269  (15.825 → 15.556)
+
+  Overall mean per-node cost: baseline 18.191  →  EoH 17.909  (Δ -0.282)

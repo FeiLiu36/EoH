@@ -1,0 +1,7 @@
+{
+    "sample_order": 64,
+    "operator": "e1",
+    "algorithm": "The algorithm computes a compound acquisition score by combining a rank-based exploitation term with a sigmoid-gated information gain that amplifies exploration for points whose mean is slightly above the best, then further weights this by a Boltzmann exploration factor based on sigma.",
+    "code": "import numpy as np\nfrom scipy.special import erf\n\ndef acquisition(mu: np.ndarray, sigma: np.ndarray, f_best: float) -> np.ndarray:\n    # Exploitation: rank-based, lower mean gets higher score\n    ranks = np.argsort(np.argsort(mu))  # 0 for smallest mu\n    exploit = -ranks / len(mu)\n    \n    # Distance from best\n    diff = mu - f_best\n    # Sigmoid gate: high when diff is near 0 (close to best), decays for large diff\n    gate = 1.0 / (1.0 + np.exp(2.0 * diff))  # sigmoid decreasing with diff\n    \n    # Information gain: sigma * gate, but weighted by a Boltzmann-like factor\n    boltzmann_factor = np.exp(sigma / (np.max(sigma) + 1e-10))\n    explore = sigma * gate * boltzmann_factor\n    \n    # Combine with temperature decay based on sigma quantile\n    q = np.percentile(sigma, 50)  # median sigma\n    temperature = 1.0 / (1.0 + q)\n    score = temperature * exploit + (1.0 - temperature) * explore\n    \n    return score",
+    "objective": -1.23093
+}

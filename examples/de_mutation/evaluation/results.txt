@@ -1,0 +1,41 @@
+DE Mutation Operator – Evaluation Results
+pop_size=50  max_evals=20000  n_runs=10  F=0.5  CR=0.9
+-----------------------------------------------------------------------------------------
+  Heuristic                      | Function     Dim |      Mean best           Std  log1p
+-----------------------------------------------------------------------------------------
+  Baseline (DE/rand/1)           | sphere        10D | mean:       0.0000  std:     0.0000  log1p: 0.0000
+  Baseline (DE/rand/1)           | sphere        20D | mean:       0.0000  std:     0.0000  log1p: 0.0000
+  Baseline (DE/rand/1)           | rastrigin     10D | mean:      27.2646  std:     4.6147  log1p: 3.3416
+  Baseline (DE/rand/1)           | rastrigin     20D | mean:     104.0246  std:     8.9225  log1p: 4.6542
+  Baseline (DE/rand/1)           | ackley        10D | mean:       0.0000  std:     0.0000  log1p: 0.0000
+  Baseline (DE/rand/1)           | ackley        20D | mean:       0.0003  std:     0.0001  log1p: 0.0003
+  Baseline (DE/rand/1)           | rosenbrock    10D | mean:       3.5392  std:     0.8359  log1p: 1.5128
+  Baseline (DE/rand/1)           | rosenbrock    20D | mean:      14.8118  std:     1.0508  log1p: 2.7608
+  Baseline (DE/rand/1)           | griewank      10D | mean:       0.2142  std:     0.1144  log1p: 0.1941
+  Baseline (DE/rand/1)           | griewank      20D | mean:       0.0067  std:     0.0101  log1p: 0.0067
+  OVERALL Baseline (DE/rand/1)   | mean log1p score: 1.2470
+-----------------------------------------------------------------------------------------
+  EoH heuristic                  | sphere        10D | mean:       0.0000  std:     0.0000  log1p: 0.0000
+  EoH heuristic                  | sphere        20D | mean:       0.0000  std:     0.0000  log1p: 0.0000
+  EoH heuristic                  | rastrigin     10D | mean:      27.2646  std:     4.6147  log1p: 3.3416
+  EoH heuristic                  | rastrigin     20D | mean:     104.0246  std:     8.9225  log1p: 4.6542
+  EoH heuristic                  | ackley        10D | mean:       0.0000  std:     0.0000  log1p: 0.0000
+  EoH heuristic                  | ackley        20D | mean:       0.0003  std:     0.0001  log1p: 0.0003
+  EoH heuristic                  | rosenbrock    10D | mean:       3.5392  std:     0.8359  log1p: 1.5128
+  EoH heuristic                  | rosenbrock    20D | mean:      14.8118  std:     1.0508  log1p: 2.7608
+  EoH heuristic                  | griewank      10D | mean:       0.2142  std:     0.1144  log1p: 0.1941
+  EoH heuristic                  | griewank      20D | mean:       0.0067  std:     0.0101  log1p: 0.0067
+  OVERALL EoH heuristic          | mean log1p score: 1.2470
+-----------------------------------------------------------------------------------------
+
+  Per-benchmark improvement (EoH vs baseline, lower log1p = better):
+  WORSE   sphere        10D  gain: +0.0000  (0.0000 → 0.0000)
+  WORSE   sphere        20D  gain: +0.0000  (0.0000 → 0.0000)
+  WORSE   rastrigin     10D  gain: +0.0000  (27.2646 → 27.2646)
+  WORSE   rastrigin     20D  gain: +0.0000  (104.0246 → 104.0246)
+  WORSE   ackley        10D  gain: +0.0000  (0.0000 → 0.0000)
+  WORSE   ackley        20D  gain: +0.0000  (0.0003 → 0.0003)
+  WORSE   rosenbrock    10D  gain: +0.0000  (3.5392 → 3.5392)
+  WORSE   rosenbrock    20D  gain: +0.0000  (14.8118 → 14.8118)
+  WORSE   griewank      10D  gain: +0.0000  (0.2142 → 0.2142)
+  WORSE   griewank      20D  gain: +0.0000  (0.0067 → 0.0067)

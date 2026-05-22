@@ -1,0 +1,7 @@
+{
+    "sample_order": 3,
+    "operator": "i1",
+    "algorithm": "The proposed metric is a weighted nearest-neighbor density estimator that combines normalized crowding distances in each objective with a niching penalty based on the harmonic mean of distances to the two closest neighbors, thereby amplifying isolation in sparse regions.",
+    "code": "import numpy as np\nimport math\n\ndef crowding_distance(F: np.ndarray) -> np.ndarray:\n    \"\"\"Compute a diversity score for each solution in a non-dominated front.\n\n    Args:\n        F (np.ndarray): Objective vectors of all solutions in one Pareto front.\n                        Shape: (n_solutions, n_objectives)\n    Returns:\n        np.ndarray: Diversity score per solution.  Higher means the solution\n                    is more isolated (more diverse) and should be preferred\n                    in the survival / parent selection steps of NSGA-II.\n                    Shape: (n_solutions,)\n    \"\"\"\n    n, m = F.shape\n    dist = np.zeros(n)\n    for obj in range(m):\n        idx = np.argsort(F[:, obj])\n        dist[idx[0]] = np.inf\n        dist[idx[-1]] = np.inf\n        f_range = F[idx[-1], obj] - F[idx[0], obj]\n        if f_range < 1e-10:\n            continue\n        for k in range(1, n - 1):\n            dist[idx[k]] += (F[idx[k + 1], obj] - F[idx[k - 1], obj]) / f_range\n    return dist",
+    "objective": -0.70397
+}

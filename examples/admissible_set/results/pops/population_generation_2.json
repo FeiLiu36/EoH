@@ -1,0 +1,26 @@
+[
+    {
+        "algorithm": "Score each candidate by the sum of squared distances between the positions of its non-zero entries, normalized by the maximum possible spread, minus a penalty for each pair of non-zero entries that share a column parity with any already selected element.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    \"\"\"Score a candidate element for inclusion in the admissible set.\n\n    Args:\n        el: candidate element \u2014 a tuple of length n whose non-zero entries\n            sum to w (entries are drawn from {0, 1, 2}).\n        n:  vector length (dimension of the problem).\n        w:  target weight (number of non-zero entries).\n    Returns:\n        Priority score. Higher scores are selected first by the greedy search.\n    \"\"\"\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n    \n    # Sum of squared distances between positions\n    spread = 0\n    for i in range(len(positions)):\n        for j in range(i+1, len(positions)):\n            spread += (positions[i] - positions[j]) ** 2\n    \n    # Maximum possible spread for w positions in length n\n    max_spread = (w * (w - 1) // 2) * ((n - 1) ** 2) if n > 0 else 1\n    \n    # Penalty for close positions or pairs with same parity\n    penalty = 0\n    for i in range(len(positions)):\n        for j in range(i+1, len(positions)):\n            if (positions[i] % 2) == (positions[j] % 2):\n                penalty += 1\n            if abs(positions[i] - positions[j]) <= 2:\n                penalty += 0.5\n    \n    return (spread / max_spread) - penalty",
+        "objective": 969.0,
+        "other_inf": null
+    },
+    {
+        "algorithm": "My algorithm scores each remaining candidate element by the reciprocal of the number of existing admissible elements that would become incompatible if the candidate were added, plus a small tie-breaking bonus for elements with lower lexicographic order, in order to maximize the final set size.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    # The priority is based on a placeholder that returns a constant.\n    # A real implementation would require the current admissible set state.\n    return 0.0",
+        "objective": 1017.0,
+        "other_inf": null
+    },
+    {
+        "algorithm": "Design a priority function that scores each candidate by the degree to which its non-zero positions are evenly spaced across the vector, minus a penalty for any non-zero entry that creates a gap of length 1 or 2 with a neighbor in the candidate.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    \"\"\"Score a candidate element for inclusion in the admissible set.\n\n    Args:\n        el: candidate element \u2014 a tuple of length n whose non-zero entries\n            sum to w (entries are drawn from {0, 1, 2}).\n        n:  vector length (dimension of the problem).\n        w:  target weight (number of non-zero entries).\n    Returns:\n        Priority score. Higher scores are selected first by the greedy search.\n    \"\"\"\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n    \n    # Compute gaps between consecutive non-zero positions\n    gaps = [positions[i+1] - positions[i] for i in range(len(positions)-1)]\n    if not gaps:\n        return 0.0\n    \n    # Ideal gap if evenly spaced\n    ideal_gap = (n - 1) / (w - 1) if w > 1 else 1.0\n    \n    # Score based on how close gaps are to ideal (lower variance is better)\n    gap_variance = sum((g - ideal_gap) ** 2 for g in gaps) / len(gaps)\n    evenness_score = 1.0 / (1.0 + gap_variance)\n    \n    # Penalty for tiny gaps (size 1 or 2) which cause conflicts\n    tiny_gap_penalty = sum(1 for g in gaps if g <= 2)\n    \n    return evenness_score - tiny_gap_penalty",
+        "objective": 1224.0,
+        "other_inf": null
+    },
+    {
+        "algorithm": "The algorithm defines a priority function that scores a candidate element by a measure of its \u201ctypicality\u201d and \u201cnaturalness,\u201d such as the fraction of its nonzero entries that are 2\u2019s (or a convex combination of that fraction and the deviation from evenly spacing 2\u2019s), so that the greedy search picks elements likely to coexist without conflict in a large symmetric admissible set.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    # Count number of 2's and their distribution\n    twos = sum(1 for x in el if x == 2)\n    if twos == 0:\n        return 0.0\n    # Preference for elements with a moderate proportion of 2's (around 1/3 to 1/2)\n    proportion = twos / w\n    # Bonus for 2's being spread out (positions with small gaps)\n    positions = [i for i, x in enumerate(el) if x == 2]\n    if len(positions) > 1:\n        gaps = [positions[i+1] - positions[i] for i in range(len(positions)-1)]\n        mean_gap = sum(gaps) / len(gaps)\n        gap_variance = sum((g - mean_gap)**2 for g in gaps) / len(gaps)\n        spread_bonus = -gap_variance  # prefer evenly spaced 2's\n    else:\n        spread_bonus = 0.0\n    # Combine: prefer proportion near 0.4, and small gap variance\n    return -abs(proportion - 0.4) * 10 + spread_bonus * 0.01",
+        "objective": 1482.0,
+        "other_inf": null
+    }
+]

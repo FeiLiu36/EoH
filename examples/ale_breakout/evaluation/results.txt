@@ -1,0 +1,3 @@
+Breakout evaluation — 20 episodes, max 5000 steps/episode
+------------------------------------------------------------------------------------------
+baseline (ball-tracking)       | mean:   47.10  std:  41.14  best:    211  worst:    15  time: 4.4s

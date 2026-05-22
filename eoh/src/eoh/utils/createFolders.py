@@ -1,23 +1,13 @@
+# Copyright (c) 2026 Fei Liu. MIT License.
+# Project: https://github.com/FeiLiu36/EoH
+# Citation: Fei Liu, Xialiang Tong, Mingxuan Yuan, Xi Lin, Fu Luo, Zhenkun Wang, Zhichao Lu,
+#           Qingfu Zhang, Evolution of Heuristics: Towards Efficient Automatic Algorithm Design
+#           Using Large Language Model, Forty-first International Conference on Machine Learning
+#           (ICML), 2024.
+
 import os
-import shutil
-def create_folders(results_path):
-    # Specify the path where you want to create the folder
-    folder_path = os.path.join(results_path, "results")
-
-    # Check if the folder already exists
-    if not os.path.exists(folder_path):
-        # Remove the existing folder and its contents
-        #shutil.rmtree(folder_path)
-
-        # Create the main folder "results"
-        os.makedirs(folder_path)
-
-    # Create subfolders inside "results"
-    subfolders = ["history", "pops", "pops_best"]
-    for subfolder in subfolders:
-        subfolder_path = os.path.join(folder_path, subfolder)
-        if not os.path.exists(subfolder_path):
-            os.makedirs(subfolder_path)
 
 
-    #print("Results folders created successfully!")
+def create_folders(output_dir: str) -> None:
+    for subdir in ("results", "results/pops", "results/pops_best", "results/samples"):
+        os.makedirs(os.path.join(output_dir, subdir), exist_ok=True)

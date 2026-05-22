@@ -1,0 +1,7 @@
+{
+    "sample_order": 78,
+    "operator": "m1",
+    "algorithm": "The new algorithm selects the next customer by maximizing the product of the squared distance from the depot and the inverse of the distance from the current node, weighted by the cube of the remaining capacity fraction, to prioritize far, high-demand customers while keeping routes compact.",
+    "code": "def select_next_node(current_node: int, depot: int, unvisited_nodes: np.ndarray,\n                     rest_capacity: float, demands: np.ndarray,\n                     distance_matrix: np.ndarray) -> int:\n    if len(unvisited_nodes) == 0:\n        return depot\n    dist_current = distance_matrix[current_node][unvisited_nodes]\n    dist_depot = distance_matrix[depot][unvisited_nodes]\n    capacity_ratio = (rest_capacity / (np.max(demands[unvisited_nodes]) + 1e-10)) ** 3\n    score = ((dist_depot ** 2) / (dist_current + 1e-10)) * capacity_ratio\n    return unvisited_nodes[np.argmax(score)]",
+    "objective": 13.23735
+}

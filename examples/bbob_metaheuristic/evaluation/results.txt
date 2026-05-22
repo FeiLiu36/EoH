@@ -1,0 +1,43 @@
+BBOB Metaheuristic Design — Full Evaluation
+budget=10000  n_runs=10  dims: 10-D & 20-D
+----------------------------------------------------------------------------------------------------
+  Metaheuristic                        | Function     Dim  |        Mean best             Std  log1p
+----------------------------------------------------------------------------------------------------
+  Baseline ((1+lam)-ES)                | sphere        10-D | mean:         0.0000  std:       0.0000  log1p: 0.0000
+  Baseline ((1+lam)-ES)                | sphere        20-D | mean:         0.3958  std:       0.4814  log1p: 0.3334
+  Baseline ((1+lam)-ES)                | rastrigin     10-D | mean:        55.5184  std:      22.5650  log1p: 4.0346
+  Baseline ((1+lam)-ES)                | rastrigin     20-D | mean:       134.2475  std:      22.9983  log1p: 4.9071
+  Baseline ((1+lam)-ES)                | ackley        10-D | mean:         6.1000  std:       7.3024  log1p: 1.9601
+  Baseline ((1+lam)-ES)                | ackley        20-D | mean:        16.0824  std:       4.6727  log1p: 2.8380
+  Baseline ((1+lam)-ES)                | rosenbrock    10-D | mean:        13.4503  std:      18.0154  log1p: 2.6707
+  Baseline ((1+lam)-ES)                | rosenbrock    20-D | mean:       117.3727  std:      40.0532  log1p: 4.7738
+  Baseline ((1+lam)-ES)                | griewank      10-D | mean:         0.1445  std:       0.1004  log1p: 0.1349
+  Baseline ((1+lam)-ES)                | griewank      20-D | mean:         2.3176  std:       1.6721  log1p: 1.1993
+  OVERALL Baseline ((1+lam)-ES)        | mean log1p score: 2.2852
+----------------------------------------------------------------------------------------------------
+  EoH metaheuristic                    | sphere        10-D | mean:         0.0020  std:       0.0008  log1p: 0.0020
+  EoH metaheuristic                    | sphere        20-D | mean:         0.0132  std:       0.0023  log1p: 0.0131
+  EoH metaheuristic                    | rastrigin     10-D | mean:         7.4445  std:       3.6427  log1p: 2.1335
+  EoH metaheuristic                    | rastrigin     20-D | mean:        12.7866  std:       3.4185  log1p: 2.6237
+  EoH metaheuristic                    | ackley        10-D | mean:         0.5512  std:       0.1177  log1p: 0.4390
+  EoH metaheuristic                    | ackley        20-D | mean:         1.5870  std:       0.2103  log1p: 0.9505
+  EoH metaheuristic                    | rosenbrock    10-D | mean:         7.7329  std:       0.3087  log1p: 2.1671
+  EoH metaheuristic                    | rosenbrock    20-D | mean:        18.3727  std:       0.7612  log1p: 2.9639
+  EoH metaheuristic                    | griewank      10-D | mean:         0.8311  std:       0.0768  log1p: 0.6049
+  EoH metaheuristic                    | griewank      20-D | mean:         1.0434  std:       0.0074  log1p: 0.7146
+  OVERALL EoH metaheuristic            | mean log1p score: 1.2612
+----------------------------------------------------------------------------------------------------
+
+  Per-benchmark improvement (EoH vs baseline, lower log1p = better):
+  WORSE   sphere        10-D  gain: -0.0020  (0.0000 → 0.0020)
+  BETTER  sphere        20-D  gain: +0.3203  (0.3958 → 0.0132)
+  BETTER  rastrigin     10-D  gain: +1.9011  (55.5184 → 7.4445)
+  BETTER  rastrigin     20-D  gain: +2.2834  (134.2475 → 12.7866)
+  BETTER  ackley        10-D  gain: +1.5211  (6.1000 → 0.5512)
+  BETTER  ackley        20-D  gain: +1.8875  (16.0824 → 1.5870)
+  BETTER  rosenbrock    10-D  gain: +0.5036  (13.4503 → 7.7329)
+  BETTER  rosenbrock    20-D  gain: +1.8100  (117.3727 → 18.3727)
+  WORSE   griewank      10-D  gain: -0.4700  (0.1445 → 0.8311)
+  BETTER  griewank      20-D  gain: +0.4846  (2.3176 → 1.0434)
+
+  Overall log1p score: baseline 2.2852  →  EoH 1.2612  (Δ -1.0240)

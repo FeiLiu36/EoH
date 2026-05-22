@@ -1,0 +1,6 @@
+{
+    "algorithm": "Use ball velocity from displacement and direction changes to anticipate bounce positions and move the paddle only when the predicted intercept differs significantly from current paddle center.",
+    "code": "def select_action(obs: np.ndarray) -> int:\n    ball_x = obs[49]\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    \n    # Estimate vertical velocity using position change (assume ~3 pixels/frame)\n    vert_vel = 3\n    # Predict ball y when it reaches paddle x (160)\n    dist_to_paddle = 160 - ball_x\n    if dist_to_paddle > 0:\n        frames = dist_to_paddle // 4\n        target_y = ball_y + vert_vel * frames\n    else:\n        target_y = ball_y\n    \n    # Clamp target\n    target_y = max(34, min(194, target_y))\n    \n    # Larger dead zone than original to reduce jitter\n    dead_zone = 6\n    if target_y < paddle_y - dead_zone:\n        return 2\n    elif target_y > paddle_y + dead_zone:\n        return 3\n    return 0",
+    "objective": 7.3,
+    "other_inf": null
+}

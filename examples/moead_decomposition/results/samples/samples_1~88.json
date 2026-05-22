@@ -1,0 +1,618 @@
+[
+    {
+        "sample_order": 1,
+        "operator": "i1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 2,
+        "operator": "i1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 3,
+        "operator": "i1",
+        "algorithm": "This new decomposition function, Adaptive Penalty-Boundary Intersection (APBI), dynamically adjusts the penalty based on the solution's distance from the weight vector and the current distribution of the population to promote both convergence and diversity.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    # Adaptive Penalty-Boundary Intersection (APBI)\n    n_solutions, n_obj = F.shape\n    \n    # Shift objectives by ideal point\n    shifted = F - ideal_point\n    \n    # Compute d1: distance along weight direction (projection)\n    weights_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (weights_norm + 1e-10)\n    d1 = np.sum(shifted * w_unit, axis=1)\n    \n    # Compute d2: perpendicular distance to weight vector\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n    \n    # Adaptive penalty factor: higher when d2 is large relative to d1\n    # Encourages diversity by penalizing solutions far from the weight direction\n    adaptive_theta = 1.0 + 0.5 * (d2 / (d1 + 1e-10))\n    \n    # Combine: minimize d1 (convergence) and penalize large d2 (diversity control)\n    score = d1 + adaptive_theta * d2\n    \n    # Handle edge cases where d1 is negative (solution dominates ideal point)\n    score = np.where(d1 < 0, d1 - d2 * 0.1, score)\n    \n    return score",
+        "objective": -7.1728
+    },
+    {
+        "sample_order": 4,
+        "operator": "i1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 5,
+        "operator": "i1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 6,
+        "operator": "i1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 7,
+        "operator": "i1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 8,
+        "operator": "i1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 9,
+        "operator": "e2",
+        "algorithm": "The new decomposition uses an entropy-based curvature correction on the normalized objective vector before computing a weighted sum, where the curvature adapts based on the solution's relative spread across objectives to balance convergence and distribution.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    n_solutions, n_obj = F.shape\n    \n    # Shift objectives by ideal point\n    shifted = F - ideal_point\n    \n    # Normalize shifted objectives to unit length per solution\n    norm_shifted = np.linalg.norm(shifted, axis=1, keepdims=True) + 1e-10\n    shifted_unit = shifted / norm_shifted\n    \n    # Compute entropy-like spread: high when objectives are balanced\n    # Use squared components to avoid log(0)\n    p = shifted_unit ** 2\n    entropy = -np.sum(p * np.log(p + 1e-10), axis=1)\n    \n    # Curvature factor: low entropy (one dominant objective) => keep linear\n    # high entropy (balanced) => apply concave transformation for better diversity\n    curvature = 1.0 + 0.3 * (1.0 - np.exp(-entropy))\n    \n    # Apply curvature transformation along each objective\n    # Use power transform where power = 1/curvature\n    transformed = np.sign(shifted) * (np.abs(shifted) ** (1.0 / curvature[:, np.newaxis]))\n    \n    # Weighted sum on transformed space\n    score = np.sum(weights * transformed, axis=1)\n    \n    return score",
+        "objective": -6.9978
+    },
+    {
+        "sample_order": 10,
+        "operator": "m1",
+        "algorithm": "This new decomposition, Adaptive Cosine-Penalized Projection (ACPP), modifies the PBI approach by using the cosine similarity between the solution vector and the weight vector to adaptively penalize divergence, promoting diversity while maintaining strong convergence.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\n\n    Args:\n        F (np.ndarray): Objective vectors of a batch of solutions.\n                        Shape: (n_solutions, n_objectives)\n        weights (np.ndarray): Weight vectors for the corresponding subproblems.\n                              Shape: (n_solutions, n_objectives)\n        ideal_point (np.ndarray): Best objective value found so far per objective.\n                                  Shape: (n_objectives,)\n    Returns:\n        np.ndarray: Scalar aggregation score per solution (lower means the\n                    solution is better for the given subproblem).\n                    Shape: (n_solutions,)\n    \"\"\"\n    # Adaptive Cosine-Penalized Projection (ACPP)\n    n_solutions, n_obj = F.shape\n    \n    # Shift objectives by ideal point\n    shifted = F - ideal_point\n    \n    # Normalize weight vectors\n    weights_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (weights_norm + 1e-10)\n    \n    # Compute d1: projection onto weight direction\n    d1 = np.sum(shifted * w_unit, axis=1)\n    \n    # Compute cosine similarity between shifted solution and weight direction\n    shifted_norm = np.linalg.norm(shifted, axis=1)\n    cos_sim = np.sum(shifted * w_unit, axis=1) / (shifted_norm + 1e-10)\n    cos_sim = np.clip(cos_sim, -1.0, 1.0)\n    \n    # Adaptive penalty based on cosine: penalize low similarity (divergence)\n    # Use exponential scaling to harshly penalize misalignment\n    penalty = np.exp(-2.0 * cos_sim)\n    \n    # Compute d2: perpendicular distance\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n    \n    # Combine: d1 for convergence, adaptive penalty on d2 for diversity\n    score = d1 + penalty * d2\n    \n    # Handle negative d1 (dominating solutions)\n    score = np.where(d1 < 0, d1 - d2 * 0.1, score)\n    \n    return score",
+        "objective": -6.6888
+    },
+    {
+        "sample_order": 11,
+        "operator": "e2",
+        "algorithm": "  \n**Adaptive Exponential Penalty (AEP):** Replace the linear penalty on d2 with an exponential term whose exponent adapts based on the ratio d2/d1, so that solutions far from the weight direction are harshly penalized while close ones are barely affected, maintaining diversity without sacrificing convergence.  \n",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    n_solutions, n_obj = F.shape\n    shifted = F - ideal_point\n    weights_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (weights_norm + 1e-10)\n    d1 = np.sum(shifted * w_unit, axis=1)\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n    ratio = d2 / (d1 + 1e-10)\n    exponent = 1.0 + 0.8 * np.tanh(ratio)\n    score = d1 + d2 * (np.exp(exponent) - 1.0)\n    score = np.where(d1 < 0, d1 - d2 * 0.2, score)\n    return score",
+        "objective": -7.1318
+    },
+    {
+        "sample_order": 12,
+        "operator": "m2",
+        "algorithm": "\"My new decomposition, Adaptive Angle-Penalized Decomposition (AAPD), dynamically weights the Tchebycheff and PBI components based on the solution's angular deviation from the weight vector and its proximity to the ideal point to balance convergence and diversity.\"",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    n_solutions, n_obj = F.shape\n    \n    # Shift by ideal point\n    shifted = F - ideal_point\n    \n    # Normalize weights\n    weights_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (weights_norm + 1e-10)\n    \n    # Tchebycheff component\n    tcheby = np.max(np.abs(shifted) * weights, axis=1)\n    \n    # PBI components\n    d1 = np.sum(shifted * w_unit, axis=1)\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n    \n    # Angle-based adaptive mixing: use cosine similarity between solution and weight\n    sol_norm = np.linalg.norm(shifted, axis=1)\n    cosine_sim = np.sum(shifted * w_unit, axis=1) / (sol_norm * weights_norm[:, 0] + 1e-10)\n    angle_factor = 1.0 - np.abs(cosine_sim)  # 0 if aligned, 1 if orthogonal\n    \n    # Adaptive penalty parameter\n    penalty = 5.0 + 10.0 * angle_factor\n    \n    # Combined score: weighted sum of Tchebycheff and PBI-like\n    alpha = 0.3 + 0.7 * (1.0 / (1.0 + np.exp(-5.0 * (d2 / (d1 + 1e-10) - 0.5))))\n    score = alpha * tcheby + (1.0 - alpha) * (d1 + penalty * d2)\n    \n    # Handle negative d1 (solutions better than ideal point)\n    score = np.where(d1 < 0, d1 - d2 * 0.2, score)\n    \n    return score",
+        "objective": -7.1938
+    },
+    {
+        "sample_order": 13,
+        "operator": "e2",
+        "algorithm": "Adaptive Sigmoid-Modulated Boundary Intersection (ASBI) uses the angle between the solution vector and the weight vector to modulate a sigmoid-shaped gating function that smoothly transitions between d1-dominant and d2-dominant regimes, then applies an inverse-distance weighting to the final score to penalize solutions far from the ideal point.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    n_solutions, n_obj = F.shape\n    shifted = F - ideal_point\n    \n    # Normalize weights\n    weights_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (weights_norm + 1e-10)\n    \n    # Projection components\n    d1 = np.sum(shifted * w_unit, axis=1)\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n    \n    # Angle between solution and weight vector\n    sol_norm = np.linalg.norm(shifted, axis=1)\n    cos_angle = np.sum(shifted * w_unit, axis=1) / (sol_norm * weights_norm[:, 0] + 1e-10)\n    angle = np.arccos(np.clip(cos_angle, -1.0, 1.0))\n    \n    # Sigmoid gating based on angle (normalized by pi/2)\n    gate = 1.0 / (1.0 + np.exp(-6.0 * (angle / (np.pi/2) - 0.5)))\n    \n    # Distance penalty from ideal point (inverse exponential weighting)\n    dist_penalty = 1.0 + np.exp(-0.5 * d1)\n    \n    # Combined score: smooth transition between d1 and d2 dominance\n    score = (1.0 - gate) * d1 + gate * d2 * 10.0\n    score = score * dist_penalty\n    \n    # Handle negative d1 (solutions better than ideal point)\n    score = np.where(d1 < 0, d1 - d2 * 0.2, score)\n    \n    return score",
+        "objective": -7.25893
+    },
+    {
+        "sample_order": 14,
+        "operator": "m1",
+        "algorithm": "The new decomposition, Adaptive Dual-Penalty Boundary Intersection (ADPBI), uses a quadratic penalty on the perpendicular distance that adapts based on normalized d1 and a population-level diversity metric to balance convergence and spread.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    n_solutions, n_obj = F.shape\n    \n    # Shift objectives by ideal point\n    shifted = F - ideal_point\n    \n    # Compute d1: distance along weight direction (projection)\n    weights_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (weights_norm + 1e-10)\n    d1 = np.sum(shifted * w_unit, axis=1)\n    \n    # Compute d2: perpendicular distance to weight vector\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n    \n    # Normalize d1 across the batch to avoid scale sensitivity\n    d1_min = np.min(d1)\n    d1_max = np.max(d1)\n    d1_norm = (d1 - d1_min) / (d1_max - d1_min + 1e-10)\n    \n    # Adaptive quadratic penalty: strong penalty when d2 is large relative to normalized d1\n    # Uses a sigmoid-like weighting to smooth the transition\n    penalty_ratio = d2 / (d1 + 1e-10)\n    sigmoid_weight = 1.0 / (1.0 + np.exp(-5.0 * (d1_norm - 0.5)))\n    adaptive_theta = 0.5 + 1.5 * sigmoid_weight * (penalty_ratio / (penalty_ratio + 1.0 + 1e-10))\n    \n    # Combine: d1 for convergence, adaptive quadratic penalty for diversity\n    score = d1 + adaptive_theta * (d2 ** 2)\n    \n    # Handle edge cases where d1 is negative (solution dominates ideal point)\n    score = np.where(d1 < 0, d1 - 0.2 * d2, score)\n    \n    return score",
+        "objective": -7.18667
+    },
+    {
+        "sample_order": 15,
+        "operator": "e2",
+        "algorithm": "My new decomposition, Adaptive Phase-Transition Decomposition (APTD), replaces the Tchebycheff/PBI mixing with a sigmoid-gated transition between a distance-based penalty and a rank-based contrastive term, where the gate is controlled by the normalized projection length d1 relative to a weight-adaptive threshold.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    n_solutions, n_obj = F.shape\n    \n    # Shift by ideal point\n    shifted = F - ideal_point\n    \n    # Normalize weights\n    weights_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (weights_norm + 1e-10)\n    \n    # Distance along weight direction\n    d1 = np.sum(shifted * w_unit, axis=1)\n    \n    # Perpendicular distance (d2)\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n    \n    # Normalize d1 by weight magnitude to make it scale-invariant\n    d1_norm = d1 / (weights_norm[:, 0] + 1e-10)\n    \n    # Weight-adaptive threshold: weights with larger spread allow higher d1\n    weight_spread = np.std(weights, axis=1)\n    threshold = 0.5 + 0.5 * weight_spread\n    \n    # Phase transition gate: sigmoid controls transition from convergence to diversity\n    gate = 1.0 / (1.0 + np.exp(-10.0 * (d1_norm - threshold)))\n    \n    # Contrastive term: penalizes solutions far from weight direction relative to others\n    d2_mean = np.mean(d2) + 1e-10\n    contrastive = d2 / d2_mean - 1.0\n    \n    # Final score: mixed distance and contrastive penalty\n    score = d1 + d2 * (1.0 + 2.0 * gate * contrastive)\n    \n    # Ensure non-negative and handle edge cases\n    score = np.maximum(score, 1e-10)\n    \n    return score",
+        "objective": -6.99913
+    },
+    {
+        "sample_order": 16,
+        "operator": "e1",
+        "algorithm": "\"My novel decomposition, Entropy-Guided Adaptive Decomposition (EGAD), uses information entropy across the population to dynamically switch between a convergence-focused weighted sum and a diversity-preserving inverse distance penalty based on each solution's rank in objective space.\"",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    n_solutions, n_obj = F.shape\n    \n    # Shift by ideal point\n    shifted = F - ideal_point\n    \n    # Normalize shifted objectives to [0,1] range across the batch\n    min_vals = np.min(shifted, axis=0)\n    max_vals = np.max(shifted, axis=0)\n    range_vals = max_vals - min_vals + 1e-10\n    normalized = (shifted - min_vals) / range_vals\n    \n    # Compute entropy per solution: how uniformly distributed are its normalized objectives\n    # High entropy means balanced objectives (diverse), low entropy means skewed (converged)\n    p = normalized / (np.sum(normalized, axis=1, keepdims=True) + 1e-10)\n    entropy = -np.sum(p * np.log(p + 1e-10), axis=1)\n    entropy_normalized = entropy / np.log(n_obj)  # 0 to 1\n    \n    # Weighted sum component (convergence)\n    weighted_sum = np.sum(shifted * weights, axis=1)\n    \n    # Inverse distance to weight vector component (diversity)\n    weights_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (weights_norm + 1e-10)\n    d1 = np.sum(shifted * w_unit, axis=1)\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n    inverse_distance = 1.0 / (d2 + 1e-10)\n    \n    # Adaptive mixing based on entropy: high entropy -> more weight on weighted sum (convergence)\n    # low entropy -> more weight on inverse distance (diversity)\n    alpha = entropy_normalized  # 0 (low entropy) to 1 (high entropy)\n    score = alpha * weighted_sum - (1.0 - alpha) * inverse_distance\n    \n    # Handle case where solution dominates ideal point\n    score = np.where(d1 < 0, d1 - d2 * 0.3, score)\n    \n    return score",
+        "objective": -5.8728
+    },
+    {
+        "sample_order": 17,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 18,
+        "operator": "e2",
+        "algorithm": "The new algorithm, Adaptive Cosine-Modulated Contrastive Decomposition (ACMC), uses a contrastive ratio between d1 and d2 modulated by a cosine-based attention weight from the ideal point, then applies an exponential shaping to penalize solutions with poor convergence-diversity balance.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    n_solutions, n_obj = F.shape\n    shifted = F - ideal_point\n    \n    weights_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (weights_norm + 1e-10)\n    \n    d1 = np.sum(shifted * w_unit, axis=1)\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n    \n    # Cosine attention: similarity between solution and weight direction\n    sol_norm = np.linalg.norm(shifted, axis=1)\n    cos_att = np.sum(shifted * w_unit, axis=1) / (sol_norm * weights_norm[:, 0] + 1e-10)\n    cos_att = np.clip(cos_att, -1.0, 1.0)\n    \n    # Contrastive ratio: how dominant is d1 vs d2\n    contrast = d1 / (d1 + d2 + 1e-10)\n    \n    # Adaptive exponent based on cosine attention\n    exp_factor = 1.0 + 2.0 * (1.0 - cos_att)  # higher when misaligned\n    \n    # Score: exponential shaping of d1 weighted by contrast, plus d2 penalty\n    score = (d1 ** (1.0 + 0.5 * (1.0 - contrast))) * (1.0 + d2 * exp_factor)\n    \n    # Handle negative d1 (better than ideal)\n    score = np.where(d1 < 0, d1 - 0.5 * d2 * (1.0 + np.exp(-d1)), score)\n    \n    return score",
+        "objective": -7.0026
+    },
+    {
+        "sample_order": 19,
+        "operator": "e2",
+        "algorithm": "My new algorithm, Curvature-Compensated Decomposition (CCD), replaces the usual linear projection with a quadratic penalty along the weight direction and exponentially penalizes deviations using a local density estimate of neighboring solutions.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    n_solutions, n_obj = F.shape\n    \n    # Shift by ideal point\n    shifted = F - ideal_point\n    \n    # Normalize weights\n    weights_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (weights_norm + 1e-10)\n    \n    # Projection along weight direction\n    d1 = np.sum(shifted * w_unit, axis=1)\n    \n    # Perpendicular distance\n    proj = d1[:, np.newaxis] * w_unit\n    diff = shifted - proj\n    d2 = np.linalg.norm(diff, axis=1)\n    \n    # Curvature compensation: quadratic d1 term to penalize extreme projections\n    d1_curved = d1 + 0.1 * d1**2 / (d1 + 1.0)\n    \n    # Exponential perpendicular penalty with adaptive exponent based on solution crowding\n    # Estimate crowding: sum of distances to nearest other solutions in objective space\n    crowding = np.zeros(n_solutions)\n    for i in range(n_solutions):\n        dists = np.linalg.norm(shifted - shifted[i], axis=1)\n        dists[i] = np.inf\n        crowding[i] = np.min(dists)\n    \n    # Normalize crowding\n    crowding_norm = crowding / (np.max(crowding) + 1e-10)\n    \n    # Adaptive exponent: less penalty when crowded (encourages spread)\n    exponent = 1.0 + 2.0 * (1.0 - crowding_norm)\n    \n    # Combine with exponential penalty\n    score = d1_curved + (d2 ** exponent) / (1.0 + d1)\n    \n    # Handle negative d1 (solutions better than ideal point)\n    score = np.where(d1 < 0, d1 - d2 * 0.3, score)\n    \n    return score",
+        "objective": -4.34307
+    },
+    {
+        "sample_order": 20,
+        "operator": "m1",
+        "algorithm": "Adaptive Reverse Chebyshev with density-aware penalty (ARCD): A decomposition that first normalizes objectives using ideal-point and nadir-point approximations, then uses a weighted Chebyshev distance where the weight vector is dynamically adjusted based on the solution's rank in each objective, and adds a diversity-preserving penalty inversely proportional to local solution density estimated via k-nearest neighbor distances.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    n_solutions, n_obj = F.shape\n    \n    # Estimate nadir point as max of each objective in current batch\n    nadir_point = np.max(F, axis=0)\n    nadir_range = nadir_point - ideal_point\n    nadir_range = np.where(nadir_range < 1e-10, 1.0, nadir_range)\n    \n    # Normalize objectives to [0,1]\n    F_norm = (F - ideal_point) / nadir_range\n    \n    # Dynamic weight adjustment: amplify weight for objectives where solution is worse\n    ranks = np.argsort(np.argsort(F_norm, axis=0), axis=0)  # rank per objective (0=best)\n    rank_ratio = ranks / (n_solutions - 1)  # normalize to [0,1]\n    weight_mod = 1.0 + 0.5 * rank_ratio  # boost weight for poorly ranked objectives\n    dyn_weights = weights * weight_mod\n    dyn_weights = dyn_weights / np.sum(dyn_weights, axis=1, keepdims=True)\n    \n    # Weighted Chebyshev with dynamic weights\n    cheb = np.max(np.abs(F_norm) * dyn_weights, axis=1)\n    \n    # Density penalty: k-nearest neighbor (k=3) distance in normalized space\n    k = min(3, n_solutions - 1)\n    dists = np.linalg.norm(F_norm[:, np.newaxis] - F_norm[np.newaxis, :], axis=2)\n    np.fill_diagonal(dists, np.inf)\n    sorted_dists = np.sort(dists, axis=1)\n    local_density = np.mean(sorted_dists[:, :k], axis=1)\n    \n    # Inverse density penalty: penalize crowded areas (low local distance)\n    density_penalty = 1.0 / (local_density + 1e-10)\n    density_penalty = density_penalty / (np.max(density_penalty) + 1e-10)\n    \n    # Combine: main term + diversity term\n    theta = 0.7  # balance factor\n    score = cheb + theta * density_penalty\n    \n    return score",
+        "objective": -4.5722
+    },
+    {
+        "sample_order": 21,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 22,
+        "operator": "e2",
+        "algorithm": "This decomposition replaces the linear penalty combination with a multiplicative fitness formulation where d1 acts as a convergence base and d2 is used to exponentially modulate the score, promoting diversity through a sigmoid-based adaptive weighting that favors solutions with moderate perpendicular deviation.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    n_solutions, n_obj = F.shape\n    \n    # Shift objectives by ideal point\n    shifted = F - ideal_point\n    \n    # Compute d1: distance along weight direction (projection)\n    weights_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (weights_norm + 1e-10)\n    d1 = np.sum(shifted * w_unit, axis=1)\n    \n    # Compute d2: perpendicular distance to weight vector\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n    \n    # Adaptive modulation factor using sigmoid of d2/d1 ratio\n    ratio = d2 / (d1 + 1e-10)\n    sigmoid_factor = 1.0 / (1.0 + np.exp(-3.0 * (ratio - 1.0)))\n    \n    # Exponential score: d1 as base, d2 as multiplicative exponent\n    score = d1 * np.exp(0.5 * sigmoid_factor * d2 / (d1 + 1e-10))\n    \n    # Handle edge cases where d1 is negative\n    score = np.where(d1 < 0, d1 - d2 * 0.1, score)\n    \n    return score",
+        "objective": -5.16947
+    },
+    {
+        "sample_order": 23,
+        "operator": "m1",
+        "algorithm": "Adaptive Inverse Tangent Weighted Sum (AITWS) uses the arctangent of the ratio between d2 and d1 to create a smooth, adaptive weight that blends a weighted sum with a constraint-based boundary penalty, then applies a Gaussian similarity factor to the weight vector for improved convergence and diversity.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    n_solutions, n_obj = F.shape\n    shifted = F - ideal_point\n\n    # Normalize weights\n    weights_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (weights_norm + 1e-10)\n\n    # Projection components\n    d1 = np.sum(shifted * w_unit, axis=1)\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n\n    # Adaptive blending factor using arctangent of d2/d1\n    ratio = d2 / (d1 + 1e-10)\n    blend = 2.0 / np.pi * np.arctan(ratio)\n\n    # Gaussian similarity to weight direction\n    sol_norm = np.linalg.norm(shifted, axis=1)\n    cos_angle = np.sum(shifted * w_unit, axis=1) / (sol_norm * weights_norm[:, 0] + 1e-10)\n    angle = np.arccos(np.clip(cos_angle, -1.0, 1.0))\n    sim_penalty = np.exp(-2.0 * angle)\n\n    # Combined score: blend weighted sum and boundary penalty\n    weighted_sum = np.sum(shifted * w_unit, axis=1)\n    boundary_penalty = d2 * 5.0\n    score = (1.0 - blend) * weighted_sum + blend * boundary_penalty\n    score = score * (1.0 + sim_penalty)\n\n    # Handle negative d1 (solutions better than ideal point)\n    score = np.where(d1 < 0, d1 - d2 * 0.3, score)\n\n    return score",
+        "objective": -6.84493
+    },
+    {
+        "sample_order": 24,
+        "operator": "m1",
+        "algorithm": "This new decomposition, \u201cAugmented Inverse Chebyshev with Cosine Similarity Weighting (AIC-CSW),\u201d combines an inverse Chebyshev distance from the ideal point with a cosine similarity penalty between the shifted objective vector and the weight vector, adaptively balancing convergence and directional alignment.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    n_solutions, n_obj = F.shape\n    \n    # Shift objectives by ideal point\n    shifted = F - ideal_point\n    \n    # Compute weighted Chebyshev component (inverse form: small max distance is good)\n    cheb = np.max(shifted * weights, axis=1)\n    \n    # Compute cosine similarity between shifted vector and weight vector\n    norm_shifted = np.linalg.norm(shifted, axis=1)\n    norm_weights = np.linalg.norm(weights, axis=1)\n    cos_sim = np.sum(shifted * weights, axis=1) / (norm_shifted * norm_weights + 1e-10)\n    \n    # Adaptive penalty: penalize low cosine similarity (misalignment) more when cheb is large\n    penalty = 1.0 - 0.5 * cos_sim\n    adaptive_factor = 1.0 + 0.3 * (cheb / (np.max(cheb) + 1e-10))\n    \n    # Score: minimize cheb, penalize directional misalignment\n    score = cheb + penalty * adaptive_factor\n    \n    # Handle negative shifted values (solution better than ideal point in some objectives)\n    score = np.where(np.any(shifted < 0, axis=1), cheb - 0.1 * (1.0 - cos_sim), score)\n    \n    return score",
+        "objective": -5.14753
+    },
+    {
+        "sample_order": 25,
+        "operator": "m1",
+        "algorithm": "This new decomposition, Adaptive Directional Diversity Augmented Chebyshev (ADDAC), combines a Chebyshev-like distance with a penalty term based on the cosine similarity between the solution\u2019s direction and the weight vector, dynamically adjusting diversity pressure relative to population spread.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    n_solutions, n_obj = F.shape\n    \n    # Shift objectives by ideal point\n    shifted = F - ideal_point\n    \n    # Compute normalized weight vectors\n    weights_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (weights_norm + 1e-10)\n    \n    # Compute directional vectors of shifted solutions\n    shifted_norm = np.linalg.norm(shifted, axis=1, keepdims=True)\n    s_unit = shifted / (shifted_norm + 1e-10)\n    \n    # Cosine similarity between solution direction and weight direction\n    cos_sim = np.sum(s_unit * w_unit, axis=1)\n    # Penalty: low similarity (far from weight direction) increases score\n    directional_penalty = 1.0 - 0.5 * cos_sim\n    \n    # Compute Tchebycheff-like term (weighted max distance)\n    cheb = np.max(np.abs(shifted) * weights, axis=1)\n    \n    # Combine: convergence (cheb) with adaptive directional penalty\n    score = cheb * directional_penalty\n    \n    # Handle cases where solution dominates ideal point (negative shifted values)\n    mask_dominance = np.all(shifted <= 0, axis=1)\n    score[mask_dominance] = cheb[mask_dominance] * 0.1\n    \n    return score",
+        "objective": -7.21693
+    },
+    {
+        "sample_order": 26,
+        "operator": "m2",
+        "algorithm": "New algorithm: \"Adaptive Angle-Penalized Weighted Sum\" dynamically blends weighted sum and angular deviation from the weight vector, using a sigmoid-based penalty factor that increases when a solution deviates far from the preferred trade-off direction.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    n_solutions, n_obj = F.shape\n    \n    # Shift objectives by ideal point\n    shifted = F - ideal_point\n    \n    # Compute weighted sum component (convergence)\n    weighted_sum = np.sum(shifted * weights, axis=1)\n    \n    # Compute angle deviation from weight vector\n    weights_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    shifted_norm = np.linalg.norm(shifted, axis=1, keepdims=True)\n    cos_angle = np.sum(shifted * weights, axis=1, keepdims=True) / (weights_norm * shifted_norm + 1e-10)\n    cos_angle = np.clip(cos_angle, -1.0, 1.0)\n    angle = np.arccos(np.abs(cos_angle))  # use absolute to handle negative directions\n    \n    # Adaptive sigmoid penalty: low penalty near weight direction, high penalty far away\n    penalty_factor = 1.0 + 2.0 / (1.0 + np.exp(-5.0 * (angle - 0.5)))\n    \n    # Combine: minimize weighted sum, penalize large angular deviation\n    score = weighted_sum + penalty_factor.squeeze() * (1.0 - cos_angle.squeeze())\n    \n    # Handle negative weighted_sum (solutions dominating ideal point)\n    score = np.where(weighted_sum < 0, weighted_sum - 0.1 * (1.0 - cos_angle.squeeze()), score)\n    \n    return score",
+        "objective": -7.25047
+    },
+    {
+        "sample_order": 27,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 28,
+        "operator": "m2",
+        "algorithm": "My new decomposition, Adaptive Tchebycheff-Penalized Angle Decomposition (ATPAD), dynamically adjusts the penalty based on the angle between the solution and weight vector and combines a weighted Tchebycheff term with a penalized perpendicular distance to enhance convergence and diversity.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    n_solutions, n_obj = F.shape\n    \n    # Shift by ideal point\n    shifted = F - ideal_point\n    \n    # Normalize weights\n    weights_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (weights_norm + 1e-10)\n    \n    # Tchebycheff component\n    tcheby = np.max(np.abs(shifted) * weights, axis=1)\n    \n    # PBI components\n    d1 = np.sum(shifted * w_unit, axis=1)\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n    \n    # Angle-based adaptive factor: cosine similarity between solution and weight\n    sol_norm = np.linalg.norm(shifted, axis=1)\n    cosine_sim = np.sum(shifted * w_unit, axis=1) / (sol_norm * weights_norm[:, 0] + 1e-10)\n    angle_factor = 1.0 - np.abs(cosine_sim)  # 0 if aligned, 1 if orthogonal\n    \n    # Adaptive penalty parameter (different from original)\n    penalty = 2.0 + 8.0 * angle_factor ** 2\n    \n    # Adaptive mixing coefficient (different from original)\n    alpha = 0.5 + 0.5 * (1.0 / (1.0 + np.exp(-3.0 * (d2 / (d1 + 1e-10) - 0.8))))\n    \n    # Combined score\n    score = alpha * tcheby + (1.0 - alpha) * (d1 + penalty * d2)\n    \n    # Handle negative d1 (solutions better than ideal point)\n    score = np.where(d1 < 0, d1 - d2 * 0.5, score)\n    \n    return score",
+        "objective": -7.21833
+    },
+    {
+        "sample_order": 29,
+        "operator": "e2",
+        "algorithm": "Based on the two provided algorithms, the common backbone idea is to **combine a convergence term (weighted distance or Tchebycheff) with a diversity-preserving penalty term based on the angular deviation from the weight vector, using an adaptive mechanism**.\nMy new algorithm, **\"Reciprocal Phase-Field Decomposition,\"** replaces the additive penalty with a multiplicative rational function that compares the Tchebycheff distance to a dynamically scaled perpendicular distance, using a subproblem-specific inverse frequency weight.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    n_solutions, n_obj = F.shape\n    \n    # Shift by ideal point\n    shifted = F - ideal_point\n    \n    # Normalize weights\n    weights_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (weights_norm + 1e-10)\n    \n    # Tchebycheff component\n    tcheby = np.max(np.abs(shifted) * weights, axis=1)\n    \n    # Perpendicular distance (d2) and projection distance (d1)\n    d1 = np.sum(shifted * w_unit, axis=1)\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n    \n    # Reciprocal phase factor: penalizes when d2 dominates d1\n    # Rational function: score = tcheby * (1 + (d2 / (d1 + epsilon))^2) / (1 + (d2 / (d1 + epsilon)))\n    ratio = d2 / (np.abs(d1) + 1e-10)\n    score = tcheby * (1.0 + ratio ** 2) / (1.0 + ratio + 1e-10)\n    \n    # Handle negative d1 (solutions dominating ideal point)\n    score = np.where(d1 < 0, d1 - 0.5 * d2, score)\n    \n    return score",
+        "objective": -6.14113
+    },
+    {
+        "sample_order": 30,
+        "operator": "m1",
+        "algorithm": "The new algorithm, Adaptive Tangent-Hyperbolic Weighted Synthesis (ATWS), uses the hyperbolic tangent of the normalized angle between the solution and weight vector to dynamically blend a weighted-sum term and a penalized d2 term, then applies a sigmoid-scaled Euclidean penalty from the ideal point to encourage convergence.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    n_solutions, n_obj = F.shape\n    shifted = F - ideal_point\n    \n    # Normalize weights\n    weights_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (weights_norm + 1e-10)\n    \n    # Weighted sum component (d1-like)\n    d1 = np.sum(shifted * w_unit, axis=1)\n    \n    # Projection and d2 component\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n    \n    # Angle between solution and weight vector\n    sol_norm = np.linalg.norm(shifted, axis=1)\n    cos_angle = np.sum(shifted * w_unit, axis=1) / (sol_norm * weights_norm[:, 0] + 1e-10)\n    angle = np.arccos(np.clip(cos_angle, -1.0, 1.0))\n    \n    # Hyperbolic tangent blending factor\n    blend = np.tanh(3.0 * (angle / (np.pi/2) - 0.5))\n    blend = (blend + 1.0) / 2.0  # scale to [0,1]\n    \n    # Sigmoid-scaled Euclidean distance penalty from ideal point\n    euclidean_dist = np.linalg.norm(shifted, axis=1)\n    dist_penalty = 1.0 + 0.5 / (1.0 + np.exp(-0.3 * (euclidean_dist - 2.0)))\n    \n    # Combined score: blend between weighted sum (d1) and d2-dominated term\n    score = (1.0 - blend) * d1 + blend * (d1 + 2.0 * d2)\n    score = score * dist_penalty\n    \n    # Handle solutions better than ideal point\n    score = np.where(d1 < 0, d1 - d2 * 0.3, score)\n    \n    return score",
+        "objective": -7.2122
+    },
+    {
+        "sample_order": 31,
+        "operator": "m2",
+        "algorithm": "This algorithm, Adaptive Entropy-Regulated Inverted Chebyshev (AERIC), computes a Chebyshev-like base distance weighted by an entropy-inspired diversity penalty that measures how evenly the solution spreads across objectives relative to the weight vector, adaptively scaling the penalty based on the current population's variance.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    n_solutions, n_obj = F.shape\n\n    shifted = F - ideal_point\n\n    # Compute Chebyshev term\n    cheb = np.max(np.abs(shifted) * weights, axis=1)\n\n    # Compute normalized weight vectors\n    w_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (w_norm + 1e-10)\n\n    # Compute normalized shifted vectors\n    s_norm = np.linalg.norm(shifted, axis=1, keepdims=True)\n    s_unit = shifted / (s_norm + 1e-10)\n\n    # Compute directional diversity: sum of squared projections on each objective axis\n    # to measure spread relative to weight direction\n    proj_sq = (s_unit * w_unit) ** 2\n    # Normalized entropy-like diversity: high when spread is even across objectives\n    entropy = -np.sum(proj_sq * np.log(proj_sq + 1e-10), axis=1) / np.log(n_obj)\n    # Penalty: low entropy (uneven spread) increases score\n    diversity_penalty = 2.0 - entropy\n\n    # Adaptive scaling based on population spread (std of shifted norms)\n    spread = np.std(s_norm) + 1e-10\n    adaptive_factor = 1.0 + 0.5 * (1.0 / (1.0 + spread))\n\n    # Combine\n    score = cheb * diversity_penalty * adaptive_factor\n\n    # If solution dominates ideal point, heavily favor convergence\n    mask_dominance = np.all(shifted <= 0, axis=1)\n    score[mask_dominance] = cheb[mask_dominance] * 0.1\n\n    return score",
+        "objective": -7.24293
+    },
+    {
+        "sample_order": 32,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 33,
+        "operator": "e1",
+        "algorithm": "The algorithm computes a weighted exponential penalty based on the angle between the solution vector and the weight vector, combined with a logarithmic barrier to enforce constraint-like closeness to the weight direction.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    n_solutions, n_obj = F.shape\n    shifted = F - ideal_point\n    \n    # Normalize weight vectors\n    w_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (w_norm + 1e-10)\n    \n    # Projection components (d1 and d2)\n    d1 = np.sum(shifted * w_unit, axis=1)\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n    \n    # Angle between solution and weight vector (in radians)\n    sol_norm = np.linalg.norm(shifted, axis=1)\n    cos_angle = np.sum(shifted * w_unit, axis=1) / (sol_norm * w_norm[:, 0] + 1e-10)\n    angle = np.arccos(np.clip(cos_angle, -1.0, 1.0))\n    \n    # Exponential penalty based on angle (steepness controlled by k)\n    k = 4.0\n    angle_penalty = np.exp(k * (angle / (np.pi/2) - 1.0))\n    \n    # Logarithmic barrier for d2 to strongly penalize large deviations\n    epsilon = 1e-6\n    log_barrier = -np.log(d2 + epsilon)\n    \n    # Weighted combination: d1 dominated, with angle penalty and log barrier\n    score = d1 + 0.5 * angle_penalty * d1 + 0.2 * log_barrier\n    \n    # Handle negative d1 (solutions better than ideal point)\n    score = np.where(d1 < 0, d1 - 0.1 * d2, score)\n    \n    return score",
+        "objective": -6.62807
+    },
+    {
+        "sample_order": 34,
+        "operator": "e2",
+        "algorithm": "My new algorithm, Hyperbolic Tangent Scaled Boundary Intersection (HTSBI), uses a hyperbolic tangent function of the solution's radial distance to the ideal point to scale the perpendicular penalty, creating an angle-independent adaptive balance that prioritizes convergence near the ideal point and diversity farther away.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    n_solutions, n_obj = F.shape\n    \n    # Shift by ideal point\n    shifted = F - ideal_point\n    \n    # Normalize weights\n    weights_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (weights_norm + 1e-10)\n    \n    # Projection components\n    d1 = np.sum(shifted * w_unit, axis=1)\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n    \n    # Radial distance from ideal point\n    radial_dist = np.linalg.norm(shifted, axis=1)\n    \n    # Hyperbolic tangent scaling based on radial distance\n    # Near ideal point (small radial_dist): tanh ~ 0, penalty small -> convergence\n    # Far from ideal point (large radial_dist): tanh ~ 1, penalty full -> diversity\n    scale = np.tanh(0.5 * radial_dist)\n    \n    # Dynamic penalty parameter modulated by radial scale\n    penalty = 5.0 * scale\n    \n    # Mixing coefficient: more weight on d1 when close, more on d2+d1 when far\n    alpha = 0.7 - 0.4 * scale\n    \n    # Combined score\n    score = alpha * d1 + (1.0 - alpha) * (d1 + penalty * d2)\n    \n    # Handle negative d1 (solutions better than ideal point)\n    score = np.where(d1 < 0, d1 - d2 * 0.3, score)\n    \n    return score",
+        "objective": -7.1544
+    },
+    {
+        "sample_order": 35,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 36,
+        "operator": "e2",
+        "algorithm": "Adaptive Curvature-Compensated Log-Penalty Decomposition (ACCLPD) uses a log-scaled penalty on the angular deviation that grows nonlinearly with the ratio of the perpendicular distance to the projected distance, modulated by a weight-adaptive curvature parameter derived from the weight vector entropy.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    n_solutions, n_obj = F.shape\n    shifted = F - ideal_point\n    \n    # Normalize weights\n    w_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (w_norm + 1e-10)\n    \n    # d1: projection along weight vector\n    d1 = np.sum(shifted * w_unit, axis=1)\n    proj = d1[:, np.newaxis] * w_unit\n    \n    # d2: perpendicular distance\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n    \n    # Compute weight entropy for curvature adaptation\n    w_safe = np.clip(weights, 1e-10, 1.0)\n    w_norm_entropy = w_safe / (np.sum(w_safe, axis=1, keepdims=True) + 1e-10)\n    entropy = -np.sum(w_norm_entropy * np.log(w_norm_entropy + 1e-10), axis=1)\n    curvature = 1.0 + 2.0 * (1.0 - entropy / np.log(n_obj + 1e-10))\n    \n    # Ratio of perpendicular to projected distance (handling zero d1)\n    ratio = d2 / (np.abs(d1) + 1e-10)\n    \n    # Log-scaled penalty with adaptive curvature\n    log_penalty = np.log(1.0 + ratio * curvature)\n    \n    # Combine: convergence term + log-penalty scaled by d1 magnitude\n    score = d1 + d1 * log_penalty\n    \n    # Ensure lower score for better convergence (handle negative d1)\n    score = np.where(d1 < 0, d1 - d2 * 0.5, score)\n    \n    return score",
+        "objective": -6.91187
+    },
+    {
+        "sample_order": 37,
+        "operator": "e2",
+        "algorithm": "My new algorithm, Exponential Harmonic Mean Decomposition (EHMD), computes an exponentially weighted harmonic mean of the normalized Tchebycheff component and the ratio of perpendicular to parallel distance, where the exponent is adaptively controlled by the cumulative distribution of the solution's position along the weight vector.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    n_solutions, n_obj = F.shape\n    \n    # Shift by ideal point\n    shifted = F - ideal_point\n    \n    # Normalize weights\n    weights_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (weights_norm + 1e-10)\n    \n    # Tchebycheff component\n    tcheby = np.max(np.abs(shifted) * weights, axis=1)\n    \n    # Projection components\n    d1 = np.sum(shifted * w_unit, axis=1)\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n    \n    # Normalize d1 and d2 to [0,1] range across the batch\n    d1_min, d1_max = d1.min(), d1.max()\n    d2_min, d2_max = d2.min(), d2.max()\n    d1_norm = (d1 - d1_min) / (d1_max - d1_min + 1e-10)\n    d2_norm = (d2 - d2_min) / (d2_max - d2_min + 1e-10)\n    \n    # Adaptive exponent based on cumulative position along weight direction\n    # Solutions near ideal point (small d1) get higher exponent (more diverse)\n    # Solutions far from ideal point get lower exponent (more convergent)\n    exp_factor = 1.0 + 4.0 * (1.0 / (1.0 + np.exp(-5.0 * (d1_norm - 0.3))))\n    \n    # Exponential weighting of Tchebycheff and d2/d1 ratio\n    ratio_term = d2_norm / (d1_norm + 1e-10)\n    \n    # Harmonic mean with exponential modulation\n    a = np.exp(-exp_factor * tcheby)\n    b = np.exp(-exp_factor * ratio_term)\n    harmonic = 2.0 * a * b / (a + b + 1e-10)\n    \n    # Final score: invert harmonic to get lower-is-better, scale by d1\n    score = d1 * (1.0 - harmonic + 1e-10)\n    \n    # Handle negative d1 (solutions better than ideal point)\n    score = np.where(d1 < 0, d1 - d2 * 0.3, score)\n    \n    return score",
+        "objective": -6.98647
+    },
+    {
+        "sample_order": 38,
+        "operator": "e1",
+        "algorithm": "Novel decomposition: \"Hyperplane Projection with Entropic Ranking\" maps each solution onto the hyperplane defined by its weight vector, then computes a score combining the signed distance to the ideal point along the weight direction and an entropy-based diversity term from the solution's non-dominance ranking among its neighbors.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    n_solutions, n_obj = F.shape\n    \n    # Shift objectives\n    shifted = F - ideal_point\n    \n    # Project onto weight direction (signed distance along weight)\n    weight_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (weight_norm + 1e-10)\n    d1 = np.sum(shifted * w_unit, axis=1)\n    \n    # Signed perpendicular distance from the weight ray\n    proj = d1[:, np.newaxis] * w_unit\n    d2_vec = shifted - proj\n    d2 = np.linalg.norm(d2_vec, axis=1)\n    \n    # Entropy-based diversity: compute local crowding via angle to other solutions\n    # First, get normalized directions of all solutions\n    sol_norm = np.linalg.norm(shifted, axis=1, keepdims=True) + 1e-10\n    sol_dir = shifted / sol_norm\n    \n    # Compute pairwise cosine similarity\n    cos_mat = np.dot(sol_dir, sol_dir.T)\n    cos_mat = np.clip(cos_mat, 0.0, 1.0)  # only consider acute angles\n    \n    # Entropy per solution: softmax over cosine similarities to others\n    # Higher entropy = more evenly spread (diverse)\n    softmax = np.exp(cos_mat * 5.0)  # temperature parameter\n    softmax_sum = np.sum(softmax, axis=1, keepdims=True)\n    prob = softmax / (softmax_sum + 1e-10)\n    entropy = -np.sum(prob * np.log(prob + 1e-10), axis=1)\n    \n    # Normalize entropy to [0,1] range\n    entropy_norm = entropy / np.log(n_solutions + 1e-10)\n    \n    # Combine: minimize d1 (convergence), penalize large d2 (alignment), reward diversity\n    # Use a hyperbolic tangent to saturate d2 penalty\n    d2_penalty = np.tanh(d2 * 2.0)\n    \n    # Final score: low d1 is good, low d2 penalty is good, high entropy is good (so subtract)\n    score = d1 + d2_penalty - 0.3 * entropy_norm\n    \n    # Handle negative d1 (solutions dominating ideal point)\n    score = np.where(d1 < 0, d1 - 0.5 * d2, score)\n    \n    return score",
+        "objective": -5.37347
+    },
+    {
+        "sample_order": 39,
+        "operator": "m1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 40,
+        "operator": "m2",
+        "algorithm": "The new algorithm \"Exponential Hypervolume-Informed Tchebycheff\" replaces the linear Chebyshev max with an exponential weighted sum of normalized deviations, emphasizing extreme objectives via a dynamic penalty inversely proportional to the current hypervolume contribution estimate.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    n_solutions, n_obj = F.shape\n    \n    # Shift objectives\n    shifted = F - ideal_point\n    \n    # Compute normalized shifted objectives (avoid division by zero)\n    shifted_norm = np.linalg.norm(shifted, axis=1, keepdims=True) + 1e-10\n    normalized = shifted / shifted_norm\n    \n    # Weighted Chebyshev baseline\n    weighted_dev = np.abs(shifted) * weights\n    chebyshev = np.max(weighted_dev, axis=1)\n    \n    # Compute exponential weighted sum with emphasis on extreme objectives\n    # Using an exponent that grows with deviation to penalize imbalance\n    exponent = 1.0 + 0.5 * np.max(weighted_dev, axis=1) / (np.mean(weighted_dev, axis=1) + 1e-10)\n    exponent = np.clip(exponent, 1.0, 3.0)\n    exp_weighted_sum = np.sum((np.abs(shifted) * weights) ** exponent[:, np.newaxis], axis=1) ** (1.0 / exponent)\n    \n    # Hypervolume-informed penalty: reward solutions that cover extreme regions\n    # Using inverse distance to weight vector direction as diversity measure\n    cos_angle = np.sum(normalized * weights, axis=1)\n    cos_angle = np.clip(cos_angle, 0.0, 1.0)\n    angle_penalty = 1.0 - cos_angle\n    \n    # Combine: primary chebyshev, secondary exp-weighted sum, small diversity bonus\n    score = chebyshev + 0.3 * exp_weighted_sum + 0.1 * angle_penalty * chebyshev\n    \n    return score",
+        "objective": -7.25847
+    },
+    {
+        "sample_order": 41,
+        "operator": "e2",
+        "algorithm": "This algorithm replaces the angle-based gating with a curvature-driven adaptive penalty that uses the ratio of d2 to d1 to form a hyperbolic blending function, then amplifies the score by a logarithmic scaling of the solution's distance from the ideal point.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    n_solutions, n_obj = F.shape\n    shifted = F - ideal_point\n    \n    # Normalize weights\n    weights_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (weights_norm + 1e-10)\n    \n    # Projection components\n    d1 = np.sum(shifted * w_unit, axis=1)\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n    \n    # Curvature ratio (avoid division by zero)\n    ratio = d2 / (d1 + 1e-10)\n    \n    # Hyperbolic blending based on curvature ratio\n    blend = np.tanh(2.0 * ratio - 1.0)  # range roughly [-1, 1]\n    \n    # Adaptive combination: when ratio is high (curved), emphasize d2; else d1\n    score = (1.0 + blend) * d1 + (1.0 - blend) * d2\n    \n    # Logarithmic scaling based on distance from ideal (adaptive amplification)\n    dist = np.linalg.norm(shifted, axis=1)\n    log_scale = 1.0 + np.log1p(dist)\n    \n    score = score * log_scale\n    \n    # Handle negative d1 (solutions better than ideal point)\n    score = np.where(d1 < 0, d1 - d2 * 0.3, score)\n    \n    return score",
+        "objective": -6.73767
+    },
+    {
+        "sample_order": 42,
+        "operator": "e2",
+        "algorithm": "Adaptive Log-Sum-Exp Decomposition with Entropic Divergence Penalty (ALSE-EDP) replaces the max or sum operations with a smooth log-sum-exp approximation of the Chebyshev norm, modulated by a Jensen-Shannon divergence between the normalized solution and weight vector that dynamically penalizes misalignment.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    n_solutions, n_obj = F.shape\n    \n    # Shift objectives\n    shifted = F - ideal_point\n    \n    # Normalize shifted and weights\n    shifted_norm = np.linalg.norm(shifted, axis=1, keepdims=True) + 1e-10\n    normalized_shifted = shifted / shifted_norm\n    weights_norm = np.linalg.norm(weights, axis=1, keepdims=True) + 1e-10\n    normalized_weights = weights / weights_norm\n    \n    # Weighted deviations\n    weighted_dev = np.abs(shifted) * weights\n    \n    # Log-sum-exp smooth approximation of Chebyshev (tau controls smoothness)\n    tau = 5.0\n    max_dev = np.max(weighted_dev, axis=1)\n    log_sum_exp = max_dev + (1.0 / tau) * np.log(np.sum(np.exp(tau * (weighted_dev - max_dev[:, np.newaxis])), axis=1))\n    \n    # Entropic divergence penalty: Jensen-Shannon divergence between normalized solution and weight distribution\n    p = normalized_shifted + 1e-10\n    p = p / np.sum(p, axis=1, keepdims=True)\n    q = normalized_weights + 1e-10\n    q = q / np.sum(q, axis=1, keepdims=True)\n    m = 0.5 * (p + q)\n    kl_pm = np.sum(p * np.log(p / (m + 1e-10)), axis=1)\n    kl_qm = np.sum(q * np.log(q / (m + 1e-10)), axis=1)\n    js_div = 0.5 * (kl_pm + kl_qm)\n    \n    # Adaptive penalty strength based on solution magnitude\n    penalty_strength = 0.5 * (1.0 + np.tanh(0.2 * (shifted_norm[:, 0] - 1.0)))\n    \n    # Final score: dominant log-sum-exp plus entropy penalty\n    score = log_sum_exp + penalty_strength * js_div * (1.0 + 0.1 * log_sum_exp)\n    \n    return score",
+        "objective": -6.78313
+    },
+    {
+        "sample_order": 43,
+        "operator": "e1",
+        "algorithm": "Adaptive Hyper-Cone Shrinkage (AHCS) computes the scalarized cost as the weighted L2 norm from the ideal point, multiplied by a dynamically shrinking exponential factor that depends on the cosine similarity between the objective vector and the weight vector, then applies a crowding-aware repulsion term based on pairwise distances in objective space.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    n_solutions, n_obj = F.shape\n    \n    shifted = F - ideal_point\n    w_norm = np.linalg.norm(weights, axis=1, keepdims=True) + 1e-10\n    w_unit = weights / w_norm\n    s_norm = np.linalg.norm(shifted, axis=1, keepdims=True) + 1e-10\n    s_unit = shifted / s_norm\n    \n    # Cosine similarity between solution and weight vector\n    cos_sim = np.sum(s_unit * w_unit, axis=1)\n    \n    # Shrinkage factor: high penalty when solution deviates from weight direction\n    shrink = np.exp(-3.0 * (1.0 - cos_sim) ** 2)\n    \n    # Weighted L2 norm from ideal point\n    weighted_l2 = np.sqrt(np.sum((shifted * weights) ** 2, axis=1))\n    \n    # Crowding-aware repulsion: average distance to other solutions in the batch\n    dist_matrix = np.linalg.norm(F[:, np.newaxis, :] - F[np.newaxis, :, :], axis=2)\n    np.fill_diagonal(dist_matrix, np.inf)\n    min_dist = np.min(dist_matrix, axis=1)\n    # Repulsion: penalize solutions that are too close to others\n    repulsion = np.exp(-2.0 * min_dist)\n    \n    # Final scalar: lower is better\n    score = weighted_l2 * shrink * (1.0 + 0.5 * repulsion)\n    \n    return score",
+        "objective": -7.09127
+    },
+    {
+        "sample_order": 44,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 45,
+        "operator": "e2",
+        "algorithm": "**\u201cHyperbolic Tangent Curvature-Compensated Projection (HTCCP)\u201d**: it computes the standard PBI d1 and d2 terms, then applies a hyperbolic tangent curvature factor that amplifies d2 when d1 is small (to promote spread near the ideal point) and dampens d2 when d1 is large (to favor convergence far from the ideal point), and finally adds an exponential penalty for solutions violating the objective dominance region.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    n_solutions, n_obj = F.shape\n    shifted = F - ideal_point\n\n    # Normalize weights\n    w_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (w_norm + 1e-10)\n\n    # d1 and d2 as in PBI\n    d1 = np.sum(shifted * w_unit, axis=1)\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n\n    # Hyperbolic tangent curvature compensation\n    # When d1 is small, amplify d2; when d1 is large, attenuate d2\n    curvature = np.tanh(2.0 * d1 / (np.mean(d1) + 1e-10))\n    d2_mod = d2 * (1.5 - curvature)\n\n    # Exponential penalty for solutions with negative d1 (dominating ideal point)\n    penalty = np.exp(-2.0 * np.minimum(d1, 0.0))\n\n    # Final score: balanced d1 and curvature-modified d2 with penalty\n    score = d1 + d2_mod + penalty\n\n    return score",
+        "objective": -6.4452
+    },
+    {
+        "sample_order": 46,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 47,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 48,
+        "operator": "e1",
+        "algorithm": "The algorithm uses a smooth min-max aggregation where each subproblem\u2019s weight vector dynamically adjusts the trade-off between projection and residual distance via a radial basis function kernel centered on the weight direction, then applies a cumulative density-based penalty to discourage solutions in crowded regions.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    n_solutions, n_obj = F.shape\n    shifted = F - ideal_point\n    \n    # Normalize weights and solutions\n    w_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (w_norm + 1e-10)\n    s_norm = np.linalg.norm(shifted, axis=1, keepdims=True)\n    s_unit = shifted / (s_norm + 1e-10)\n    \n    # Projection and residual components\n    d1 = np.sum(shifted * w_unit, axis=1)\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n    \n    # Radial basis kernel similarity between solution direction and weight direction\n    cos_sim = np.sum(s_unit * w_unit, axis=1)\n    rbf_scale = 2.0\n    kernel = np.exp(-rbf_scale * (1.0 - cos_sim))\n    \n    # Adaptive blend between d1 and d2 using kernel\n    alpha = kernel\n    score = alpha * d1 + (1.0 - alpha) * d2\n    \n    # Cumulative density penalty: penalize solutions with small d2 (crowded near weight)\n    # Use a sigmoid to smooth the penalty\n    density_factor = 1.0 / (1.0 + np.exp(-10.0 * (d2 - 0.1)))\n    score = score * (1.0 + 0.5 * density_factor)\n    \n    # Ensure lower is better; handle negative d1 gracefully\n    score = np.where(d1 < 0, d1 - 0.1 * d2, score)\n    \n    return score",
+        "objective": -5.94747
+    },
+    {
+        "sample_order": 49,
+        "operator": "e1",
+        "algorithm": "The new algorithm, called \"Adaptive Hypercone Projection with Curvature Modulation (AHP-CM)\", projects each objective vector onto a hypercone defined by its weight vector and applies a curvature-based non-linear scaling that dynamically emphasizes proximity to the ideal point for well-aligned solutions while penalizing angular deviation through a cosine-power transformation.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    n_solutions, n_obj = F.shape\n    shifted = F - ideal_point\n    \n    # Normalize weight vectors\n    w_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (w_norm + 1e-10)\n    \n    # Projection onto weight direction (d1)\n    d1 = np.sum(shifted * w_unit, axis=1)\n    \n    # Cosine of angle between solution and weight vector\n    sol_norm = np.linalg.norm(shifted, axis=1)\n    cos_theta = np.clip(d1 / (sol_norm * w_norm[:, 0] + 1e-10), -1.0, 1.0)\n    \n    # Curvature parameter: adaptive based on how aligned the solution is\n    curvature = 2.0 + 4.0 * (1.0 - cos_theta)  # ranges from 2 to 6\n    \n    # Hypercone projection: radial distance scaled by curvature\n    radial = sol_norm / (sol_norm + 1e-10)\n    cone_proj = radial ** curvature\n    \n    # D2 (perpendicular distance) component\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n    \n    # Final score: combine d1 dominance and angular penalty\n    score = d1 + (d2 ** 1.5) * (1.0 + (1.0 - cos_theta) ** 2) * 5.0\n    \n    # Penalize very small or negative d1 (solutions behind ideal point)\n    score = np.where(d1 < 0, d1 - d2 * 2.0, score)\n    \n    return score",
+        "objective": -7.0968
+    },
+    {
+        "sample_order": 50,
+        "operator": "e1",
+        "algorithm": "The algorithm \"Quantile-Adaptive Log-Sum-Exp with Dynamic Entropy Regularization\" uses a smoothed maximum (log-sum-exp) of weighted deviations, adaptively tuned by a per-solution quantile of the deviation distribution, plus an entropy-based regularization term that penalizes unbalanced objective improvements to promote diversity.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    n_solutions, n_obj = F.shape\n    \n    # Shift objectives\n    shifted = F - ideal_point\n    weighted_dev = np.abs(shifted) * weights\n    \n    # Compute per-solution quantile of weighted deviations\n    sorted_dev = np.sort(weighted_dev, axis=1)\n    quantile_indices = np.floor(n_obj * 0.7).astype(int)  # 70% quantile\n    quantile_dev = sorted_dev[:, quantile_indices]\n    \n    # Adaptive log-sum-exp smoothing parameter based on quantile\n    beta = 1.0 / (quantile_dev + 1e-10)\n    beta = np.clip(beta, 0.1, 10.0)\n    \n    # Log-sum-exp as smoothed maximum\n    max_weighted = np.max(weighted_dev, axis=1)\n    log_sum_exp = (1.0 / beta) * np.log(np.sum(np.exp(beta * weighted_dev), axis=1) + 1e-10)\n    \n    # Dynamic entropy regularization: measure balance across objectives\n    # Normalize weighted deviations to form a probability distribution\n    prob_dist = weighted_dev / (np.sum(weighted_dev, axis=1, keepdims=True) + 1e-10)\n    entropy = -np.sum(prob_dist * np.log(prob_dist + 1e-10), axis=1)\n    max_entropy = np.log(n_obj)\n    entropy_ratio = entropy / max_entropy\n    # Penalize low entropy (unbalanced) more when solution is far from ideal\n    total_dev = np.sum(weighted_dev, axis=1)\n    entropy_penalty = (1.0 - entropy_ratio) * total_dev * 0.2\n    \n    # Final score: log-sum-exp + entropy penalty\n    score = log_sum_exp + entropy_penalty\n    \n    return score",
+        "objective": null
+    },
+    {
+        "sample_order": 51,
+        "operator": "e1",
+        "algorithm": "The \"Dual-Phase Funnel Aggregation\" (DPFA) computes a weighted sum of two funnel-shaped penalties: a global funnel that attracts solutions toward the ideal point via a soft-min across objectives, and a local funnel that penalizes deviation from the weight vector direction using a cross-entropy between the normalized solution and weight distributions, then adaptively blends them based on the solution\u2019s normalized rank.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    n_solutions, n_obj = F.shape\n    \n    shifted = F - ideal_point\n    shifted_norm = np.linalg.norm(shifted, axis=1, keepdims=True)\n    shifted_unit = shifted / (shifted_norm + 1e-10)\n    \n    w_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (w_norm + 1e-10)\n    \n    # Global funnel: soft-min across objectives (weighted)\n    global_funnel = np.sum(shifted * weights, axis=1) / np.sum(weights, axis=1)\n    \n    # Local funnel: cross-entropy between normalized solution and weight direction\n    p = np.abs(shifted_unit) + 1e-10\n    p = p / np.sum(p, axis=1, keepdims=True)\n    q = np.abs(w_unit) + 1e-10\n    q = q / np.sum(q, axis=1, keepdims=True)\n    cross_entropy = -np.sum(p * np.log(q + 1e-10), axis=1)\n    local_funnel = cross_entropy * shifted_norm.flatten()\n    \n    # Adaptive blend based on normalized rank of solution norm\n    ranks = np.argsort(np.argsort(shifted_norm.flatten()))\n    normalized_rank = ranks / (n_solutions - 1)\n    blend = 0.5 + 0.5 * np.sin(np.pi * normalized_rank)\n    \n    score = blend * global_funnel + (1.0 - blend) * local_funnel\n    \n    # Handle solutions dominating ideal point\n    mask_dominance = np.all(shifted <= 0, axis=1)\n    score[mask_dominance] = global_funnel[mask_dominance] * 0.1\n    \n    return score",
+        "objective": -5.29307
+    },
+    {
+        "sample_order": 52,
+        "operator": "m2",
+        "algorithm": "\u201cAlgorithm description: **Tanh-Weighted Euclidean Return (TWER)** uses the hyperbolic tangent of the normalized objective vector to produce a smooth, bounded scalarization that emphasizes the worst-performing objective while applying a weight-dependent Euclidean penalty term.\u201d",
+        "code": "import numpy as np\n\ndef custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    # Shift to ideal point\n    shifted = F - ideal_point\n    \n    # Normalize shift to avoid extreme values\n    norm = np.linalg.norm(shifted, axis=1, keepdims=True) + 1e-10\n    normalized = shifted / norm\n    \n    # Apply tanh to each objective for bounded, smooth transformation\n    tanh_shifted = np.tanh(shifted)\n    \n    # Weighted sum of tanh values (dominant term)\n    weighted_tanh = np.sum(weights * tanh_shifted, axis=1)\n    \n    # Euclidean distance from ideal point, weighted by inverse of weight norm\n    weight_norm = np.linalg.norm(weights, axis=1) + 1e-10\n    euclidean_dist = np.linalg.norm(shifted, axis=1)\n    penalty = euclidean_dist / weight_norm\n    \n    # Combine: tanh term (negative for better solutions) + penalty\n    score = -weighted_tanh + 0.5 * penalty\n    \n    return score",
+        "objective": -7.28507
+    },
+    {
+        "sample_order": 53,
+        "operator": "m2",
+        "algorithm": "The new algorithm \"Adaptive Tchebycheff with Exponential Neighbor Pressure\" replaces the max operator in Tchebycheff with a weighted exponential sum of deviations, adding a distance-based penalty to favor proximity to the ideal point.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    n_solutions, n_obj = F.shape\n\n    # Shift objectives by ideal point\n    shifted = F - ideal_point\n\n    # Tchebycheff-inspired weighted deviations\n    weighted_dev = np.abs(shifted) * weights\n\n    # Compute Euclidean distance from ideal point (convergence signal)\n    dist_to_ideal = np.linalg.norm(shifted, axis=1)\n\n    # Exponential aggregation: sum of weighted deviations raised to power p\n    p = 2.0  # exponent controlling shape\n    exp_agg = np.sum(weighted_dev ** p, axis=1) ** (1.0 / p)\n\n    # Neighbor penalty: small constant penalty to avoid plateauing far from ideal\n    penalty = 0.05 * dist_to_ideal\n\n    # Final score: lower is better, balance aggregation and distance penalty\n    score = exp_agg + penalty\n\n    return score",
+        "objective": -7.06747
+    },
+    {
+        "sample_order": 54,
+        "operator": "e2",
+        "algorithm": "**Inverse Cosine-Weighted Log Barrier Distance** uses a log barrier function on cosine-weighted distances to penalize solutions outside a shrinking angular cone, while adapting the barrier strength based on solution rank in the population.**",
+        "code": "import numpy as np\n\ndef custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    n_solutions, n_obj = F.shape\n    shifted = F - ideal_point\n    \n    # Distance from ideal point (convergence)\n    dist = np.linalg.norm(shifted, axis=1) + 1e-10\n    \n    # Cosine similarity to weight direction (normalized)\n    w_norm = np.linalg.norm(weights, axis=1, keepdims=True) + 1e-10\n    s_norm = np.linalg.norm(shifted, axis=1, keepdims=True) + 1e-10\n    cos_sim = np.sum(shifted * weights, axis=1, keepdims=True) / (w_norm * s_norm)\n    cos_sim = np.clip(cos_sim, -0.999, 0.999)\n    \n    # Barrier strength: inverse of cosine similarity (high when aligned, low when misaligned)\n    barrier = 1.0 / (1.0 - cos_sim.squeeze() + 1e-10)\n    \n    # Log penalty: grows quickly as alignment worsens\n    log_penalty = np.log(1.0 + barrier)\n    \n    # Combine: convergence + adaptive barrier penalty\n    score = dist + log_penalty * dist\n    \n    return score",
+        "objective": -7.04953
+    },
+    {
+        "sample_order": 55,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 56,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 57,
+        "operator": "e2",
+        "algorithm": "My new algorithm uses the convex hull of the objective-transformed weight vectors as a dynamic reference frame, then computes a penalized Euclidean distance to the nearest point on this hull, where the penalty is the product of the angle deviation and the rank-based crowding distance.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    n_solutions, n_obj = F.shape\n    shifted = F - ideal_point\n    \n    # Compute convex hull of transformed weight vectors\n    theta = np.arctan2(weights[:, 1], weights[:, 0])\n    r = np.linalg.norm(weights, axis=1)\n    hull_pts = np.column_stack([r * np.cos(theta), r * np.sin(theta)])\n    \n    # Project shifted objectives onto hull space\n    proj = np.zeros(n_solutions)\n    for i in range(n_solutions):\n        t = np.linspace(0, 1, 50)\n        hull_line = np.outer(1 - t, hull_pts[i]) + np.outer(t, hull_pts[(i+1) % n_solutions])\n        dists = np.linalg.norm(shifted[i, :2] - hull_line, axis=1)\n        proj[i] = np.min(dists)\n    \n    # Angle deviation penalty\n    cos_angle = np.sum(shifted * weights, axis=1) / (np.linalg.norm(shifted, axis=1) * np.linalg.norm(weights, axis=1) + 1e-10)\n    angle_penalty = 1.0 + np.abs(np.arccos(np.clip(cos_angle, -1.0, 1.0))) / (np.pi/2)\n    \n    # Rank-based crowding distance\n    scores = np.argsort(np.argsort(proj))\n    crowding = 1.0 + scores / n_solutions\n    \n    # Final score\n    score = proj * angle_penalty * crowding\n    \n    # Handle negative projections\n    score = np.where(proj < 0, proj - 0.1 * angle_penalty, score)\n    \n    return score",
+        "objective": -2.52847
+    },
+    {
+        "sample_order": 58,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 59,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 60,
+        "operator": "m1",
+        "algorithm": "The proposed decomposition, \"Adaptive Exponential Tchebycheff with Repulsion (AETR)\", modifies the Tchebycheff function by introducing an exponential scaling of deviations and a repulsion term based on the cosine distance to the weight vector, then applies a sigmoid-weighted blend to adaptively balance convergence and diversity.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    n_solutions, n_obj = F.shape\n    shifted = F - ideal_point\n    \n    # Normalize weights\n    weights_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (weights_norm + 1e-10)\n    \n    # Exponential Tchebycheff component\n    exp_dev = np.exp(np.abs(shifted) * weights) - 1.0\n    tcheb = np.max(exp_dev, axis=1)\n    \n    # Repulsion term: cosine distance from weight vector\n    sol_norm = np.linalg.norm(shifted, axis=1)\n    cos_sim = np.sum(shifted * w_unit, axis=1) / (sol_norm * weights_norm[:, 0] + 1e-10)\n    cos_dist = 1.0 - np.clip(cos_sim, -1.0, 1.0)\n    \n    # Distance-based adaptive blend factor\n    dist_to_ideal = np.linalg.norm(shifted, axis=1)\n    alpha = 1.0 / (1.0 + np.exp(-2.0 * (dist_to_ideal - 1.0)))\n    \n    # Combined score: exponential Tchebycheff with repulsion\n    score = alpha * tcheb + (1.0 - alpha) * cos_dist * 2.0\n    \n    # Handle non-dominated solutions (negative shifted values)\n    score = np.where(np.any(shifted < 0, axis=1), \n                     np.max(np.abs(shifted) * weights, axis=1), \n                     score)\n    \n    return score",
+        "objective": -4.44713
+    },
+    {
+        "sample_order": 61,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 62,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 63,
+        "operator": "e2",
+        "algorithm": "Lorentzian Cross-Entropy with Inverse Cosine Decay (LCE-ICD) uses a Lorentzian (Cauchy) robust function of the weighted objectives to measure cross-entropy-like divergence, then discounts the score using an inverse cosine of the angle to the weight vector, promoting solutions that align well.",
+        "code": "import numpy as np\n\ndef custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    # Shift to ideal point\n    shifted = F - ideal_point\n    \n    # Normalize weight vectors\n    w_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (w_norm + 1e-10)\n    \n    # Lorentzian (Cauchy) robust loss on weighted shifted values\n    # log(1 + (weighted_shifted)^2) acts as a smooth approximation of p-norm\n    weighted_shifted = shifted * w_unit\n    lorentzian = np.log(1 + weighted_shifted**2)\n    cross_entropy_term = np.sum(lorentzian, axis=1)\n    \n    # Angle between solution and weight vector\n    sol_norm = np.linalg.norm(shifted, axis=1) + 1e-10\n    cos_angle = np.sum(shifted * w_unit, axis=1) / (sol_norm + 1e-10)\n    cos_angle = np.clip(cos_angle, -1.0, 1.0)\n    \n    # Inverse cosine decay: solutions far from weight direction get penalty\n    angle_penalty = 1.0 / (np.arccos(cos_angle) + 0.1)\n    \n    # Final score: cross-entropy term times angle penalty\n    score = cross_entropy_term * angle_penalty\n    \n    # Handle negative shifts (solutions better than ideal point)\n    score = np.where(np.any(shifted < 0, axis=1), \n                     cross_entropy_term - 0.5 * angle_penalty, \n                     score)\n    \n    return score",
+        "objective": -7.02413
+    },
+    {
+        "sample_order": 64,
+        "operator": "e1",
+        "algorithm": "This new algorithm, \"Entropy-Driven Adaptive Tchebycheff with Rank-Based Normalization\" (EDAT-RB), uses a rank-based projection of objectives onto an entropy-weighted hyperplane to compute a dynamic Chebyshev-like score that adapts its accentuation based on the diversity of the solution set.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    n_solutions, n_obj = F.shape\n    \n    # Shift objectives by ideal point\n    shifted = F - ideal_point\n    \n    # Rank-based normalization: convert each objective into its rank among solutions (0 = best)\n    ranks = np.argsort(np.argsort(shifted, axis=0), axis=0) / (n_solutions - 1)  # [0,1]\n    \n    # Compute entropy of ranks across objectives for each solution (diversity measure)\n    epsilon = 1e-10\n    p = ranks / (np.sum(ranks, axis=1, keepdims=True) + epsilon)\n    entropy = -np.sum(p * np.log(p + epsilon), axis=1) / np.log(n_obj)  # normalized [0,1]\n    \n    # Weighted rank deviation (like Chebyshev but on ranks, weighted)\n    weighted_rank_dev = np.max(ranks * weights, axis=1)\n    \n    # Adaptive accentuation: high entropy -> more emphasis on rank deviation (exploration)\n    # low entropy -> more emphasis on raw weighted sum (exploitation)\n    accent = 0.5 + 0.5 * entropy  # sigmoid-like shift\n    weighted_sum = np.sum(shifted * weights, axis=1)\n    \n    # Normalize weighted sum to similar scale as rank deviation\n    ws_min, ws_max = np.min(weighted_sum), np.max(weighted_sum)\n    ws_norm = (weighted_sum - ws_min) / (ws_max - ws_min + epsilon)\n    \n    # Score is a weighted combination of rank-based Chebyshev and normalized weighted sum\n    score = accent * weighted_rank_dev + (1.0 - accent) * ws_norm\n    \n    # Handle cases where solution dominates ideal point (negative shifted)\n    if np.any(shifted < 0):\n        neg_penalty = -np.sum(np.minimum(shifted, 0), axis=1) * 0.1\n        score = score + neg_penalty\n    \n    return score",
+        "objective": -3.21893
+    },
+    {
+        "sample_order": 65,
+        "operator": "e2",
+        "algorithm": "Adaptive Crossover-Metric Decomposition (ACMD) uses a weighted harmonic mean of normalized objective deviations, adaptively blended with a distance penalty derived from the solution's projection onto the weight vector's orthogonal complement, where the blend factor is controlled by the ratio of extreme-to-mean deviation.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\n\n    Args:\n        F (np.ndarray): Objective vectors of a batch of solutions.\n                        Shape: (n_solutions, n_objectives)\n        weights (np.ndarray): Weight vectors for the corresponding subproblems.\n                              Shape: (n_solutions, n_objectives)\n        ideal_point (np.ndarray): Best objective value found so far per objective.\n                                  Shape: (n_objectives,)\n    Returns:\n        np.ndarray: Scalar aggregation score per solution (lower means the\n                    solution is better for the given subproblem).\n                    Shape: (n_solutions,)\n    \"\"\"\n    shifted = F - ideal_point\n    n_obj = shifted.shape[1]\n    \n    # Weighted normalized deviations\n    weighted_dev = np.abs(shifted) * weights\n    \n    # Geometric mean (harmonic-like) with epsilon\n    eps = 1e-10\n    prod = np.prod(weighted_dev + eps, axis=1)\n    harmonic = n_obj / np.sum(1.0 / (weighted_dev + eps), axis=1)\n    \n    # Deviation ratio (extreme vs mean) for adaptive blend\n    max_dev = np.max(weighted_dev, axis=1)\n    mean_dev = np.mean(weighted_dev, axis=1) + eps\n    ratio = max_dev / mean_dev\n    blend = 1.0 / (1.0 + np.exp(-2.0 * (ratio - 2.0)))  # sigmoid around ratio=2\n    \n    # Orthogonal distance penalty (like d2 but scaled by weight magnitude)\n    weights_norm = np.linalg.norm(weights, axis=1, keepdims=True) + eps\n    w_unit = weights / weights_norm\n    d1 = np.sum(shifted * w_unit, axis=1)\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n    \n    # Final score: blend between harmonic and Chebyshev, plus d2 penalty\n    cheb = max_dev\n    score = (1.0 - blend) * harmonic + blend * cheb + 0.15 * d2\n    \n    # Handle negative deviations (solutions better than ideal)\n    negative_mask = np.any(shifted < 0, axis=1)\n    score = np.where(negative_mask, cheb - d2 * 0.1, score)\n    \n    return score",
+        "objective": -7.10007
+    },
+    {
+        "sample_order": 66,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 67,
+        "operator": "e1",
+        "algorithm": "New algorithm: \"Adaptive Hypervolume Contribution Guided Decomposition\" estimates each solution's contribution to the hypervolume improvement relative to the weight vector direction, using a Gaussian-shaped reward around the ideal point to bias selection toward solutions that simultaneously improve convergence and diversity.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    n_solutions, n_obj = F.shape\n    \n    # Shift objectives by ideal point\n    shifted = F - ideal_point\n    \n    # Compute distance to ideal point (convergence)\n    dist_to_ideal = np.linalg.norm(shifted, axis=1)\n    \n    # Compute cosine similarity with weight vector\n    weights_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    shifted_norm = np.linalg.norm(shifted, axis=1, keepdims=True)\n    cos_sim = np.sum(shifted * weights, axis=1) / (weights_norm.squeeze() * shifted_norm.squeeze() + 1e-10)\n    cos_sim = np.clip(cos_sim, -1.0, 1.0)\n    \n    # Gaussian-shaped reward: high reward for solutions close to ideal point and aligned with weight\n    sigma = 0.3  # bandwidth parameter\n    reward = np.exp(-0.5 * (dist_to_ideal / sigma) ** 2) * (0.5 + 0.5 * cos_sim)\n    \n    # Penalty for solutions far from weight direction (diversity preservation)\n    angle_penalty = 1.0 - cos_sim ** 2\n    \n    # Combine: minimize a score that balances convergence and diversity\n    # Lower score means better (small distance, high reward, low angle penalty)\n    score = dist_to_ideal - 0.5 * reward + 0.3 * angle_penalty\n    \n    return score",
+        "objective": -7.24513
+    },
+    {
+        "sample_order": 68,
+        "operator": "e2",
+        "algorithm": "**Adaptive Log-Cosh Boundary Projection (ALBP)** uses a smooth log-cosh function on weighted deviations to approximate Chebyshev behavior near the ideal point, then adds a boundary penalty based on the cosine similarity between the solution direction and the weight vector to push solutions toward the Pareto front extremes.",
+        "code": "import numpy as np\n\ndef custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    # Shift by ideal point\n    shifted = F - ideal_point\n    \n    # Weighted deviations\n    weighted_dev = np.abs(shifted) * weights\n    \n    # Log-cosh smooth approximation of Chebyshev (soft maximum)\n    # log(cosh(x)) \u2248 |x| - log(2) for large |x|, x^2/2 for small x\n    log_cosh = np.log(np.cosh(weighted_dev))\n    smooth_cheb = np.sum(log_cosh, axis=1)  # sum of smooth per-objective terms\n    \n    # Boundary penalty: angle between solution direction and weight vector\n    norm_sol = np.linalg.norm(shifted, axis=1, keepdims=True) + 1e-10\n    direction = shifted / norm_sol\n    cos_angle = np.sum(direction * weights, axis=1)\n    cos_angle = np.clip(cos_angle, 0.0, 1.0)\n    angle_penalty = 1.0 - cos_angle\n    \n    # Dynamic scaling based on deviation magnitude\n    max_dev = np.max(weighted_dev, axis=1)\n    penalty_strength = 0.2 * (1.0 - np.exp(-max_dev))  # grows with deviation\n    \n    score = smooth_cheb + penalty_strength * angle_penalty * max_dev\n    \n    return score",
+        "objective": -7.21987
+    },
+    {
+        "sample_order": 69,
+        "operator": "e2",
+        "algorithm": "Adaptive Cosine-Warped Asymmetric Decomposition (ACWAD) uses an asymmetry parameter derived from the cosine similarity between the solution vector and weight vector to logarithmically warp the projection distance and amplify the perpendicular distance, then applies a Chebyshev-inspired max-reduction across the warped objectives to produce a score that favors balanced convergence.",
+        "code": "import numpy as np\n\ndef custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    shifted = F - ideal_point\n    epsilon = 1e-10\n    \n    # Normalize weights and solution vectors\n    w_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    w_unit = weights / (w_norm + epsilon)\n    s_norm = np.linalg.norm(shifted, axis=1, keepdims=True)\n    s_unit = shifted / (s_norm + epsilon)\n    \n    # Cosine similarity between solution and weight direction\n    cos_sim = np.sum(s_unit * w_unit, axis=1)\n    cos_sim = np.clip(cos_sim, -1.0, 1.0)\n    \n    # Asymmetry parameter: high when solution aligns poorly with weight\n    asymmetry = np.exp(2.0 * (1.0 - cos_sim)) - 1.0\n    \n    # Projection along weight direction\n    d1 = np.sum(shifted * w_unit, axis=1)\n    \n    # Perpendicular distance (d2)\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n    \n    # Logarithmic warp of d1 with asymmetry modulation\n    d1_warped = np.log1p(np.abs(d1) * (1.0 + asymmetry))\n    d1_warped = np.where(d1 >= 0, d1_warped, -d1_warped)\n    \n    # Amplify d2 based on asymmetry\n    d2_amplified = d2 * (1.0 + 0.5 * asymmetry)\n    \n    # Warped objectives per dimension\n    n_obj = F.shape[1]\n    warped_objs = np.zeros_like(shifted)\n    for i in range(n_obj):\n        warped_objs[:, i] = np.abs(shifted[:, i]) * weights[:, i] * (1.0 + 0.3 * asymmetry)\n    \n    # Chebyshev-like max over warped objectives\n    max_term = np.max(warped_objs, axis=1)\n    \n    # Combine d1_warped, d2_amplified, and max_term\n    score = max_term + 0.5 * d1_warped + 0.3 * d2_amplified\n    \n    # Ensure non-negative and return\n    score = np.maximum(score, epsilon)\n    return score",
+        "objective": -7.30347
+    },
+    {
+        "sample_order": 70,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 71,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 72,
+        "operator": "e2",
+        "algorithm": "**Entropy-Regulated Deviation Scalarization (ERDS)** leverages information entropy across normalized objective values to adaptively balance convergence and diversity, penalizing solutions with unbalanced objective improvements relative to the weight vector.",
+        "code": "import numpy as np\n\ndef custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    n_solutions, n_obj = F.shape\n    \n    # Shift to ideal point\n    shifted = F - ideal_point\n    \n    # Compute normalized objective proportions for entropy\n    shifted_safe = np.maximum(shifted, 1e-10)\n    proportions = shifted_safe / np.sum(shifted_safe, axis=1, keepdims=True)\n    \n    # Entropy: high when objectives are balanced, low when unbalanced\n    entropy = -np.sum(proportions * np.log(proportions + 1e-10), axis=1)\n    max_entropy = np.log(n_obj)\n    entropy_ratio = entropy / max_entropy  # [0,1]\n    \n    # Weighted sum (convergence)\n    weighted_sum = np.sum(shifted * weights, axis=1)\n    \n    # Compute cosine similarity with weight vector (direction alignment)\n    w_norm = np.linalg.norm(weights, axis=1, keepdims=True)\n    s_norm = np.linalg.norm(shifted, axis=1, keepdims=True)\n    cos_sim = np.sum(shifted * weights, axis=1, keepdims=True) / (w_norm * s_norm + 1e-10)\n    cos_sim = np.clip(cos_sim, -1.0, 1.0).squeeze()\n    \n    # Entropy-modulated penalty: low entropy (unbalanced) increases penalty\n    penalty = (1.0 - cos_sim) * (2.0 - entropy_ratio)\n    \n    # Final score: convergence + diversity penalty\n    score = weighted_sum + penalty\n    \n    return score",
+        "objective": -7.2296
+    },
+    {
+        "sample_order": 73,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 74,
+        "operator": "m1",
+        "algorithm": "The new algorithm \"Adaptive Norm-Weighted Hypervolume-Guided Scalarization\" replaces the Chebyshev max with a weighted Minkowski p-norm where p is dynamically adjusted per solution based on the angle to the weight vector, and augments the score with a penalty inversely proportional to the distance from the ideal point to promote convergence.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    n_solutions, n_obj = F.shape\n    \n    # Shift objectives\n    shifted = F - ideal_point\n    shifted = np.abs(shifted)  # non-negative deviations\n    \n    # Compute dynamic p-norm based on alignment with weight vector\n    # Use angle between shifted solution and weight vector to determine p\n    norm_shifted = np.linalg.norm(shifted, axis=1, keepdims=True) + 1e-10\n    normalized_shifted = shifted / norm_shifted\n    cos_angle = np.sum(normalized_shifted * weights, axis=1)\n    cos_angle = np.clip(cos_angle, 0.0, 1.0)\n    # p ranges from 1 (aligned) to 4 (misaligned)\n    p = 1.0 + 3.0 * (1.0 - cos_angle)\n    \n    # Weighted Minkowski p-norm\n    weighted = shifted * weights\n    # Compute p-norm per solution\n    p_norm = np.sum(weighted ** p[:, np.newaxis], axis=1) ** (1.0 / p)\n    \n    # Hypervolume-guided penalty: reward closeness to ideal point\n    # Combine with a small Chebyshev component for robustness\n    chebyshev = np.max(weighted, axis=1)\n    score = p_norm + 0.2 * chebyshev\n    \n    return score",
+        "objective": -7.21787
+    },
+    {
+        "sample_order": 75,
+        "operator": "m2",
+        "algorithm": "The new algorithm \"Directional Entropy-Weighted Decomposition\" replaces the static exponent and angle penalty with an adaptive entropy-based weighting that measures objective imbalance across the batch and scales the decomposition dynamically.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    n_solutions, n_obj = F.shape\n    \n    # Shift objectives\n    shifted = F - ideal_point\n    \n    # Weighted deviations\n    weighted_dev = np.abs(shifted) * weights  # (n_solutions, n_obj)\n    \n    # Chebyshev baseline\n    chebyshev = np.max(weighted_dev, axis=1)\n    \n    # Normalize shifted for directional entropy\n    shifted_norm = np.linalg.norm(shifted, axis=1, keepdims=True) + 1e-10\n    normalized = shifted / shifted_norm  # (n_solutions, n_obj)\n    \n    # Compute entropy of normalized deviations per solution\n    # Higher entropy = more balanced objectives\n    prob = (np.abs(shifted) + 1e-10) / (np.sum(np.abs(shifted), axis=1, keepdims=True) + 1e-10)\n    entropy = -np.sum(prob * np.log(prob + 1e-10), axis=1) / np.log(n_obj)  # normalized 0-1\n    \n    # Adaptive penalty: penalize low-entropy (imbalanced) solutions\n    # For solutions with low entropy, increase the score (worse)\n    imbalance_penalty = (1.0 - entropy) ** 2\n    \n    # Directional alignment with weight vector (cosine similarity)\n    cos_sim = np.sum(normalized * weights, axis=1)\n    cos_sim = np.clip(cos_sim, 0.0, 1.0)\n    direction_bonus = 1.0 - cos_sim  # high when misaligned\n    \n    # Combine: chebyshev + entropy penalty + direction penalty\n    score = chebyshev * (1.0 + 0.4 * imbalance_penalty + 0.2 * direction_bonus)\n    \n    return score",
+        "objective": -7.2434
+    },
+    {
+        "sample_order": 76,
+        "operator": "e2",
+        "algorithm": "**Adaptive Sigmoid-Weighted Boundary Distance (ASWBD)** which uses a sigmoid-modulated penalty on the Euclidean distance to a dynamically computed boundary surface defined by the weight vectors, combined with an inverted cosine similarity reward for diversity.",
+        "code": "import numpy as np\n\ndef custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    epsilon = 1e-10\n    n_solutions, n_obj = F.shape\n    \n    # Shift objectives\n    shifted = F - ideal_point\n    \n    # Compute unit vectors\n    w_norm = np.linalg.norm(weights, axis=1, keepdims=True) + epsilon\n    w_unit = weights / w_norm\n    s_norm = np.linalg.norm(shifted, axis=1, keepdims=True) + epsilon\n    s_unit = shifted / s_norm\n    \n    # Euclidean distance from ideal point\n    euclidean_dist = s_norm.squeeze()\n    \n    # Projection onto weight direction\n    d1 = np.sum(shifted * w_unit, axis=1)\n    \n    # Perpendicular distance\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n    \n    # Cosine similarity (inverted for reward when well-aligned)\n    cos_sim = np.sum(s_unit * w_unit, axis=1)\n    cos_sim = np.clip(cos_sim, -1.0, 1.0)\n    cos_reward = 0.5 * (cos_sim + 1.0)  # map to [0, 1]\n    \n    # Sigmoid-weighted boundary distance\n    # Boundary surface: d1 = 0 (ideal point) projected along weight\n    # Sigmid modulates penalty based on alignment\n    sigmoid_scale = 5.0 * (1.0 - cos_reward) + 0.5\n    boundary_penalty = 1.0 / (1.0 + np.exp(-sigmoid_scale * (d1 / (euclidean_dist + epsilon) - 0.3)))\n    \n    # Main score: Euclidean distance penalized by boundary proximity, rewarded by alignment, plus perpendicular distance\n    score = euclidean_dist * (1.0 + 0.5 * boundary_penalty) - 0.2 * cos_reward * euclidean_dist + 0.4 * d2\n    \n    # Ensure non-negative\n    score = np.maximum(score, epsilon)\n    return score",
+        "objective": -7.26787
+    },
+    {
+        "sample_order": 77,
+        "operator": "e1",
+        "algorithm": "The algorithm uses a non-linear combination of weighted exponential distances and a repulsive term based on pairwise angular diversity among solutions to encourage both convergence and spread.",
+        "code": "def custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    n_solutions, n_obj = F.shape\n    shifted = F - ideal_point + 1e-10\n    \n    # Weighted exponential distance (p-norm with p=1.5)\n    weighted_shifted = np.abs(shifted) * weights\n    exp_dist = np.power(np.sum(np.power(weighted_shifted, 1.5), axis=1), 1.0/1.5)\n    \n    # Repulsive term: angle-based diversity penalty relative to other solutions\n    repulsion = np.zeros(n_solutions)\n    for i in range(n_solutions):\n        vec_i = F[i]\n        angles = np.zeros(n_solutions)\n        for j in range(n_solutions):\n            if i != j:\n                cos_angle = np.dot(vec_i, F[j]) / (np.linalg.norm(vec_i) * np.linalg.norm(F[j]) + 1e-10)\n                angles[j] = np.arccos(np.clip(cos_angle, -1.0, 1.0))\n        # Repulsion from nearest neighbor (small angle = high repulsion)\n        repulsion[i] = 1.0 / (np.min(angles[angles > 0]) + 1e-10)\n    \n    repulsion = repulsion / (np.max(repulsion) + 1e-10)  # normalize\n    \n    # Final score: convergence (exp_dist) minus small diversity bonus, plus repulsion penalty\n    score = exp_dist - 0.1 * np.min(weighted_shifted, axis=1) + 0.05 * repulsion\n    \n    return score",
+        "objective": -6.9718
+    },
+    {
+        "sample_order": 78,
+        "operator": "m1",
+        "algorithm": "The algorithm, **Directional Gaussian Barrier Decomposition (DGBD)**, replaces the sigmoid penalty with a Gaussian barrier centered on the weight direction, scaled by adaptive width based on the solution's alignment, and combines it with an exponential reward for convergence.",
+        "code": "import numpy as np\n\ndef custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\"\"\"\n    epsilon = 1e-10\n    n_solutions, n_obj = F.shape\n    \n    # Shift objectives\n    shifted = F - ideal_point\n    \n    # Compute unit vectors\n    w_norm = np.linalg.norm(weights, axis=1, keepdims=True) + epsilon\n    w_unit = weights / w_norm\n    s_norm = np.linalg.norm(shifted, axis=1, keepdims=True) + epsilon\n    s_unit = shifted / s_norm\n    \n    # Euclidean distance from ideal point\n    euclidean_dist = s_norm.squeeze()\n    \n    # Projection onto weight direction\n    d1 = np.sum(shifted * w_unit, axis=1)\n    \n    # Perpendicular distance\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n    \n    # Cosine similarity\n    cos_sim = np.sum(s_unit * w_unit, axis=1)\n    cos_sim = np.clip(cos_sim, -1.0, 1.0)\n    alignment = 0.5 * (cos_sim + 1.0)  # [0, 1]\n    \n    # Gaussian barrier: centered at a target proportion of convergence along weight direction\n    target_ratio = 0.4  # target convergence ratio\n    width = 0.2 + 0.5 * (1.0 - alignment)  # wider when poorly aligned\n    barrier = np.exp(-0.5 * ((d1 / (euclidean_dist + epsilon) - target_ratio) / width) ** 2)\n    \n    # Exponential convergence reward (strongly favors small d1)\n    convergence_reward = np.exp(-2.0 * d1 / (euclidean_dist + epsilon))\n    \n    # Final score: weighted sum of perpendicular distance, barrier penalty, and convergence reward\n    score = d2 + 0.6 * barrier * euclidean_dist + 0.3 * (1.0 - convergence_reward) * euclidean_dist\n    \n    # Ensure non-negative\n    score = np.maximum(score, epsilon)\n    return score",
+        "objective": -6.88113
+    },
+    {
+        "sample_order": 79,
+        "operator": "e1",
+        "algorithm": "{**Log-Sum-Exponential (LSE) with Adaptive Objective Ranking (AOR)**: transforms the weighted objective differences via a temperature-controlled log-sum-exponential function that smoothly approximates the maximum while preserving differentiability, and adaptively re-weights objectives based on their relative ranks within the batch to encourage diversity and penalize stagnation.**",
+        "code": "import numpy as np\n\ndef custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    \"\"\"Design a novel decomposition method for MOEA/D.\n\n    Args:\n        F (np.ndarray): Objective vectors of a batch of solutions.\n                        Shape: (n_solutions, n_objectives)\n        weights (np.ndarray): Weight vectors for the corresponding subproblems.\n                              Shape: (n_solutions, n_objectives)\n        ideal_point (np.ndarray): Best objective value found so far per objective.\n                                  Shape: (n_objectives,)\n    Returns:\n        np.ndarray: Scalar aggregation score per solution (lower means the\n                    solution is better for the given subproblem).\n                    Shape: (n_solutions,)\n    \"\"\"\n    n_solutions, n_obj = F.shape\n    epsilon = 1e-10\n\n    # Shift objectives\n    shifted = F - ideal_point\n\n    # Compute ranks for each objective across solutions (higher rank = worse)\n    ranks = np.argsort(np.argsort(shifted, axis=0), axis=0).astype(np.float64)\n    ranks = ranks / (n_solutions - 1 + epsilon)  # normalize to [0, 1]\n\n    # Adaptive re-weighting: boost weights for objectives where solution is poor\n    adaptive_weights = weights * (1.0 + 0.5 * ranks)\n    adaptive_weights = adaptive_weights / (np.sum(adaptive_weights, axis=1, keepdims=True) + epsilon)\n\n    # Weighted differences\n    weighted_diff = adaptive_weights * shifted\n\n    # Log-Sum-Exponential with temperature (decreasing temperature = more like max)\n    temperature = 2.0  # moderate temperature\n    lse = temperature * np.log(np.sum(np.exp(weighted_diff / temperature), axis=1) + epsilon)\n\n    # Add small perpendicular distance for diversity (PBI-like)\n    w_unit = weights / (np.linalg.norm(weights, axis=1, keepdims=True) + epsilon)\n    d1 = np.sum(shifted * w_unit, axis=1)\n    proj = d1[:, np.newaxis] * w_unit\n    d2 = np.linalg.norm(shifted - proj, axis=1)\n\n    # Final score: LSE + small d2 penalty\n    score = lse + 0.3 * d2\n\n    return score",
+        "objective": -7.18033
+    },
+    {
+        "sample_order": 80,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 81,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 82,
+        "operator": "e1",
+        "algorithm": "The algorithm \u201cCubic Contour Hyperbola Merge (CCHM)\u201d constructs a scalar score by computing the elementwise cubic power of the shifted objectives, applying a weight-dependent hyperbolic tangent of the sum, and adding a scaled geometric mean of the shifted objectives, producing a non\u2011linear contour that aggressively penalizes imbalance.",
+        "code": "import numpy as np\n\ndef custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    shifted = F - ideal_point\n    epsilon = 1e-10\n    \n    # Cubic transformation of shifted objectives\n    cubed = np.abs(shifted) ** 3\n    weighted_cubed = cubed * weights\n    \n    # Weighted sum of cubes\n    sum_cubed = np.sum(weighted_cubed, axis=1)\n    \n    # Hyperbolic tangent of sum_cubed for smooth saturation\n    tanh_term = np.tanh(sum_cubed)\n    \n    # Geometric mean of shifted magnitudes (with sign)\n    sign = np.sign(np.prod(shifted, axis=1))\n    geom_mean = np.exp(np.mean(np.log(np.abs(shifted) + epsilon), axis=1)) * sign\n    \n    # Hyperbola-inspired combination: multiply tanh by geometric mean and add a bias\n    score = tanh_term * geom_mean + np.max(weighted_cubed, axis=1)\n    \n    # Ensure non-negative and finite\n    score = np.maximum(score, epsilon)\n    return score",
+        "objective": -7.2372
+    },
+    {
+        "sample_order": 83,
+        "operator": "m1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 84,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 85,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 86,
+        "operator": "m2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 87,
+        "operator": "e1",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 88,
+        "operator": "e2",
+        "algorithm": "**Entropy-Gated Inverse Cosine Similarity (EGICS)** computes a scalar score by weighting the negative cosine similarity between the shifted objective and the weight vector with an entropy-based gate that penalizes unbalanced objective improvement.",
+        "code": "import numpy as np\n\ndef custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    shifted = F - ideal_point + 1e-10\n    norms_F = np.linalg.norm(shifted, axis=1, keepdims=True)\n    norms_W = np.linalg.norm(weights, axis=1, keepdims=True)\n    cosine_sim = np.sum(shifted * weights, axis=1) / (norms_F.flatten() * norms_W.flatten() + 1e-10)\n    \n    # Entropy of normalized shifted objectives (measure of balance)\n    prob = np.abs(shifted) / (np.sum(np.abs(shifted), axis=1, keepdims=True) + 1e-10)\n    entropy = -np.sum(prob * np.log(prob + 1e-10), axis=1)\n    max_entropy = np.log(F.shape[1])\n    gate = 1 - (entropy / max_entropy)  # high gate = unbalanced\n    \n    score = -cosine_sim + 0.8 * gate * norms_F.flatten()\n    return score",
+        "objective": -4.45447
+    }
+]

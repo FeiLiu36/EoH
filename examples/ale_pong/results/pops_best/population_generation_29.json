@@ -1,0 +1,6 @@
+{
+    "algorithm": "Use a finite state machine that switches between aggressive pursuit of the ball's current position and defensive centering based on ball direction, with velocity-adaptive dead zones.",
+    "code": "def select_action(obs: np.ndarray) -> int:\n    ball_x = obs[49]\n    ball_y = obs[54]\n    paddle_y = obs[51]\n    \n    # Velocity estimation from ball position relative to screen\n    if ball_y < 105:\n        vert_vel = -3\n    else:\n        vert_vel = 3\n        \n    # Determine ball direction\n    ball_coming = ball_x > 80  # ball on right half coming toward player\n    \n    if ball_coming:\n        # Aggressive tracking with velocity-aware dead zone\n        error = ball_y - (paddle_y + 10)\n        dead_zone = max(4, abs(vert_vel) * 2)\n        if error < -dead_zone:\n            return 2\n        elif error > dead_zone:\n            return 3\n        return 0\n    else:\n        # Defensive centering: move toward middle of screen\n        target_y = 105  # screen vertical center\n        error = target_y - (paddle_y + 10)\n        dead_zone = 8\n        if error < -dead_zone:\n            return 2\n        elif error > dead_zone:\n            return 3\n        return 0",
+    "objective": 0.4,
+    "other_inf": null
+}

@@ -1,0 +1,6 @@
+{
+    "algorithm": "The proposed crossover operator adaptively blends parent differences using a dynamic crossover probability based on the Euclidean distance between parents, favoring exploration when parents are far apart and exploitation when close, combined with a weighted average scheme.",
+    "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    dist = np.linalg.norm(x1 - x2) / np.sqrt(len(x1))\n    p_cross = 0.5 + 0.4 * (1 - dist)\n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(len(x1)):\n        if np.random.random() < p_cross:\n            alpha = np.random.uniform(-0.5, 1.5)\n            c1[i] = (1 - alpha) * x1[i] + alpha * x2[i]\n            c2[i] = (1 - alpha) * x2[i] + alpha * x1[i]\n    return c1, c2",
+    "objective": -0.69751,
+    "other_inf": null
+}

@@ -1,0 +1,26 @@
+[
+    {
+        "algorithm": "The algorithm uses rank-based sigmoid weights that assign gradually higher influence to better observations, with an adaptive steepness that increases with group size to balance exploration and exploitation.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Rank from 0 (worst) to n-1 (best)\n    ranks = np.arange(n)\n    # Steepness grows with n: steeper for larger n (more exploitation)\n    steepness = 0.1 + 0.02 * np.sqrt(n)\n    # Sigmoid centered at mid-rank, scaled to [0.1, 1]\n    sigmoid = 1 / (1 + np.exp(-steepness * (ranks - n / 2)))\n    weights = 0.1 + 0.9 * (sigmoid - sigmoid.min()) / (sigmoid.max() - sigmoid.min() + 1e-10)\n    return weights",
+        "objective": 0.09043,
+        "other_inf": null
+    },
+    {
+        "algorithm": "'Use a **logistic softplus weight** that combines an inverse-quadratic decay from the best observation with a sigmoid-like ramp that flattens for the top 10% of points, using a temperature that cools inversely with the square root of n to sharpen focus as the group grows.'",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    distances = np.arange(n - 1, -1, -1, dtype=float)\n    temperature = 1.0 + 10.0 / np.sqrt(n)\n    inv_quad = 1.0 / (1.0 + (distances / temperature) ** 2)\n    # Logistic softplus: flat for top 10%, then sigmoid decay\n    top_k = max(1, n // 10)\n    sigmoid_scale = 5.0 / np.sqrt(n)\n    logistic = 1.0 - 1.0 / (1.0 + np.exp(-(distances - (n - top_k)) / sigmoid_scale))\n    weights = inv_quad * logistic\n    # ensure non-negative and avoid zero for best point\n    weights = np.maximum(weights, 1e-10)\n    weights = weights / np.sum(weights)\n    return weights",
+        "objective": 0.12039,
+        "other_inf": null
+    },
+    {
+        "algorithm": "Use a **softmin-normalized inverse quadratic weight** that sharply peaks at the best observation and decays polynomially toward the worst, with a temperature schedule that increases focus as the group grows.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Inverse quadratic rank: distance from best (index n-1)\n    distances = np.arange(n - 1, -1, -1, dtype=float)  # [n-1, n-2, ..., 0]\n    # Temperature decreases with n to increase focus on best\n    temperature = 1.0 + 10.0 / np.sqrt(n)\n    # Inverse quadratic weighting, avoid division by zero for best point\n    weights = 1.0 / (1.0 + (distances / temperature) ** 2)\n    # Softmin normalization to preserve relative magnitudes\n    weights = weights / np.sum(weights)\n    return weights",
+        "objective": 0.18303,
+        "other_inf": null
+    },
+    {
+        "algorithm": "Use a rank-based inverse exponential weighting scheme that assigns higher weights to the best observations, with a temperature parameter that adapts to the group size to balance exploration and exploitation.",
+        "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Rank from 0 (worst) to n-1 (best)\n    ranks = np.arange(n)\n    # Temperature decreases with n, tightening focus on best points as group grows\n    temperature = max(1.0, n / 5.0)\n    weights = np.exp(ranks / temperature)\n    return weights",
+        "objective": 0.23336,
+        "other_inf": null
+    }
+]

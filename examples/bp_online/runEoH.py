@@ -1,22 +1,28 @@
-from eoh import eoh
-from eoh.utils.getParas import Paras
+import os
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'eoh', 'src'))
 
-# Parameter initilization #
-paras = Paras() 
+from eoh import EoH, LLMConfig
+from prob import BPONLINE
 
-# Set parameters #
-paras.set_paras(method = "eoh",    # ['ael','eoh']
-                problem = "bp_online", #['tsp_construct','bp_online']
-                llm_api_endpoint = "xxx", # set your LLM endpoint
-                llm_api_key = "xxx",   # set your key
-                llm_model = "gpt-3.5-turbo",
-                ec_pop_size = 4, # number of samples in each population
-                ec_n_pop = 4,  # number of populations
-                exp_n_proc = 4,  # multi-core parallel
-                exp_debug_mode = False)
+if __name__ == "__main__":
 
-# initilization
-evolution = eoh.EVOL(paras)
+    llm = LLMConfig(
+        api_endpoint='api.deepseek.com',
+        api_key='sk-xxx',
+        model='deepseek-chat',
+        timeout=150,
+    )
 
-# run 
-evolution.run()
+    task = BPONLINE(capacity=100, timeout=40, n_processes=4)
+
+    eoh = EoH(
+        llm=llm,
+        problem=task,
+        pop_size=4,
+        n_pop=20,
+        operators=['e1', 'e2', 'm1', 'm2'],
+        output_dir="./",
+    )
+
+    eoh.run()

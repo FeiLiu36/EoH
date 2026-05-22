@@ -1,0 +1,7 @@
+{
+    "sample_order": 1,
+    "operator": "i1",
+    "algorithm": "The algorithm uses rank-based sigmoid weights that assign gradually higher influence to better observations, with an adaptive steepness that increases with group size to balance exploration and exploitation.",
+    "code": "import numpy as np\n\ndef compute_weights(n: int) -> np.ndarray:\n    if n == 0:\n        return np.array([])\n    # Rank from 0 (worst) to n-1 (best)\n    ranks = np.arange(n)\n    # Steepness grows with n: steeper for larger n (more exploitation)\n    steepness = 0.1 + 0.02 * np.sqrt(n)\n    # Sigmoid centered at mid-rank, scaled to [0.1, 1]\n    sigmoid = 1 / (1 + np.exp(-steepness * (ranks - n / 2)))\n    weights = 0.1 + 0.9 * (sigmoid - sigmoid.min()) / (sigmoid.max() - sigmoid.min() + 1e-10)\n    return weights",
+    "objective": 0.09043
+}

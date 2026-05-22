@@ -1,0 +1,26 @@
+[
+    {
+        "algorithm": "The algorithm computes a compound acquisition score by combining a rank-based exploitation term with a sigmoid-gated information gain that amplifies exploration for points whose mean is slightly above the best, then further weights this by a Boltzmann exploration factor based on sigma.",
+        "code": "import numpy as np\nfrom scipy.special import erf\n\ndef acquisition(mu: np.ndarray, sigma: np.ndarray, f_best: float) -> np.ndarray:\n    # Exploitation: rank-based, lower mean gets higher score\n    ranks = np.argsort(np.argsort(mu))  # 0 for smallest mu\n    exploit = -ranks / len(mu)\n    \n    # Distance from best\n    diff = mu - f_best\n    # Sigmoid gate: high when diff is near 0 (close to best), decays for large diff\n    gate = 1.0 / (1.0 + np.exp(2.0 * diff))  # sigmoid decreasing with diff\n    \n    # Information gain: sigma * gate, but weighted by a Boltzmann-like factor\n    boltzmann_factor = np.exp(sigma / (np.max(sigma) + 1e-10))\n    explore = sigma * gate * boltzmann_factor\n    \n    # Combine with temperature decay based on sigma quantile\n    q = np.percentile(sigma, 50)  # median sigma\n    temperature = 1.0 / (1.0 + q)\n    score = temperature * exploit + (1.0 - temperature) * explore\n    \n    return score",
+        "objective": -1.23093,
+        "other_inf": null
+    },
+    {
+        "algorithm": "The algorithm uses a regret-weighted, entropy-aware acquisition that penalizes high-mean regions via a probabilistic thresholding of the posterior and adds an adaptive exploration bonus proportional to the differential entropy reduction rate.",
+        "code": "import numpy as np\nfrom scipy.stats import norm\nfrom scipy.special import erf\n\ndef acquisition(mu: np.ndarray, sigma: np.ndarray, f_best: float) -> np.ndarray:\n    # 1. Probability of improvement at a relaxed threshold\n    threshold = f_best + 0.1 * np.abs(f_best)\n    gamma = (threshold - mu) / (sigma + 1e-10)\n    pi = 0.5 * (1 + erf(gamma / np.sqrt(2)))\n    \n    # 2. Differential entropy reduction (exploration)\n    # Approximate reduction by log of sigma (higher sigma -> more info gain)\n    entropy = np.log(sigma + 1e-10)\n    entropy_reduction = -entropy  # want to maximize reduction\n    \n    # 3. Regret-aware weighting: focus where current best is hard to beat\n    regret_ratio = np.maximum(0, f_best - mu) / (np.abs(f_best) + 1e-10)\n    regret_weight = np.tanh(2.0 * regret_ratio)  # saturating weight\n    \n    # 4. Combined score: penalize high mean, reward high uncertainty, balance via regret\n    score = -mu + 1.5 * sigma * (1 + entropy_reduction) + 2.0 * pi * regret_weight\n    \n    return score",
+        "objective": -1.20565,
+        "other_inf": null
+    },
+    {
+        "algorithm": "It applies a **parabolic information-ratio** that discounts standard deviation by the inverse of the squared distance to the current best, then adds a **cosine-annealed noise term** driven by the disagreement between the mean and the best-observed value.",
+        "code": "import numpy as np\n\ndef acquisition(mu: np.ndarray, sigma: np.ndarray, f_best: float) -> np.ndarray:\n    # Base exploitation: penalize high mean (like LCB)\n    exploit = -mu\n    \n    # Parabolic information-ratio: discount sigma heavily near the best, boost far away\n    diff = mu - f_best\n    # Avoid division by zero; small constant\n    denominator = (diff ** 2 + 1e-10)\n    # Inverse diff squared: large when mu is far from f_best (either side)\n    info_ratio = 1.0 / denominator\n    # Clamp to stable range\n    info_ratio = np.clip(info_ratio, 0.0, 10.0)\n    # Exploration term: sigma scaled by this adaptive ratio\n    explore = sigma * info_ratio\n    \n    # Cosine-annealed noise: adds a cyclical penalty based on disagreement\n    # Noise magnitude depends on how far mu is from f_best\n    noise = np.cos(2.0 * np.pi * diff / (sigma + 1e-10)) * sigma * 0.5\n    \n    # Total score: combine with a small constant to avoid negative scores dominating\n    score = exploit + 2.0 * explore + noise\n    \n    return score",
+        "objective": -1.18149,
+        "other_inf": null
+    },
+    {
+        "algorithm": "The algorithm uses a sigmoid-gated exploration term that amplifies uncertainty when the mean is near the current best and adds a periodic sign-flip based on the parity of the cumulative number of observed improvements.",
+        "code": "import numpy as np\n\ndef acquisition(mu: np.ndarray, sigma: np.ndarray, f_best: float) -> np.ndarray:\n    # Exploitation: lower mean is better\n    exploit = -mu\n    \n    # Distance from current best\n    diff = mu - f_best\n    # Sigmoid gate: close to 1 when diff is near zero, decays for large |diff|\n    gate = 1.0 / (1.0 + diff**2 + 1e-10)\n    # Exploration: sigma modulated by gate\n    explore = sigma * gate\n    \n    # Periodic sign-flip based on diff sign and magnitude (simulates improvement parity)\n    parity = np.sign(np.cos(2.0 * np.pi * diff / (sigma + 1e-10)))  # +1 or -1\n    # Amplify exploration further when parity is positive (encouraging diverse sampling)\n    explore = explore * (1.0 + 0.5 * (parity > 0))\n    \n    # Combine with a small constant to avoid negative dominance\n    score = exploit + 2.5 * explore\n    \n    return score",
+        "objective": -1.16672,
+        "other_inf": null
+    }
+]

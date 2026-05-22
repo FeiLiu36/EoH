@@ -1,0 +1,6 @@
+{
+    "algorithm": "Use a logistic sigmoid centered on an adaptively shifting threshold of delta_fitness/temperature, with the sigmoid's steepness increasing over iterations to gradually harden the acceptance boundary.",
+    "code": "def acceptance_probability(delta_fitness: float, temperature: float,\n                           iteration: int, max_iterations: int) -> float:\n    import numpy as np\n    progress = iteration / max_iterations\n    # Threshold shifts from 2.0 to 0.5 over iterations\n    threshold = 2.0 - 1.5 * progress\n    # Steepness increases from 0.5 to 5.0\n    steepness = 0.5 + 4.5 * progress\n    # Logistic sigmoid centered at threshold\n    z = steepness * (threshold - delta_fitness / max(temperature, 1e-10))\n    prob = 1.0 / (1.0 + np.exp(-z))\n    return float(np.clip(prob, 0.0, 1.0))",
+    "objective": 1.57724,
+    "other_inf": null
+}

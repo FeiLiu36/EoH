@@ -1,0 +1,6 @@
+{
+    "algorithm": "\u201cAlgorithm description: **Tanh-Weighted Euclidean Return (TWER)** uses the hyperbolic tangent of the normalized objective vector to produce a smooth, bounded scalarization that emphasizes the worst-performing objective while applying a weight-dependent Euclidean penalty term.\u201d",
+    "code": "import numpy as np\n\ndef custom_decomposition(F: np.ndarray,\n                         weights: np.ndarray,\n                         ideal_point: np.ndarray) -> np.ndarray:\n    # Shift to ideal point\n    shifted = F - ideal_point\n    \n    # Normalize shift to avoid extreme values\n    norm = np.linalg.norm(shifted, axis=1, keepdims=True) + 1e-10\n    normalized = shifted / norm\n    \n    # Apply tanh to each objective for bounded, smooth transformation\n    tanh_shifted = np.tanh(shifted)\n    \n    # Weighted sum of tanh values (dominant term)\n    weighted_tanh = np.sum(weights * tanh_shifted, axis=1)\n    \n    # Euclidean distance from ideal point, weighted by inverse of weight norm\n    weight_norm = np.linalg.norm(weights, axis=1) + 1e-10\n    euclidean_dist = np.linalg.norm(shifted, axis=1)\n    penalty = euclidean_dist / weight_norm\n    \n    # Combine: tanh term (negative for better solutions) + penalty\n    score = -weighted_tanh + 0.5 * penalty\n    \n    return score",
+    "objective": -7.28507,
+    "other_inf": null
+}

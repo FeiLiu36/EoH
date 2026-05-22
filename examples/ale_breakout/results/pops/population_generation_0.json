@@ -1,0 +1,8 @@
+[
+    {
+        "algorithm": "The algorithm tracks the ball's x and y positions from the RAM and moves the paddle toward the ball's current x-coordinate when the ball is in play, then fires to launch a new ball when the ball is lost.",
+        "code": "def select_action(obs: np.ndarray) -> int:\n    if obs[101] == 0:\n        return 1  # FIRE to launch the ball\n\n    ball_x   = obs[99]\n    paddle_x = obs[72]\n\n    if ball_x < paddle_x:\n        return 3  # LEFT\n    elif ball_x > paddle_x:\n        return 2  # RIGHT\n    return 0  # NOOP",
+        "objective": -10.5,
+        "other_inf": null
+    }
+]

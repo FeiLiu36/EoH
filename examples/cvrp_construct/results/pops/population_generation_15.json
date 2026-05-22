@@ -1,0 +1,26 @@
+[
+    {
+        "algorithm": "The new algorithm selects the next customer by maximizing the ratio of distance from the depot to the customer to the distance from the current node to the customer, multiplied by the square of the remaining capacity fraction, to favor far, high-capacity-utilizing customers early.",
+        "code": "def select_next_node(current_node: int, depot: int, unvisited_nodes: np.ndarray,\n                     rest_capacity: float, demands: np.ndarray,\n                     distance_matrix: np.ndarray) -> int:\n    if len(unvisited_nodes) == 0:\n        return depot\n    dist_current = distance_matrix[current_node][unvisited_nodes]\n    dist_depot = distance_matrix[depot][unvisited_nodes]\n    capacity_ratio = (rest_capacity / (np.max(demands[unvisited_nodes]) + 1e-10)) ** 2\n    score = (dist_depot / (dist_current + 1e-10)) * capacity_ratio\n    return unvisited_nodes[np.argmax(score)]",
+        "objective": 13.28515,
+        "other_inf": null
+    },
+    {
+        "algorithm": "The algorithm iteratively selects the nearest feasible unvisited customer until capacity is exhausted, then returns to the depot to start a new route.",
+        "code": "def select_next_node(current_node: int, depot: int, unvisited_nodes: np.ndarray,\n                     rest_capacity: float, demands: np.ndarray,\n                     distance_matrix: np.ndarray) -> int:\n    \"\"\"Select the next node to visit in a CVRP greedy construction.\n\n    Args:\n        current_node:    index of the current node (0 = depot)\n        depot:           index of the depot (always 0)\n        unvisited_nodes: array of feasible unvisited customer indices\n                         (already filtered to satisfy remaining capacity)\n        rest_capacity:   remaining vehicle capacity\n        demands:         demand of every node (index 0 = depot demand = 0)\n        distance_matrix: pairwise Euclidean distance matrix\n    Returns:\n        Index of the next node to visit, or 0 to return to the depot early.\n    \"\"\"\n    if len(unvisited_nodes) == 0:\n        return depot\n    return unvisited_nodes[np.argmin(distance_matrix[current_node][unvisited_nodes])]",
+        "objective": 13.61078,
+        "other_inf": null
+    },
+    {
+        "algorithm": "New algorithm selects the next customer by maximizing the distance from the depot to the customer divided by the distance from the current node, multiplied by a factor that prioritizes customers with demands close to the remaining capacity.",
+        "code": "def select_next_node(current_node: int, depot: int, unvisited_nodes: np.ndarray,\n                     rest_capacity: float, demands: np.ndarray,\n                     distance_matrix: np.ndarray) -> int:\n    if len(unvisited_nodes) == 0:\n        return depot\n    dist_current = distance_matrix[current_node][unvisited_nodes] + 1e-10\n    dist_depot = distance_matrix[depot][unvisited_nodes] + 1e-10\n    demand_factor = 1 + (rest_capacity - demands[unvisited_nodes]) / (rest_capacity + 1e-10)\n    score = (dist_depot / dist_current) * demand_factor\n    return unvisited_nodes[np.argmax(score)]",
+        "objective": 13.74516,
+        "other_inf": null
+    },
+    {
+        "algorithm": "The new algorithm selects the next customer by minimizing the distance from the current node penalized by the square root of the remaining capacity after serving that customer, thus favoring nearby customers while moderately prioritizing higher demand to reduce capacity waste.",
+        "code": "import numpy as np\n\ndef select_next_node(current_node: int, depot: int, unvisited_nodes: np.ndarray,\n                     rest_capacity: float, demands: np.ndarray,\n                     distance_matrix: np.ndarray) -> int:\n    if len(unvisited_nodes) == 0:\n        return depot\n    dist_current = distance_matrix[current_node][unvisited_nodes]\n    demands_subset = demands[unvisited_nodes]\n    score = dist_current * np.sqrt(rest_capacity - demands_subset + 1e-10)\n    return unvisited_nodes[np.argmin(score)]",
+        "objective": 13.75137,
+        "other_inf": null
+    }
+]

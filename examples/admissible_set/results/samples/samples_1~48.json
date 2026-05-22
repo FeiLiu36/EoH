@@ -1,0 +1,338 @@
+[
+    {
+        "sample_order": 1,
+        "operator": "i1",
+        "algorithm": "My algorithm scores each remaining candidate element by the reciprocal of the number of existing admissible elements that would become incompatible if the candidate were added, plus a small tie-breaking bonus for elements with lower lexicographic order, in order to maximize the final set size.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    # The priority is based on a placeholder that returns a constant.\n    # A real implementation would require the current admissible set state.\n    return 0.0",
+        "objective": 1017.0
+    },
+    {
+        "sample_order": 2,
+        "operator": "i1",
+        "algorithm": "The algorithm defines a priority function that scores a candidate element by a measure of its \u201ctypicality\u201d and \u201cnaturalness,\u201d such as the fraction of its nonzero entries that are 2\u2019s (or a convex combination of that fraction and the deviation from evenly spacing 2\u2019s), so that the greedy search picks elements likely to coexist without conflict in a large symmetric admissible set.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    # Count number of 2's and their distribution\n    twos = sum(1 for x in el if x == 2)\n    if twos == 0:\n        return 0.0\n    # Preference for elements with a moderate proportion of 2's (around 1/3 to 1/2)\n    proportion = twos / w\n    # Bonus for 2's being spread out (positions with small gaps)\n    positions = [i for i, x in enumerate(el) if x == 2]\n    if len(positions) > 1:\n        gaps = [positions[i+1] - positions[i] for i in range(len(positions)-1)]\n        mean_gap = sum(gaps) / len(gaps)\n        gap_variance = sum((g - mean_gap)**2 for g in gaps) / len(gaps)\n        spread_bonus = -gap_variance  # prefer evenly spaced 2's\n    else:\n        spread_bonus = 0.0\n    # Combine: prefer proportion near 0.4, and small gap variance\n    return -abs(proportion - 0.4) * 10 + spread_bonus * 0.01",
+        "objective": 1482.0
+    },
+    {
+        "sample_order": 3,
+        "operator": "i1",
+        "algorithm": "Design a priority function that scores each candidate by the number of pairs of columns it would block if added, scaled inversely by its contribution to future admissibility constraints.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    \"\"\"Score a candidate element for inclusion in the admissible set.\"\"\"\n    # Count pairs of columns that become blocked if this element is chosen.\n    # Blocked pairs are those where the element has a 2 or where two 1's\n    # are in the same columns as another element's 1's.\n    # We use a simple heuristic: fewer collisions of 1's and 2's is better.\n    ones_positions = [i for i, v in enumerate(el) if v == 1]\n    twos_positions = [i for i, v in enumerate(el) if v == 2]\n    # Penalize elements with many 2's (they block many columns)\n    penalty = len(twos_positions) * 2 + len(ones_positions)\n    # Reward elements that spread their 1's widely (more future flexibility)\n    # Count number of distinct column pairs among ones positions that could conflict\n    # Simpler: prefer elements with fewer ones (less blocking) and fewer twos\n    return -penalty",
+        "objective": 1896.0
+    },
+    {
+        "sample_order": 4,
+        "operator": "i1",
+        "algorithm": "The algorithm greedily selects candidate elements with the highest score, where the priority function scores each candidate by the number of remaining valid positions it would fill minus a penalty for conflicts with already selected elements, estimated via the minimum Hamming distance to the current admissible set.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    \"\"\"Score a candidate element for inclusion in the admissible set.\"\"\"\n    ones = sum(1 for x in el if x == 1)\n    twos = sum(1 for x in el if x == 2)\n    # Prefer elements with more twos (helps maximize future symmetric completions)\n    # and penalize elements with many ones early to reduce conflicts\n    return twos - 0.5 * ones",
+        "objective": 1677.0
+    },
+    {
+        "sample_order": 5,
+        "operator": "i1",
+        "algorithm": "The algorithm constructs a maximum-cardinality symmetric constant-weight admissible set by iteratively selecting the candidate element that minimizes the total number of pairwise forbidden configurations it would create with already chosen elements, thereby maximizing future expansion potential.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    # Count the number of positions with value 2 (doubled positions)\n    double_positions = sum(1 for x in el if x == 2)\n    # Priority: prefer fewer double positions (more flexibility), \n    # and among those, prefer lower lexicographic order to break ties consistently\n    return -double_positions",
+        "objective": 1896.0
+    },
+    {
+        "sample_order": 6,
+        "operator": "i1",
+        "algorithm": "For a candidate element, compute its priority as the sum over positions of a weighted combination of the element's digit value, the degree of freedom remaining in that coordinate from the symmetric constant-weight constraint, and a penalty for exceeding the allowed maximum per-coordinate sum.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    # Weighted heuristic: prefer elements with more 2s early, but penalize if overusing a coordinate\n    score = 0.0\n    for val in el:\n        if val == 2:\n            score += 1.5\n        elif val == 1:\n            score += 1.0\n        # val == 0 contributes nothing\n    # Penalize based on how many 2s: too many 2s may block future elements\n    count2 = sum(1 for v in el if v == 2)\n    # Ideal is to have roughly w/2 pairs, so penalize deviation\n    score -= abs(count2 - w / 2) * 0.3\n    return score",
+        "objective": 1677.0
+    },
+    {
+        "sample_order": 7,
+        "operator": "i1",
+        "algorithm": "\"The algorithm scores each remaining candidate element by a priority function that combines the sum of its squared entries (rewarding higher local density of twos) and a penalty for sharing overlapping one-positions with already chosen elements, then greedily selects the highest-scoring element to iteratively build a large admissible set.\"",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    \"\"\"Score a candidate element for inclusion in the admissible set.\n\n    Args:\n        el: candidate element \u2014 a tuple of length n whose non-zero entries\n            sum to w (entries are drawn from {0, 1, 2}).\n        n:  vector length (dimension of the problem).\n        w:  target weight (number of non-zero entries).\n    Returns:\n        Priority score. Higher scores are selected first by the greedy search.\n    \"\"\"\n    # Count ones and twos\n    ones = sum(1 for x in el if x == 1)\n    twos = sum(1 for x in el if x == 2)\n    # Reward: more twos and compact distribution of nonzeros\n    # also moderate bonus for ones to maintain diversity\n    return twos * 3 + ones * 1 + (sum(x * x for x in el) / (w + 1))",
+        "objective": 1677.0
+    },
+    {
+        "sample_order": 8,
+        "operator": "i1",
+        "algorithm": "At each step, prioritize candidate elements whose non-zero positions have the fewest already-selected elements in their pairwise Hamming-distance-2 constraints, thereby reducing future blocking.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    # This function is a stub; the actual priority computation would need access to the current admissible set.\n    # As a placeholder, we return a constant (the greedy then degenerates to arbitrary order).\n    return 1.0",
+        "objective": 1017.0
+    },
+    {
+        "sample_order": 9,
+        "operator": "e2",
+        "algorithm": "Score each candidate by the sum of squared distances between the positions of its non-zero entries, normalized by the maximum possible spread, minus a penalty for each pair of non-zero entries that share a column parity with any already selected element.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    \"\"\"Score a candidate element for inclusion in the admissible set.\n\n    Args:\n        el: candidate element \u2014 a tuple of length n whose non-zero entries\n            sum to w (entries are drawn from {0, 1, 2}).\n        n:  vector length (dimension of the problem).\n        w:  target weight (number of non-zero entries).\n    Returns:\n        Priority score. Higher scores are selected first by the greedy search.\n    \"\"\"\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n    \n    # Sum of squared distances between positions\n    spread = 0\n    for i in range(len(positions)):\n        for j in range(i+1, len(positions)):\n            spread += (positions[i] - positions[j]) ** 2\n    \n    # Maximum possible spread for w positions in length n\n    max_spread = (w * (w - 1) // 2) * ((n - 1) ** 2) if n > 0 else 1\n    \n    # Penalty for close positions or pairs with same parity\n    penalty = 0\n    for i in range(len(positions)):\n        for j in range(i+1, len(positions)):\n            if (positions[i] % 2) == (positions[j] % 2):\n                penalty += 1\n            if abs(positions[i] - positions[j]) <= 2:\n                penalty += 0.5\n    \n    return (spread / max_spread) - penalty",
+        "objective": 969.0
+    },
+    {
+        "sample_order": 10,
+        "operator": "m1",
+        "algorithm": "The new algorithm scores each candidate by the number of distinct columns it still leaves available for future elements, penalizing elements that place 1's and 2's in already crowded columns, thereby maximizing flexibility.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    \"\"\"Score a candidate element for inclusion in the admissible set.\n\n    Args:\n        el: candidate element \u2014 a tuple of length n whose non-zero entries\n            sum to w (entries are drawn from {0, 1, 2}).\n        n:  vector length (dimension of the problem).\n        w:  target weight (number of non-zero entries).\n    Returns:\n        Priority score. Higher scores are selected first by the greedy search.\n    \"\"\"\n    ones_positions = [i for i, v in enumerate(el) if v == 1]\n    twos_positions = [i for i, v in enumerate(el) if v == 2]\n    # Count distinct columns used by this element\n    used_columns = len(ones_positions) + len(twos_positions)\n    # Reward elements that leave more columns free, penalize 2's heavily\n    # Prefer elements with more 1's spread out and few 2's\n    spread = len(set(ones_positions))\n    score = (n - used_columns) * 10 + spread * 5 - len(twos_positions) * 20\n    return float(score)",
+        "objective": 1896.0
+    },
+    {
+        "sample_order": 11,
+        "operator": "e2",
+        "algorithm": "Score each candidate by the product of the number of zeros it contains and the number of twos it contains, penalized by the Hamming distance to the centroid of already selected elements (estimated by a fixed reference pattern), to simultaneously promote sparsity and flexibility in future completions.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    \"\"\"Score a candidate element for inclusion in the admissible set.\n\n    Args:\n        el: candidate element \u2014 a tuple of length n whose non-zero entries\n            sum to w (entries are drawn from {0, 1, 2}).\n        n:  vector length (dimension of the problem).\n        w:  target weight (number of non-zero entries).\n    Returns:\n        Priority score. Higher scores are selected first by the greedy search.\n    \"\"\"\n    zeros = sum(1 for x in el if x == 0)\n    twos = sum(1 for x in el if x == 2)\n    # Reference pattern: prefer elements balanced between zeros and twos,\n    # with small penalty for ones (which cause conflicts).\n    return zeros * (twos + 1) - 0.3 * (w - zeros - twos)",
+        "objective": 1677.0
+    },
+    {
+        "sample_order": 12,
+        "operator": "m2",
+        "algorithm": "The new algorithm prioritizes elements that maximize the diversity of column indices among their 1's and minimize the number of 2's, while also penalizing overlaps in 1-positions with already selected elements, using a custom scoring formula.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    ones = [i for i, v in enumerate(el) if v == 1]\n    twos = [i for i, v in enumerate(el) if v == 2]\n    # Score: reward spread of ones (unique columns), penalize twos and ones count\n    spread_bonus = len(set(ones)) - len(ones) * 0.1  # encourages uniqueness\n    penalty = len(twos) * 3 + len(ones) * 0.5\n    return spread_bonus - penalty",
+        "objective": 1896.0
+    },
+    {
+        "sample_order": 13,
+        "operator": "e2",
+        "algorithm": "The common backbone idea in the provided algorithms is to prioritize candidate elements based on the proportion and spatial distribution of the value `2` within the tuple, favoring moderate frequency and even spacing of `2`s.\n\nBased on that backbone, my new algorithm instead scores elements by the entropy of the pattern of `1`s and `2`s, preferring patterns with higher uncertainty (more balanced mix of `1`s and `2`s) and symmetric placement of `2`s around the center.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    \"\"\"Score a candidate element for inclusion in the admissible set.\n\n    Args:\n        el: candidate element \u2014 a tuple of length n whose non-zero entries\n            sum to w (entries are drawn from {0, 1, 2}).\n        n:  vector length (dimension of the problem).\n        w:  target weight (number of non-zero entries).\n    Returns:\n        Priority score. Higher scores are selected first by the greedy search.\n    \"\"\"\n    ones = sum(1 for x in el if x == 1)\n    twos = sum(1 for x in el if x == 2)\n    if twos == 0 or ones == 0:\n        return -float('inf')\n    \n    # Entropy of 1's and 2's distribution\n    p1 = ones / (ones + twos)\n    p2 = twos / (ones + twos)\n    if p1 == 0 or p2 == 0:\n        entropy = 0.0\n    else:\n        entropy = -p1 * (p1 and p1 and __import__('math').log2(p1)) - p2 * __import__('math').log2(p2)\n    \n    # Symmetry bonus: prefer 2's placed symmetrically around center\n    positions = [i for i, x in enumerate(el) if x == 2]\n    center = (n - 1) / 2.0\n    symmetry_score = -sum(abs(pos - (n - 1 - pos)) for pos in positions)\n    \n    return entropy * 10 + symmetry_score * 0.1",
+        "objective": 1806.0
+    },
+    {
+        "sample_order": 14,
+        "operator": "m1",
+        "algorithm": "The new algorithm scores candidates by prioritizing elements that maximize the sum of squared values (to favor higher twos and penalize ones linearly) while also incorporating a diversity bonus for positions with few already selected non-zero entries, estimated via the fraction of unique positions used.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    \"\"\"Score a candidate element for inclusion in the admissible set.\n\n    Args:\n        el: candidate element \u2014 a tuple of length n whose non-zero entries\n            sum to w (entries are drawn from {0, 1, 2}).\n        n:  vector length (dimension of the problem).\n        w:  target weight (number of non-zero entries).\n    Returns:\n        Priority score. Higher scores are selected first by the greedy search.\n    \"\"\"\n    # Sum of squares: 2^2 = 4 for twos, 1^2 = 1 for ones, 0^2 = 0 for zeros\n    sum_squares = sum(x * x for x in el)\n    # Count number of non-zero positions\n    nonzero_positions = sum(1 for x in el if x != 0)\n    # Bonus for using fewer distinct positions (encourages overlap with future candidates)\n    diversity_bonus = w - nonzero_positions\n    return sum_squares + 0.3 * diversity_bonus",
+        "objective": 1677.0
+    },
+    {
+        "sample_order": 15,
+        "operator": "e2",
+        "algorithm": "Score candidates by the *square* of the number of incompatibilities they avoid, divided by their total pairwise Hamming distance to already selected elements, with a penalty for high lexicographic order as tie-breaker.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    # A dummy implementation; real logic would need current admissible set state.\n    # Placeholder returns a constant as in the examples.\n    return 0.0",
+        "objective": 1017.0
+    },
+    {
+        "sample_order": 16,
+        "operator": "e1",
+        "algorithm": "Design a priority function that scores each candidate by the degree to which its non-zero positions are evenly spaced across the vector, minus a penalty for any non-zero entry that creates a gap of length 1 or 2 with a neighbor in the candidate.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    \"\"\"Score a candidate element for inclusion in the admissible set.\n\n    Args:\n        el: candidate element \u2014 a tuple of length n whose non-zero entries\n            sum to w (entries are drawn from {0, 1, 2}).\n        n:  vector length (dimension of the problem).\n        w:  target weight (number of non-zero entries).\n    Returns:\n        Priority score. Higher scores are selected first by the greedy search.\n    \"\"\"\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n    \n    # Compute gaps between consecutive non-zero positions\n    gaps = [positions[i+1] - positions[i] for i in range(len(positions)-1)]\n    if not gaps:\n        return 0.0\n    \n    # Ideal gap if evenly spaced\n    ideal_gap = (n - 1) / (w - 1) if w > 1 else 1.0\n    \n    # Score based on how close gaps are to ideal (lower variance is better)\n    gap_variance = sum((g - ideal_gap) ** 2 for g in gaps) / len(gaps)\n    evenness_score = 1.0 / (1.0 + gap_variance)\n    \n    # Penalty for tiny gaps (size 1 or 2) which cause conflicts\n    tiny_gap_penalty = sum(1 for g in gaps if g <= 2)\n    \n    return evenness_score - tiny_gap_penalty",
+        "objective": 1224.0
+    },
+    {
+        "sample_order": 17,
+        "operator": "m2",
+        "algorithm": "New algorithm uses weighted harmonic mean of pairwise distances normalized by theoretical maximum, plus a bonus for balanced parity distribution, minus a penalty for adjacent nonzero positions.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    \"\"\"Score a candidate element for inclusion in the admissible set.\n\n    Args:\n        el: candidate element \u2014 a tuple of length n whose non-zero entries\n            sum to w (entries are drawn from {0, 1, 2}).\n        n:  vector length (dimension of the problem).\n        w:  target weight (number of non-zero entries).\n    Returns:\n        Priority score. Higher scores are selected first by the greedy search.\n    \"\"\"\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n\n    # Pairwise distances\n    distances = []\n    for i in range(len(positions)):\n        for j in range(i+1, len(positions)):\n            distances.append(abs(positions[i] - positions[j]))\n\n    if not distances:\n        return 0.0\n\n    # Harmonic mean of distances\n    harmonic = len(distances) / sum(1.0 / d for d in distances)\n\n    # Maximum possible distance sum for w positions in length n\n    max_possible_distance_sum = (w * (w - 1) / 2.0) * (n - 1)\n    max_harmonic = max_possible_distance_sum / (w * (w - 1) / 2.0) if w > 1 else 0\n\n    # Normalized harmonic score\n    score = harmonic / max_harmonic if max_harmonic > 0 else 0.0\n\n    # Parity balance bonus\n    odd_count = sum(1 for p in positions if p % 2 == 1)\n    even_count = len(positions) - odd_count\n    parity_balance = min(odd_count, even_count) / max(1, max(odd_count, even_count))\n    score += 0.3 * parity_balance\n\n    # Adjacency penalty (positions differ by 1)\n    adjacency_penalty = 0\n    for i in range(len(positions)):\n        for j in range(i+1, len(positions)):\n            if abs(positions[i] - positions[j]) == 1:\n                adjacency_penalty += 1.0\n    score -= 0.5 * adjacency_penalty\n\n    return score",
+        "objective": 555.0
+    },
+    {
+        "sample_order": 18,
+        "operator": "e2",
+        "algorithm": "Score each candidate by the sum of its entrywise variance from a uniform ideal pattern, plus a penalty proportional to the number of conflicts it would create with previously selected elements, estimated via pairwise Hamming distance.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    # Measure internal structure: deviation from uniform distribution of nonzeros\n    nonzero_indices = [i for i, x in enumerate(el) if x != 0]\n    if not nonzero_indices:\n        return -float('inf')\n    ideal_positions = [int(i * (n - 1) / (w - 1)) for i in range(w)] if w > 1 else [0]\n    internal_score = -sum(abs(nonzero_indices[i] - ideal_positions[i]) for i in range(len(nonzero_indices)) if i < len(ideal_positions))\n    # External compatibility penalty: sum of Hamming distances to already selected elements (simulated)\n    # Since we don't have the set state, we estimate using global properties\n    # penalty for having many 2's close together (conflict prone)\n    twos = [i for i, x in enumerate(el) if x == 2]\n    conflict_penalty = 0\n    if len(twos) > 1:\n        for i in range(len(twos) - 1):\n            gap = twos[i+1] - twos[i]\n            if gap <= 2:\n                conflict_penalty += (3 - gap) * 2\n    return internal_score - conflict_penalty",
+        "objective": 1332.0
+    },
+    {
+        "sample_order": 19,
+        "operator": "e2",
+        "algorithm": "Compute priority as the variance of positions, minus a penalty equal to the reciprocal of the minimum pairwise distance (with a large constant if any distance is zero), plus a bonus for each adjacent parity alternation in sorted positions, all normalized by a scaling factor.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    pos = [i for i, v in enumerate(el) if v != 0]\n    if len(pos) < 2:\n        return 0.0\n    # Variance (spread measure)\n    mean_pos = sum(pos) / len(pos)\n    var = sum((p - mean_pos) ** 2 for p in pos) / len(pos)\n    # Minimum distance penalty\n    min_dist = min(abs(pos[i] - pos[j]) for i in range(len(pos)) for j in range(i+1, len(pos)))\n    if min_dist == 0:\n        dist_penalty = 1e6\n    else:\n        dist_penalty = 1.0 / min_dist\n    # Alternating parity bonus\n    sorted_pos = sorted(pos)\n    alt_bonus = sum(1 for i in range(len(sorted_pos)-1) if sorted_pos[i] % 2 != sorted_pos[i+1] % 2)\n    # Normalize variance by maximum possible (n-1)^2/4\n    max_var = ((n-1)**2) / 4.0 if n > 1 else 1\n    return (var / max_var) - dist_penalty + (alt_bonus / max(1, len(pos)))",
+        "objective": 1854.0
+    },
+    {
+        "sample_order": 20,
+        "operator": "m1",
+        "algorithm": "The new algorithm scores a candidate by combining the inverse of the maximum run length of consecutive non-zero entries with a bonus for having a high count of 2\u2019s relative to 1\u2019s, favoring elements that promote a dense and conflict-free structure.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    \"\"\"Score a candidate element for inclusion in the admissible set.\n\n    Args:\n        el: candidate element \u2014 a tuple of length n whose non-zero entries\n            sum to w (entries are drawn from {0, 1, 2}).\n        n:  vector length (dimension of the problem).\n        w:  target weight (number of non-zero entries).\n    Returns:\n        Priority score. Higher scores are selected first by the greedy search.\n    \"\"\"\n    # Count runs of consecutive non-zero entries\n    max_run = 0\n    current_run = 0\n    for x in el:\n        if x != 0:\n            current_run += 1\n            max_run = max(max_run, current_run)\n        else:\n            current_run = 0\n    # Prefer shorter maximum runs (inverse scoring)\n    run_score = 1.0 / (max_run + 1)\n\n    # Ratio of 2's to total non-zero entries\n    twos = sum(1 for x in el if x == 2)\n    ones = w - twos\n    if ones == 0:\n        ratio_score = 1.0\n    else:\n        ratio_score = twos / (twos + ones)\n\n    # Combined score: balance run shortness and 2-richness\n    return run_score * 0.7 + ratio_score * 0.3",
+        "objective": 1155.0
+    },
+    {
+        "sample_order": 21,
+        "operator": "m2",
+        "algorithm": "The new algorithm scores a candidate by heavily emphasizing a high density of 2\u2019s while still penalizing long runs of non-zero entries, using an inverted exponential decay on run length and a logarithmic bonus for the proportion of 2\u2019s.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    max_run = 0\n    current_run = 0\n    for x in el:\n        if x != 0:\n            current_run += 1\n            max_run = max(max_run, current_run)\n        else:\n            current_run = 0\n    run_score = 1.0 / (1 + max_run ** 2)\n\n    twos = sum(1 for x in el if x == 2)\n    ones = w - twos\n    if ones == 0:\n        ratio_score = 2.0\n    else:\n        ratio_score = (twos / (twos + ones)) * 2.0\n\n    return run_score * 0.3 + ratio_score * 0.7",
+        "objective": 1308.0
+    },
+    {
+        "sample_order": 22,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 23,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses the variance of pairwise distances to encourage even spacing, adds a reward for symmetry around the center, and penalizes consecutive non-zero positions where the vector value is the same.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    \"\"\"Score a candidate element for inclusion in the admissible set.\n\n    Args:\n        el: candidate element \u2014 a tuple of length n whose non-zero entries\n            sum to w (entries are drawn from {0, 1, 2}).\n        n:  vector length (dimension of the problem).\n        w:  target weight (number of non-zero entries).\n    Returns:\n        Priority score. Higher scores are selected first by the greedy search.\n    \"\"\"\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n\n    # Pairwise distances\n    distances = []\n    for i in range(len(positions)):\n        for j in range(i+1, len(positions)):\n            distances.append(abs(positions[i] - positions[j]))\n\n    if not distances:\n        return 0.0\n\n    # Variance of distances (lower is better for even spacing)\n    mean_dist = sum(distances) / len(distances)\n    variance = sum((d - mean_dist) ** 2 for d in distances) / len(distances)\n    max_possible_variance = ((n - 1) - mean_dist) ** 2  # rough scaling\n    score = -variance / max_possible_variance if max_possible_variance > 0 else -1.0\n\n    # Symmetry bonus: reward positions symmetric around center (n-1)/2\n    center = (n - 1) / 2.0\n    symmetry_score = 0.0\n    for p in positions:\n        mirror = int(2 * center - p)\n        if mirror in positions:\n            symmetry_score += 1.0\n    score += 0.4 * (symmetry_score / max(1, len(positions)))\n\n    # Penalty for consecutive same-value non-zero entries\n    penalty = 0.0\n    for i in range(len(positions) - 1):\n        if positions[i+1] - positions[i] == 1:\n            if el[positions[i]] == el[positions[i+1]]:\n                penalty += 1.0\n    score -= 0.6 * penalty\n\n    return score",
+        "objective": 498.0
+    },
+    {
+        "sample_order": 24,
+        "operator": "m1",
+        "algorithm": "The new algorithm scores each candidate element by the number of existing admissible elements with which it shares at least one non-zero coordinate (i.e., conflict count), negated, plus a small tie-breaking bonus for elements with higher lexicographic order to favor diversity.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    # Placeholder: in a real greedy run, the admissible set state would be accessed.\n    # This implementation assumes an external variable or closure provides `current_set`.\n    # For demonstration, returns a constant; real logic would compute negative conflict count.\n    return 0.0",
+        "objective": 1017.0
+    },
+    {
+        "sample_order": 25,
+        "operator": "m1",
+        "algorithm": "Design a new priority function that scores each candidate by the normalized sum of absolute differences between positions of non-zero entries, with a penalty for pairs that are adjacent or share the same parity, and a bonus for pairs that are maximally spread.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n    \n    spread = 0\n    for i in range(len(positions)):\n        for j in range(i+1, len(positions)):\n            spread += abs(positions[i] - positions[j])\n    \n    max_spread = (w * (w - 1) // 2) * (n - 1) if n > 0 else 1\n    \n    penalty = 0\n    bonus = 0\n    for i in range(len(positions)):\n        for j in range(i+1, len(positions)):\n            if (positions[i] % 2) == (positions[j] % 2):\n                penalty += 1\n            if abs(positions[i] - positions[j]) == 1:\n                penalty += 1\n            if abs(positions[i] - positions[j]) == n - 1:\n                bonus += 0.5\n    \n    return (spread / max_spread) - penalty + bonus",
+        "objective": 582.0
+    },
+    {
+        "sample_order": 26,
+        "operator": "m2",
+        "algorithm": "New algorithm uses the sum of pairwise distances raised to a power and normalized, combined with a parity imbalance penalty and a strong bonus for avoiding adjacent positions, using different weights and scaling.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    \"\"\"Score a candidate element for inclusion in the admissible set.\n\n    Args:\n        el: candidate element \u2014 a tuple of length n whose non-zero entries\n            sum to w (entries are drawn from {0, 1, 2}).\n        n:  vector length (dimension of the problem).\n        w:  target weight (number of non-zero entries).\n    Returns:\n        Priority score. Higher scores are selected first by the greedy search.\n    \"\"\"\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n\n    # Pairwise distances\n    distances = []\n    for i in range(len(positions)):\n        for j in range(i+1, len(positions)):\n            distances.append(abs(positions[i] - positions[j]))\n\n    if not distances:\n        return 0.0\n\n    # Sum of squared distances\n    sum_sq = sum(d * d for d in distances)\n\n    # Normalize by maximum possible sum of squared distances\n    # Max distance between any two positions is n-1\n    max_dist_sq = (n - 1) ** 2\n    num_pairs = w * (w - 1) // 2\n    max_sum_sq = float(num_pairs * max_dist_sq) if num_pairs > 0 else 1.0\n    score = sum_sq / max_sum_sq\n\n    # Penalty for parity imbalance (favor balanced parity)\n    odd_count = sum(1 for p in positions if p % 2 == 1)\n    even_count = len(positions) - odd_count\n    imbalance = abs(odd_count - even_count)\n    max_imbalance = w\n    score -= 0.4 * (imbalance / max_imbalance)\n\n    # Strong bonus for no adjacent positions\n    adjacency_count = 0\n    for i in range(len(positions)):\n        for j in range(i+1, len(positions)):\n            if abs(positions[i] - positions[j]) == 1:\n                adjacency_count += 1\n    if adjacency_count == 0:\n        score += 0.6\n    else:\n        score -= 0.3 * adjacency_count\n\n    return score",
+        "objective": 819.0
+    },
+    {
+        "sample_order": 27,
+        "operator": "e1",
+        "algorithm": "The algorithm uses the **minimum Hamming distance to already selected elements** as the primary score, preferring elements that are as far as possible from all current admissible elements to maximize diversity and future capacity, with a small tie-breaking bonus for lower lexicographic order.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    # This function requires access to the current admissible set.\n    # As a standalone placeholder, it returns a constant.\n    # In real usage, it would compute min Hamming distance to all selected elements.\n    return 0.0",
+        "objective": 1017.0
+    },
+    {
+        "sample_order": 28,
+        "operator": "m2",
+        "algorithm": "The new algorithm prioritizes uniform spacing by rewarding large minimum pairwise distances and penalizing asymmetric patterns through a weighted combination of inverse distance variance, a mirror-symmetry count, and a reduced penalty for same-value consecutives.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n\n    # Pairwise distances\n    distances = []\n    for i in range(len(positions)):\n        for j in range(i+1, len(positions)):\n            distances.append(abs(positions[i] - positions[j]))\n\n    if not distances:\n        return 0.0\n\n    # Inverse of variance of distances (higher is better for even spacing)\n    mean_dist = sum(distances) / len(distances)\n    variance = sum((d - mean_dist) ** 2 for d in distances) / len(distances)\n    max_possible_variance = ((n - 1) - mean_dist) ** 2\n    inv_variance_score = 1.0 / (1.0 + variance / max_possible_variance) if max_possible_variance > 0 else 0.5\n\n    # Symmetry bonus: reward positions symmetric around center (n-1)/2\n    center = (n - 1) / 2.0\n    symmetry_score = 0.0\n    for p in positions:\n        mirror = int(2 * center - p)\n        if mirror in positions:\n            symmetry_score += 1.0\n    symmetry_score = symmetry_score / max(1, len(positions))\n\n    # Penalty for consecutive same-value non-zero entries (reduced weight)\n    penalty = 0.0\n    for i in range(len(positions) - 1):\n        if positions[i+1] - positions[i] == 1:\n            if el[positions[i]] == el[positions[i+1]]:\n                penalty += 1.0\n    penalty = penalty / max(1, len(positions))\n\n    # Weighted combination with different parameters\n    score = 0.7 * inv_variance_score + 0.3 * symmetry_score - 0.3 * penalty\n    return score",
+        "objective": 924.0
+    },
+    {
+        "sample_order": 29,
+        "operator": "e2",
+        "algorithm": "The priority is the product of the sum of squared distances (magnified by a logarithmic factor for sparsity emphasis) and a Fibonacci-distance-based harmonic uniformity term, discounted by the entropy of the value distribution among non-zero positions.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    \"\"\"Score a candidate element for inclusion in the admissible set.\n\n    Args:\n        el: candidate element \u2014 a tuple of length n whose non-zero entries\n            sum to w (entries are drawn from {0, 1, 2}).\n        n:  vector length (dimension of the problem).\n        w:  target weight (number of non-zero entries).\n    Returns:\n        Priority score. Higher scores are selected first by the greedy search.\n    \"\"\"\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n\n    distances = []\n    for i in range(len(positions)):\n        for j in range(i+1, len(positions)):\n            distances.append(abs(positions[i] - positions[j]))\n    if not distances:\n        return 0.0\n\n    # 1. Sum of squared distances (encourage spread)\n    sum_sq_dist = sum(d * d for d in distances)\n    max_sum_sq = (w * (w - 1) / 2.0) * ((n - 1) ** 2)\n    spread_score = sum_sq_dist / max_sum_sq if max_sum_sq > 0 else 0.0\n    spread_score = spread_score * (1.0 + 0.5 * (w / max(1, n)) ** 0.5)  # log-like sparsity boost\n\n    # 2. Fibonacci-distance harmonic uniformity\n    fib_seq = [1, 2]\n    while fib_seq[-1] < n:\n        fib_seq.append(fib_seq[-1] + fib_seq[-2])\n    fib_set = set(fib_seq)\n    fib_harmonic = 0.0\n    for d in distances:\n        nearest_fib = min(fib_set, key=lambda x: abs(x - d))\n        fib_harmonic += 1.0 / max(1, nearest_fib)\n    fib_uniformity = len(distances) / max(1, fib_harmonic)\n    fib_norm = fib_uniformity / max(1, n)\n\n    # 3. Entropy penalty for value distribution\n    values = [el[p] for p in positions]\n    val_counts = {v: values.count(v) for v in set(values)}\n    total = len(values)\n    entropy = -sum((c / total) * (c / total) for c in val_counts.values())  # simplified\n    entropy_penalty = 0.3 * (1.0 - entropy / max(1, 1.0 / len(val_counts)))\n\n    # Combine: product of spread and uniformity, minus entropy penalty\n    score = spread_score * (1.0 + fib_norm) - entropy_penalty\n    return score",
+        "objective": 2082.0
+    },
+    {
+        "sample_order": 30,
+        "operator": "m1",
+        "algorithm": "The new algorithm scores each candidate by computing the logarithm of the total pairwise distance product among non-zero positions, then subtracts a penalty for parity matches and adjacency, while adding a bonus for pairs that are exactly one apart from being maximally spread.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n    \n    product = 1.0\n    penalty = 0\n    bonus = 0\n    for i in range(len(positions)):\n        for j in range(i+1, len(positions)):\n            d = abs(positions[i] - positions[j])\n            product *= (d + 1)\n            if (positions[i] % 2) == (positions[j] % 2):\n                penalty += 1\n            if d == 1:\n                penalty += 1\n            if d == n - 1:\n                bonus += 0.5\n    \n    return (product ** (1.0 / (w * (w - 1) // 2))) - penalty + bonus",
+        "objective": 759.0
+    },
+    {
+        "sample_order": 31,
+        "operator": "m2",
+        "algorithm": "The new algorithm prioritizes candidates by the harmonic mean of pairwise distances between non-zero positions, with a strong penalty for consecutive positions and a bonus for positions that are symmetrical around the center.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n    \n    distances = []\n    for i in range(len(positions)):\n        for j in range(i+1, len(positions)):\n            distances.append(abs(positions[i] - positions[j]))\n    \n    if not distances:\n        return 0.0\n    \n    harmonic_sum = sum(1.0 / d for d in distances if d > 0)\n    harmonic_mean = len(distances) / harmonic_sum if harmonic_sum > 0 else 0.0\n    \n    penalty = 0\n    for i in range(len(positions)):\n        for j in range(i+1, len(positions)):\n            if abs(positions[i] - positions[j]) == 1:\n                penalty += 2\n    \n    bonus = 0\n    mid = (n - 1) / 2.0\n    for p in positions:\n        bonus += 0.5 if abs(p - mid) <= 1.0 else 0.0\n    \n    return harmonic_mean - penalty + bonus",
+        "objective": 522.0
+    },
+    {
+        "sample_order": 32,
+        "operator": "e1",
+        "algorithm": "The algorithm computes a score based on the entropy of the positions' spatial distribution, combined with a measure of their \"center of mass\" deviation from the midpoint and a reward for the standard deviation of gaps between consecutive non-zero entries being close to the average gap.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    \"\"\"Score a candidate element for inclusion in the admissible set.\n\n    Args:\n        el: candidate element \u2014 a tuple of length n whose non-zero entries\n            sum to w (entries are drawn from {0, 1, 2}).\n        n:  vector length (dimension of the problem).\n        w:  target weight (number of non-zero entries).\n    Returns:\n        Priority score. Higher scores are selected first by the greedy search.\n    \"\"\"\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n\n    # Spatial entropy: spread of positions\n    min_pos = min(positions)\n    max_pos = max(positions)\n    span = max_pos - min_pos\n    if span == 0:\n        return 0.0\n    normalized_positions = [(p - min_pos) / span for p in positions]\n    entropy = 0.0\n    for p in normalized_positions:\n        if p > 0 and p < 1:\n            entropy -= p * (p ** 2)  # use a concave function of p for spread\n    # Use sum of squares of normalized positions as spread measure\n    spread = sum((p - 0.5) ** 2 for p in normalized_positions)\n    entropy_score = 1.0 - (spread / (len(positions) * 0.25)) if len(positions) > 0 else 0.0\n\n    # Center of mass deviation from midpoint\n    midpoint = (n - 1) / 2.0\n    center_of_mass = sum(positions) / len(positions)\n    deviation = abs(center_of_mass - midpoint) / midpoint\n    deviation_penalty = deviation\n\n    # Standard deviation of gaps relative to average gap\n    sorted_pos = sorted(positions)\n    gaps = [sorted_pos[i+1] - sorted_pos[i] for i in range(len(sorted_pos)-1)]\n    if gaps:\n        avg_gap = (max_pos - min_pos) / (len(positions) - 1)\n        if avg_gap > 0:\n            gap_std = (sum((g - avg_gap)**2 for g in gaps) / len(gaps)) ** 0.5\n            gap_regularity = 1.0 - (gap_std / avg_gap) if gap_std < avg_gap else 0.0\n        else:\n            gap_regularity = 0.0\n    else:\n        gap_regularity = 0.0\n\n    # Final score: combine\n    score = 0.5 * entropy_score - 0.4 * deviation_penalty + 0.3 * gap_regularity\n    return score",
+        "objective": 633.0
+    },
+    {
+        "sample_order": 33,
+        "operator": "e1",
+        "algorithm": "The new algorithm scores candidates by computing the entropy of the distribution of non-zero positions, rewarding diverse spacing, and adding a bonus proportional to the number of isolated non-zero entries (surrounded by zeros) to promote spread and avoid clusters.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n    \n    # Compute entropy of normalized positions as a measure of spread diversity\n    pos_normalized = [p / (n - 1) for p in positions]\n    total = sum(pos_normalized)\n    if total == 0:\n        entropy = 0.0\n    else:\n        probs = [p / total for p in pos_normalized]\n        entropy = -sum(p * (p if p == 0 else __import__('math').log(p)) for p in probs)\n    \n    # Count isolated non-zero entries (both neighbors are zero)\n    isolated = 0\n    for idx in positions:\n        left_ok = (idx == 0) or (el[idx - 1] == 0)\n        right_ok = (idx == n - 1) or (el[idx + 1] == 0)\n        if left_ok and right_ok:\n            isolated += 1\n    \n    # Score: high entropy good, more isolated entries good, scale to roughly [-1, 1]\n    score = entropy + 0.5 * (isolated / max(1, len(positions)))\n    return score",
+        "objective": 984.0
+    },
+    {
+        "sample_order": 34,
+        "operator": "e2",
+        "algorithm": "My new algorithm scores each candidate by computing the entropy of its non-zero positions to encourage uniform distribution, rewards alternating value transitions, and adds a bonus for boundary-symmetry where the first and last non-zero positions are equally distant from the ends of the vector.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    \"\"\"Score a candidate element for inclusion in the admissible set.\n\n    Args:\n        el: candidate element \u2014 a tuple of length n whose non-zero entries\n            sum to w (entries are drawn from {0, 1, 2}).\n        n:  vector length (dimension of the problem).\n        w:  target weight (number of non-zero entries).\n    Returns:\n        Priority score. Higher scores are selected first by the greedy search.\n    \"\"\"\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n\n    # Entropy of normalized positions (higher entropy = more uniform)\n    norm_pos = [p / (n - 1) for p in positions]\n    bins = [0.0] * len(positions)\n    for p in norm_pos:\n        idx = int(p * len(positions))\n        if idx >= len(positions):\n            idx = len(positions) - 1\n        bins[idx] += 1.0\n    total = sum(bins)\n    entropy = 0.0\n    for b in bins:\n        if b > 0:\n            p = b / total\n            entropy -= p * (p and (p ** 2))  # approximate entropy via squared p\n    score = entropy  # higher is better\n\n    # Alternation reward: count changes between different non-zero values in consecutive positions\n    alternations = 0\n    for i in range(len(positions) - 1):\n        if el[positions[i]] != el[positions[i + 1]]:\n            alternations += 1\n    score += 0.5 * (alternations / max(1, len(positions) - 1))\n\n    # Boundary-symmetry bonus: first and last positions symmetric about center\n    center = (n - 1) / 2.0\n    first = positions[0]\n    last = positions[-1]\n    if abs(first - center) == abs(last - center):\n        score += 0.3\n\n    return score",
+        "objective": 999.0
+    },
+    {
+        "sample_order": 35,
+        "operator": "e1",
+        "algorithm": "The algorithm scores each candidate by computing the entropy of the normalized gaps between consecutive nonzero positions, adding a bonus for covering both endpoints, and subtracting a penalty proportional to the variance of the distances from the center.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n\n    # Gaps between consecutive nonzero positions\n    gaps = [positions[i+1] - positions[i] for i in range(len(positions)-1)]\n    total_gap = sum(gaps)\n    if total_gap == 0:\n        return 0.0\n\n    # Entropy of normalized gaps\n    entropy = 0.0\n    for g in gaps:\n        p = g / total_gap\n        if p > 0:\n            entropy -= p * (p ** 0.5)  # using sqrt to dampen large gaps\n\n    # Bonus for covering both endpoints (0 and n-1)\n    endpoint_bonus = 0.0\n    if 0 in positions:\n        endpoint_bonus += 0.5\n    if (n-1) in positions:\n        endpoint_bonus += 0.5\n\n    # Penalty for variance of distances from center (n-1)/2\n    center = (n - 1) / 2.0\n    dist_center = [abs(p - center) for p in positions]\n    mean_dist = sum(dist_center) / len(dist_center)\n    variance_penalty = sum((d - mean_dist)**2 for d in dist_center) / len(dist_center)\n\n    return entropy + endpoint_bonus - 0.1 * variance_penalty",
+        "objective": 1743.0
+    },
+    {
+        "sample_order": 36,
+        "operator": "e2",
+        "algorithm": "My new algorithm computes the sum of the reciprocals of pairwise distances to promote compactness and clustering, rewards balanced alternating value patterns, and penalizes asymmetry around the center using a weighted deviation.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n\n    # Sum of reciprocals of pairwise distances (higher for compact clusters)\n    reciprocal_sum = 0.0\n    for i in range(len(positions)):\n        for j in range(i+1, len(positions)):\n            dist = abs(positions[i] - positions[j])\n            if dist > 0:\n                reciprocal_sum += 1.0 / dist\n\n    # Alternation reward: count changes between 1 and 2 in consecutive non-zero positions\n    alt_count = 0\n    for i in range(len(positions) - 1):\n        if (el[positions[i]] == 1 and el[positions[i+1]] == 2) or \\\n           (el[positions[i]] == 2 and el[positions[i+1]] == 1):\n            alt_count += 1\n    alt_score = alt_count / max(1, len(positions) - 1)\n\n    # Asymmetry penalty: measure deviation of positions from center (n-1)/2\n    center = (n - 1) / 2.0\n    asymmetry = sum(abs(p - center) for p in positions)\n    norm_asymmetry = asymmetry / (len(positions) * (n / 2.0))\n\n    score = reciprocal_sum + 0.5 * alt_score - 0.3 * norm_asymmetry\n    return score",
+        "objective": 2034.0
+    },
+    {
+        "sample_order": 37,
+        "operator": "e2",
+        "algorithm": "Score each candidate by the product of the variance of its non-zero positions and the minimum distance between any two non-zero positions, scaled by the number of distinct parity groups present.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n    \n    # Variance of positions (measure of spread)\n    mean_pos = sum(positions) / len(positions)\n    variance = sum((p - mean_pos) ** 2 for p in positions) / len(positions)\n    max_variance = ((n - 1) / 2) ** 2  # approximate max variance for length n\n    norm_variance = variance / max_variance if max_variance > 0 else 0\n    \n    # Minimum distance between any two non-zero positions\n    min_dist = min(abs(positions[i] - positions[j]) \n                   for i in range(len(positions)) \n                   for j in range(i+1, len(positions)))\n    norm_min_dist = min_dist / (n - 1) if n > 1 else 0\n    \n    # Number of distinct parity groups (0: even, 1: odd)\n    parities = set(p % 2 for p in positions)\n    parity_count = len(parities)  # 1 or 2\n    \n    return norm_variance * norm_min_dist * parity_count",
+        "objective": 1920.0
+    },
+    {
+        "sample_order": 38,
+        "operator": "e1",
+        "algorithm": "The new algorithm scores candidates based on the entropy of the distribution of gaps between non-zero positions, encouraging diversity in spacing, combined with a weighted count of unique subsequence patterns to favor structural complexity.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n\n    # Gaps between consecutive non-zero positions\n    gaps = [positions[i+1] - positions[i] for i in range(len(positions)-1)]\n    if not gaps:\n        return 0.0\n\n    # Entropy of gap distribution (higher is more diverse)\n    from collections import Counter\n    gap_counts = Counter(gaps)\n    total_gaps = len(gaps)\n    entropy = 0.0\n    for count in gap_counts.values():\n        p = count / total_gaps\n        if p > 0:\n            entropy -= p * (p ** 0.5)  # using sqrt(p) to dampen large probabilities\n\n    # Count unique pairs of (value, position modulo 2) as a structural fingerprint\n    patterns = [(el[p], p % 2) for p in positions]\n    unique_patterns = len(set(patterns))\n    pattern_score = unique_patterns / max(1, len(positions))\n\n    final_score = entropy * 2.0 + pattern_score * 1.5\n    return final_score",
+        "objective": 543.0
+    },
+    {
+        "sample_order": 39,
+        "operator": "m1",
+        "algorithm": "The new algorithm uses a weighted sum of the entropy of the position distribution (favoring uniform spread), a harmonic centrality reward for positions near the median, and a penalty for long runs of consecutive non-zero entries that invert the natural alternating pattern.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n\n    # 1. Entropy of position distribution (higher entropy \u2192 more uniform spacing)\n    intervals = [positions[i+1] - positions[i] for i in range(len(positions)-1)]\n    if not intervals:\n        return 0.0\n    total_span = positions[-1] - positions[0]\n    if total_span == 0:\n        return 0.0\n    # Normalize intervals to probabilities\n    probs = [d / total_span for d in intervals]\n    entropy = -sum(p * (p ** 0.5) for p in probs if p > 0)  # pseudo-entropy (sqrt weighting)\n    score = entropy / (len(intervals) ** 0.5)\n\n    # 2. Harmonic centrality near median\n    median_pos = (n - 1) / 2.0\n    centrality = sum(1.0 / (1 + abs(p - median_pos)) for p in positions)\n    score += 0.5 * (centrality / max(1, len(positions)))\n\n    # 3. Penalty for consecutive same-value non-zero entries that create long runs\n    penalty = 0.0\n    run_length = 1\n    for i in range(1, len(positions)):\n        if positions[i] == positions[i-1] + 1 and el[positions[i]] == el[positions[i-1]]:\n            run_length += 1\n        else:\n            if run_length > 1:\n                penalty += (run_length - 1) ** 2\n            run_length = 1\n    if run_length > 1:\n        penalty += (run_length - 1) ** 2\n    score -= 0.7 * penalty / max(1, len(positions))\n\n    return score",
+        "objective": 378.0
+    },
+    {
+        "sample_order": 40,
+        "operator": "m2",
+        "algorithm": "The new algorithm prioritizes candidates using the sum of squared distances between non-zero positions, penalizes isolated positions near the edges, and rewards balanced spacing with a Gaussian kernel centered at the middle.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n    \n    # Sum of squared distances\n    sq_dist_sum = 0.0\n    for i in range(len(positions)):\n        for j in range(i+1, len(positions)):\n            d = abs(positions[i] - positions[j])\n            sq_dist_sum += d * d\n    \n    # Penalty for positions too close to edges (first 2 or last 2 indices)\n    edge_penalty = 0\n    for p in positions:\n        if p < 2 or p > n - 3:\n            edge_penalty += 1.5\n    \n    # Gaussian reward for positions near center\n    center = (n - 1) / 2.0\n    gaussian_bonus = 0.0\n    sigma = n / 6.0\n    for p in positions:\n        gaussian_bonus += 2.0 * (2.71828 ** (-((p - center) ** 2) / (2 * sigma * sigma)))\n    \n    return sq_dist_sum - edge_penalty + gaussian_bonus",
+        "objective": 1692.0
+    },
+    {
+        "sample_order": 41,
+        "operator": "e2",
+        "algorithm": "Score based on the variance of the spacings between successive non-zero positions, rewarded if the first and last non-zero positions are symmetrically placed around the vector midpoint, and penalized if consecutive non-zero values are identical in magnitude.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n\n    # 1. Variance of spacings (lower variance \u2192 more uniform spacing, preferred)\n    gaps = [positions[i+1] - positions[i] for i in range(len(positions)-1)]\n    if len(gaps) < 2:\n        variance = 0.0\n    else:\n        mean_gap = sum(gaps) / len(gaps)\n        variance = sum((g - mean_gap) ** 2 for g in gaps) / len(gaps)\n    spacing_score = -variance * 0.5  # negative because lower variance is better\n\n    # 2. Symmetry reward: first and last non-zero equidistant from midpoint\n    midpoint = (n - 1) / 2.0\n    left_dist = abs(positions[0] - midpoint)\n    right_dist = abs(positions[-1] - midpoint)\n    symmetry_score = -abs(left_dist - right_dist) * 0.3\n\n    # 3. Penalty for consecutive identical non-zero values\n    penalty = 0.0\n    for i in range(len(positions) - 1):\n        if el[positions[i]] == el[positions[i+1]]:\n            penalty += 1.0\n    penalty_score = -penalty * 0.8\n\n    return spacing_score + symmetry_score + penalty_score",
+        "objective": 348.0
+    },
+    {
+        "sample_order": 42,
+        "operator": "e2",
+        "algorithm": null,
+        "code": null,
+        "objective": null
+    },
+    {
+        "sample_order": 43,
+        "operator": "e1",
+        "algorithm": "The algorithm uses the variance of the reflected pairwise distances (mirroring the pattern around the center) plus a reward for alternating non-zero values that avoid two identical adjacent entries, normalized by the number of positions.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n    \n    mid = (n - 1) / 2.0\n    # Reflected distances: for each pair, distance plus its mirror distance from center\n    reflected_dists = []\n    for i in range(len(positions)):\n        for j in range(i+1, len(positions)):\n            d = abs(positions[i] - positions[j])\n            mirror_d = abs((mid - positions[i]) - (mid - positions[j]))\n            reflected_dists.append(d + mirror_d)\n    if not reflected_dists:\n        return 0.0\n    mean_rd = sum(reflected_dists) / len(reflected_dists)\n    variance_rd = sum((rd - mean_rd) ** 2 for rd in reflected_dists) / len(reflected_dists)\n    \n    # Reward for alternating non-zero values (avoid adjacent identical)\n    alt_reward = 0.0\n    for i in range(len(positions) - 1):\n        if el[positions[i]] != el[positions[i+1]]:\n            alt_reward += 1.0\n    alt_reward /= max(1, len(positions) - 1)\n    \n    # Combine: lower variance is better, higher alternation is better\n    return -variance_rd + 2.0 * alt_reward",
+        "objective": 1545.0
+    },
+    {
+        "sample_order": 44,
+        "operator": "e2",
+        "algorithm": "The new algorithm scores candidates by the *variance of the cumulative inertia of positions*, rewarding even spread across the vector while penalizing clustering near one end.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n    \n    # Cumulative inertia: for each normalized position, accumulate squared offset from center\n    mid = (n - 1) / 2.0\n    inertias = []\n    for i in range(1, len(positions) + 1):\n        offset = (positions[i-1] - mid) / max(1, n)\n        inertias.append(offset ** 2)\n    \n    mean_inertia = sum(inertias) / len(inertias)\n    variance_inertia = sum((x - mean_inertia) ** 2 for x in inertias) / len(inertias)\n    \n    # Penalize if any two non-zero positions are consecutive\n    penalty = 0\n    for i in range(len(positions) - 1):\n        if positions[i+1] - positions[i] == 1:\n            penalty += 1\n    \n    return variance_inertia * 10.0 - penalty * 5.0",
+        "objective": 552.0
+    },
+    {
+        "sample_order": 45,
+        "operator": "e2",
+        "algorithm": "Score by the negative entropy of the distribution of non-zero positions across equally-sized blocks, reward symmetry via the overlap of positions with their mirrored counterparts, and penalize any two consecutive positions that are both non-zero and have the same value.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    \"\"\"Score a candidate element for inclusion in the admissible set.\n\n    Args:\n        el: candidate element \u2014 a tuple of length n whose non-zero entries\n            sum to w (entries are drawn from {0, 1, 2}).\n        n:  vector length (dimension of the problem).\n        w:  target weight (number of non-zero entries).\n    Returns:\n        Priority score. Higher scores are selected first by the greedy search.\n    \"\"\"\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n\n    # 1. Entropy of block distribution (lower entropy \u2192 more concentrated, penalize)\n    num_blocks = max(2, int(n ** 0.5))\n    block_size = n / num_blocks\n    block_counts = [0] * num_blocks\n    for p in positions:\n        block_idx = min(int(p / block_size), num_blocks - 1)\n        block_counts[block_idx] += 1\n    total = len(positions)\n    entropy = 0.0\n    for c in block_counts:\n        if c > 0:\n            p = c / total\n            entropy -= p * (p ** 0.5)  # use sqrt-probability weighting for stability\n    entropy_score = -entropy * 0.5\n\n    # 2. Symmetry reward: fraction of positions with a mirror counterpart\n    center = (n - 1) / 2.0\n    mirror_count = 0\n    pos_set = set(positions)\n    for p in positions:\n        mirror = int(2 * center - p)\n        if mirror in pos_set and mirror != p:\n            mirror_count += 1\n    symmetry_score = 0.3 * (mirror_count / max(1, len(positions)))\n\n    # 3. Penalty for consecutive same-value non-zero entries\n    penalty = 0.0\n    for i in range(len(positions) - 1):\n        if positions[i+1] - positions[i] == 1:\n            if el[positions[i]] == el[positions[i+1]]:\n                penalty += 1.0\n    penalty_score = -0.7 * penalty\n\n    return entropy_score + symmetry_score + penalty_score",
+        "objective": 483.0
+    },
+    {
+        "sample_order": 46,
+        "operator": "e1",
+        "algorithm": "The new algorithm scores each candidate by the variance of its non-zero positions relative to a staggered target pattern, combined with a penalty for adjacency of equal values and a bonus for symmetric coverage around the center.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n    \n    # Variance penalty: deviations from evenly spaced ideal positions\n    ideal_positions = [i * (n - 1) / (w - 1) for i in range(w)]\n    var_penalty = sum((p - ip) ** 2 for p, ip in zip(positions, ideal_positions))\n    variance_score = -var_penalty / (n ** 2)\n    \n    # Adjacent same-value penalty (even if not consecutive indices)\n    adj_penalty = 0.0\n    for i in range(1, len(positions)):\n        if el[positions[i]] == el[positions[i-1]]:\n            adj_penalty += 1.0\n    adj_score = -adj_penalty / max(1, len(positions))\n    \n    # Symmetry bonus: mirror pairs around center\n    center = (n - 1) / 2.0\n    mirror_bonus = 0.0\n    for p in positions:\n        mirror_pos = int(2 * center - p)\n        if mirror_pos in positions and mirror_pos != p:\n            mirror_bonus += 0.5\n    symmetry_score = mirror_bonus / max(1, len(positions))\n    \n    # Combine: weight variance heavily, then symmetry, then adjacency\n    return 2.0 * variance_score + 1.0 * symmetry_score + 0.5 * adj_score",
+        "objective": 966.0
+    },
+    {
+        "sample_order": 47,
+        "operator": "m2",
+        "algorithm": "The new algorithm scores candidates by combining a quadratic penalty for deviations from perfect central symmetry, a reward for alternating non-zero values, and a penalty for any non-zero values at the extremes, with parameters tuned to favor balance and alternation.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n\n    # 1. Central symmetry score: reward if first and last positions are symmetric around midpoint\n    midpoint = (n - 1) / 2.0\n    left_dist = positions[0] - midpoint\n    right_dist = positions[-1] - midpoint\n    symmetry_score = -((left_dist + right_dist) ** 2) * 0.6\n\n    # 2. Alternation reward: penalize consecutive identical non-zero values, reward alternation\n    alternation_penalty = 0.0\n    for i in range(len(positions) - 1):\n        if el[positions[i]] == el[positions[i+1]]:\n            alternation_penalty += 1.0\n        else:\n            alternation_penalty -= 0.5\n    alternation_score = -alternation_penalty * 0.9\n\n    # 3. Extreme position penalty: penalize non-zero values at the very first or last index\n    extreme_penalty = 0.0\n    if positions[0] == 0:\n        extreme_penalty += 1.0\n    if positions[-1] == n - 1:\n        extreme_penalty += 1.0\n    extreme_score = -extreme_penalty * 0.7\n\n    return symmetry_score + alternation_score + extreme_score",
+        "objective": 507.0
+    },
+    {
+        "sample_order": 48,
+        "operator": "e1",
+        "algorithm": "The new algorithm scores candidates by computing the entropy of the positions histogram over equal-sized bins, rewarding uniform coverage across the vector, then adjusts by the sum of pairwise distances to avoid clustering, and finally boosts elements that minimize the maximum gap between consecutive non-zero positions.",
+        "code": "def priority(el: tuple, n: int, w: int) -> float:\n    positions = [i for i, v in enumerate(el) if v != 0]\n    if len(positions) < 2:\n        return 0.0\n    \n    # Entropy over bins for uniform coverage\n    num_bins = max(2, w)\n    bin_size = n / num_bins\n    counts = [0] * num_bins\n    for p in positions:\n        bin_idx = min(int(p // bin_size), num_bins - 1)\n        counts[bin_idx] += 1\n    total = len(positions)\n    entropy = 0.0\n    for c in counts:\n        if c > 0:\n            p = c / total\n            entropy -= p * (p and __import__('math').log(p))\n    max_entropy = __import__('math').log(num_bins)\n    entropy_score = entropy / max_entropy if max_entropy > 0 else 0.0\n    \n    # Sum of pairwise distances (larger = better to avoid clustering)\n    dist_sum = 0.0\n    for i in range(len(positions)):\n        for j in range(i+1, len(positions)):\n            dist_sum += abs(positions[i] - positions[j])\n    max_dist_sum = (len(positions) - 1) * (n - 1) * len(positions) / 2.0\n    dist_score = dist_sum / max_dist_sum if max_dist_sum > 0 else 0.0\n    \n    # Minimize maximum gap\n    gaps = []\n    sorted_pos = sorted(positions)\n    for i in range(len(sorted_pos) - 1):\n        gaps.append(sorted_pos[i+1] - sorted_pos[i])\n    max_gap = max(gaps) if gaps else 0\n    max_possible_gap = n - 1\n    gap_score = 1.0 - (max_gap / max_possible_gap)\n    \n    # Combined score: weight entropy and spacing\n    score = 0.5 * entropy_score + 0.3 * dist_score + 0.2 * gap_score\n    return score",
+        "objective": 462.0
+    }
+]

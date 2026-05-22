@@ -1,0 +1,6 @@
+{
+    "algorithm": "The new algorithm selects the next customer by maximizing the ratio of distance from the depot to the customer to the distance from the current node to the customer, multiplied by the square of the remaining capacity fraction, to favor far, high-capacity-utilizing customers early.",
+    "code": "def select_next_node(current_node: int, depot: int, unvisited_nodes: np.ndarray,\n                     rest_capacity: float, demands: np.ndarray,\n                     distance_matrix: np.ndarray) -> int:\n    if len(unvisited_nodes) == 0:\n        return depot\n    dist_current = distance_matrix[current_node][unvisited_nodes]\n    dist_depot = distance_matrix[depot][unvisited_nodes]\n    capacity_ratio = (rest_capacity / (np.max(demands[unvisited_nodes]) + 1e-10)) ** 2\n    score = (dist_depot / (dist_current + 1e-10)) * capacity_ratio\n    return unvisited_nodes[np.argmax(score)]",
+    "objective": 13.28515,
+    "other_inf": null
+}

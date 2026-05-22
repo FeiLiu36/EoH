@@ -1,0 +1,6 @@
+{
+    "algorithm": "The new crossover operator uses a parent-distance-adaptive aggressive blending factor and a higher base crossover probability to increase initial exploration while retaining exploitation via a dynamic alpha range that shrinks as parents become more similar.",
+    "code": "import numpy as np\n\ndef crossover(x1: np.ndarray, x2: np.ndarray) -> tuple:\n    dist = np.linalg.norm(x1 - x2) / np.sqrt(len(x1))\n    p_cross = 0.7 + 0.3 * (1 - dist)\n    c1, c2 = x1.copy(), x2.copy()\n    for i in range(len(x1)):\n        if np.random.random() < p_cross:\n            alpha = np.random.uniform(-0.8, 1.8)\n            c1[i] = (1 - alpha) * x1[i] + alpha * x2[i]\n            c2[i] = (1 - alpha) * x2[i] + alpha * x1[i]\n    return c1, c2",
+    "objective": -0.70129,
+    "other_inf": null
+}
