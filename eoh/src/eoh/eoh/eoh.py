@@ -197,6 +197,12 @@ class EOH:
                 raise FileNotFoundError(f"Continue file not found: {cfg.continue_path!r}") from None
             except (OSError, json.JSONDecodeError) as e:
                 raise RuntimeError(f"Failed to load continue file {cfg.continue_path!r}: {e}") from e
+            # Seed best-tracker from the loaded population so samples_best.json
+            # is only overwritten when a genuinely better individual is found.
+            valid_objs = [ind['objective'] for ind in population if ind.get('objective') is not None]
+            if valid_objs:
+                self._best_obj = min(valid_objs)
+                self._logger.info(f"  Restored best_obj={self._best_obj} from checkpoint population")
             return population, cfg.continue_id
 
         self._logger.info(f"\n[Init]  ({2 * self.pop_size} samples → pop={self.pop_size})")
