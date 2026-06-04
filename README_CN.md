@@ -214,9 +214,90 @@ EoH 支持三种模板类型，自动识别：
 
 
 
+## 三种层级的启发式设计
+
+EoH 支持三种层级的启发式设计，表达能力逐级增强。以下以 TSP 构造启发式任务为例分别说明。
+
+---
+
+#### 第一层级 — 单函数（[`tsp_construct`](https://github.com/FeiLiu36/EOH/tree/main/examples/tsp_construct)）
+
+最简单也最常用的形式。LLM 进化一个独立函数，该函数本身即为入口点。
+
+```python
+template_program = '''
+def select_next_node(current_node: int, destination_node: int,
+                     unvisited_nodes: np.ndarray,
+                     distance_matrix: np.ndarray) -> int:
+    """在 TSP 贪婪构造中选择下一个访问节点。"""
+    return unvisited_nodes[np.argmin(distance_matrix[current_node][unvisited_nodes])]
+'''
+```
+
+---
+
+#### 第二层级 — 多函数（[`tsp_construct_multifunction`](https://github.com/FeiLiu36/EOH/tree/main/examples/tsp_construct_multifunction)）
+
+LLM 进化多个协作函数。**最后**一个顶层函数为入口点；定义在其上方的辅助函数由入口函数内部调用。这使 LLM 能够将启发式分解为可复用的子组件。
+
+```python
+template_program = '''
+def compute_node_scores(current_node: int, unvisited_nodes: np.ndarray,
+                        distance_matrix: np.ndarray,
+                        destination_node: int) -> np.ndarray:
+    """为每个候选未访问节点计算优先级分数。"""
+    return -distance_matrix[current_node][unvisited_nodes]
+
+
+def select_next_node(current_node: int, destination_node: int,
+                     unvisited_nodes: np.ndarray,
+                     distance_matrix: np.ndarray) -> int:
+    """利用 compute_node_scores 选择下一个节点。"""
+    scores = compute_node_scores(current_node, unvisited_nodes,
+                                 distance_matrix, destination_node)
+    return unvisited_nodes[np.argmax(scores)]
+'''
+```
+
+---
+
+#### 第三层级 — 类（[`tsp_construct_class`](https://github.com/FeiLiu36/EOH/tree/main/examples/tsp_construct_class)）
+
+LLM 进化一个完整的类。**类名**为入口点——EoH 实例化该类并调用指定方法。这是表达能力最强的层级，支持有状态的启发式、内部数据结构及面向对象设计。
+
+```python
+template_program = '''
+class TSPConstructor:
+    """旅行商问题的构造启发式。"""
+
+    def select_next_node(self, current_node: int, destination_node: int,
+                         unvisited_nodes: np.ndarray,
+                         distance_matrix: np.ndarray) -> int:
+        """选择下一个访问节点。"""
+        return unvisited_nodes[np.argmin(distance_matrix[current_node][unvisited_nodes])]
+'''
+```
+
+---
+
+| | 单函数 | 多函数 | 类 |
+|---|:---:|:---:|:---:|
+| **入口点** | 函数本身 | 最后一个顶层函数 | 类（实例化后调用） |
+| **辅助组件** | — | 上方定义的辅助函数 | 方法与属性 |
+| **有状态设计** | — | — | 支持 |
+| **典型用途** | 大多数启发式 | 分解式评分/选择 | 有状态或复杂启发式 |
+| **示例** | `tsp_construct` | `tsp_construct_multifunction` | `tsp_construct_class` |
+
+
+
 ## 示例列表
 
 下表列出了 `examples/` 目录中的全部 33 个示例任务。
+
+| TSP 构造启发式 | BBOB 元启发式 | Atari Breakout |
+|:---:|:---:|:---:|
+| <img src="./docs/figures/tsp_construct.gif" width="280"> | <img src="./docs/figures/bbob_metaheuristic.gif" width="280"> | <img src="./docs/figures/gameplay_baseline_ball-tracking.gif" width="280"> |
+| `tsp_construct` | `bbob_metaheuristic` | `ale_breakout` |
 
 | 名称 | 描述 | 链接 | 备注 |
 |------|------|------|------|
@@ -295,6 +376,12 @@ llm = LLMConfig(
 在 `eoh/src/eoh/llm/` 中继承 LLM 接口，即可接入任何其他 LLM 服务。
 
 
+
+## 常见问题解答
+
+有关安装、LLM 配置、问题定义、进化算子、结果输出及故障排查等常见问题，请参阅 **[FAQ（常见问题）](./FAQ_CN.md)**。
+
+---
 
 ## LLM4Opt 相关工作
 欢迎访问[大模型与优化参考文献和研究论文收藏](https://github.com/FeiLiu36/LLM4Opt)

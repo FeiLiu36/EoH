@@ -215,9 +215,90 @@ See [`examples/tsp_construct_class`](https://github.com/FeiLiu36/EOH/tree/main/e
 
 
 
+## Three Levels of Heuristic Design
+
+EoH supports three levels of heuristic design, offering increasing expressiveness. All three are illustrated using the TSP constructive heuristic task.
+
+---
+
+#### Level 1 — Single Function ([`tsp_construct`](https://github.com/FeiLiu36/EOH/tree/main/examples/tsp_construct))
+
+The simplest and most common form. The LLM evolves a single standalone function. The entry point is the function itself.
+
+```python
+template_program = '''
+def select_next_node(current_node: int, destination_node: int,
+                     unvisited_nodes: np.ndarray,
+                     distance_matrix: np.ndarray) -> int:
+    """Select the next node to visit in a TSP greedy construction."""
+    return unvisited_nodes[np.argmin(distance_matrix[current_node][unvisited_nodes])]
+'''
+```
+
+---
+
+#### Level 2 — Multi-Function ([`tsp_construct_multifunction`](https://github.com/FeiLiu36/EOH/tree/main/examples/tsp_construct_multifunction))
+
+The LLM evolves multiple cooperating functions. The **last** top-level function is the entry point; helper functions defined above it are called internally. This allows the LLM to decompose the heuristic into reusable sub-components.
+
+```python
+template_program = '''
+def compute_node_scores(current_node: int, unvisited_nodes: np.ndarray,
+                        distance_matrix: np.ndarray,
+                        destination_node: int) -> np.ndarray:
+    """Compute a priority score for each candidate unvisited node."""
+    return -distance_matrix[current_node][unvisited_nodes]
+
+
+def select_next_node(current_node: int, destination_node: int,
+                     unvisited_nodes: np.ndarray,
+                     distance_matrix: np.ndarray) -> int:
+    """Select the next node using compute_node_scores."""
+    scores = compute_node_scores(current_node, unvisited_nodes,
+                                 distance_matrix, destination_node)
+    return unvisited_nodes[np.argmax(scores)]
+'''
+```
+
+---
+
+#### Level 3 — Class ([`tsp_construct_class`](https://github.com/FeiLiu36/EOH/tree/main/examples/tsp_construct_class))
+
+The LLM evolves an entire class. The **class name** is the entry point — EoH instantiates it and calls the designated method. This is the most expressive level, enabling stateful heuristics, internal data structures, and object-oriented design.
+
+```python
+template_program = '''
+class TSPConstructor:
+    """Constructive heuristic for the Travelling Salesman Problem."""
+
+    def select_next_node(self, current_node: int, destination_node: int,
+                         unvisited_nodes: np.ndarray,
+                         distance_matrix: np.ndarray) -> int:
+        """Select the next node to visit."""
+        return unvisited_nodes[np.argmin(distance_matrix[current_node][unvisited_nodes])]
+'''
+```
+
+---
+
+| | Single Function | Multi-Function | Class |
+|---|:---:|:---:|:---:|
+| **Entry point** | the function | last top-level function | the class (instantiated) |
+| **Helper components** | — | additional functions above | methods and attributes |
+| **Stateful design** | — | — | yes |
+| **Typical use** | most heuristics | decomposed scoring/selection | stateful or complex heuristics |
+| **Example** | `tsp_construct` | `tsp_construct_multifunction` | `tsp_construct_class` |
+
+
+
 ## Examples
 
 The table below lists all 33 example tasks included in the `examples/` directory.
+
+| TSP Constructive Heuristic | BBOB Metaheuristic | Atari Breakout |
+|:---:|:---:|:---:|
+| <img src="./docs/figures/tsp_construct.gif" width="280"> | <img src="./docs/figures/bbob_metaheuristic.gif" width="280"> | <img src="./docs/figures/gameplay_baseline_ball-tracking.gif" width="280"> |
+| `tsp_construct` | `bbob_metaheuristic` | `ale_breakout` |
 
 | Name | Description | Link | Note |
 |------|-------------|------|------|
@@ -296,6 +377,12 @@ The local server must accept POST requests in the format expected by `api_local_
 Subclass the LLM interface in `eoh/src/eoh/llm/` to integrate any other LLM provider.
 
 
+
+## Frequently Asked Questions
+
+For answers to common questions about installation, LLM configuration, defining problems, evolutionary operators, results, and troubleshooting, see the **[FAQ](./FAQ.md)**.
+
+---
 
 ## Related Works on LLM4Opt
 Welcome to visit [a collection of references and research papers on LLM4Opt](https://github.com/FeiLiu36/LLM4Opt)
