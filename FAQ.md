@@ -2,26 +2,27 @@
 
 ## Table of Contents
 
-1. [What is EoH and what problems can it solve?](#1-what-is-eoh-and-what-problems-can-it-solve)
-2. [How do I install EoH?](#2-how-do-i-install-eoh)
-3. [Which LLMs are supported?](#3-which-llms-are-supported)
-4. [How do I configure the LLM (API key, endpoint, model)?](#4-how-do-i-configure-the-llm-api-key-endpoint-model)
-5. [My API calls keep timing out — how do I fix this?](#5-my-api-calls-keep-timing-out--how-do-i-fix-this)
-6. [How do I define my own optimization problem?](#6-how-do-i-define-my-own-optimization-problem)
-7. [What are the supported template types?](#7-what-are-the-supported-template-types)
-8. [What should I put in the initial template function?](#8-what-should-i-put-in-the-initial-template-function)
-9. [Does EoH maximize or minimize the fitness value?](#9-does-eoh-maximize-or-minimize-the-fitness-value)
-10. [What are the evolutionary operators (e1, e2, m1, m2)?](#10-what-are-the-evolutionary-operators-e1-e2-m1-m2)
-11. [How do I run EoH and what are the key configuration parameters?](#11-how-do-i-run-eoh-and-what-are-the-key-configuration-parameters)
-12. [Where are the results saved?](#12-where-are-the-results-saved)
-13. [How do I resume a run that was interrupted?](#13-how-do-i-resume-a-run-that-was-interrupted)
-14. [How do I seed EoH with hand-crafted algorithms?](#14-how-do-i-seed-eoh-with-hand-crafted-algorithms)
-15. [How do I speed up evaluation with parallel workers?](#15-how-do-i-speed-up-evaluation-with-parallel-workers)
-16. [Why does EoH produce no valid results or always return None?](#16-why-does-eoh-produce-no-valid-results-or-always-return-none)
-17. [How do comments in the template affect EoH performance?](#17-how-do-comments-in-the-template-affect-eoh-performance)
-18. [How does EoH compare to FunSearch and AEL?](#18-how-does-eoh-compare-to-funsearch-and-ael)
-19. [What are the advantages of LLM-based heuristic design over traditional methods?](#19-what-are-the-advantages-of-llm-based-heuristic-design-over-traditional-methods)
-20. [Are there known limitations or failure modes?](#20-are-there-known-limitations-or-failure-modes)
+- [EoH Frequently Asked Questions](#eoh-frequently-asked-questions)
+  - [Table of Contents](#table-of-contents)
+  - [1. What is EoH and what problems can it solve?](#1-what-is-eoh-and-what-problems-can-it-solve)
+  - [2. How do I install EoH?](#2-how-do-i-install-eoh)
+  - [3. Which LLMs are supported?](#3-which-llms-are-supported)
+  - [4. How do I configure the LLM (API key, endpoint, model)?](#4-how-do-i-configure-the-llm-api-key-endpoint-model)
+  - [5. My API calls keep timing out — how do I fix this?](#5-my-api-calls-keep-timing-out--how-do-i-fix-this)
+  - [6. How do I define my own optimization problem?](#6-how-do-i-define-my-own-optimization-problem)
+  - [7. What are the supported template types?](#7-what-are-the-supported-template-types)
+  - [8. What should I put in the initial template function?](#8-what-should-i-put-in-the-initial-template-function)
+  - [9. Does EoH maximize or minimize the fitness value?](#9-does-eoh-maximize-or-minimize-the-fitness-value)
+  - [10. What are the evolutionary operators (e1, e2, m1, m2)?](#10-what-are-the-evolutionary-operators-e1-e2-m1-m2)
+  - [11. How do I run EoH and what are the key configuration parameters?](#11-how-do-i-run-eoh-and-what-are-the-key-configuration-parameters)
+  - [12. Where are the results saved?](#12-where-are-the-results-saved)
+  - [13. How do I resume a run that was interrupted?](#13-how-do-i-resume-a-run-that-was-interrupted)
+  - [14. How do I seed EoH with hand-crafted algorithms?](#14-how-do-i-seed-eoh-with-hand-crafted-algorithms)
+  - [15. How do I speed up evaluation with parallel workers?](#15-how-do-i-speed-up-evaluation-with-parallel-workers)
+  - [16. Why does EoH produce no valid results or always return None?](#16-why-does-eoh-produce-no-valid-results-or-always-return-none)
+  - [17. How do comments in the template affect EoH performance?](#17-how-do-comments-in-the-template-affect-eoh-performance)
+  - [18. What are the advantages of LLM-based heuristic design over traditional methods?](#18-what-are-the-advantages-of-llm-based-heuristic-design-over-traditional-methods)
+  - [19. Are there known limitations or failure modes?](#19-are-there-known-limitations-or-failure-modes)
 
 ---
 
@@ -376,21 +377,7 @@ When in doubt, start minimal and add comments only if the LLM consistently misun
 
 ---
 
-## 18. How does EoH compare to FunSearch and AEL?
-
-| | EoH | FunSearch | AEL |
-|---|---|---|---|
-| **Co-evolves thoughts** | Yes | No | No |
-| **Operators** | 4 (e1, e2, m1, m2) | mutation only | 3 |
-| **LLM queries (bin packing)** | ~500 | ~1000+ | ~500 |
-| **Result quality** | Surpasses FunSearch | Strong baseline | Competitive |
-| **Venue** | ICML 2024 (Oral) | Nature 2023 | GECCO 2024 |
-
-EoH's key advantage over FunSearch is the co-evolution of "thoughts" (natural-language reasoning) alongside code, which provides richer diversity and better performance with fewer LLM calls. AEL uses a similar LLM-EC combination but without thought evolution.
-
----
-
-## 19. What are the advantages of LLM-based heuristic design over traditional methods?
+## 18. What are the advantages of LLM-based heuristic design over traditional methods?
 
 - **High automation**: No manual feature engineering or domain-specific tuning required beyond defining the problem interface.
 - **No training data needed**: LLMs bring prior knowledge from pretraining; you do not need to collect or label examples.
@@ -400,7 +387,7 @@ EoH's key advantage over FunSearch is the co-evolution of "thoughts" (natural-la
 
 ---
 
-## 20. Are there known limitations or failure modes?
+## 19. Are there known limitations or failure modes?
 
 - **Complex problem descriptions**: Extracting a concise, unambiguous task description from a complex real-world problem can be challenging. Poorly written `task_description` values are a common source of low-quality results.
 - **Model capability ceiling**: The quality of evolved heuristics is bounded by the LLM's code generation ability. Very weak models may never produce valid programs.
