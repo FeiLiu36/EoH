@@ -306,7 +306,7 @@ class TSPConstructor:
 | `ale_breakout` | 为 Atari Breakout 智能体进化动作选择启发式。 | [代码](https://github.com/FeiLiu36/EOH/tree/main/examples/ale_breakout) | 需要 ALE |
 | `ale_pong` | 为 Atari Pong 智能体进化动作选择启发式。 | [代码](https://github.com/FeiLiu36/EOH/tree/main/examples/ale_pong) | 需要 ALE |
 | `bbob_metaheuristic` | 为连续黑箱优化设计完整的单目标元启发式算法。 | [代码](https://github.com/FeiLiu36/EOH/tree/main/examples/bbob_metaheuristic) | 类模板 |
-| `bo_acquisition` | 为贝叶斯优化设计采集函数以指导候选点选择。 | [代码](https://github.com/FeiLiu36/EOH/tree/main/examples/bo_acquisition) | [PPSN 2024 最佳论文提名](https://arxiv.org/abs/2404.16906) |
+| `bo_acquisition` | 为贝叶斯优化设计采集函数以指导候选点选择。 | [代码](https://github.com/FeiLiu36/EOH/tree/main/examples/bo_acquisition) |  |
 | `bp_online` | 为在线装箱设计箱子评分函数以最小化使用箱数。 | [代码](https://github.com/FeiLiu36/EOH/tree/main/examples/bp_online) | EoH 论文基准 |
 | `cmaes_cov_update` | 为 CMA-ES 设计协方差矩阵更新规则（10 维基准）。 | [代码](https://github.com/FeiLiu36/EOH/tree/main/examples/cmaes_cov_update) | |
 | `cvrp_construct` | 为有容量约束的车辆路径问题设计贪婪构造启发式。 | [代码](https://github.com/FeiLiu36/EOH/tree/main/examples/cvrp_construct) | |

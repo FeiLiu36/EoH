@@ -307,7 +307,7 @@ The table below lists all 33 example tasks included in the `examples/` directory
 | `ale_breakout` | Evolve an action-selection heuristic for an Atari Breakout agent. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/ale_breakout) | Requires ALE |
 | `ale_pong` | Evolve an action-selection heuristic for an Atari Pong agent. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/ale_pong) | Requires ALE |
 | `bbob_metaheuristic` | Design a complete single-objective metaheuristic for continuous black-box optimization. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/bbob_metaheuristic) | Class template |
-| `bo_acquisition` | Design an acquisition function for Bayesian Optimization to guide candidate selection. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/bo_acquisition) | [PPSN 2024 Best Paper Nomination](https://arxiv.org/abs/2404.16906) |
+| `bo_acquisition` | Design an acquisition function for Bayesian Optimization to guide candidate selection. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/bo_acquisition) | |
 | `bp_online` | Design a bin-scoring function for online bin packing to minimise the number of used bins. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/bp_online) | EoH paper benchmark |
 | `cmaes_cov_update` | Design a covariance matrix update rule for CMA-ES on 10-D benchmarks. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/cmaes_cov_update) | |
 | `cvrp_construct` | Design a greedy constructive heuristic for the Capacitated Vehicle Routing Problem. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/cvrp_construct) | |

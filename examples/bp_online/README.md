@@ -40,7 +40,7 @@ instances used the intended capacity. This repo fixes it (every instance uses th
 configured capacity), so the corrected capacity-500 columns differ from the paper.
 The fix is being documented in the GitHub repo and the arXiv version of the paper.
 
-*Thanks to Tai Nguyen (University of St Andrews) for his careful investigation of this issue.*
+*Thanks to Tai (University of St Andrews) for his careful investigation of this issue.*
 
 ---
 
@@ -72,6 +72,11 @@ absolute-magnitude terms (e.g. `1/(1+remaining)`) tuned to capacity-100 leftover
 **Guidance:** evaluate on multiple sizes *and* capacities; prefer scale-invariant
 scores (normalize by capacity, use ratios); run multiple seeds and select on held-out
 OOD performance, not training fitness.
+
+Some solutions to this issue are discussed in EoH-S [1] and MoH [2] etc.
+
+[1] [EoH-S: Evolution of Heuristic Set using LLMs for Automated Heuristic Design](https://ojs.aaai.org/index.php/AAAI/article/view/41038), AAAI 2026
+[2] [Generalizable Heuristic Generation Through LLMs with Meta-Optimization](https://openreview.net/forum?id=tIQZ7pVN6S), ICLR 2026
 
 ---
 
