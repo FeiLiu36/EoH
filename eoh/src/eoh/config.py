@@ -28,6 +28,14 @@ class EoHConfig:
     operators: list = field(default_factory=lambda: ['e1', 'e2', 'm1', 'm2'])
     operator_weights: list = None
     n_parents: int = 2
+    # Async pipeline concurrency (decoupled from pop_size).
+    # num_samplers : concurrent LLM-generation threads (I/O bound).
+    # num_evaluators: concurrent evaluation workers (CPU bound, each isolated
+    #                 in a hard-timeout subprocess).
+    # max_sample_nums: total evolution-sample budget; None → n_pop * pop_size.
+    num_samplers: int = 1
+    num_evaluators: int = 1
+    max_sample_nums: int = None
     output_dir: str = "./"
     debug: bool = False
     use_seed: bool = False

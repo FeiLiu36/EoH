@@ -1,17 +1,28 @@
+import os
+import pickle as pkl
+
 import numpy as np
 
 
 class GetData:
-    def __init__(self, n_instance, n_cities):
-        self.n_instance = n_instance
-        self.n_cities = n_cities
+    """Loads pre-generated TSP instances with known optimal tour costs.
 
-    def generate_instances(self):
-        """Returns list of (coordinates, distance_matrix) tuples."""
-        np.random.seed(2024)
-        instances = []
-        for _ in range(self.n_instance):
-            coords = np.random.rand(self.n_cities, 2)
-            dist = np.linalg.norm(coords[:, np.newaxis] - coords, axis=2)
-            instances.append((coords, dist))
-        return instances
+    The training set (TSPAEL64.pkl) holds 64 random 100-node Euclidean TSP
+    instances together with their optimal tour costs, used to compute the
+    optimality gap during evolution.
+    """
+
+    def __init__(self, n_instance, datafile=None):
+        self.n_instance = n_instance
+        if datafile is None:
+            datafile = os.path.join(os.path.dirname(__file__),
+                                    'TrainingData', 'TSPAEL64.pkl')
+        self.datafile = datafile
+
+    def load_instances(self):
+        with open(self.datafile, 'rb') as f:
+            data = pkl.load(f)
+        coords = [np.asarray(c) for c in data['coordinate'][:self.n_instance]]
+        instances = [np.asarray(d) for d in data['distance_matrix'][:self.n_instance]]
+        opt_costs = list(data['cost'][:self.n_instance])
+        return coords, instances, opt_costs

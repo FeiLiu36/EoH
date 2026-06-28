@@ -1,0 +1,62 @@
+[
+    {
+        "algorithm": "Use a compact fit-plus-packing-pressure score that rewards near-tight placements while gently biasing toward bins that are already more constrained, so the item goes to the bin most likely to reduce future fragmentation and bin count.",
+        "code": "def score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"Score each bin for assigning the current item. Higher score = preferred bin.\n\n    Args:\n        item: size of the current item to assign\n        bins: remaining capacities of feasible bins (all >= item size)\n    Returns:\n        scores: priority scores for each bin\n    \"\"\"\n    remaining = bins - item\n    tightness = -remaining.astype(float)\n    pressure = item / (bins.astype(float) + 1e-9)\n    return 0.7 * tightness + 0.3 * pressure",
+        "objective": 0.03984,
+        "other_inf": null
+    },
+    {
+        "algorithm": "Rank bins by how closely the post-placement remainder matches a dynamic target based on the current item, then amplify exact-fit pressure while penalizing both underfilled and overlarge leftovers through a multiplicative shape term.",
+        "code": "def score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"Score each bin for assigning the current item. Higher score = preferred bin.\n\n    Args:\n        item: size of the current item to assign\n        bins: remaining capacities of feasible bins (all >= item size)\n    Returns:\n        scores: priority scores for each bin\n    \"\"\"\n    bins_f = bins.astype(float)\n    remaining = bins_f - float(item)\n\n    # Dynamic target: larger items push toward smaller remainders, smaller items allow more slack.\n    target = np.maximum(0.0, 0.5 * float(item))\n    gap = np.abs(remaining - target)\n\n    # Shape term rewards exact fits and steadily suppresses bins that leave too much space.\n    exact_fit = 1.0 / (1.0 + remaining)\n    shape = 1.0 / (1.0 + gap)\n\n    # Mild utilization pressure: prefer bins that are already more committed.\n    utilization = float(item) / (bins_f + 1e-9)\n\n    return 0.60 * exact_fit + 0.30 * shape + 0.10 * utilization",
+        "objective": 0.04115,
+        "other_inf": null
+    },
+    {
+        "algorithm": "Use a residual-capacity kernel that rewards near-exact fits, adds a balance term for leaving moderate leftover space, and applies a light saturation bonus so bins that would become nearly full are preferred without using the original linear utility form.",
+        "code": "def score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"Score each bin for assigning the current item. Higher score = preferred bin.\n\n    Args:\n        item: size of the current item to assign\n        bins: remaining capacities of feasible bins (all >= item size)\n    Returns:\n        scores: priority scores for each bin\n    \"\"\"\n    b = bins.astype(float)\n    remaining = b - float(item)\n\n    fit = np.exp(-3.5 * (remaining / (b + 1e-9)) ** 2)\n    balance = np.exp(-6.0 * ((remaining / (b + 1e-9)) - 0.25) ** 2)\n    saturation = 1.0 / (1.0 + np.exp(10.0 * ((remaining / (b + 1e-9)) - 0.15)))\n\n    return 2.2 * fit + 1.1 * balance + 0.7 * saturation",
+        "objective": 0.04326,
+        "other_inf": null
+    },
+    {
+        "algorithm": "Score feasible bins with a multiplicative blend of post-placement utilization, a sharp near-fullness gate, and a residual-capacity preference centered on a smaller target slack to favor tighter packing.",
+        "code": "def score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"Score each bin for assigning the current item. Higher score = preferred bin.\n\n    Args:\n        item: size of the current item to assign\n        bins: remaining capacities of feasible bins (all >= item size)\n    Returns:\n        scores: priority scores for each bin\n    \"\"\"\n    b = bins.astype(float)\n    item_f = float(item)\n    remaining = b - item_f\n\n    post_fill = item_f / (b + 1e-9)\n    utilization = (item_f + remaining) / (b + 1e-9)\n    slack = remaining / (b + 1e-9)\n\n    target_slack = 0.18\n    slack_gate = np.exp(-18.0 * (slack - target_slack) ** 2)\n    fullness_gate = 1.0 / (1.0 + np.exp(10.0 * (slack - 0.12)))\n\n    return 1.8 * post_fill + 1.2 * utilization + 2.2 * slack_gate + 1.0 * fullness_gate - 0.6 * slack",
+        "objective": 0.05051,
+        "other_inf": null
+    },
+    {
+        "algorithm": "Normalize each feasible bin\u2019s post-assignment slack, reward placements that land near a target utilization band while sharply penalizing extreme slack, and add a small rank-based preference so the chosen bin is the most space-efficient among similarly suitable options.",
+        "code": "def score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"Score each bin for assigning the current item. Higher score = preferred bin.\n\n    Args:\n        item: size of the current item to assign\n        bins: remaining capacities of feasible bins (all >= item size)\n    Returns:\n        scores: priority scores for each bin\n    \"\"\"\n    bins = bins.astype(float)\n    slack = bins - float(item)\n\n    # Target a moderate residual gap after placement, scaled by the item size.\n    target = 0.18 * bins + 0.12 * float(item)\n\n    # Prefer bins whose leftover space is close to the target band.\n    closeness = 1.0 / (1.0 + np.abs(slack - target))\n\n    # Strongly discourage large post-placement slack.\n    utilization = 1.0 - (slack / (bins + 1e-9))\n\n    # Tiny rank-based tie-breaker: tighter bins get a slight edge.\n    order = np.argsort(slack)\n    rank_bonus = np.empty_like(slack)\n    rank_bonus[order] = np.linspace(1.0, 0.0, len(slack), endpoint=True)\n\n    return 0.62 * closeness + 0.33 * utilization + 0.05 * rank_bonus",
+        "objective": 0.06681,
+        "other_inf": null
+    },
+    {
+        "algorithm": "Normalize each feasible bin by the current item-to-bin scale, then combine a tighter-fit preference, a mid-remainder target, and a leftover-capacity penalty with a different weight mix to steer assignments toward more compact bin usage.",
+        "code": "def score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"Score each bin for assigning the current item. Higher score = preferred bin.\n\n    Args:\n        item: size of the current item to assign\n        bins: remaining capacities of feasible bins (all >= item size)\n    Returns:\n        scores: priority scores for each bin\n    \"\"\"\n    bins_f = bins.astype(float)\n    remaining = bins_f - float(item)\n\n    scale = np.max(bins_f) + 1e-9\n    rem_norm = remaining / scale\n\n    tight_fit = -rem_norm\n    target = 0.10\n    target_bias = -np.abs(rem_norm - target)\n    leftover_penalty = -(rem_norm ** 2)\n    stability = np.sqrt(np.maximum(rem_norm, 0.0))\n\n    return 0.40 * tight_fit + 0.30 * target_bias + 0.20 * stability + 0.10 * leftover_penalty",
+        "objective": 0.07928,
+        "other_inf": null
+    },
+    {
+        "algorithm": "Rank feasible bins by the post-placement residual capacity after a logarithmic compression, then add a locality bonus that favors placements near the current item size while penalizing large slack to steer choices toward dense packing.",
+        "code": "def score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"Score each bin for assigning the current item. Higher score = preferred bin.\n\n    Args:\n        item: size of the current item to assign\n        bins: remaining capacities of feasible bins (all >= item size)\n    Returns:\n        scores: priority scores for each bin\n    \"\"\"\n    bins_f = bins.astype(float)\n    residual = bins_f - float(item)\n\n    compressed = -np.log1p(residual)\n    locality = -np.abs(residual - 0.5 * float(item))\n    slack_penalty = -np.sqrt(residual + 1e-9)\n\n    return 0.55 * compressed + 0.30 * locality + 0.15 * slack_penalty",
+        "objective": 0.07948,
+        "other_inf": null
+    },
+    {
+        "algorithm": "Score bins by a smooth multiplicative utility that combines post-placement fill ratio, slack penalty, and a novelty bias toward bins whose residual capacity would land near a learned midpoint, so assignments favor dense packing without relying on a linear tightness-pressure sum.",
+        "code": "def score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"Score each bin for assigning the current item. Higher score = preferred bin.\n\n    Args:\n        item: size of the current item to assign\n        bins: remaining capacities of feasible bins (all >= item size)\n    Returns:\n        scores: priority scores for each bin\n    \"\"\"\n    b = bins.astype(float)\n    remaining = b - float(item)\n    fill_ratio = float(item) / (b + 1e-9)\n    slack = remaining / (b + 1e-9)\n    target = 0.5\n    midpoint_bias = np.exp(-8.0 * (slack - target) ** 2)\n    return 2.0 * fill_ratio + 1.5 * midpoint_bias - 0.8 * slack",
+        "objective": 0.08512,
+        "other_inf": null
+    },
+    {
+        "algorithm": "Scores feasible bins by a tighter-fit dominance rule that favors near-exact placements, softly prefers moderate residual capacity, and penalizes both oversized slack and tiny leftover gaps to reduce future bin use.",
+        "code": "def score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"Score each bin for assigning the current item. Higher score = preferred bin.\n\n    Args:\n        item: size of the current item to assign\n        bins: remaining capacities of feasible bins (all >= item size)\n    Returns:\n        scores: priority scores for each bin\n    \"\"\"\n    bins_f = bins.astype(float)\n    remaining = bins_f - float(item)\n\n    scale = np.max(bins_f) + 1e-9\n    rem_norm = remaining / scale\n\n    tight_fit = -rem_norm\n    moderate_residual = -np.abs(rem_norm - 0.12)\n    tiny_gap_penalty = -np.exp(-12.0 * rem_norm)\n    waste_penalty = -(rem_norm ** 2)\n\n    return 0.60 * tight_fit + 0.20 * moderate_residual + 0.15 * tiny_gap_penalty + 0.05 * waste_penalty",
+        "objective": 0.08663,
+        "other_inf": null
+    },
+    {
+        "algorithm": "Rank feasible bins by a composite of exact-fill preference, post-placement capacity balance, and a mild anti-clumping term that steers items toward bins whose residual capacity lands near a stable target band.",
+        "code": "def score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"Score each bin for assigning the current item. Higher score = preferred bin.\n\n    Args:\n        item: size of the current item to assign\n        bins: remaining capacities of feasible bins (all >= item size)\n    Returns:\n        scores: priority scores for each bin\n    \"\"\"\n    bins_f = bins.astype(float)\n    remaining = bins_f - float(item)\n\n    exact_fit = 1.0 / (1.0 + remaining)\n    balance_target = np.maximum(bins_f.mean() - float(item), 0.0)\n    balance = 1.0 / (1.0 + np.abs(remaining - balance_target))\n    anti_clump = np.exp(-np.abs(bins_f - bins_f.min()))\n\n    return 0.55 * exact_fit + 0.30 * balance + 0.15 * anti_clump",
+        "objective": 0.0981,
+        "other_inf": null
+    }
+]

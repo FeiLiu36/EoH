@@ -15,12 +15,13 @@ if __name__ == "__main__":
         timeout=150,
     )
 
-    task = FSSPGLS(n_jobs=20, n_machines=5, n_instance=5,
-                   iter_max=100, time_max=10.0, timeout=60, n_processes=4)
+    task = FSSPGLS(n_inst_eva=3, time_max=30.0, iter_max=1000, timeout=120)
 
     eoh = EoH(
         llm=llm,
         problem=task,
+        num_samplers=4,
+        num_evaluators=4,
         pop_size=4,
         n_pop=20,
         operators=['e1', 'e2', 'm1', 'm2'],

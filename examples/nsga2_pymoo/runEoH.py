@@ -20,12 +20,13 @@ if __name__ == "__main__":
         n_gen=100,      # generations per evaluation run
         n_runs=3,       # random seeds averaged per instance
         timeout=60,
-        n_processes=4,
     )
 
     eoh = EoH(
         llm=llm,
         problem=task,
+        num_samplers=4,
+        num_evaluators=4,
         pop_size=4,
         n_pop=20,
         operators=['e1', 'e2', 'm1', 'm2'],

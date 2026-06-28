@@ -33,11 +33,13 @@ if __name__ == "__main__":
     )
 
     # 10 episodes × up to 5000 steps each; 120 s timeout per evaluation
-    task = ALEPONG(n_episodes=10, max_steps=5000, timeout=120, n_processes=8)
+    task = ALEPONG(n_episodes=10, max_steps=5000, timeout=120)
 
     eoh = EoH(
         llm=llm,
         problem=task,
+        num_samplers=4,
+        num_evaluators=4,
         pop_size=8,
         n_pop=100,
         operators=['e1', 'e2', 'm1', 'm2'],

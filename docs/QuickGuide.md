@@ -335,14 +335,16 @@ llm = LLMConfig(
     timeout=150,
 )
 
-problem = KnapsackProblem(n_instances=16, n_items=50, timeout=30, n_processes=4)
+problem = KnapsackProblem(n_instances=16, n_items=50, timeout=30)
 
 eoh = EoH(
     llm=llm,
     problem=problem,
-    pop_size=5,        # programs kept per generation
-    n_pop=20,          # number of generations
+    pop_size=5,          # programs kept per generation
+    n_pop=20,            # number of generations
     operators=['e1', 'e2', 'm1', 'm2'],
+    num_samplers=8,      # concurrent LLM-generation threads (I/O bound)
+    num_evaluators=4,    # concurrent evaluation subprocesses (CPU bound)
     output_dir="./results",
     debug=False,
 )
@@ -364,7 +366,10 @@ python runEoH.py
 | `n_pop` | 20 | 10–20 for a quick run; 50+ for thorough search |
 | `operators` | all four | Start with `['e1', 'e2', 'm1', 'm2']`; restrict if LLM budget is tight |
 | `operator_weights` | uniform | E.g. `[0.3, 0.3, 0.2, 0.2]` to weight crossover more |
-| `n_processes` | problem default | Overrides `n_processes` set on the problem instance |
+| `num_samplers` | 1 | Concurrent LLM-generation threads. Main throughput knob; `-1` = all CPUs |
+| `num_evaluators` | 1 | Concurrent evaluation subprocesses. Set ≤ CPU cores; `-1` = all CPUs |
+| `max_sample_nums` | `n_pop × pop_size` | Total evolution-sample budget (optional override) |
+| `n_processes` | `None` | Legacy shortcut that sets both `num_samplers` and `num_evaluators` |
 | `debug` | `False` | Set `True` to see LLM responses and evaluation tracebacks |
 
 **Evolutionary operators:**

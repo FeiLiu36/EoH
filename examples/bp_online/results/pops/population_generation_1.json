@@ -1,0 +1,44 @@
+[
+    {
+        "algorithm": "Prefer bins whose post-placement leftover is small, proportionate to the bin\u2019s current capacity, and aligned with a reusable leftover profile rather than an awkward fragment.",
+        "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"Score each bin for assigning the current item. Higher score = preferred bin.\n\n    Args:\n        item: size of the current item to assign\n        bins: remaining capacities of feasible bins (all >= item size)\n    Returns:\n        scores: priority scores for each bin\n    \"\"\"\n    bins = np.asarray(bins, dtype=float)\n    residual = bins - float(item)\n\n    with np.errstate(divide=\"ignore\", invalid=\"ignore\"):\n        tightness = 1.0 / (1.0 + residual)\n        utilization = float(item) / (bins + 1.0)\n        reuse_shape = np.sin(np.pi * residual / (bins + 1.0)) ** 2\n\n    scores = 2.6 * tightness + 1.7 * utilization - 1.2 * reuse_shape\n    return scores",
+        "objective": 0.03894,
+        "other_inf": null
+    },
+    {
+        "algorithm": "Use a smooth normalized-fit term that peaks on near-exact placements, combine it with a future-use retention bonus for larger remaining capacities, and apply a mild occupancy penalty to prefer reusing bins without sacrificing flexibility.",
+        "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"Score each bin for assigning the current item. Higher score = preferred bin.\n\n    Args:\n        item: size of the current item to assign\n        bins: remaining capacities of feasible bins (all >= item size)\n    Returns:\n        scores: priority scores for each bin\n    \"\"\"\n    bins = bins.astype(float)\n    slack = bins - float(item)\n\n    # Normalized fit quality: highest near a tight fit, declines smoothly as slack grows\n    fit_quality = 1.0 / (1.0 + slack / (item + 1.0))\n    fit_peak = np.exp(-0.35 * slack)\n\n    # Retain flexibility in larger bins, but keep the effect subdominant\n    reuse_bonus = np.sqrt(bins / (item + 1.0))\n\n    # Mild pressure toward using bins that are already less roomy\n    occupancy_pressure = np.log1p(bins - slack + 1.0)\n\n    scores = 2.2 * fit_quality + 1.4 * fit_peak + 0.6 * reuse_bonus - 0.18 * occupancy_pressure\n    return scores",
+        "objective": 0.03974,
+        "other_inf": null
+    },
+    {
+        "algorithm": "Score feasible bins by combining tight-fit preference with a compactness bonus that favors bins likely to stay reusable, using a smooth penalty for leftover slack and a small bias toward already tighter bins.",
+        "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"Score each bin for assigning the current item. Higher score = preferred bin.\n\n    Args:\n        item: size of the current item to assign\n        bins: remaining capacities of feasible bins (all >= item size)\n    Returns:\n        scores: priority scores for each bin\n    \"\"\"\n    bins = np.asarray(bins, dtype=float)\n    leftover = bins - float(item)\n\n    fit = -leftover\n    compactness = -leftover * leftover\n    reuse_bias = -bins\n\n    scores = 3.0 * fit + 2.0 * compactness + 0.25 * reuse_bias\n    return scores",
+        "objective": 0.03984,
+        "other_inf": null
+    },
+    {
+        "algorithm": "Use a smooth rank-based score that rewards near-tight fits, favors bins whose post-placement slack lands near a moderate target, and adds a small reuse preference for bins with less remaining capacity.",
+        "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"Score each bin for assigning the current item. Higher score = preferred bin.\n\n    Args:\n        item: size of the current item to assign\n        bins: remaining capacities of feasible bins (all >= item size)\n    Returns:\n        scores: priority scores for each bin\n    \"\"\"\n    bins = np.asarray(bins, dtype=float)\n    slack = bins - float(item)\n\n    # Smooth tight-fit term: highest when slack is small, but not singular.\n    tight = np.exp(-slack / (item + 1.0))\n\n    # Prefer post-placement slack near a moderate target to avoid wasting too much space.\n    target = 0.35 * (bins.mean() + 1.0)\n    balance = np.exp(-np.abs(slack - target) / (target + 1.0))\n\n    # Small reuse bias toward smaller remaining bins so large bins stay available.\n    reuse = 1.0 / (1.0 + bins)\n\n    return 2.2 * tight + 1.4 * balance + 0.25 * reuse",
+        "objective": 0.04004,
+        "other_inf": null
+    },
+    {
+        "algorithm": "Rank bins by a normalized residual-shape score that combines post-placement slack ratio, a centered spread penalty, and a discrete preference for exact or near-exact fills so the chosen bin is the one that best preserves future packing options while still absorbing the item tightly.",
+        "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"Score each bin for assigning the current item. Higher score = preferred bin.\n\n    Args:\n        item: size of the current item to assign\n        bins: remaining capacities of feasible bins (all >= item size)\n    Returns:\n        scores: priority scores for each bin\n    \"\"\"\n    bins = np.asarray(bins, dtype=float)\n    residual = bins - float(item)\n\n    capacity_scale = np.maximum(bins, 1.0)\n    slack_ratio = residual / capacity_scale\n\n    mean_residual = np.mean(residual)\n    spread_penalty = np.abs(residual - mean_residual) / (1.0 + mean_residual)\n\n    exact_fill_bonus = np.where(residual == 0.0, 1.0, 0.0)\n    near_fill_bonus = np.where(residual <= 2.0, 1.0 / (1.0 + residual), 0.0)\n\n    scores = (\n        -2.2 * slack_ratio\n        -1.4 * spread_penalty\n        + 1.8 * exact_fill_bonus\n        + 0.9 * near_fill_bonus\n    )\n\n    return scores",
+        "objective": 0.2454,
+        "other_inf": null
+    },
+    {
+        "algorithm": "Rank feasible bins by a normalized tight-fit term, a centralization term that prefers medium residual space, and a small age-like reuse bias so the chosen bin remains useful for later items.",
+        "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"Score each bin for assigning the current item. Higher score = preferred bin.\n\n    Args:\n        item: size of the current item to assign\n        bins: remaining capacities of feasible bins (all >= item size)\n    Returns:\n        scores: priority scores for each bin\n    \"\"\"\n    bins = np.asarray(bins, dtype=float)\n    leftover = bins - float(item)\n\n    fit = -leftover / (bins + 1.0)\n    centrality = -np.abs(leftover - np.mean(leftover))\n    reuse_bias = -np.log1p(bins)\n\n    scores = 4.0 * fit + 1.5 * centrality + 0.2 * reuse_bias\n    return scores",
+        "objective": 0.59755,
+        "other_inf": null
+    },
+    {
+        "algorithm": "Score bins by a balance of tight-fit preference and future flexibility, using a nonlinear closeness term plus a capacity-preservation term so the item is placed in the bin that fits best while leaving larger bins available for later items.",
+        "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"Score each bin for assigning the current item. Higher score = preferred bin.\n\n    Args:\n        item: size of the current item to assign\n        bins: remaining capacities of feasible bins (all >= item size)\n    Returns:\n        scores: priority scores for each bin\n    \"\"\"\n    bins = bins.astype(float)\n    slack = bins - item\n\n    # Prefer tighter fits strongly, but keep some preference for larger leftover capacity\n    tight_fit = 1.0 / (1.0 + slack)\n    preserve_capacity = bins / (item + 1.0)\n\n    # Nonlinear blend: tight fit dominates, capacity preservation breaks ties\n    scores = 2.5 * tight_fit + 0.75 * np.sqrt(preserve_capacity)\n\n    # Small penalty for overly large bins to encourage bin reuse\n    scores -= 0.15 * np.log1p(bins)\n\n    return scores",
+        "objective": 0.69081,
+        "other_inf": null
+    }
+]

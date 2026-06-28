@@ -1,0 +1,6 @@
+{
+    "algorithm": "Rank bins by a three-part score that combines a normalized post-placement fit bonus, an asymmetric penalty for leaving medium slack, and a soft preference for preserving larger bins when the current item would otherwise fragment capacity.",
+    "code": "def score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"Score each bin for assigning the current item. Higher score = preferred bin.\n\n    Args:\n        item: size of the current item to assign\n        bins: remaining capacities of feasible bins (all >= item size)\n    Returns:\n        scores: priority scores for each bin\n    \"\"\"\n    b = bins.astype(float)\n    item_f = float(item)\n    remaining = b - item_f\n\n    fit = item_f / (b + 1e-9)\n    slack = remaining / (b + 1e-9)\n\n    near_tight = np.exp(-22.0 * np.maximum(slack, 0.0))\n    mid_slack_penalty = np.exp(-((slack - 0.18) / 0.09) ** 2)\n    capacity_preserve = np.log1p(b) / (1.0 + item_f)\n\n    return 2.1 * fit + 1.8 * near_tight - 1.3 * mid_slack_penalty + 0.7 * capacity_preserve",
+    "objective": 0.02696,
+    "other_inf": null
+}

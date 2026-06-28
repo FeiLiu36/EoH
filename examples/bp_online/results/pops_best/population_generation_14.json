@@ -1,0 +1,6 @@
+{
+    "algorithm": "Rank feasible bins by a softened tight-fit gain, a bell-shaped preference for moderate leftover space, and a light smoothness penalty that nudges choices away from repeatedly draining the same capacity scale.",
+    "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"Score each bin for assigning the current item. Higher score = preferred bin.\n\n    Args:\n        item: size of the current item to assign\n        bins: remaining capacities of feasible bins (all >= item size)\n    Returns:\n        scores: priority scores for each bin\n    \"\"\"\n    bins = bins.astype(float)\n    slack = bins - float(item)\n\n    cap_scale = np.maximum(np.percentile(bins, 90), 1.0)\n    fit_gain = np.log1p(1.0 / (1.0 + slack))\n    mid_slack = 0.42 * cap_scale\n    slack_width = 0.18 * cap_scale + 1.0\n    balance_bonus = np.exp(-0.5 * ((slack - mid_slack) / slack_width) ** 2)\n    smooth_penalty = np.sqrt(bins / (cap_scale + 1.0))\n\n    scores = 2.4 * fit_gain + 0.9 * balance_bonus - 0.22 * smooth_penalty\n    return scores",
+    "objective": 0.01227,
+    "other_inf": null
+}

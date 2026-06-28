@@ -8,6 +8,7 @@
 import time
 import sys
 import os
+import random
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -17,88 +18,152 @@ from eoh import BaseProblem
 from get_instance import GetData
 
 
-# ── FSSP primitives ────────────────────────────────────────────────────────────
-
-def _makespan(order, tasks):
-    """Compute makespan for a job permutation on a flow-shop."""
-    n_machines = tasks.shape[1]
-    c = np.zeros(n_machines)
-    for job in order:
-        c[0] += tasks[job, 0]
-        for k in range(1, n_machines):
-            if c[k] < c[k - 1]:
-                c[k] = c[k - 1]
-            c[k] += tasks[job, k]
-    return float(c[-1])
+# ── FSSP / GLS engine (pure-Python port of the original numba implementation) ───
 
 
-def _neh(tasks):
-    """NEH constructive heuristic — good initial solution for FSSP."""
-    n_jobs = len(tasks)
-    order = np.argsort(-tasks.sum(axis=1)).tolist()
-    seq = [order[0]]
-    for i in range(1, n_jobs):
-        best_pos, best_c = 0, float('inf')
-        for j in range(i + 1):
-            s = seq[:j] + [order[i]] + seq[j:]
-            c = _makespan(s, tasks)
-            if c < best_c:
-                best_c = c
-                best_pos = j
-        seq.insert(best_pos, order[i])
-    return seq, _makespan(seq, tasks)
+def makespan(order, tasks, machines_val):
+    times = [0] * machines_val
+    for j in order:
+        times[0] += tasks[j][0]
+        for k in range(1, machines_val):
+            if times[k] < times[k - 1]:
+                times[k] = times[k - 1]
+            times[k] += tasks[j][k]
+    return max(times)
 
 
-def _local_search(seq, tasks, t_end=None):
-    """Swap + insert local search until no improving move (with optional time cap)."""
-    best = seq[:]
-    best_c = _makespan(best, tasks)
-    improved = True
-    while improved:
-        if t_end and time.time() > t_end:
-            break
-        improved = False
-        n = len(best)
-        for i in range(n):
-            for j in range(i + 1, n):
-                s = best[:]
-                s[i], s[j] = s[j], s[i]
-                c = _makespan(s, tasks)
-                if c < best_c - 1e-10:
-                    best, best_c, improved = s, c, True
-        for i in range(n):
-            job = best[i]
-            for j in range(n):
-                if i == j:
-                    continue
-                s = best[:]
-                s.pop(i)
-                s.insert(j, job)
-                c = _makespan(s, tasks)
-                if c < best_c - 1e-10:
-                    best, best_c, improved = s, c, True
-    return best, best_c
+def local_search(sequence, cmax_old, tasks, machines_val):
+    """One sweep of swap + insert moves (best-accept within the sweep)."""
+    new_seq = sequence[:]
+    for i in range(len(new_seq)):
+        for j in range(i + 1, len(new_seq)):
+            temp_seq = new_seq[:]
+            temp_seq[i], temp_seq[j] = temp_seq[j], temp_seq[i]
+            cmax = makespan(temp_seq, tasks, machines_val)
+            if cmax < cmax_old:
+                new_seq = temp_seq[:]
+                cmax_old = cmax
+
+    for i in range(1, len(new_seq)):
+        for j in range(1, len(new_seq)):
+            temp_seq = new_seq[:]
+            temp_seq.remove(i)
+            temp_seq.insert(j, i)
+            cmax = makespan(temp_seq, tasks, machines_val)
+            if cmax < cmax_old:
+                new_seq = temp_seq[:]
+                cmax_old = cmax
+
+    return new_seq
 
 
-def _local_search_targeted(seq, tasks, jobs):
-    """Insert-only local search restricted to the given job indices."""
-    best = seq[:]
-    best_c = _makespan(best, tasks)
-    n = len(best)
-    for job in jobs:
-        if job not in best:
-            continue
-        i = best.index(job)
-        for j in range(n):
-            if i == j:
-                continue
-            s = best[:]
-            s.pop(i)
-            s.insert(j, job)
-            c = _makespan(s, tasks)
-            if c < best_c - 1e-10:
-                best, best_c = s, c
-    return best, best_c
+def local_search_perturb(sequence, cmax_old, tasks, machines_val, job):
+    """Targeted swap + insert moves restricted to the perturbed jobs."""
+    new_seq = sequence[:]
+    for i in job:
+        for j in range(i + 1, len(new_seq)):
+            temp_seq = new_seq[:]
+            temp_seq[i], temp_seq[j] = temp_seq[j], temp_seq[i]
+            cmax = makespan(temp_seq, tasks, machines_val)
+            if cmax < cmax_old:
+                new_seq = temp_seq[:]
+                cmax_old = cmax
+
+    for i in job:
+        for j in range(1, len(new_seq)):
+            temp_seq = new_seq[:]
+            temp_seq.remove(i)
+            temp_seq.insert(j, i)
+            cmax = makespan(temp_seq, tasks, machines_val)
+            if cmax < cmax_old:
+                new_seq = temp_seq[:]
+                cmax_old = cmax
+
+    return new_seq
+
+
+def sum_and_order(tasks_val, machines_val, tasks):
+    """Order jobs by descending total processing time (NEH ordering)."""
+    tab = [0] * tasks_val
+    tab1 = [0] * tasks_val
+    for j in range(tasks_val):
+        for k in range(machines_val):
+            tab[j] += tasks[j][k]
+    place = 0
+    it = 0
+    while it != tasks_val:
+        max_time = 1
+        for i in range(tasks_val):
+            if max_time < tab[i]:
+                max_time = tab[i]
+                place = i
+        tab[place] = 1
+        tab1[it] = place
+        it += 1
+    return tab1
+
+
+def neh(tasks, machines_val, tasks_val):
+    """NEH constructive heuristic."""
+    order = sum_and_order(tasks_val, machines_val, tasks)
+    current_seq = [order[0]]
+    for i in range(1, tasks_val):
+        min_cmax = float("inf")
+        best_seq = None
+        for j in range(0, i + 1):
+            tmp = current_seq[:]
+            tmp.insert(j, order[i])
+            cmax_tmp = makespan(tmp, tasks, machines_val)
+            if min_cmax > cmax_tmp:
+                best_seq = tmp
+                min_cmax = cmax_tmp
+        current_seq = best_seq
+    return current_seq, makespan(current_seq, tasks, machines_val)
+
+
+def gls(tasks_val, tasks, machines_val, time_max, iter_max, heuristic):
+    """Guided local search for one flow-shop instance; returns best makespan."""
+    cmax_best = 1E10
+    random.seed(2024)
+    try:
+        pi, cmax = neh(tasks, machines_val, tasks_val)
+        n = len(pi)
+
+        pi_best = pi
+        cmax_best = cmax
+        n_itr = 0
+        time_start = time.time()
+        while time.time() - time_start < time_max and n_itr < iter_max:
+            piprim = local_search(pi, cmax, tasks, machines_val)
+
+            pi = piprim
+            cmax = makespan(pi, tasks, machines_val)
+
+            if cmax < cmax_best:
+                pi_best = pi
+                cmax_best = cmax
+
+            tasks_perturb, jobs = heuristic(pi, tasks.copy(), machines_val, n)
+            jobs = list(jobs)
+
+            if len(jobs) <= 1:
+                return 1E10
+            if len(jobs) > 5:
+                jobs = jobs[:5]
+
+            cmax = makespan(pi, tasks_perturb, machines_val)
+
+            pi = local_search_perturb(pi, cmax, tasks_perturb, machines_val, jobs)
+
+            n_itr += 1
+            if n_itr % 50 == 0:
+                pi = pi_best
+                cmax = cmax_best
+
+    except Exception:
+        cmax_best = 1E10
+
+    return cmax_best
 
 
 class FSSPGLS(BaseProblem):
@@ -106,13 +171,14 @@ class FSSPGLS(BaseProblem):
 
     The LLM designs get_matrix_and_jobs, which at each GLS iteration:
       (a) modifies the processing-time matrix to expose bottleneck jobs, and
-      (b) selects 2–5 jobs to perturb via targeted local search.
+      (b) selects 2-5 jobs to perturb via targeted local search.
 
     GLS loop (per iteration):
-      1. Full swap+insert local search on the original times.
+      1. One sweep of swap + insert local search on the original times.
       2. Call get_matrix_and_jobs to get a modified time matrix and perturb list.
-      3. Targeted insert-LS on the modified times, restricted to perturb jobs.
-      4. Record makespan on the *original* times.
+      3. Targeted swap + insert local search on the modified times, restricted
+         to the perturb jobs; evaluate makespan on the *original* times.
+      4. Every 50 iterations restart from the best-so-far sequence.
 
     Fitness: average final makespan across all training instances (lower = better).
     """
@@ -143,57 +209,18 @@ def get_matrix_and_jobs(current_sequence: list, time_matrix: np.ndarray,
         "The goal is to minimise the final makespan."
     )
 
-    def __init__(self, n_jobs: int = 20, n_machines: int = 5,
-                 n_instance: int = 3, iter_max: int = 100, time_max: float = 10.0,
-                 timeout: int = 60, n_processes: int = 1):
+    def __init__(self, n_inst_eva: int = 3, time_max: float = 30.0,
+                 iter_max: int = 1000, timeout: int = 60, n_processes: int = 1):
         super().__init__(timeout=timeout, n_processes=n_processes)
-        self.n_jobs = n_jobs
-        self.n_machines = n_machines
-        self.n_instance = n_instance
-        self.iter_max = iter_max
+        self.n_inst_eva = n_inst_eva
         self.time_max = time_max
-        self.instance_data = GetData(n_instance, n_jobs, n_machines).generate_instances()
-
-    def _gls(self, tasks, heuristic):
-        seq, cmax = _neh(tasks)
-        best_seq, best_cmax = seq[:], cmax
-
-        t_end = time.time() + self.time_max
-        for _ in range(self.iter_max):
-            if time.time() > t_end:
-                break
-
-            # Full LS on original times
-            seq, cmax = _local_search(seq, tasks, t_end)
-            if cmax < best_cmax:
-                best_seq, best_cmax = seq[:], cmax
-
-            # Perturbation via LLM-designed heuristic
-            result = heuristic(seq[:], tasks.copy(), self.n_machines, self.n_jobs)
-            new_matrix, perturb_jobs = result
-            new_matrix = np.asarray(new_matrix, dtype=float)
-
-            # Validate outputs
-            if new_matrix.shape != tasks.shape:
-                continue
-            perturb_jobs = list(perturb_jobs)
-            if len(perturb_jobs) < 2:
-                continue
-            perturb_jobs = [int(j) for j in perturb_jobs[:5]
-                            if 0 <= int(j) < self.n_jobs]
-            if len(perturb_jobs) < 2:
-                continue
-
-            # Targeted LS on modified times
-            seq, _ = _local_search_targeted(seq, new_matrix, perturb_jobs)
-            cmax = _makespan(seq, tasks)          # evaluate on original
-            if cmax < best_cmax:
-                best_seq, best_cmax = seq[:], cmax
-
-        return best_cmax
+        self.iter_max = iter_max
+        self.tasks_val, self.machines_val, self.tasks = GetData(n_inst_eva).load_instances()
 
     def evaluate_program(self, program_str: str, callable_func) -> float | None:
-        makespans = []
-        for tasks in self.instance_data:
-            makespans.append(self._gls(tasks, callable_func))
-        return float(np.mean(makespans))
+        cmax_list = np.zeros(self.n_inst_eva)
+        for i in range(self.n_inst_eva):
+            cmax_list[i] = gls(self.tasks_val[i], self.tasks[i],
+                               self.machines_val[i], self.time_max,
+                               self.iter_max, callable_func)
+        return float(np.mean(cmax_list))

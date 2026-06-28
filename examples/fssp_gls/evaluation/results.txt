@@ -1,0 +1,3 @@
+Avg makespan on 5 t_j20_m5.txt instances:   1259.40   time:    37.4s
+Avg makespan on 5 t_j20_m10.txt instances:   1527.20   time:    77.4s
+Avg makespan on 5 t_j50_m5.txt instances:   2762.80   time:   150.4s

@@ -1,90 +1,86 @@
-import numpy as np
+# Generate the online bin-packing test datasets used by the bp_online example.
+#
+# Item sizes are drawn from 45 * Weibull(shape=3), clipped to [1, capacity] and
+# rounded to integers (mean item size ~40 for capacity 100). Each dataset is a
+# dict {num_items: [[items_instance_1], [items_instance_2], ...]}.
+#
+# Datasets are named "<N>k" where N is the item count in thousands
+# (e.g. test_dataset_10k.pkl holds instances of 10,000 items each).
+#
+# A fixed per-dataset seed makes the committed pickles exactly reproducible:
+# running this script regenerates byte-identical files.
+
+import os
 import pickle
 
-def generate_weibull_dataset(num_instances, num_items, clipping_limit):
-    dataset = {}
+import numpy as np
 
-    for i in range(num_instances):
-        items = []
+HERE = os.path.dirname(os.path.abspath(__file__))
 
-        # Generate random samples from Weibull(45, 3) distribution
-        samples = np.random.weibull(3, num_items) * 45
+# Bins have this capacity; item sizes are clipped to [1, CAPACITY].
+CAPACITY = 100
+# Base seed; each dataset uses BASE_SEED + its index so files are independently
+# reproducible (adding/removing a dataset does not change the others).
+BASE_SEED = 2024
 
-        # Clip the samples at the specified limit
-        samples = np.clip(samples, 1, clipping_limit)
+# (filename, num_instances, num_items)
+DATASETS = [
+    ('training_dataset_5k.pkl', 5, 5000),
+    ('test_dataset_1k.pkl',     5, 1000),
+    ('test_dataset_2k.pkl',     5, 2000),
+    ('test_dataset_5k.pkl',     5, 5000),
+    ('test_dataset_10k.pkl',    5, 10000),
+    ('test_dataset_100k.pkl',   1, 100000),
+]
 
-        # Round the item sizes to the nearest integer
+
+def generate_weibull_dataset(num_instances, num_items, clipping_limit=CAPACITY, seed=None):
+    """Generate `num_instances` instances of `num_items` Weibull-distributed items.
+
+    Returns {num_items: [[items], ...]} with integer item sizes in
+    [1, clipping_limit].
+    """
+    rng = np.random.default_rng(seed)
+    dataset = {num_items: []}
+    for _ in range(num_instances):
+        samples = rng.weibull(3, num_items) * 45        # 45 * Weibull(shape=3)
+        samples = np.clip(samples, 1, clipping_limit)   # keep sizes in [1, cap]
         sizes = np.round(samples).astype(int)
-
-        # Add the items to the instance
-        for size in sizes:
-            items.append(size)
-
-        if num_items not in dataset:
-            dataset[num_items] = []
-
-        dataset[num_items].append(items)
-
+        dataset[num_items].append(sizes.tolist())
     return dataset
-    
-def read_dataset_from_file(filename):
-    with open(filename, 'rb') as file:
-        dataset = pickle.load(file)
 
-    transformed_dataset = {}
 
+def read_dataset_from_file(filename, capacity=CAPACITY):
+    """Load a test pickle into the {"Weibull Nk": {test_i: {...}}} format."""
+    with open(filename, 'rb') as f:
+        dataset = pickle.load(f)
+    transformed = {}
     for num_items, instances in dataset.items():
-        transformed_dataset[f"Weibull {num_items}k"] = {}
-        for instance_num, items in enumerate(instances, 1):
-            instance_name = f"test_{instance_num}"
-            instance_data = {
-                "capacity": 100,
+        label = f"Weibull {num_items // 1000}k"
+        transformed[label] = {
+            f"test_{i}": {
+                "capacity": capacity,
                 "num_items": num_items,
-                "items": items
+                "items": items,
             }
-            transformed_dataset[f"Weibull {num_items}k"][instance_name] = instance_data
-
-    return transformed_dataset
-
-# Generate training dataset with 5 instances and 5,000 items
-training_dataset = generate_weibull_dataset(5, 5000, 100)
-
-# Generate validation dataset with 5 instances and 5,000 items
-validation_dataset = generate_weibull_dataset(5, 5000, 100)
-
-# Generate test dataset with 5 instances and 5,000 items
-test_dataset_05k = generate_weibull_dataset(5, 1000, 100)
+            for i, items in enumerate(instances, 1)
+        }
+    return transformed
 
 
-# Generate test dataset with 5 instances and 5,000 items
-test_dataset_1k = generate_weibull_dataset(5, 2000, 100)
-
-# Generate test dataset with 5 instances and 5,000 items
-test_dataset_5k = generate_weibull_dataset(5, 5000, 100)
-
-# Generate test dataset with 5 instances and 10,000 items
-test_dataset_10k = generate_weibull_dataset(5, 10000, 100)
-
-# Generate test dataset with 1 instance and 100,000 items
-test_dataset_100k = generate_weibull_dataset(1, 100000, 100)
-
-# Write datasets to pickle files
 def write_dataset_to_file(dataset, filename):
-    with open(filename, 'wb') as file:
-        pickle.dump(dataset, file)
-
-write_dataset_to_file(training_dataset, 'training_dataset_5k.pkl')
-#write_dataset_to_file(validation_dataset, 'validation_dataset.pkl')
-#write_dataset_to_file(test_dataset_05k, 'test_dataset_1k.pkl')
-#write_dataset_to_file(test_dataset_1k, 'test_dataset_2k.pkl')
-#write_dataset_to_file(test_dataset_5k, 'test_dataset_5k.pkl')
-#write_dataset_to_file(test_dataset_10k, 'test_dataset_10k.pkl')
-#write_dataset_to_file(test_dataset_100k, 'test_dataset_100k.pkl')
+    with open(filename, 'wb') as f:
+        pickle.dump(dataset, f)
 
 
-#test_dataset_5k = read_dataset_from_file('test_dataset_5k.pkl')
-#test_dataset_10k = read_dataset_from_file('test_dataset_10k.pkl')
-#test_dataset_100k = read_dataset_from_file('test_dataset_100k.pkl')
-print(test_dataset_5k)
+def main():
+    for idx, (filename, n_inst, n_items) in enumerate(DATASETS):
+        dataset = generate_weibull_dataset(n_inst, n_items, seed=BASE_SEED + idx)
+        write_dataset_to_file(dataset, os.path.join(HERE, filename))
+        flat = np.concatenate([np.asarray(x) for x in dataset[n_items]])
+        print(f'{filename:24} instances={n_inst:>2} items/inst={n_items:>6} '
+              f'range=[{flat.min()},{flat.max()}] mean={flat.mean():.2f}')
 
 
+if __name__ == '__main__':
+    main()

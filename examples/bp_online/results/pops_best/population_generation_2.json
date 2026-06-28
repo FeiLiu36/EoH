@@ -1,0 +1,6 @@
+{
+    "algorithm": "Prefer bins whose post-placement leftover is small, proportionate to the bin\u2019s current capacity, and aligned with a reusable leftover profile rather than an awkward fragment.",
+    "code": "import numpy as np\n\ndef score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"Score each bin for assigning the current item. Higher score = preferred bin.\n\n    Args:\n        item: size of the current item to assign\n        bins: remaining capacities of feasible bins (all >= item size)\n    Returns:\n        scores: priority scores for each bin\n    \"\"\"\n    bins = np.asarray(bins, dtype=float)\n    residual = bins - float(item)\n\n    with np.errstate(divide=\"ignore\", invalid=\"ignore\"):\n        tightness = 1.0 / (1.0 + residual)\n        utilization = float(item) / (bins + 1.0)\n        reuse_shape = np.sin(np.pi * residual / (bins + 1.0)) ** 2\n\n    scores = 2.6 * tightness + 1.7 * utilization - 1.2 * reuse_shape\n    return scores",
+    "objective": 0.03894,
+    "other_inf": null
+}

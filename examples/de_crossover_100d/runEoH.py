@@ -22,12 +22,13 @@ if __name__ == "__main__":
         F=0.8,             # DE scale factor
         CR=0.9,            # base crossover rate passed to the evolved operator
         timeout=60,        # per-candidate evaluation timeout (seconds)
-        n_processes=4,     # parallel candidate evaluations
     )
 
     eoh = EoH(
         llm=llm,
         problem=task,
+        num_samplers=4,
+        num_evaluators=4,
         pop_size=4,
         n_pop=20,
         operators=['e1', 'e2', 'm1', 'm2'],

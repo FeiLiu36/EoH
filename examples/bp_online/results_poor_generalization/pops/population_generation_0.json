@@ -1,0 +1,8 @@
+[
+    {
+        "algorithm": "Use a compact fit-plus-packing-pressure score that rewards near-tight placements while gently biasing toward bins that are already more constrained, so the item goes to the bin most likely to reduce future fragmentation and bin count.",
+        "code": "def score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"Score each bin for assigning the current item. Higher score = preferred bin.\n\n    Args:\n        item: size of the current item to assign\n        bins: remaining capacities of feasible bins (all >= item size)\n    Returns:\n        scores: priority scores for each bin\n    \"\"\"\n    remaining = bins - item\n    tightness = -remaining.astype(float)\n    pressure = item / (bins.astype(float) + 1e-9)\n    return 0.7 * tightness + 0.3 * pressure",
+        "objective": 0.03984,
+        "other_inf": null
+    }
+]

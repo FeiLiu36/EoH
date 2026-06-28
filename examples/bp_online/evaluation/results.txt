@@ -1,0 +1,11 @@
+
+Excess over L1 lower bound (%, lower is better)
+5 instances per cell; items ~ Weibull, sizes = #items, c = bin capacity
+
+Method                    |  1k_c100 |  5k_c100 | 10k_c100 |  1k_c500 |  5k_c500 | 10k_c500
+-------------------------------------------------------------------------------------------
+Best Fit                  |    4.46% |    4.18% |    4.01% |    0.99% |    0.45% |    0.50%
+First Fit                 |    4.96% |    4.52% |    4.29% |    0.99% |    0.55% |    0.50%
+EoH (original paper)      |    2.63% |    0.67% |    0.55% |    0.99% |    0.45% |    0.35%
+EoH (this code poor gen.) |    3.12% |    0.68% |    0.32% |  208.64% |  210.02% |  210.17%
+EoH (this code)           |    2.53% |    0.75% |    0.52% |    0.74% |    0.45% |    0.37%

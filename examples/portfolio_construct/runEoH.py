@@ -17,12 +17,14 @@ if __name__ == "__main__":
 
     task = PortfolioConstruct(
         n_assets=20, n_select=5, n_periods=252,
-        n_instance=5, timeout=40, n_processes=4,
+        n_instance=5, timeout=40,
     )
 
     eoh = EoH(
         llm=llm,
         problem=task,
+        num_samplers=4,
+        num_evaluators=4,
         pop_size=4,
         n_pop=10,
         operators=['e1', 'e2', 'm1', 'm2'],

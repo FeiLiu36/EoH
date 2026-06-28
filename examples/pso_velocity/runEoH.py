@@ -24,12 +24,13 @@ if __name__ == "__main__":
         c2=1.494,
         v_max_ratio=0.2,
         timeout=60,
-        n_processes=4,
     )
 
     eoh = EoH(
         llm=llm,
         problem=task,
+        num_samplers=4,
+        num_evaluators=4,
         pop_size=4,
         n_pop=10,
         operators=['e1', 'e2', 'm1', 'm2'],

@@ -16,11 +16,13 @@ if __name__ == "__main__":
     )
 
     task = TSPRNR(n_nodes=50, n_instance=5, iter_max=100, time_max=5.0,
-                  timeout=40, n_processes=4)
+                  timeout=40)
 
     eoh = EoH(
         llm=llm,
         problem=task,
+        num_samplers=4,
+        num_evaluators=4,
         pop_size=4,
         n_pop=20,
         operators=['e1', 'e2', 'm1', 'm2'],

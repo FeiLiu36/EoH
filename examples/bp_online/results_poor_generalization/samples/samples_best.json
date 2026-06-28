@@ -1,0 +1,7 @@
+{
+    "sample_order": 1,
+    "operator": "i1",
+    "algorithm": "Use a scarcity-aware fit score that favors the tightest feasible bin while adding a small concentration bonus so bins that are already closer to exhaustion are reused sooner.",
+    "code": "def score(item: int, bins: np.ndarray) -> np.ndarray:\n    \"\"\"Score each bin for assigning the current item. Higher score = preferred bin.\n\n    Args:\n        item: size of the current item to assign\n        bins: remaining capacities of feasible bins (all >= item size)\n    Returns:\n        scores: priority scores for each bin\n    \"\"\"\n    bins = np.asarray(bins, dtype=float)\n    residual = bins - float(item)\n\n    # Prefer tighter fits, then bins that are already closer to being filled.\n    fit_score = -residual\n    scarcity_bonus = 1.0 / (bins + 1.0)\n\n    return fit_score + scarcity_bonus",
+    "objective": 0.03984
+}

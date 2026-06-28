@@ -12,16 +12,30 @@ import re
 import sys
 import signal
 import logging
+import threading
 import warnings
 import multiprocessing
 
 import numpy as np
-from joblib import Parallel, delayed
+
+# joblib powers only the legacy generation-batch path (get_algorithm) and
+# parallel seed evaluation. The async pipeline in eoh.py does not use it, so the
+# dependency is optional — import lazily and fall back to sequential if absent.
+try:
+    from joblib import Parallel, delayed
+except ImportError:  # pragma: no cover
+    Parallel = delayed = None
 
 # spawn: safe on all platforms, no background server started at import time.
 # forkserver would start a server process at module import, which breaks when
 # evolution.py is re-imported inside joblib's loky worker processes.
 _MP_CTX = multiprocessing.get_context('spawn')
+
+# Serialises the (rare) global set_start_method call below so concurrent eval
+# threads can never race on it. In the async pipeline the start method is set
+# once in the main thread, so this branch is normally never taken; the lock only
+# matters for the legacy joblib/loky seed path.
+_START_METHOD_LOCK = threading.Lock()
 
 logger = logging.getLogger('eoh')
 
@@ -41,6 +55,32 @@ def _eval_worker(queue, problem, code):
         queue.put(None)
 
 
+def _kill_process_tree(p):
+    """Hard-stop a timed-out eval process and any children, escalating to SIGKILL.
+
+    On Unix _eval_worker called os.setsid(), so the eval and any compiler/runner
+    children share a process group we can signal as a unit. We try SIGTERM first,
+    then escalate to SIGKILL, and bound every join so a subprocess that ignores
+    SIGTERM can never hang the calling eval thread indefinitely.
+    """
+    pid = p.pid
+
+    def _signal_group(sig):
+        if sys.platform != 'win32' and pid is not None:
+            try:
+                os.killpg(os.getpgid(pid), sig)
+            except (ProcessLookupError, PermissionError, OSError):
+                pass
+
+    _signal_group(signal.SIGTERM)
+    p.terminate()
+    p.join(5)
+    if p.is_alive():
+        _signal_group(signal.SIGKILL)
+        p.kill()
+        p.join(5)
+
+
 def _eval_with_timeout(problem, code, timeout):
     """Run evaluate() in a subprocess and enforce a hard per-eval timeout.
 
@@ -53,21 +93,17 @@ def _eval_with_timeout(problem, code, timeout):
     # child calls set_start_method('loky', force=True) — which fails in a fresh
     # interpreter where loky is not registered.  Force 'spawn' before creating
     # the subprocess; each loky worker is an isolated OS process so this only
-    # affects the current worker, not the main process or other workers.
-    if multiprocessing.get_start_method(allow_none=False) != 'spawn':
-        multiprocessing.set_start_method('spawn', force=True)
+    # affects the current worker, not the main process or other workers.  The
+    # lock makes the (rare) global mutation safe under the threaded eval pool.
+    with _START_METHOD_LOCK:
+        if multiprocessing.get_start_method(allow_none=False) != 'spawn':
+            multiprocessing.set_start_method('spawn', force=True)
     q = _MP_CTX.Queue()
     p = _MP_CTX.Process(target=_eval_worker, args=(q, problem, code))
     p.start()
     p.join(timeout)
     if p.is_alive():
-        if sys.platform != 'win32':
-            try:
-                os.killpg(os.getpgid(p.pid), signal.SIGTERM)
-            except (ProcessLookupError, PermissionError):
-                pass
-        p.terminate()
-        p.join()
+        _kill_process_tree(p)
         return None
     try:
         return q.get_nowait()
@@ -310,21 +346,37 @@ class Evolution:
 
         return parents, code, algorithm
 
+    # ── code generation (no evaluation) ───────────────────────────────────────
+
+    def generate_code(self, population: list, operator: str):
+        """LLM generation + duplicate-retry, WITHOUT evaluation.
+
+        Returns (parents, code, algorithm), or (None, None, None) on failure.
+        This is the producer half used by the async pipeline: evaluation is run
+        separately on the evaluation pool so LLM I/O and CPU-bound evaluation
+        scale independently of each other and of pop_size.
+        """
+        parents, code, algorithm = self._generate(population, operator)
+        if code is None:
+            return None, None, None
+
+        n_retry = 0
+        while self._is_duplicate(population, code) and n_retry < 2:
+            logger.debug("  [offspring] duplicate — retrying...")
+            _, code, algorithm = self._generate(population, operator)
+            if code is None:
+                return None, None, None
+            n_retry += 1
+
+        return parents, code, algorithm
+
     # ── single offspring ──────────────────────────────────────────────────────
 
     def get_offspring(self, population: list, operator: str):
         try:
-            parents, code, algorithm = self._generate(population, operator)
+            parents, code, algorithm = self.generate_code(population, operator)
             if code is None:
                 return None, None
-
-            n_retry = 0
-            while self._is_duplicate(population, code) and n_retry < 2:
-                logger.debug("  [offspring] duplicate — retrying...")
-                _, code, algorithm = self._generate(population, operator)
-                if code is None:
-                    return None, None
-                n_retry += 1
 
             # Always isolate evaluation in a subprocess so a per-eval hard timeout
             # applies consistently in both sequential and parallel modes.
@@ -364,7 +416,7 @@ class Evolution:
         timeouts are enforced without a batch-level timeout. On any Parallel()
         failure the call falls back to sequential so no offspring are silently lost.
         """
-        if self.n_processes == 1:
+        if self.n_processes == 1 or Parallel is None:
             results = [self.get_offspring(population, op) for op in operators]
         else:
             try:
@@ -384,7 +436,7 @@ class Evolution:
     def evaluate_seeds(self, seeds: list) -> list:
         _timeout = self.timeout
         _problem = self.interface_eval
-        if self.n_processes == 1:
+        if self.n_processes == 1 or Parallel is None:
             fitness_list = [
                 _eval_with_timeout(_problem, s['code'], _timeout) for s in seeds
             ]

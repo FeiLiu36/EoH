@@ -15,11 +15,13 @@ if __name__ == "__main__":
         timeout=150,
     )
 
-    task = CVRPCONST(n_customers=50, capacity=40, n_instance=16, timeout=40, n_processes=4)
+    task = CVRPCONST(n_customers=50, capacity=40, n_instance=16, timeout=40)
 
     eoh = EoH(
         llm=llm,
         problem=task,
+        num_samplers=4,
+        num_evaluators=4,
         pop_size=4,
         n_pop=20,
         operators=['e1', 'e2', 'm1', 'm2'],
