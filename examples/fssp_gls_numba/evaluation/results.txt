@@ -1,0 +1,15 @@
+FSSP-GLS evaluation on 11 Taillard datasets, 10 instances each, 10s / 1000 iters per instance, 8 parallel workers
+gap = (makespan / best-known upper bound - 1) * 100%, averaged per dataset (lower = better)
+dataset       jobs  mach    n  avg makespan  avg gap to UB   s/inst
+t_j20_m5        20     5   10       1235.40         1.064%     0.4s
+t_j20_m10       20    10   10       1536.50         1.515%     0.4s
+t_j20_m20       20    20   10       2272.60         1.671%     0.7s
+t_j50_m5        50     5   10       2740.70         0.159%     2.8s
+t_j50_m10       50    10   10       3059.00         2.041%     4.4s
+t_j50_m20       50    20   10       3822.50         2.451%     8.7s
+t_j100_m5      100     5   10       5253.50         0.127%    10.2s
+t_j100_m10     100    10   10       5674.50         0.791%    10.2s
+t_j100_m20     100    20   10       6466.00         1.623%    10.2s
+t_j200_m10     200    10   10      10731.00         0.542%    11.4s
+t_j200_m20     200    20   10      11531.30         1.386%    11.7s
+all                       110                       1.215%    (total wall time 138.7s)

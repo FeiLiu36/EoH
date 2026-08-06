@@ -308,7 +308,7 @@ The table below lists all 33 example tasks included in the `examples/` directory
 | `ale_pong` | Evolve an action-selection heuristic for an Atari Pong agent. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/ale_pong) | Requires ALE |
 | `bbob_metaheuristic` | Design a complete single-objective metaheuristic for continuous black-box optimization. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/bbob_metaheuristic) | Class template |
 | `bo_acquisition` | Design an acquisition function for Bayesian Optimization to guide candidate selection. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/bo_acquisition) | |
-| `bp_online` | Design a bin-scoring function for online bin packing to minimise the number of used bins. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/bp_online) | EoH paper benchmark |
+| `bp_online` | Design a bin-scoring function for online bin packing to minimise the number of used bins. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/bp_online) | **Used in Original EoH paper** |
 | `cmaes_cov_update` | Design a covariance matrix update rule for CMA-ES on 10-D benchmarks. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/cmaes_cov_update) | |
 | `cvrp_construct` | Design a greedy constructive heuristic for the Capacitated Vehicle Routing Problem. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/cvrp_construct) | |
 | `de_crossover_100d` | Design an adaptive crossover operator for Differential Evolution at 100 dimensions. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/de_crossover_100d) | High-dimensional |
@@ -317,6 +317,7 @@ The table below lists all 33 example tasks included in the `examples/` directory
 | `es_step_size` | Design a step-size adaptation rule for (1+λ)-Evolution Strategy. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/es_step_size) | |
 | `evo_dynamic` | Design a population response strategy for dynamic optimization under periodic environment changes. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/evo_dynamic) | Dynamic environment |
 | `fssp_gls` | Design a guided local search perturbation for flow-shop scheduling to minimise makespan. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/fssp_gls) | |
+| `fssp_gls_numba` | Design a guided local search perturbation for flow-shop scheduling to minimise makespan. Use numba for speed up. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/fssp_gls_numba) | **Used in Original EoH paper** |
 | `gnn_aggregation` | Design a neighborhood aggregation function for GNN node classification. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/gnn_aggregation) | Requires PyTorch |
 | `large_scale_es` | Design diagonal variance adaptation for separable CMA-ES at 100 dimensions. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/large_scale_es) | High-dimensional |
 | `mobbob_metaheuristic` | Design a multi-objective metaheuristic to maximise hypervolume on 2-objective BBOB. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/mobbob_metaheuristic) | Multi-objective; class template |
@@ -330,10 +331,11 @@ The table below lists all 33 example tasks included in the `examples/` directory
 | `sa_acceptance` | Design an acceptance probability function for Simulated Annealing on 10-D benchmarks. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/sa_acceptance) | |
 | `tabu_tsp` | Design a move-scoring function for Tabu Search with 2-opt moves on TSP. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/tabu_tsp) | |
 | `tpe_bandwidth` | Design an observation-weighting function for Optuna's Tree-structured Parzen Estimator. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/tpe_bandwidth) | Uses Optuna |
-| `tsp_construct` | Design a next-node selection heuristic for greedy TSP tour construction. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/tsp_construct) | EoH paper benchmark |
+| `tsp_construct` | Design a next-node selection heuristic for greedy TSP tour construction. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/tsp_construct) |  |
 | `tsp_construct_class` | Design a TSP constructive heuristic as a class with a `select_next_node` method. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/tsp_construct_class) | Class template example |
 | `tsp_construct_multifunction` | Design two cooperating functions (node scoring + selection) for TSP construction. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/tsp_construct_multifunction) | Multi-function template example |
 | `tsp_gls` | Design an edge-distance update strategy for TSP Guided Local Search. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/tsp_gls) | |
+| `tsp_gls_numba` | Design an edge-distance update strategy for TSP Guided Local Search. Use numba for speed up.| [code](https://github.com/FeiLiu36/EOH/tree/main/examples/tsp_gls_numba) | **Used in original EoH paper**|
 | `tsp_rnr` | Design a destroy operator (node selection) for a ruin-and-recreate TSP algorithm. | [code](https://github.com/FeiLiu36/EOH/tree/main/examples/tsp_rnr) | |
 
 

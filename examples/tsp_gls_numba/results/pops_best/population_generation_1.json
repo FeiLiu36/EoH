@@ -1,0 +1,6 @@
+{
+    "algorithm": "Instead of penalizing edges in the current tour, we reward edges not in the tour by temporarily reducing their effective distances, making them more attractive for 2-opt moves and thus steering the search toward unexplored solutions.",
+    "code": "def update_edge_distance(edge_distance: np.ndarray, local_opt_tour: np.ndarray,\n                          edge_n_used: np.ndarray) -> np.ndarray:\n    n = edge_distance.shape[0]\n    updated = edge_distance.copy()\n    reward_factor = 0.2\n    tour_edges = set()\n    for i in range(n):\n        u = local_opt_tour[i]\n        v = local_opt_tour[(i + 1) % n]\n        tour_edges.add((u, v))\n        tour_edges.add((v, u))\n    for i in range(n):\n        for j in range(i + 1, n):\n            if (i, j) not in tour_edges:\n                reward = reward_factor * edge_distance[i, j] / (1 + edge_n_used[i, j])\n                updated[i, j] = max(0, edge_distance[i, j] - reward)\n                updated[j, i] = updated[i, j]\n    return updated",
+    "objective": 5.77955,
+    "other_inf": null
+}
